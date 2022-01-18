@@ -1,0 +1,71 @@
+<html><head>
+<style type="text/css">
+table { border-collapse:collapse; border-spacing: 0px; margin: 0px; font-size:9px; }
+table>tbody>tr>td { border-collapse:collapse; border-spacing: 0px; padding: 2px; margin: 0px; }
+.pdfField { font-weight:bold; }
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body style="border:0; margin: 0;">
+<div style="width:100%;">
+    {* Entete *}
+    <table style="width:100%;">
+        <tr>
+            <td style="width:75px;text-decoration:underline;">
+                <img src="{ATF::$staticserver}images/logos/absystech.jpg" />
+            </td>
+            <td valign="middle" style="text-align:center;font-weight:bold;text-decoration:underline;font-size:16px;">
+                RECAPITULATIF HOTLINE {ATF::societe()->select($id_societe,"societe")|upper} du {$date_debut} au {$date_fin}
+            </td>
+        </tr>
+    </table>
+	{$nb_hotline=60}
+	{$total_nb_tickets=0}
+	{*$solde=ATF::societe()->getSolde($id_societe,util::formatDate($date_debut))*}
+	{foreach from=$tickets item=ticket}
+		{if $ticket@index % $nb_hotline == 0}
+			<div style="page-break-after:always; margin-top:40px;">
+				<table> 
+					<thead class="pdfField">
+						<tr>
+							<td>N°</td>
+							<td>Résumé</td>
+							<td>Date</td>
+							<td>Votre Contact</td>
+							<td>Contact AbsysTech</td>
+							<td style="width:40px;text-align:right;">Crédits</td>
+							<td style="width:40px;text-align:right;">Solde</td>
+						</tr>
+					</thead>  
+					<tbody>
+		{/if}
+		{$nb_tickets=$ticket.nbre_tickets}
+		{*$nb_tickets=ATF::hotline()->getBillingTime($hotline.id_hotline)*}
+		{*$solde=$solde-$nb_tickets*}
+		{$total_nb_tickets=$total_nb_tickets+$nb_tickets}
+		<tr>
+			<td>{$ticket.id_hotline}</td>
+			<td>{if $ticket.id_hotline}{$ticket.hotline|truncate:70:'...'}{else}<span style="color:blue;font-weight:bold;">Crédit {if $ticket.id_facture}(Facture {ATF::facture()->select($ticket.id_facture,'ref')}){/if}</span>{/if} {$ticket.libelle}</td>
+			<td style="width:60px;">{$ticket.date|date_format:"%d-%m-%Y"}</td>
+			<td>{if !empty($ticket.id_contact)}{ATF::contact()->select($ticket.id_contact,nom)}{/if}</td>
+			<td>{if !empty($ticket.id_user)}{ATF::user()->select($ticket.id_user,nom)}{/if}</td>
+			<td style="width:40px;text-align:right;"><b>{$nb_tickets}</b></td>
+			<td style="width:60px;text-align:right;">{$ticket.solde}</td>
+		</tr>
+		{if $ticket@index % $nb_hotline == ($nb_hotline-1) || $ticket@last}
+					<tfoot>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td><b>Total :</b></td>
+							<td style="text-align:right;"><span style="font-weight:bold;color:red;">{$total_nb_tickets}</span></td>
+							<td style="text-align:right;"><span style="font-weight:bold;color:red;">{$ticket.solde}</span></td>
+						</tr>
+					</tfoot>
+					</tbody> 
+				</table>
+			</div>
+		{/if}
+    {/foreach}
+</div>
+</body></html>

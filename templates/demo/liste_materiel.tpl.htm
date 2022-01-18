@@ -1,0 +1,71 @@
+{if $liste_materiel.id_societe}
+	{$count=ATF::commande()->en_cours($liste_materiel.id_societe,true)}
+{/if}
+
+<div class="liste_materiel">
+    {ATF::$usr->trans('commande','liste_materiel')} ({$count})
+
+    <select name="{$current_class->table}.id_societe" onchange="ATF.tpl2div('commande,UpdateListeMateriel.ajax','id_societe='+this.value);">
+        <option value="">Choisissez une société</option>
+        {html_options options=ATF::commande()->options_societe() selected=$liste_materiel.id_societe}
+    </select>
+    
+    {if $liste_materiel.id_societe}
+        {foreach from=ATF::commande()->en_cours($liste_materiel.id_societe) key=k item=i}
+                {if $liste_materiel.message[$i.id_commande]}
+                        <table>
+                            <tr>
+                                <td><span style="font-size:14; color:#FF0000; font-weight:bold">{$liste_materiel.message[$i.id_commande]}</span></td>
+                            </tr>
+                        </table>
+                    {/if}
+                    <div id="form_case_['liste_materiel'][{$i.id_commande}]">
+                        <table class="std">
+                            <tr style="font-weight:bold">
+                                <td><input type="checkbox" style="width:10px" name="liste_materiel['id_commande'][{$i.id_commande}]" value="{$i.id_commande}" onclick="if (this.checked === true) ATF.tpl2div('commande,UpdateListeMateriel.ajax','id_societe={$liste_materiel.id_societe}&id_commande='+this.value);" {if $liste_materiel.id_commande == $i.id_commande}checked="checked"{/if}/></td>
+                                <td>Commande {$i.ref}&nbsp;{$i.resume}</td>
+                            </tr>
+                        </table>
+                    </div>  
+                    <form name="commande,InsertMaterielStock" action="" method="post" class="maxwidth">
+                        {if $liste_materiel.id_commande == $i.id_commande}	
+                            <table class="std">
+                                {if $liste_materiel.message.quantite}
+                                    <tr>
+                                        <td colspan="5"><span style="font-size:14; color:#FF0000; font-weight:bold">{$liste_materiel.message.quantite}</span></td>
+                                    </tr>
+                                {/if}
+                                <tr style="font-weight:bold">
+                                    {foreach from=ATF::commande()->colonnes_commande_ligne key=key item=item}
+                                        <td>{ATF::$usr->trans($key,$current_class->table)}</td>
+                                    {/foreach}
+                                </tr>
+                                    {foreach from=ATF::commande()->ligne_commande($liste_materiel.id_commande,$liste_materiel.id_societe) key=key item=item}
+                                        {if ATF::commande()->quantite($item.serial,$item.quantite,true) >0}
+                                            <tr onmouseover="this.style.backgroundColor='#FFFFFF';" onmouseout="this.style.backgroundColor='transparent';">
+                                                {foreach from=ATF::commande()->colonnes_commande_ligne key=key_ item=item_}
+                                                    {if $key_ =='quantite'}
+                                                        <td>{html_options name=$item.id_commande_ligne options=ATF::commande()->quantite($item.serial,$item.quantite)}</td>
+                                                    {elseif $key_ =='serial'}
+                                                        <td><input type="text" name="serial_{$item.id_commande_ligne}" value="{$session.commande.post["serial{$item.id_commande_ligne}"]}" style="width:150px" {tip text="Veuillez séparer les numéros par une virgule"}/></td>
+                                                    {else}
+                                                        <td>{$item[$key_]}</td>
+                                                    {/if}
+                                                {/foreach}
+                                            </tr>
+                                        {/if}
+                                    {/foreach}
+                                    <tr>
+                                        <td colspan="4" style="text-align:center">
+                                            <input type="hidden" name="id_commande"  value="{$liste_materiel.id_commande}" />
+                                            <input type="hidden" name="id_societe"  value="{$liste_materiel.id_societe}" />
+                                            <input type="button" name="enrg" id="enrg" value="Enregistrer" onclick="ATF.insert(this.form);" />
+                                        </td>
+                                    </tr>
+                            </table>
+                        {/if}
+                    </form>
+                    <hr />
+            {/foreach}
+    {/if}
+</div>        

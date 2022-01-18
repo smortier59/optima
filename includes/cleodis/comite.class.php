@@ -271,10 +271,8 @@ class comite extends classes_optima {
 			return $this->cryptId($infos["id_comite"]);
 		}else{
 			if(!$tu) $this->move_files($infos["id_comite"],$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$infos["etat"]));
-
-
 			if($infos["etat"]){
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$infos["etat"]));
 				$suivi = array(
 					 "id_user"=>ATF::$usr->get('id_user')
 					,"id_societe"=>$infos['id_societe']
@@ -399,46 +397,61 @@ class comite extends classes_optima {
 	}
 
 	/**
+	 * Permet de retourner si un user peut valider un comité, utilisé dans le template comite-gridpanel-init
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  string $login
+	 */
+	public function canValidComite($login) {
+		ATF::constante()->q->reset()->where("constante", "__USER_VALIDATEUR_COMITE__");
+		$user_validateur_comite = ATF::constante()->select_row();
+		$canValidComite = $user_validateur_comite["valeur"];
+
+		$canValidComite = explode(',', $canValidComite);
+		return in_array($login, $canValidComite);
+
+	}
+
+	/**
 	 * Permet d'interoger Credit Safe et de récupérer les infos de la société
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 * @param  array $infos
 	 */
 	public function getInfosFromCREDITSAFE($infos){
-		$siret = ATF::societe()->select($infos["societe"], "siret");
-		$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
 
-		$xml = simplexml_load_string($res);
+		if(ATF::$codename == "cleodisbe"){
+			$num_ident = ATF::societe()->select($infos["societe"], "num_ident");
+			$res = ATF::societe()->getInfosFromCREDITSAFE(array("num_ident"=>$num_ident, "returnxml"=>"oui"));
+		}else{
+			$siret = ATF::societe()->select($infos["societe"], "siret");
+			$res = ATF::creditsafe()->getInfosCompanyBySiret(str_replace(" ","",$siret));
+		}
 
-		$bi = $xml->xmlresponse->body->company->baseinformation;
-		$s = $xml->xmlresponse->body->company->summary;
-		$b = $xml->xmlresponse->body->company->balancesynthesis;
+		/*
+			foreach ($maison_meres->ultimateparent as $key => $value) {	$mm[] = (string)$value->name; }
 
-		$maison_meres = $s->ultimateparents;
+			if($mm[0]){ $data["maison_mere1"] = $mm[0]; }
+			if($mm[1]){ $data["maison_mere2"] = $mm[1]; }
+			if($mm[2]){ $data["maison_mere3"] = $mm[2]; }
+			if($mm[3]){ $data["maison_mere4"] = $mm[3]; }
+		*/
 
-		foreach ($maison_meres->ultimateparent as $key => $value) {	$mm[] = (string)$value->name; }
+		$data["date_creation"] = $res["date_creation"];
+		$data["date_compte"] =   $res["lastScoreDate"];
 
-		if($mm[0]){ $data["maison_mere1"] = $mm[0]; }
-		if($mm[1]){ $data["maison_mere2"] = $mm[1]; }
-		if($mm[2]){ $data["maison_mere3"] = $mm[2]; }
-		if($mm[3]){ $data["maison_mere4"] = $mm[3]; }
+		$data["note"] = $res["cs_score"];
+		$data["limite"] = $res["cs_avis_credit"];
 
-		$data["date_creation"] = (string)$bi->formationdate;
-		$data["date_compte"] = (string)$bi->lastaccountdate;
-
-		$data["note"] = (string)$s->rating2013;
-		$data["limite"] = (string)$s->creditlimit2013;
-
-		$data["activite"] = (string)$bi->activitydescription;
-
-
-
-		$data['ca'] = (string)$s->financialsummary->tradingtodate[0]->turnover;
+		$data["activite"] = $res["activite"];
 
 
-		$data["resultat_exploitation"] = (string)$b->balancesheet->profitloss->operatingprofitloss;
-		$data["capital_social"] = (string)$bi->sharecapital;
-		$data["capitaux_propres"] = (string)$b->balancesheet->passiveaccount->shareholdersequity;
-		$data["dettes_financieres"] = (string)$b->balancesheet->passiveaccount->financialliabilities;
+
+		$data['ca'] = $res["ca"];
+
+
+		$data["resultat_exploitation"] = $res["resultat_exploitation"];
+		$data["capital_social"] = $res["capital_social"];
+		$data["capitaux_propres"] = $res["capitaux_propres"];
+		$data["dettes_financieres"] = $res["dettes_financieres"];
 
 		if(strpos($data["capital_social"], "Euros")){ $data["capital_social"] = str_replace(" Euros", "", $data["capital_social"]); }
 		return $data;
@@ -457,29 +470,44 @@ class comite extends classes_optima {
 
 		$id = $this->decryptId($infos["id"]);
 
-		if($infos["comboDisplay"] == "refus_comite"){
-			$etat = "refuse";
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
-		}elseif($infos["comboDisplay"] == "attente_retour"){
-			$etat = "en_attente";
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
-		}else{
-			$etat = "accepte";
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
 
-			$id_affaire = ATF::comite()->select($id, "id_affaire");
 
-			ATF::comite()->q->reset()->where("id_affaire", $id_affaire)
-							 ->where("etat", "accepte");
+		switch($infos["comboDisplay"]){
 
-			$c = ATF::comite()->sa();
+			case "refus_comite":
+				$etat = "refuse";
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
+			break;
 
-			if($c){
-				foreach ($c as $key => $value) {
-					ATF::comite()->u(array("id_comite"=>$value["id_comite"] , "etat"=> "accord_non utilise"));
+			case "attente_retour":
+			case "accord_reserve_cession";
+				$etat = "en_attente";
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
+			break;
+
+
+			case "accord_portage" :
+			case "accord_portage_recherche_cession" :
+			case "accord_portage_recherche_cession_groupee" :
+				$etat = "accepte";
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
+
+				$id_affaire = ATF::comite()->select($id, "id_affaire");
+
+				ATF::comite()->q->reset()->where("id_affaire", $id_affaire)
+								 ->where("etat", "accepte");
+
+				$c = ATF::comite()->sa();
+
+				if($c){
+					foreach ($c as $key => $value) {
+						ATF::comite()->u(array("id_comite"=>$value["id_comite"] , "etat"=> "accord_non utilise"));
+					}
 				}
-			}
+			break;
+
 		}
+
 
 		$data = array("id_comite"=>$id,
 					  "etat"=>$etat,
@@ -494,9 +522,8 @@ class comite extends classes_optima {
 		$devis = ATF::devis()->select_row();
 
 
-
-		$notifie_suivi = array(ATF::$usr->getID(), $devis["id_user"], ATF::societe()->select($this->select($id , "id_societe"), "id_owner"));
-
+		//Utilisateurs notifié de validation de comité -> Jerome, Alison, Severine et Jeanne
+		$notifie_suivi = ATF::user()->getDestinataireFromConstante(' __NOTIFIE_CREATE_TACHE_PARTENAIRE__');
 		$notifie_suivi = array_unique($notifie_suivi);
 
 		$suivi_notifie = "";

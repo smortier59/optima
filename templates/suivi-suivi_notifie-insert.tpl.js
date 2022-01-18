@@ -19,20 +19,16 @@
 				{$list=ATF::tache()->select($requests.id_tache)}
 				{foreach from=$list['dest'] key=cle item=id_user}
 					if(liste_dest)liste_dest+=",";
-					liste_dest+="{$id_user}";
 				{/foreach}
 				this.setValue(liste_dest);
 			{elseif $requests[$current_class->table][$key]}
 				var liste_dest="";
 				{foreach from=$requests[$current_class->table][$key] key=cle item=id_user}
 					if(liste_dest)liste_dest+=",";
-					liste_dest+="{$id_user}";
 				{/foreach}
 				this.setValue(liste_dest);
-			{else}
-				/* par défaut, on selectionne le user courant */
-				this.setValue("{ATF::$usr->getID()}");
+
 			{/if}
-		} 
+		}
 	}
 }

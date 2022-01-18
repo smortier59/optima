@@ -1,0 +1,85 @@
+{* héhé *}
+{if $smarty.session[$current_class->controlled_by].prix}
+	<hr />
+    {if $smarty.session[$current_class->table]}
+		{include file="generic_ligne.tpl.htm" entete=true table=$current_class->table}
+	{/if}
+    <div id="ligne_conteneur">
+			{* LIGNE DEJA PRESENTE DANS LA SESSION *}
+            {if $smarty.session[$current_class->table]}
+                <div class="filled_line" id="filled_line">
+                    {foreach from=$smarty.session[$current_class->table] item=i key=k}
+                        {foreach from=$i item=it key=ke}
+                            {foreach from=$current_class->colonnes.ligne item=item key=key}
+                                {if !$item.hidden}
+                                    <div class="field" id="{$key}">
+                                        {if ATF::getClass($current_class->fk_from($key))}  
+                                            {$key_class=ATF::getClass($current_class->fk_from($key))}
+                                            {$key_class->nom($it[$key])}
+                                        {else}
+                                            {$it[$key]}
+                                        {/if}
+                                    </div>
+                                {/if}
+                            {/foreach}
+                            <div class="ClearLeft"></div>
+                        {/foreach}
+                    {foreachelse}
+                        <span class="italic">
+                            {ATF::$usr->trans('aucun_produit',$current_class->table)}
+                        </span>
+                    {/foreach}
+                </div>
+            {/if}
+			{* AFFICHAGE DU TOTAL *}
+			<div id="generic_ligne-total">
+				<div id="total">
+					<span>
+						{ATF::$usr->trans(sous_total)}
+					</span>
+					{$smarty.session.facture.sous_total|string_format:"%.2f"} €
+				</div>
+				<div class="ClearRight"></div>
+				<div id="total">
+					<span>
+						{ATF::$usr->trans(frais_de_port)}
+					</span>
+					<input type="hidden" id="facture[frais_de_port]"   name="facture[frais_de_port]" value="{$smarty.session.facture.frais_de_port}"/>
+					{$smarty.session.facture.frais_de_port|string_format:"%.2f"} €
+				</div>
+				<div class="ClearRight"></div>
+				<div id="total">
+					<span>
+						{ATF::$usr->trans(prix)}
+					</span>
+					<input type="hidden" id="facture[prix]" name="facture[prix]" value="{$smarty.session.facture.prix}"/>
+					{$smarty.session.facture.prix|string_format:"%.2f"} €
+				</div>
+				<div class="ClearRight"></div>
+			</div>
+	</div>
+{else}
+	<div id="facture_form" style="margin-left:110px">
+		<table>
+			<tbody>
+				{foreach from=ATF::facture()->colonnes.primary key=key item=item}
+					{if $item.if_not_session}   
+						{if ($event=="insert" && !$item.update_only) || ($event!="insert")}   
+							{if $item.FCKEditor}
+								{*include file="FCKEditor.tpl.htm" key=$key item=$item name_field="{$current_class->table}[{$key}]"*}
+							{else}
+								<tr>
+									{if $smarty.session[$current_class->table][$key]}	
+										{include file="generic_field.tpl.htm" key=$key item=$item  extra='readonly="readonly"' value=$smarty.session[$current_class->table][$key]}
+									{else}
+										{include file="generic_field.tpl.htm" key=$key item=$item name="facture[`$key`]"}
+									{/if}
+								</tr>
+							{/if}
+						{/if}
+					{/if}
+				{/foreach}
+			</tbody>
+		</table>
+	</div>
+{/if}

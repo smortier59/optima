@@ -1,0 +1,1 @@
+{include file="suivi-suivi_from_mail-insert.tpl.js"}

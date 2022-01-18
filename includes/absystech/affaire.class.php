@@ -36,7 +36,7 @@ class affaire_absystech extends affaire {
 			,'affaire.date'
 			,'affaire.forecast'=>array("renderer"=>"progress","rowEditor"=>"forecastUpdate","width"=>100)
 			,'marge'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
-			,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
+			//,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
 			,'marge_commandee'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"money","type"=>"decimal","width"=>100)
 			,'pourcent'=>array("renderer"=>"percent","custom"=>true,"aggregate"=>array("avg","min","max"),"width"=>80)
 		);
@@ -105,18 +105,18 @@ class affaire_absystech extends affaire {
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
-			->addJointure("affaire","id_affaire","hotline","id_affaire")
-			->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
+			//->addJointure("affaire","id_affaire","hotline","id_affaire")
+			//->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
 
 			->addGroup("affaire.id_affaire")
 			->addField("(SUM(facture.prix)
 							 -IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
-			->addField("(SUM(facture.prix)
+			/*->addField("(SUM(facture.prix)
 						-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
 						-IF(COUNT(`hotline`.`id_hotline`)=0,
 							0,
 								(SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
-							)","margenette")
+							)","margenette")*/
 			->addField("IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, commande.prix-`commande`.`prix_achat`)","marge_commandee")
 			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
 			->setView(array("align"=>array("marge"=>"right","pourcent"=>"center")));
@@ -321,7 +321,6 @@ class affaire_absystech extends affaire {
 		->addField("date")
 		->addField("-SUM(prix_achat)","prix")
 		->setStrict()
-//		->addCondition("YEAR(date)",date('Y'))
 		->addGroup("year")
 		->addGroup("month");
 		ATF::stats()->conditionYearSimple(ATF::commande()->q,"date",($annee?$annee:date('Y')));
@@ -333,7 +332,6 @@ class affaire_absystech extends affaire {
 		->addField("date")
 		->addField("SUM(prix)","prix")
 		->setStrict()
-//		->addCondition("YEAR(date)",date('Y'))
 		->addGroup("year")
 		->addGroup("month");
 		ATF::stats()->conditionYearSimple(ATF::facture()->q,"date",($annee?$annee:date('Y')));
@@ -355,7 +353,6 @@ class affaire_absystech extends affaire {
 		->addField("SUM(uni.prix)","prix")
 		->setStrict()
 		->setSubQuery($subQuery,'uni')
-//		->addCondition("YEAR(uni.date)",date('Y'))
 		->addGroup("year")
 		->addGroup("month");
 		ATF::stats()->conditionYearSimple($this->q,"uni.date",($annee?$annee:date('Y')));
@@ -596,6 +593,7 @@ class affaire_absystech extends affaire {
 
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function widget_marge_nette(){
 		$this->q->reset()
@@ -807,6 +805,7 @@ class affaire_absystech extends affaire {
 	* @param $get array contient le tri, page limit et potentiellement un id.
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
+	* @codeCoverageIgnore
 	*/
 	public function _GET($get,$post) {
 		if ($c = ATF::$usr->get('contact')) {
@@ -817,18 +816,27 @@ class affaire_absystech extends affaire {
 		return $return;
 	}
 
+	/**
+	* @codeCoverageIgnore
+	*/
 	public function _getJalons($get) {
 		if ($c = ATF::$usr->get('contact')) {
 			return ATF::affaire_partenaire()->getJalons($get);
 		}
 	}
 
+	/**
+	* @codeCoverageIgnore
+	*/
 	public function _getJalonsHistory($get) {
 		if ($c = ATF::$usr->get('contact')) {
 			return ATF::affaire_partenaire()->getJalonsHistory($get['id']);
 		}
 	}
 
+	/**
+	* @codeCoverageIgnore
+	*/
 	public function _addJalon($get, $post) {
 		if ($c = ATF::$usr->get('contact')) {
 			return ATF::affaire_partenaire()->addJalon($post);
@@ -1011,8 +1019,13 @@ class affaire_att extends affaire_absystech {
 };
 
 class affaire_wapp6 extends affaire_absystech { };
+class affaire_atoutcoms extends affaire_absystech { };
 class affaire_demo extends affaire_absystech { };
+class affaire_nco extends affaire_absystech { };
 
+/**
+* @codeCoverageIgnore
+*/
 class affaire_partenaire extends affaire {
 	public $table = "affaire";
 	/**
@@ -1431,6 +1444,7 @@ class affaire_telescope extends affaire_absystech {
 			"affaire.etat"=>array(),
 			"affaire.id_societe"=>array("visible"=>false),
 			"affaire.affaire"=>array(),
+			"affaire.nature"=>array(),
 			"societe.societe"=>array()
 		);
 
@@ -1528,3 +1542,4 @@ class affaire_telescope extends affaire_absystech {
 		return $return;
 	}
 };
+

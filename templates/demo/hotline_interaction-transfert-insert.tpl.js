@@ -1,0 +1,1 @@
+{include file="generic-field-textfield.tpl.js" current_class=ATF::user() fieldLabel=ATF::$usr->trans(transfert,hotline_interaction) key=id_user name="hotline_interaction[transfert]" est_nul=true}

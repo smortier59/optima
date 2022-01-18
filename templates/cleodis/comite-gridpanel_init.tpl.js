@@ -1,15 +1,9 @@
 {$id_user = ATF::$usr->getID()}
+{$login = ATF::$usr->getLogin()}
 {util::push($fieldsKeys,"reseau")}
 
+{if ATF::comite()->canValidComite($login) }
 
-
-{if $id_user == 16
- || $id_user == 17
- || $id_user == 18
- || $id_user == 93
- || $id_user == 35
- || $id_user == 21
- || (ATF::$codename == "cleodisbe" &&$id_user == 113) || (ATF::$codename == "cleodis" &&$id_user == 116) }
 	ATF.renderer.comiteDecision=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {
 			var idDiv = Ext.id();
@@ -19,11 +13,7 @@
 
 			var ok = true;
 
-			{if $id_user == 21}
-				if(record.data.reseau == false){
-					ok = false;
-				}
-			{/if}
+
 
 			if (record.data.comite__dot__etat=="en_attente" && ok==true) {
 				var btndecision = {
@@ -41,9 +31,11 @@
 									fields: ["id", "text"],
 									data: [  ["refus_comite", "Refus comité"]
 											,["accord_portage", "Accord de portage"]
-											,["accord_reserve_cession", "Accord réserve de cession"]
+											,["accord_portage_recherche_cession", "Accord de portage avec recherche et cession"]
+											,["accord_portage_recherche_cession_groupee", "Accord de portage avec recherche et cession GROUPEE"]
+											,["accord_reserve_cession", "Accord sous réserve de cession"]
 											,["attente_retour", "Attente de retour"]
-											,["favorable_cession", "Favorable à la cession"]
+
 										  ]
 								});
 								var hiddenField = new Ext.form.Hidden({

@@ -59,3 +59,6 @@ class formation_attestation_presence_cleodis extends formation_attestation_prese
 class formation_attestation_presence_cleodisbe extends formation_attestation_presence_cleodis { };
 class formation_attestation_presence_cap extends formation_attestation_presence_cleodis { };
 
+class formation_attestation_presence_bdomplus extends formation_attestation_presence_cleodis { };
+class formation_attestation_presence_bdom extends formation_attestation_presence_cleodis { };
+class formation_attestation_presence_boulanger extends formation_attestation_presence_cleodis { };

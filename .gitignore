@@ -1,1 +1,7 @@
 /sftp-config.json
+/global.inc.php
+/log
+/templates_c
+.vscode
+
+.vscode/

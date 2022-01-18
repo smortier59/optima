@@ -1,4 +1,3 @@
-{log::logger("OK" , "mfleurquin")}
 {$table="parc"}
 {$no_update='true'}
 {$no_maj='true'}

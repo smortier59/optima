@@ -17,7 +17,7 @@ class commande_cleodis extends commande {
 			,'specificDate'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommande","width"=>330)
 //			,'specificDateRestitution'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommandeRestitution","width"=>290)
 			,'commande.id_affaire'
-			,'commande.id_societe'
+			,'code_client'=>array("custom"=>true)
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
 			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
@@ -63,10 +63,11 @@ class commande_cleodis extends commande {
 		);
 
 		$this->colonnes['panel']['total'] = array(
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			 "prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			,"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
@@ -152,6 +153,11 @@ class commande_cleodis extends commande {
 	 */
 	public function _contratPartenaire($get,$post) {
 		if ($apporteur = ATF::$usr->get("contact")) {
+
+			// Gestion du tri
+			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "commande.ref";
+			if (!$get['trid']) $get['trid'] = "desc";
+
 			ATF::commande()->q->reset()
 				//->addField('affaire.*, loyer.*')
 				->addJointure("commande","id_societe","societe","id_societe")
@@ -186,7 +192,7 @@ class commande_cleodis extends commande {
 				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
 			}
 
-			if($commande = ATF::commande()->sa()){
+			if($commande = ATF::commande()->sa($get['tri'],$get['trid'])){
 				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
 				foreach ($commande as $key => $cmd) {
 					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
@@ -326,7 +332,7 @@ class commande_cleodis extends commande {
 						if($commande['commande']){
 							$type = $commande['type'];
 						}elseif($commande['devis']){
-							$type = "prelevement";
+							$type = ATF::societe()->select($commande["id_societe"], "divers_2");
 						}
 						return $type;
 				case "email":
@@ -342,6 +348,8 @@ class commande_cleodis extends commande {
 					return $commande['prix_achat'];
 				case "prix":
 					return $commande['prix'];
+				case "prix_sans_tva":
+					return $commande['prix_sans_tva'];
 				case "id_devis":
 					return $commande['id_devis'];
 			}
@@ -402,8 +410,14 @@ class commande_cleodis extends commande {
 		ATF::db($this->db)->begin_transaction();
 
 		//*****************************Transaction********************************
+		if((ATF::affaire()->select($devis["id_affaire"], "site_associe") || ATF::affaire()->select($devis["id_affaire"], "provenance")) && ATF::affaire()->select($devis["id_affaire"], "provenance") != "partenaire"){
+			//On ne crée pas la tache pour les affaires du portail partenaire, car elle est crée lors de la création de l'affaire
+			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
+		}
 
-		$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
+
+		if(ATF::$codename != "bdomplus"){
+			$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
 									   "id_user"=>$infos["id_user"],
 									   "origine"=>"societe_commande",
 									   "tache"=>"Relancer le contrat ",
@@ -414,20 +428,37 @@ class commande_cleodis extends commande {
 									  ),
 						"dest"=>$dest
 					  );
-		$id_tache = ATF::tache()->insert($tache);
+			$id_tache = ATF::tache()->insert($tache);
+
+		}
+
 
 		unset($infos["marge"],$infos["marge_absolue"]);
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		$dest = NULL;
-		if($infos["id_user"] == 18) $dest = 21;
-		elseif($infos["id_user"] == 93) $dest = 103;
-		else $dest = ATF::$usr->getID();
+		// Pierre -> Destinataire Severine
+		// Terence --> Destinataire Alison
+		$createur = ATF::user()->select($infos["id_user"]);
+
+		if($createur === "pcaminel"){
+			//ATF::user()->q->reset()->where("login", "smazars")
+			ATF::user()->q->reset()->where("login", "lhochart");
+			$desti = ATF::user()->select_row();
+			$dest = $desti["id_user"];
+		}elseif($createur === "tdelattre"){
+			ATF::user()->q->reset()->where("login", "mmysoet");
+			$desti = ATF::user()->select_row();
+			$dest = $desti["id_user"];
+		}else {
+			$dest = ATF::$usr->getID();
+		}
 
 
 
 		// Mise à jour du forecast
 		if(ATF::$codename == "cleodisbe") $affaire = new affaire_cleodisbe($infos['id_affaire']);
+		elseif(ATF::$codename == "bdomplus") $affaire = new affaire_bdomplus($infos['id_affaire']);
 		else $affaire = new affaire_cleodis($infos['id_affaire']);
 
 		$affaire->majForecastProcess();
@@ -444,6 +475,7 @@ class commande_cleodis extends commande {
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["commande_ligne__dot__visible"]="non";
+				$infos_ligne_non_visible[$key]["commande_ligne__dot__visible_pdf"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
 			}
 		}
@@ -510,6 +542,7 @@ class commande_cleodis extends commande {
 	* @return bool
     */
 	public function updateDate($infos,&$s,&$request){
+
 		if (!$infos['id_commande']) return false;
 
 		if ($infos['value'] == "undefined") $infos["value"] = "";
@@ -523,6 +556,7 @@ class commande_cleodis extends commande {
 			case "date_demande_resiliation":
 			case "date_prevision_restitution":
 			case "date_restitution_effective":
+			case "date_demande_reprise_broker":
 
 				//Il ne faut pas que la date début soit un 29 30 ou 31 car sinon cela pause problème lors de la création de l'échéancier
 				if($infos['key']=="date_debut"){
@@ -538,6 +572,7 @@ class commande_cleodis extends commande {
 					if(ATF::societe()->select($id_societe, "relation") !== "client"){ ATF::societe()->u(array("id_societe"=> $id_societe, "relation"=>"client")); }
 
 				}
+
 				//Mode transactionel
 				ATF::db($this->db)->begin_transaction();
 				try {
@@ -555,6 +590,12 @@ class commande_cleodis extends commande {
 								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL));
 					}
 
+					//si la date de demande de reprise au broker est envoyé alors il faut check si il y a une date de restitution effective
+					if ($infos['key']=="date_restitution_effective" && $infos['value']!= NULL){
+						if ($cmdBefore["date_demande_reprise_broker"] == NULL){
+							$d['date_demande_reprise_broker'] = $d['date_restitution_effective'];
+						}
+					}
 					$this->u($d);
 					$commande = $this->select($infos['id_commande']);
 
@@ -563,8 +604,8 @@ class commande_cleodis extends commande {
 						,"field"=>$infos['key']
 						,"date"=>$d[$infos['key']]
 					));
-
 					if($infos['key'] === "date_debut" && $infos['value']){
+
 						//Creation de la facture prorata si besoin
 						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
 						$affaire = ATF::affaire()->select($id_affaire);
@@ -582,7 +623,6 @@ class commande_cleodis extends commande {
 										"date_debut_contrat" => $infos['value'],
 										"id_commande"=> $infos["id_commande"]
 									 );
-
 						//Creation de la premiere facture
 						ATF::facture()->createPremiereFacture($data);
 
@@ -598,8 +638,7 @@ class commande_cleodis extends commande {
 
 							//On met Jennifer en notifié pour les MEP de contrat
 							if($infos['key']=="date_debut"){
-								if(ATF::$codename == "cleodis") $notifies[] = 106;
-								if(ATF::$codename == "cleodisbe") $notifies[] = 107;
+								$notifies = ATF::user()->getDestinataireFromConstante("__SUIVI_NOTIFIE_MEP__");
 							}
 
 							$suivi = array(
@@ -628,6 +667,14 @@ class commande_cleodis extends commande {
 							ATF::suivi()->d($item["id_suivi"]);
 						}
 					}
+
+					$this->checkEtatContentieux($infos["id_commande"]);
+
+
+
+					if(ATF::$codename == "bdomplus" && $infos["key"] == "retour_contrat" && $infos["value"] != null){
+						ATF::societe()->demande_creation_compte_espace_client(null,null,$infos["id_commande"]);
+					}
 				} catch(errorATF $e) {
 					//On rollback le tout
 					ATF::db($this->db)->rollback_transaction();
@@ -647,57 +694,11 @@ class commande_cleodis extends commande {
 				throw new errorATF("date_invalide",987);
 		}
 
-		if($infos["table"]!="commande"){
-//			ATF::commande()->redirection("select_all",NULL,"commande.html");
-//		}else{
+		if($infos["table"]!="commande" && $infos['key'] === "date_debut"){
 			ATF::affaire()->redirection("select",$cmd["id_affaire"]);
 		}
 		return true;
 	}
-
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	  * @param array $infos
-//    */
-//	public function updateDateResiliation($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		//Il faut une date de de résiliation pour insérer une date de restitution
-//		if($infos['value'] == 'undefined' && ($commande["date_restitution"] || $commande["date_restitution_effective"])){
-//			throw new errorATF("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
-//		}else{
-//			return parent::updateDate($infos);
-//		}
-//	}
-//
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos
-//    */
-//	public function updateDateRestitution($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		//Il faut une date de de résiliation pour insérer une date de restitution
-//		if($infos['value'] != 'undefined' && !$commande["date_resiliation"]){
-//			throw new errorATF("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
-//		}elseif($infos['value'] == 'undefined' && $commande["date_restitution_effective"]){
-//			throw new errorATF("Impossible de supprimer la date de résiliation si la restitution est effective",883);
-//		}else{
-//			return parent::updateDate($infos);
-//		}
-//	}
-//
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos
-//    */
-//	public function updateDateRestitution_effective($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		parent::updateDate($infos);
-//		$commande = new commande_cleodis($infos['id_commande']);
-//		$this->checkEtat($commande);
-//	}
 
 	/**
     * Vérification si on peut modifier/supprimer une commande
@@ -816,6 +817,11 @@ class commande_cleodis extends commande {
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
 
+					if(ATF::$codename == "boulanger"){
+						/*Il faut également généré l'echéancier de facturation fournisseur */
+						ATF::facturation_fournisseur()->generate_echeancier($commande,$affaire,$affaires_parentes,$devis);
+					}
+
 
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
 					if($commande->get("etat")=="prolongation"){
@@ -876,6 +882,11 @@ class commande_cleodis extends commande {
 					//Mise à jour des facturations
 					ATF::facturation()->delete_special($commande->get("id_affaire"));
 
+					if(ATF::$codename == "boulanger"){
+						//Mise à jour des facturations fournisseur
+						ATF::facturation_fournisseur()->delete_special($commande->get("id_affaire"));
+					}
+
 					//Mise à jour des prolongations (supprimer les dates)
 					ATF::prolongation()->unsetDate($commande->get("id_affaire"));
 
@@ -928,10 +939,7 @@ class commande_cleodis extends commande {
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($infos["id_commande"]);
 
-						$notifie = array(21);
-						if(ATF::$usr->getID() !=21){
-							$notifie[] = ATF::$usr->getID();
-						}
+						$notifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_PASSAGE_ARRETEE_AFFAIRE__");
 
 						$suivi = array(
 							"id_user"=>ATF::$usr->get('id_user')
@@ -943,9 +951,12 @@ class commande_cleodis extends commande {
 							,'suivi_notifie'=>$notifie
 						);
 						ATF::suivi()->insert($suivi);
+					}else{
+						$this->checkEtat($commande);
 					}
 				}else{
-					throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
+					//throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
+					$this->checkEtat($commande);
 				}
 				//}
 			break;
@@ -962,11 +973,11 @@ class commande_cleodis extends commande {
 		}
 		$affaire->majForecastProcess();
 
-		if($infos["field"] !== "date_prevision_restitution" || $reload){
-			if($commande->get("id_affaire")){
-				ATF::affaire()->redirection("select",$commande->get("id_affaire"));
-			}
-		}
+		// if($infos["field"] !== "date_prevision_restitution" || $reload){
+		// 	if($commande->get("id_affaire")){
+		// 		ATF::affaire()->redirection("select",$commande->get("id_affaire"));
+		// 	}
+		// }
 
 
 	}
@@ -984,14 +995,14 @@ class commande_cleodis extends commande {
 				$commande->set("etat","non_loyer");
 			}
 		//Si la commande est une vente, si elle est AR ou si elle est terminée, il ne faut pas modifier son état
-		}elseif($commande->get("etat")!="arreter"){
+		}elseif($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux"){
 			if($affaireFillesAR){
 				ATF::commande()->q->reset()->addCondition("id_affaire",$affaireFillesAR["id_affaire"])->setDimension("row");
 				$commandeFilleAR=ATF::commande()->sa();
 			}
 			// Si on est dans la période du contrat
 			if ($commande->estEnCours()) {
-				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
+				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter" || $commandeFilleAR["etat"]=="arreter_contentieux")){
 					$commande->set("etat","AR");
 				}else{
 					//if($commande->dateEvolutionDepassee()){
@@ -1035,21 +1046,25 @@ class commande_cleodis extends commande {
 				}
 			// Sinon Si la période du contrat est dépassé
 			} elseif($commande->dateEvolutionDepassee()){
-				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
+				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter" || $commandeFilleAR["etat"]=="arreter_contentieux")){
 					$commande->set("etat","AR");
 				}else{
 					//Si il y a une date de restitution et qu'elle est dépassée OU que la date evolution est depassée et pas de date resti
 					if($commande->dateRestitutionEffectiveDepassee()){
-						$commande->set("etat","arreter");
+						if(strpos( $commande->get("etat"), "contentieux")){
+							$commande->set("etat","arreter_contentieux");
+						}else{
+							$commande->set("etat","arreter");
+						}
+
 						$comm = ATF::commande()->select($commande->get("id_commande"));
 
-						$notifie = array(21);
-						if(ATF::$usr->getID() !=21){
-							$notifie[] = ATF::$usr->getID();
-						}
+						$notifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_DATE_RESTITUTION_DEPASSEE__");
+
 						$suivi = array(
 							"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
+							,"id_affaire"=>$comm['id_affaire']
 							,"type_suivi"=>'Contrat'
 							,"texte"=>"L'affaire est passée en arrêté car la date de restitution effective est dépassée ou date Evolution dépassée sans date de restitution"
 							,'public'=>'oui'
@@ -1086,6 +1101,59 @@ class commande_cleodis extends commande {
 		}
 	}
 
+
+
+	/**
+	 * Permet de mettre à jour le statut d'un contrat selon si il a des factures rejetée ou non
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  Number $id_commande
+	 */
+	function checkEtatContentieux($id_commande){
+		$id_commande = $this->decryptId($id_commande);
+		ATF::facture()->q->reset()->where("facture.id_commande", $id_commande)
+								  ->addField("facture.rejet")
+								  ->addField("facture.date_regularisation");
+		$res = ATF::facture()->select_all();
+
+		$contientFactureRejet = false;
+
+		foreach($res as $k=>$v){
+			if(($v["facture.rejet"] != "non_rejet") && ($v["facture.rejet"] != "non_preleve_mandat") && (!$v["facture.date_regularisation"])){
+				$contientFactureRejet = true;
+			}
+		}
+
+		ATF::commande()->q->reset()->where("commande.id_commande",$id_commande)->addField("commande.etat" , "etat");
+		$etatCommande = ATF::commande()->select_row();
+
+		$etatCommande = $etatCommande["etat"];
+		if($contientFactureRejet){
+			if($etatCommande === "mis_loyer"){
+				$etatCommande = "mis_loyer_contentieux";
+			}elseif( $etatCommande === "prolongation"){
+				$etatCommande = "prolongation_contentieux";
+			}elseif( $etatCommande === "restitution"){
+				$etatCommande = "restitution_contentieux";
+			}elseif( $etatCommande === "arreter"){
+				$etatCommande = "arreter_contentieux";
+				ATF::affaire()->u(array("id_affaire" => ATF::commande()->select($id_commande, "id_affaire"), "etat" => "terminee_contentieux"));
+			}
+		}else{
+			if($etatCommande === "mis_loyer_contentieux"){
+				$etatCommande = "mis_loyer";
+			}elseif( $etatCommande === "prolongation_contentieux"){
+				$etatCommande = "prolongation";
+			}elseif( $etatCommande === "restitution_contentieux"){
+				$etatCommande = "restitution";
+			}elseif( $etatCommande === "arreter_contentieux"){
+				$etatCommande = "arreter";
+				ATF::affaire()->u(array("id_affaire" => ATF::commande()->select($id_commande, "id_affaire"), "etat" => "terminee"));
+			}
+		}
+		ATF::commande()->u(array("id_commande" => $id_commande , "etat" => $etatCommande));
+
+	}
+
 	/**
 	* Retourne l'objet affaire associé à la commande passée en paramètre, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -1094,6 +1162,8 @@ class commande_cleodis extends commande {
 	function getAffaire(){
 		$this->notSingleton();
 		if(ATF::$codename == "cleodisbe") return new affaire_cleodisbe($this->infos['id_affaire']);
+		if(ATF::$codename == "assets") return new affaire_assets($this->infos['id_affaire']);
+		if(ATF::$codename == "bdomplus") return new affaire_bdomplus($this->infos['id_affaire']);
 		return new affaire_cleodis($this->infos['id_affaire']);
 	}
 
@@ -1169,12 +1239,10 @@ class commande_cleodis extends commande {
 		if (is_numeric($infos) || is_string($infos)) {
 			$id=$this->decryptId($infos);
 			$commande=$this->select($id);
-//log::logger("delete1",'error.log');
 
 			//Commande
 			if($commande){
 //*****************************Transaction********************************
-//log::logger("delete2",'error.log');
 				ATF::db($this->db)->begin_transaction();
 				parent::delete($id,$s);
 
@@ -1202,7 +1270,6 @@ class commande_cleodis extends commande {
 
 				ATF::db($this->db)->commit_transaction();
 	//*****************************************************************************
-//log::logger("redirection",'error.log');
 
 				ATF::affaire()->redirection("select",$commande["id_affaire"]);
 
@@ -1237,14 +1304,38 @@ class commande_cleodis extends commande {
 							,"ref"=>$this->get("ref")
 						)
 					));
-					if ($value=="arreter") {
-						if(ATF::$codename == "cleodisbe") $a = new affaire_cleodisbe($this->get('id_affaire'));
-						else $a = new affaire_cleodis($this->get('id_affaire'));
 
-						$a->set('etat','terminee');
+					if(ATF::$codename == "cleodisbe") $a = new affaire_cleodisbe($this->get('id_affaire'));
+					elseif(ATF::$codename == "assets") $a = new affaire_assets($this->get('id_affaire'));
+					elseif(ATF::$codename == "bdomplus") $a = new affaire_bdomplus($this->get('id_affaire'));
+					else $a = new affaire_cleodis($this->get('id_affaire'));
+
+					switch ($value) {
+						case 'arreter':
+						case 'arreter_contentieux' :
+							if($value == "arreter") $a->set('etat','terminee');
+							else $a->set('etat','terminee_contentieux');
+						break;
+
+						case 'non_loyer' :
+						case 'non_loyer_contentieux' :
+							$a->set('etat', 'commande');
+						break;
+
+						case 'vente' :
+							$a->set('etat', 'facture');
+						break;
+
+						default:
+							$a->set('etat', 'facture');
+						break;
 					}
+				break;
 			}
 		}
+
+		ATF::societe()->checkMauvaisPayeur($this->get("id_societe"));
+
 	}
 
 	/**
@@ -1334,6 +1425,7 @@ class commande_cleodis extends commande {
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 		$this->q
 			->addField("commande.id_affaire")
+			->addField("societe.code_client","code_client")
 			->addField("commande.date_debut")
 			->addField("commande.date_evolution")
 			->addField("commande.retour_contrat")
@@ -1342,6 +1434,7 @@ class commande_cleodis extends commande {
 			->addField("commande.date_demande_resiliation")
 			->addField("commande.date_prevision_restitution")
 			->addField("commande.date_restitution_effective")
+			->addField("commande.date_demande_reprise_broker")
 			->from("commande","id_societe","societe","id_societe")
 			->from("commande","id_affaire","affaire","id_affaire");
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -1365,24 +1458,54 @@ class commande_cleodis extends commande {
 			} else {
 				$return['data'][$k]['prolongationAllow'] = false;
 			}
-			//Check l'existence de création de BDC
-			if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
-				$return['data'][$k]['bdcExist'] = true;
-			} else {
-				$return['data'][$k]['bdcExist'] = false;
+
+			//Check l'existence d'un comité accepte
+			if(ATF::affaire()->comiteAccepte($i["commande.id_affaire_fk"])){
+				$return['data'][$k]['allowBDCCreate'] = true;
+				$return['data'][$k]['allowAllBDCCreate'] = false;
+
+				ATF::bon_de_commande()->q->reset()->where("id_affaire", $i['commande.id_affaire_fk']);
+				$bdc=ATF::bon_de_commande()->sa();
+
+				if(count($bdc)==0){
+					$return['data'][$k]['allowAllBDCCreate'] = true;
+				}
+
+				//Check l'existence de création de BDC
+				if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
+					$return['data'][$k]['bdcExist'] = true;
+				} else {
+					$return['data'][$k]['bdcExist'] = false;
+				}
+
+			}else{
+				$return['data'][$k]['allowBDCCreate'] = false;
+				$return['data'][$k]['allowAllBDCCreate'] = false;
 			}
+
+
+
 			//Check l'existence de création de demande refi
-			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"]) || $affaire['nature']=="vente") {
+			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false, false) || $affaire['nature']=="vente") {
 				$return['data'][$k]['demandeRefiExist'] = true;
 			} else {
 				$return['data'][$k]['demandeRefiExist'] = false;
 			}
 			//Check affichage de création de facture
-			if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
-				$return['data'][$k]['factureAllow'] = true;
-			} else {
-				$return['data'][$k]['factureAllow'] = false;
+			if(ATF::$codename == "bdomplus"){
+				if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist']) {
+					$return['data'][$k]['factureAllow'] = true;
+				} else {
+					$return['data'][$k]['factureAllow'] = false;
+				}
+			}else{
+				if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
+					$return['data'][$k]['factureAllow'] = true;
+				} else {
+					$return['data'][$k]['factureAllow'] = false;
+				}
 			}
+
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
 
             // check des fichiers courriers types
@@ -1438,25 +1561,129 @@ class commande_cleodis extends commande {
 			foreach($commandes as $key=>$item){
 					//Ligne de la commande pour le fournisseur il ne faut pas que ces lignes soient présentes dans un autre bon de commande
 					ATF::commande_ligne()->q->reset()->addOrder("commande_ligne.id_commande_ligne","asc")
-													 ->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
 													 ->where("id_commande",$item["id_commande"])
-													 ->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
+													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
 													 ->where("id_fournisseur",$id_fournisseur);
 					$commande_ligne=ATF::commande_ligne()->sa();
+
+
+					//On recupere les lignes déja commandées
+					ATF::bon_de_commande_ligne()->q->reset()
+													 ->from("bon_de_commande_ligne","id_bon_de_commande","bon_de_commande","id_bon_de_commande")
+													 ->where("bon_de_commande.id_commande",$item["id_commande"])
+													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
+													 ->where("bon_de_commande.id_fournisseur",$id_fournisseur);
+
+					foreach ($commande_ligne as $kl => $vl) {
+						ATF::bon_de_commande_ligne()->q->where("bon_de_commande_ligne.id_commande_ligne", $vl["id_commande_ligne"], "OR", "commande");
+					}
+					ATF::bon_de_commande_ligne()->q->unsetToString();
+					$lignes_bdc=ATF::bon_de_commande_ligne()->sa();
+
+					$temp = $lignes_bdc;
+					$lignes_bdc = array();
+					foreach ($temp as $kt => $vt) {
+						$lignes_bdc[$vt["id_commande_ligne"]] += $vt["quantite"];
+					}
+
+
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande_fk"]);
 						unset($ligne_commande);
+						$cle=0;
+
 						foreach($commande_ligne as $k=>$i){
-							$ligne_commande[]=array(
-												"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id"=>$i["id_commande_ligne"]
-												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
-												,"quantite"=>$i["quantite"]
-												,"icon"=>ATF::$staticserver."images/blank.gif"
-												,"checked"=>false
-										);
+							if(!$lignes_bdc[$i["id_commande_ligne"]]){
+								if($i["quantite"] > 1){
+									$n = 1;
+									for($n=1; $n<=$i["quantite"];$n++){
+										$cle++;
+										$ligne_commande[]=array(
+													 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+													,"id_commande_ligne"=>$i["id_commande_ligne"]
+													,"id"=>$cle
+													,"leaf"=>true
+													,"prix"=>$i["prix_achat"]
+													,"quantite"=>1
+													,"icon"=>ATF::$staticserver."images/blank.gif"
+													,"checked"=>false
+											);
+									}
+								}else{
+									$cle++;
+									$ligne_commande[]=array(
+													 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+													,"id_commande_ligne"=>$i["id_commande_ligne"]
+													,"id"=>$cle
+													,"leaf"=>true
+													,"prix"=>$i["prix_achat"]
+													,"quantite"=>$i["quantite"]
+													,"icon"=>ATF::$staticserver."images/blank.gif"
+													,"checked"=>false
+											);
+								}
+							}else{
+								$quantite_restant= $i["quantite"] - $lignes_bdc[$i["id_commande_ligne"]];
+								if($quantite_restant > 0 ){
+									if($quantite_restant > 1){
+										$n = 1;
+										for($n=1; $n<=$quantite_restant;$n++){
+											$cle++;
+											$ligne_commande[]=array(
+														 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+														,"id_commande_ligne"=>$i["id_commande_ligne"]
+														,"id"=>$cle
+														,"leaf"=>true
+														,"prix"=>$i["prix_achat"]
+														,"quantite"=>1
+														,"icon"=>ATF::$staticserver."images/blank.gif"
+														,"checked"=>false
+												);
+										}
+									}else{
+										$cle++;
+										$ligne_commande[]=array(
+														 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+														,"id_commande_ligne"=>$i["id_commande_ligne"]
+														,"id"=>$cle
+														,"leaf"=>true
+														,"prix"=>$i["prix_achat"]
+														,"quantite"=>1
+														,"icon"=>ATF::$staticserver."images/blank.gif"
+														,"checked"=>false
+												);
+									}
+								}
+							}
 						}
+
+
+
+
+						/*foreach($commande_ligne as $k=>$i){
+							$ligne_commande[]=array(
+									"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+									,"id"=>$i["id_commande_ligne"]
+									,"leaf"=>true
+									,"prix"=>$i["prix_achat"]
+									,"quantite"=>$i["quantite"]
+									,"icon"=>ATF::$staticserver."images/blank.gif"
+									,"checked"=>false
+							);
+
+							/*for($n=1;$n<=$i["quantite"]; $n++){
+								$ligne_commande[]=array(
+										"text"=>$i["produit"]." ".$i["ref"]." (1)"
+										,"id"=>$i["id_commande_ligne"]
+										,"leaf"=>true
+										,"prix"=>$i["prix_achat"]
+										,"quantite"=>1
+										,"icon"=>ATF::$staticserver."images/blank.gif"
+										,"checked"=>false
+								);
+							}*/
+
+						//}
 
 						if ($ligne_commande) {
 							$commande[]=array(
@@ -1522,15 +1749,22 @@ class commande_cleodis extends commande {
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     */
 	public function cleodisStatut(){
-		$this->q->setCount()->addOrder("id_commande","DESC");
+		$this->q->setCount()
+							/*->where("ref", "2007073", "OR")
+							->where("ref", "0709050", "OR")
+							->where("ref", "0709038", "OR")
+							->where("ref", "0711065", "OR")*/
+
+							->addOrder("id_commande","DESC");
 		$commandeSa=$this->sa();
 		$i=1;
+		$commandeMAJ = array();
 		ATF::db($this->db)->begin_transaction();
 		foreach($commandeSa["data"] as $key=>$item){
 			unset($affaires_parentes);
 
-//			log::logger($i." \ ".$commandeSa["count"],'cleodis_statut.log');
 			if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($item['id_commande']);
+			elseif(ATF::$codename == "go_abonnement") $commande = new commande_go_abonnement($item['id_commande']);
 			else $commande = new commande_cleodis($item['id_commande']);
 
 			$affaire = $commande->getAffaire();
@@ -1555,11 +1789,50 @@ class commande_cleodis extends commande {
 			$etat_modifie=$commande->get("etat");
 			if($etat!=$etat_modifie){
 				log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'cleodis_statut.log');
+				$commandeMAJ[] = array("ref"=>$commande->get("ref"),
+									   "id_commande"=>$commande->get("id_commande"),
+									   "ancien_etat" => $etat,
+									   "nouvel_etat" => $etat_modifie,
+									   "client" => $commande->get("id_societe")
+				 					   );
 			}
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			$i++;
 		}
 		ATF::db($this->db)->commit_transaction();
+
+
+		if($commandeMAJ){
+			$infos_mail["from"] = "NO REPLY <no-reply@cleodis.com>";
+		    $infos_mail["recipient"] = "jerome.loison@cleodis.com,benjamin.tronquit@cleodis.com";
+		    $infos_mail["html"] = true;
+		    $infos_mail["template"] = "mail_recap_update_statut_contrat";
+			$infos_mail["objet"] = "[".ATF::$codename."] - Recapitulatif des contrat ayant changé de statut";
+			$infos_mail["commande"] = $commandeMAJ;
+			$mail = new mail($infos_mail);
+			$send = $mail->send();
+		}
+
+	}
+
+	/**
+    * Appel stopCommande depuis l'espace client / Conseiller
+	* @author Moran FLEURQUN <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function _stopCommande($infos){
+		ATF::$usr->set('id_user',16);
+		ATF::$usr->set('id_agence',1);
+		try{
+			$this->stopCommande($infos);
+			$aff = $this->select($infos["id_commande"], "id_affaire");
+			$affaireDepart = ATF::affaire()->select(ATF::affaire()->getAffaireDepart($aff));
+
+			return array("affaireDepart"=> $affaireDepart);
+		}catch(errorATF $e){
+			return false;
+		}
 	}
 
 	/**
@@ -1570,25 +1843,30 @@ class commande_cleodis extends commande {
     */
 	public function stopCommande($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
+		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
 		if ($commande) {
 
-			$commande->set('etat','arreter');
+			$arret = "arreter";
+
+			if(strpos( $commande->get("etat"), "contentieux")){
+				$arret = "arreter_contentieux";
+			}
+
+			$commande->set('etat',$arret);
 			$commande->set('date_arret',date("Y-m-d"));
+			$commande->set('date_restitution_effective',date("Y-m-d"));
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
-			$notifie = array(21);
-			if(ATF::$usr->getID() !=21){
-				$notifie[] = ATF::$usr->getID();
-			}
-
+			$notifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_STOP_CONTRAT__");
 
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
 							,"type_suivi"=>'Contrat'
-							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en arrêté "
+							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en ".$arret
 							,'public'=>'oui'
 							,'suivi_societe'=>ATF::$usr->getID()
 							,'suivi_notifie'=>$notifie
@@ -1602,6 +1880,8 @@ class commande_cleodis extends commande {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
+					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
@@ -1621,11 +1901,19 @@ class commande_cleodis extends commande {
     */
 	public function reactiveCommande($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
+		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
 		if ($commande) {
-			$commande->set('etat','non_loyer');
+			if(strpos( $commande->get("etat"), "contentieux")){
+				$commande->set('etat','non_loyer_contentieux');
+			}else{
+				$commande->set('etat','non_loyer');
+			}
+
 			$commande->set('date_arret',NULL);
+			$commande->set('date_restitution_effective',NULL);
 			$affaire = $commande->getAffaire();
 
 			$comm = ATF::commande()->select($infos['id_commande']);
@@ -1641,6 +1929,8 @@ class commande_cleodis extends commande {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
+					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
@@ -1667,7 +1957,7 @@ class commande_cleodis extends commande {
         if (!$infos['id_commande'] || !$infos['pdf']) return false;;
         $commande = $this->select($infos['id_commande']);
 
-        if(ATF::affaire()->select($commande["id_affaire"], "type_affaire") === "NL"){
+        if(ATF::affaire()->select($commande["id_affaire"], "langue") === "NL"){
         	$data = ATF::pdf()->generic($infos['pdf']."NL",$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
         }else{
         	$data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
@@ -2158,7 +2448,8 @@ class commande_cleodis extends commande {
 						  array("title"=> "Pas MEP B", "code_client"=> "B"),
 						  array("title"=> "Pas MEP S", "code_client"=> "S"),
 						  array("title"=> "Pas MEP ATOL", "code_client"=> ""),
-						  array("title"=> "Pas MEP non repertorié")
+						  array("title"=> "Pas MEP non repertorié"),
+						  array("title"=> "Tous")
 						);
 
 		$data = array();
@@ -2173,7 +2464,7 @@ class commande_cleodis extends commande {
 				$esp = 0;
 
 				foreach ($feuilles as $kf => $vf) {
-					if($esp ===0 && $kf === count($feuilles)-1) {
+					if($esp ===0 && $kf === count($feuilles)-2) {
 						$data[$kf][] = $value;
 					}else{
 						if($esp === 0){
@@ -2186,7 +2477,12 @@ class commande_cleodis extends commande {
 							}
 						}
 					}
+
+					if($kf === count($feuilles)-1) {
+						$data[$kf][] = $value;
+					}
 				}
+
 			}
 		}
 
@@ -2214,6 +2510,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Contrat", "size"=>60),
 								array("title"=> "Code client", "size"=>15),
 								array("title"=> "Installation prévue", "size"=>15),
+								array("title"=> "Installation réelle", "size"=>15),
 								array("title"=> "Retour (AP)", "size"=>15),
 								array("title"=> "Retour (PV)", "size"=>15),
 								array("title"=> "Retour", "size"=>15),
@@ -2221,12 +2518,18 @@ class commande_cleodis extends commande {
 								array("title"=> "Durée", "size"=>15),
 								array("title"=> "Fréquence du loyer", "size"=>15),
 								array("title"=> "Total", "size"=>15),
+								array("title"=> "Achat", "size"=>15),
+								array("title"=> "Date blocage", "size"=>15),
+								array("title"=> "Description blocage", "size"=>30),
+								array("title"=> "RIB", "size"=>15),
 								array("title"=> "Refinanceur", "size"=>30),
 								array("title"=> "Comité", "size"=>15),
 								array("title"=> "Décision Comité", "size"=>15),
 								array("title"=> "Validité de l'accord", "size"=>15),
 								array("title"=> "Commentaire", "size"=>60),
-								array("title"=> "Observations", "size"=>60));
+								array("title"=> "Observations", "size"=>60),
+								array("title"=> "CNI présente", "size"=>15)
+							);
 
 			$i=0;
 	    	foreach($cols as $col=>$titre){
@@ -2263,6 +2566,7 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $value["affaire.affaire"];
 			$row_data[$key][] = $value["code_client"];
 			$row_data[$key][] = $value["affaire.date_installation_prevu"];
+			$row_data[$key][] = $value["affaire.date_installation_reel"];
 			$row_data[$key][] = $value["commande.retour_prel"];
 			$row_data[$key][] = $value["commande.retour_pv"];
 			$row_data[$key][] = $value["commande.retour_contrat"];
@@ -2270,53 +2574,50 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $value["loyer.duree"];
 			$row_data[$key][] = $value["loyer.frequence_loyer"];
 			$row_data[$key][] = ($value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"]) * $value["loyer.duree"];
+			$row_data[$key][] = $value["commande.prix_achat"];
 
 
-			ATF::demande_refi()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"],"AND")
-									   ->where("etat", "valide");
+			/*Ajout valeur date et description du suivi de type blocage ici*/
+			ATF::suivi()->q->reset()
+							->addField('suivi.date')
+							->addField('suivi.texte')
+							->addField('suivi.type_suivi')
+							->addCondition("suivi.type_suivi",'Blocage', "AND")
+							->where("id_affaire", $value["affaire.id_affaire_fk"])
+							->addOrder("suivi.date", "desc")
+							->setLimit(1);
+			$suivi = ATF::suivi()->select_row();
+			$suivi_date = NULL;
+			$suivi_description = NULL;
+			if($suivi){
+				$suivi_date = $suivi["suivi.date"];
+				$suivi_description = $suivi["suivi.texte"];
+			}
 
-			$refi = ATF::demande_refi()->select_row();
-			if($refi)	$row_data[$key][] = ATF::refinanceur()->select($refi["id_refinanceur"] , "refinanceur");
-			else $row_data[$key][] = "";
+			$row_data[$key][] = $suivi_date;
+			$row_data[$key][] = $suivi_description;
+ 			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"rib_client"))? "oui": "non";;
 
 
-			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
-			$comites = ATF::comite()->select_all();
 
-			if($comites){
-				$commentaire = $decision = $observations = "";
-				foreach ($comites as $k => $v) {
-					if($k !== 0){
-						$decisiondate = $decisiondate."\n". $v["date"];
-						$commentaire = $commentaire."\n".$v["commentaire"];
-						$decision = $decision."\n".$v["decisionComite"];
-						$date_accord = $date_accord."\n".$v["validite_accord"];
-						$observations 	  = $observations."\n".$v["observations"];
-
-					}else{
-						$decisiondate = $v["date"];
-						$commentaire  = $v["commentaire"];
-						$decision 	  = $v["decisionComite"];
-						$date_accord =  $v["validite_accord"];
-						$observations  = $v["observations"];
-					}
-				}
-
-				$row_data[$key][] = $decisiondate;
-				$row_data[$key][] = $decision;
-				$row_data[$key][] = $date_accord;
-				$row_data[$key][] = $commentaire;
-				$row_data[$key][] = $observations;
-
+			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"])->addOrder("date", 'DESC');
+			$comite = ATF::comite()->select_row();
+			if($comite){
+				$row_data[$key][] = ATF::refinanceur()->select($comite["id_refinanceur"] , "refinanceur");
+				$row_data[$key][] = $comite["date"];
+				$row_data[$key][] = $comite["commentaire"];
+				$row_data[$key][] = $comite["decisionComite"];
+				$row_data[$key][] = $comite["validite_accord"];
+				$row_data[$key][] = $comite["observations"];
 			} else {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
+				$row_data[$key][] = "";
 			}
-
-
+			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"cni"))? "oui": "non";
     	}
 
 
@@ -2398,8 +2699,6 @@ class commande_cleodis extends commande {
 
 					$result= parent::select_all();
 
-					$this->q->setToString();
-					log::logger(parent::select_all() , "mfleurquin");
 
 
 					$annee = $date-3;
@@ -2414,6 +2713,63 @@ class commande_cleodis extends commande {
 												->addOrder("year")->addOrder("month")
 												->where("stat_concerne", "mep-".$type);
 					$res = ATF::stat_snap()->select_all();
+
+					/*$annee = $date-3;
+					for($a=$annee; $a<$date;$a++){
+						for($m=1;$m<=12;$m++){
+
+							ATF::commande()->q->reset()
+								->addField("COUNT(*)","nb")
+								->setStrict()
+								->addJointure("commande","id_societe","societe","id_societe")
+								->addJointure("commande","id_affaire","affaire","id_affaire")
+								->addJointure("societe","id_owner","user","id_user")
+								->where("user.id_agence",$id_agence)
+
+								->addCondition("commande.etat","prolongation" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","AR" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","arreter" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","vente" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","restitution" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","mis_loyer_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+
+								//->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+								->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+
+								->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+
+								->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%Y')","year")
+								->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%m')","month")
+
+								->addGroup("year")->addGroup("month")
+								->addOrder("year")->addOrder("month")
+
+								->addCondition("`commande`.`mise_en_place`",$a."-".$m."-01","AND",false,">=")
+								->addCondition("`commande`.`mise_en_place`",$a."-".$m."-31","AND",false,"<");
+
+
+							if($type == "reseau"){
+								ATF::commande()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+									    		->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
+							}else{
+								ATF::commande()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
+									    		->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
+							}
+							$r[$a][$m] = ATF::commande()->select_row();
+						}
+					}
+
+					foreach ($r as $ky => $value) {
+						foreach ($value as $k => $v) {
+							$res[] = array(
+										"nb"=> $v["nb"],
+										"year"=> $v["year"],
+										"month"=> $v["month"]
+									);
+						}
+					}*/
 				}
 
 
@@ -2471,8 +2827,8 @@ class commande_cleodis extends commande {
 					}
 
 					$totalPrec = 0;
-					if($type == "o2m" ||$type== 'reseau'){	$objectif = $agence["objectif_devis_reseaux"]; }
-					else{ 	$objectif = $agence["objectif_devis_autre"]; }
+					if($type == "o2m" ||$type== 'reseau'){	$objectif = $agence["objectif_mep_reseaux"]; }
+					else{ 	$objectif = $agence["objectif_mep_autre"]; }
 
 					foreach ($avg as $key => $value) {
 						$avg[$key]["value"] = round($value["value"]/3);
@@ -2775,4 +3131,11 @@ class commande_cap extends commande_cleodis {
 
 
 };
-?>
+
+
+class commande_bdomplus extends commande_cleodis { };
+class commande_boulanger extends commande_cleodis { };
+
+class commande_assets extends commande_cleodis { };
+
+class commande_go_abonnement extends commande_cleodis { };

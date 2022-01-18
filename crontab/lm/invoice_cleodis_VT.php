@@ -1,4 +1,4 @@
-<<?php
+<?php
 define("__BYPASS__",true);
 $_SERVER["argv"][1] = "lm";
 include(dirname(__FILE__)."/../../global.inc.php");

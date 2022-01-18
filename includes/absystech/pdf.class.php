@@ -74,7 +74,7 @@ class pdf_absystech extends pdf {
 		$this->SetXY(10,-10);
 		$this->setfont('arial','I',8);
 		$this->multicell(0,3,strtoupper($this->societe["societe"])." - ".$this->societe['structure'].($this->societe["capital"] ? " au capital de ".number_format($this->societe["capital"],2,',','.')." EUR" : NULL).($this->societe["siret"] ? " SIRET : ".$this->societe["siret"] : NULL),0,'C');
-		$this->multicell(0,3,"Siège social : ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".ATF::pays()->select($this->societe['id_pays'],"pays")." - ".$this->societe['email']." - Tél : ".$this->societe['tel'].($this->societe['fax'] ? " - Fax : ".$this->societe['fax'] : NULL),0,'C');
+		$this->multicell(0,3,"Siège social : ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".ATF::pays()->select($this->societe['id_pays'],"pays")." - ".$this->societe['email'].($this->societe['tel'] ? " - Tél : ".$this->societe['tel']." ": NULL).($this->societe['fax'] ? " - Fax : ".$this->societe['fax'] : NULL),0,'C');
 		if (!$this->noPageNo) {
 			$this->ln(-3);
 			$this->Cell(0,3,$this->noPageNo.'Page '.$this->PageNo(),0,0,'R');
@@ -89,6 +89,61 @@ class pdf_absystech extends pdf {
 		$pageCount = $this->setSourceFile(__PDF_PATH__."absystech/cgv.pdf");
 		$tplIdx = $this->importPage(1);
 		$r = $this->useTemplate($tplIdx, -5, -10, 220, 0, true);
+	}
+
+	/**
+	* Echéancier des tickets hotline par mois
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function hotline_echeancier($id){
+		$date_debut = ATF::_r("date_debut") ? ATF::_r("date_debut") : date('Y-m-01');
+
+		$date_fin = ATF::_r("date_fin") ? ATF::_r("date_fin") : date("Y-m-d");
+
+		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","N°")
+								  ->addField("hotline.hotline","Résumé")
+								  ->addField("gestion_ticket.date","Date")
+								  ->addField("facture.ref","Facture")
+								  ->addField("CONCAT(contact.prenom,' ',contact.nom)","Contact")
+								  ->addField("CONCAT(user.prenom,' ',user.nom)","Contact Absystech")
+								  ->addField("gestion_ticket.nbre_tickets","Crédits")
+								  ->addField("gestion_ticket.solde","Solde")
+								  ->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($id))
+								  ->addCondition("gestion_ticket.date",$date_fin,"AND",false,"<=")
+								  ->addCondition("gestion_ticket.date",$date_debut,"AND",false,">=")
+								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
+								  ->addJointure("gestion_ticket","id_facture","facture","id_facture")
+								  ->addJointure("hotline","id_contact","contact","id_contact")
+								  ->addJointure("hotline","id_user","user","id_user")
+								  ->setStrict()
+								  ->addOrder("gestion_ticket.date");
+		// ATF::gestion_ticket()->q->setToString();
+		// log::logger(ATF::gestion_ticket()->sa(), "qjanon");
+		// ATF::gestion_ticket()->q->unsetToString();
+
+		$tickets = ATF::gestion_ticket()->sa();
+		$id_societe = $id;
+
+		$this->Open();
+		$this->Addpage();
+		$this->setleftmargin(10);
+		$this->setrightmargin(15);
+		$this->setfont('arial','',15);
+
+		$this->multicell(0,5,"RECAPITULATIF HOTLINE ".ATF::societe()->nom($id)." du ".$date_debut." au ".$date_fin,0, "C");
+		$this->ln(10);
+		$this->setfont('arial','',10);
+
+		$this->multicell(0,5,count($tickets)." occurences trouvées");
+		$this->ln(5);
+
+		foreach ($tickets as $k=>$i) {
+			$data[] = array_values($i);
+		}
+
+		$head = array_keys($tickets[0]);
+
+		$this->tableau($head,$data,array(10,50,30,20,25,25,15,15));
 	}
 
 
@@ -130,11 +185,9 @@ class pdf_absystech extends pdf {
 			$infos_societe = ATF::societe()->select($infos_user['id_societe']);
 			$this->societe = $infos_absystech = ATF::societe()->select(1);
 
-
+			$infos_contact = NULL;
 			if ($infos_client['id_contact_facturation']) {
 				$infos_contact = ATF::contact()->select($infos_client['id_contact_facturation']);
-			}elseif ($infos_devis['id_contact']) {
-				$infos_contact = ATF::contact()->select($infos_devis['id_contact']);
 			}
 
 			$this->Open();
@@ -583,6 +636,10 @@ class pdf_absystech extends pdf {
 		}
 	}
 
+	// Retourne TRUE si on ne doit pas signer avec le nom/prenom
+	public function nePasSignerMonNom($id_user) {
+		return in_array(ATF::user()->select($id_user,'login'),array("aduquesne","rviseux","psorriaux","ppersyn"));
+	}
 
 	public function devis_normal($id){
 		$infos_devis = ATF::devis()->select($id);
@@ -762,7 +819,11 @@ class pdf_absystech extends pdf {
 		$this->ln(5);
 		$this->setx(15);
 		$this->multicell(0,5,ATF::politesse()->nom($infos_devis['id_politesse_post']));
-		$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
+			$this->multicell(0,5,"",0,'R');
+		} else {
+			$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+		}
 
 		$this->pied($infos_societe);
 
@@ -794,7 +855,11 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT COMMERCIAL :",0,1);
 		$this->setfont('arial','',10);
-		$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
+			$this->cell(0,5,"",0,1);
+		} else {
+			$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+		}
 		$this->ln(5);
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT TECHNIQUE :",0,1);
@@ -893,15 +958,32 @@ class pdf_absystech extends pdf {
 			if($infos_devis["financement_cleodis"] == "oui"){
 				if($total > 1500 && !$infos_devis["duree_financement"]){
 					$this->ln(2);
-					if($total <= 7500){
-						$coeffCleodis = 0.03378;
-					}elseif($total <= 15000){
-						$coeffCleodis = 0.03244;
-					}elseif($total <= 30000){
-						$coeffCleodis = 0.03070;
-					}elseif($total > 30000){
-						$coeffCleodis = 0.02985;
+
+
+					if(ATF::$codename == "atoutcoms"){
+						if($total <= 7500){
+							$coeffCleodis = 0.0198;
+						}elseif($total <= 15000){
+							$coeffCleodis = 0.0191;
+						}elseif($total <= 30000){
+							$coeffCleodis = 0.0189;
+						}elseif($total > 30000){
+							$coeffCleodis = 0.0187;
+						}
+					}else{
+						if($total <= 7500){
+							$coeffCleodis = 0.0310;
+						}elseif($total <= 15000){
+							$coeffCleodis = 0.0300;
+						}elseif($total <= 30000){
+							$coeffCleodis = 0.0290;
+						}elseif($total > 30000){
+							$coeffCleodis = 0.0280;
+						}
 					}
+
+
+
 
 					$total = ($total*$coeffCleodis);
 
@@ -910,7 +992,11 @@ class pdf_absystech extends pdf {
 					$this->setx(15);
 					$this->multicell(0,5,"Pensez «Location Evolutive» avec notre partenaire");
 					$this->image(__PDF_PATH__.ATF::$codename."/cleodis.jpg",100,$this->gety()-9,20);
-					$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 36 (+3) mois.*");
+					if(ATF::$codename == "atoutcoms"){
+						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 63 mois.*");
+					}else{
+						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 36 (+3) mois.*");
+					}
 					$this->ln(5);
 					$this->multicell(0,5,"Si vous êtes intéressé  par ce mode de financement, merci de cocher la case");
 					$this->setxy(140,$this->gety()-5);
@@ -928,11 +1014,14 @@ class pdf_absystech extends pdf {
 			$this->setfont('arial','',10);
 			$this->ln(5);
 		} else {
-			$this->ln(20);
+			$this->ln(15);
 		}
 
 		$this->setfont('arial','U',10);
-		$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
+		$this->cell(100,5,"TERMES DE PAIEMENT",0,0);
+		$this->settextcolor('white');
+		$this->cell(0,5,"[Sceau/]",0,1);
+		$this->settextcolor('black');
 		$this->setfont('arial','',10);
 		$this->cell(0,5,ATF::termes()->nom($infos_affaire['id_termes']),0,1);
 		if($infos_devis["acompte"]){
@@ -950,9 +1039,18 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','',10);
 		$this->cell(0,5,ATF::delai_de_realisation()->nom($infos_devis['id_delai_de_realisation']),0,1);
 
-		$this->cadre(20,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),array('txt'=>"\n\n\n\n\n\n\n\nLa signature vaut pour acceptation de nos conditions générales de vente", 'align'=>"C","size"=>6,'italic'=>true)),"Partie réservée au client");
+		$this->cadre(20,220,80,60,array(
+			array('txt'=>"Date / Cachet / Visa",'align'=>"C"),
+			array('txt'=>"[Signature/]",'align'=>"L","color"=>"white"),
+			array('txt'=>"\n\n\n\n\n\n\n\nLa signature vaut pour acceptation de nos conditions générales de vente", 'align'=>"C","size"=>6,'italic'=>true))
+		,"Partie réservée au client");
+
 		$this->setfont('arial','',10);
-		$this->cadre(110,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),"","","","","",""),"Partie réservée à Absystech");
+		$this->cadre(110,220,80,60,array(
+			array('txt'=>"Date / Cachet / Visa",'align'=>"C"),
+			array('txt'=>"[SignatureFournisseur/]","color"=>"white"),
+			"","","","",""
+		),"Partie réservée à Absystech");
 
 
 		$this->pied($infos_societe);
@@ -1214,9 +1312,14 @@ class pdf_absystech extends pdf {
 		$this->setx(60);
 		$this->Cell(135,4,ATF::societe()->maSociete['email'],0,1,'R');
 		$this->setx(60);
-		$this->Cell(135,4,"Tel : ".ATF::societe()->maSociete['tel'],0,1,'R');
-		$this->setx(60);
-		$this->Cell(135,4,"Fax : ".ATF::societe()->maSociete['fax'],0,1,'R');
+		if(ATF::societe()->maSociete['tel']){
+			$this->Cell(135,4,"Tel : ".ATF::societe()->maSociete['tel'],0,1,'R');
+			$this->setx(60);
+		}
+
+		if(ATF::societe()->maSociete['fax']){
+			$this->Cell(135,4,"Fax : ".ATF::societe()->maSociete['fax'],0,1,'R');
+		}
 
 		$this->setfont('arial','B',11);
 		$this->cadre(75,30,60,5,NULL,"ORDRE DE MISSION",2,true);
@@ -2484,4 +2587,18 @@ class pdf_aewd extends pdf_absystech {
 	}
 }
 class pdf_wapp6 extends pdf_absystech { }
+class pdf_atoutcoms extends pdf_absystech {
+
+	//Couleur CLEODIS
+	public $Rentete = 251;
+	public $Gentete = 109;
+	public $Bentete = 43;
+
+	public $bgcolorTableau = "fb6d2b";
+	public $txtcolorTableau = "000000";
+
+
+}
+
+class pdf_nco extends pdf_absystech { }
 ?>

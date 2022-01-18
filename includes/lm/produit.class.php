@@ -59,14 +59,19 @@ class produit_lm extends produit {
 		$this->panels['simulateur'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true);
     	$this->colonnes['panel']["affichage_site_souscription"][]=array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'simulateur');
 
+    	$this->files["cga_produit"] = array("type"=>"pdf");
 
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
+
+
 
 		$this->colonnes["panel"]["fournisseur_lignes"] = array(
 			"loyer_fournisseur"=>array("custom"=>true),
 			"produit_fournisseur"=>array("custom"=>true),
 			'tva_prix_achat',
-			'element_declencheur'
+			'element_declencheur',
+			'prevenir_presta_arret',
+			'ref_fournisseur'
 		);
 
 
@@ -101,7 +106,7 @@ class produit_lm extends produit {
 		$this->foreign_key["id_pack_produit"] = "pack_produit";
 		$this->foreign_key["id_compte_produit"] = "compte_produit";
 
-		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
+		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer','produit_links');
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['update'] =

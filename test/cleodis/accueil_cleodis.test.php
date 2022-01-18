@@ -37,7 +37,7 @@ class accueil_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	/* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
 	public function test_widgets_cleodisbe(){
-		ATF::db()->select_db("extranet_v3_cleodisbe");
+		ATF::db()->select_db("optima_cleodisbe");
 		$c = new accueil_cleodisbe();	
 		
 		$this->assertEquals(
@@ -47,7 +47,7 @@ class accueil_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		);
 
 
-		ATF::db()->select_db("extranet_v3_cleodis");		
+		ATF::db()->select_db("optima_cleodis");		
 	}
 
 	public function test_type_agence(){

@@ -1,0 +1,64 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=devis}
+{$type = devis_prix}
+<div id="{$module}_devis_ca" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->devis_prix()}
+
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_devis_ca',
+            type: 'column'
+        },
+        title: {            
+            text: "CA des devis des 30 derniers jours"
+            ,style :{
+                fontSize: '10px'
+            }
+        },
+        colors :[
+            "#FF0033",
+            "#FFCF23",
+            "#19FF30"
+        ],
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },        
+        yAxis: {
+            title: {
+                text: null
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+                    {if $key == "attente"},visible: false {/if}
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});    
+    
+</script>
+
+<div>
+   
+</div>
+{/strip}

@@ -41,7 +41,9 @@ class affaire_etat extends classes_optima {
 	 */
 	public function _POST($get, $post){
 		$id_affaire = ATF::affaire()->decryptId($post["id_affaire"]);
-		$etat = "autre";
+		if(!$post["etat"]) $etat = "autre";
+		else $etat = $post["etat"];
+
 		$commentaire = json_encode($post);
 
 		ATF::affaire_etat()->insert(array(

@@ -1,0 +1,2602 @@
+<?xml version="1.0" encoding="UTF-8"?><Suppliers>
+<Supplier>
+<SupplierNumber>32420</SupplierNumber>
+<Name>DEROTRONIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>37 RUE ERNEST DECONINCK</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>37835609100017</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>32398</SupplierNumber>
+<Name>OPHTEL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>8 PLACE DE L EUROPE</Street>
+<PostalCode>94220</PostalCode>
+<City>CHARENTON LE PONT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34942437400057</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>32374</SupplierNumber>
+<Name>MICROSOFT FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>39 QUAI DU PRESIDENT ROOSEVELT</Street>
+<PostalCode>92130</PostalCode>
+<City>ISSY LES MOULINEAUX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>32773318400516</TaxCode>
+<TelephoneNumber>0970019090</TelephoneNumber>
+<FaxNumber>0157757700</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>32009</SupplierNumber>
+<Name>CLEODIS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>144 RUE NATIONALE</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45307981600048</TaxCode>
+<TelephoneNumber>0675726113</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>31478</SupplierNumber>
+<Name>MICRO INFORMATIQUE SERVICES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>1 LE GRAND CLERE</Street>
+<PostalCode>37220</PostalCode>
+<City>BRIZAY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>41529027900025</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>31258</SupplierNumber>
+<Name>PC CONSULTANTS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>44 rue Foch</Street>
+<PostalCode>77590</PostalCode>
+<City>CHARTRETTES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>53986889300014</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>31053</SupplierNumber>
+<Name>SARL "INTER-ACTIF"</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Parc d'affairesAllée JM Amelin - Bat D</Street>
+<PostalCode>51370</PostalCode>
+<City>CHAMPIGNY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44970885800047</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>30935</SupplierNumber>
+<Name>BRUNET MIGNE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>19 AVENUE DE LA COOPERATION</Street>
+<PostalCode>86200</PostalCode>
+<City>LOUDUN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38981890700385</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>30361</SupplierNumber>
+<Name>ALIAS INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>9 Rue de Champagne</Street>
+<PostalCode>59770</PostalCode>
+<City>MARLY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80532072800019</TaxCode>
+<TelephoneNumber>0685015675</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29764</SupplierNumber>
+<Name>DECATHLON THONON</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>LOT LE CARTHERAY</Street>
+<PostalCode>74500</PostalCode>
+<City>PUBLIER</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50056940500961</TaxCode>
+<TelephoneNumber>0675726113</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29754</SupplierNumber>
+<Name>DECATHLON Barentin</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE DE L EMS</Street>
+<PostalCode>76360</PostalCode>
+<City>BARENTIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50056940502314</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29740</SupplierNumber>
+<Name>LOC'A'LOISIR</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>33 BOULEVARD DALOZ</Street>
+<PostalCode>62520</PostalCode>
+<City>LE TOUQUET PARIS PLAGE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>41201646100052</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29718</SupplierNumber>
+<Name>FLUNCH</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>BOULEVARD VAN GOGH</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>32077251000022</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29647</SupplierNumber>
+<Name>CYCLES N' REPAIR</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 B AVENUE DES LILAS</Street>
+<PostalCode>59552</PostalCode>
+<City>COURCHELETTES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>82336174600014</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29473</SupplierNumber>
+<Name>SA ERICK DEBUSSCHERE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE DU TRIEU DU QUESNOY</Street>
+<PostalCode>59390</PostalCode>
+<City>TOUFFLERS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34103734900055</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29458</SupplierNumber>
+<Name>RECOMMERCE SOLUTIONS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>54 AVENUE LENINE</Street>
+<PostalCode>94250</PostalCode>
+<City>GENTILLY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>51396940200033</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29189</SupplierNumber>
+<Name>HOME PROTEKT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>24 AVENUE HENRI FREVILLE</Street>
+<PostalCode>35200</PostalCode>
+<City>RENNES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>82878549300028</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29162</SupplierNumber>
+<Name>MC DISTRIBUTION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>13 BOULEVARD OLOF PALME</Street>
+<PostalCode>62110</PostalCode>
+<City>HENIN BEAUMONT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>83773487000012</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29144</SupplierNumber>
+<Name>NGI GROUP</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Parc de Crécy10 B, rue de la Voie Lactée</Street>
+<PostalCode>69370</PostalCode>
+<City>SAINT DIDIER AU MONT D'OR</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49024284900043</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29109</SupplierNumber>
+<Name>DECATHLON btwin</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 RUE JEAN PERRIN</Street>
+<PostalCode>59000</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>30613890003613</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29031</SupplierNumber>
+<Name>OGEA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 BOULEVARD DE MONS</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50176699200017</TaxCode>
+<TelephoneNumber>0320337500</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29022</SupplierNumber>
+<Name>SARL MD INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ZONE ARTISANALE LIEUDIT LA GARE</Street>
+<PostalCode>38150</PostalCode>
+<City>SALAISE SUR SANNE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44870370200044</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29019</SupplierNumber>
+<Name>NOUVELLE FOG AUTOMOTIVE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>82 AV DU 85 EME DE LIGNE</Street>
+<PostalCode>58200</PostalCode>
+<City>COSNE COURS SUR LOIRE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80296071600024</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>29010</SupplierNumber>
+<Name>PAPIER NUMERIQUE - PN</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ALLEE DE LA GLORIETTE</Street>
+<PostalCode>38160</PostalCode>
+<City>CHATTE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>53755929600018</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28997</SupplierNumber>
+<Name>TELEPHONE ELECTRICITE COURANTS FAIBLES ET INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>8 RUE DES LAINIERS</Street>
+<PostalCode>59150</PostalCode>
+<City>WATTRELOS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42177199900024</TaxCode>
+<TelephoneNumber>0320242094</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28978</SupplierNumber>
+<Name>DYADEM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ZONE ARTISANALE DU PAPILLON</Street>
+<PostalCode>37210</PostalCode>
+<City>PARCAY MESLAY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38820459600034</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28977</SupplierNumber>
+<Name>HABIL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>6/8 rue Paul Langevin</Street>
+<PostalCode>78370</PostalCode>
+<City>PLAISIR</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>83853932800016</TaxCode>
+<TelephoneNumber>0962691035</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28974</SupplierNumber>
+<Name>EGI FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>12 VOIE D ANGLETERRE</Street>
+<PostalCode>13127</PostalCode>
+<City>VITROLLES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80395503800010</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28973</SupplierNumber>
+<Name>BOULANGER PRO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>266 rue Jules Verne</Street>
+<PostalCode>59273</PostalCode>
+<City>FRETIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45122067700095</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28971</SupplierNumber>
+<Name>NETSULTING</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 RUE DE COURTALIN</Street>
+<PostalCode>77700</PostalCode>
+<City>MAGNY LE HONGRE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48929427200039</TaxCode>
+<TelephoneNumber>0164170148</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28847</SupplierNumber>
+<Name>FLOREDEL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>3 Rue Joseph Cugnot</Street>
+<PostalCode>64230</PostalCode>
+<City>LESCAR</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49049405100017</TaxCode>
+<TelephoneNumber>0559778350</TelephoneNumber>
+<FaxNumber>0559778351</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28835</SupplierNumber>
+<Name>ALL CABLING SERVICES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Parc Industriel 3Boîte C</Street>
+<PostalCode>1440</PostalCode>
+<City>BRAINE-LE-CHÂTEAU</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE 0501 763 479</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28770</SupplierNumber>
+<Name>SICOMOR HDF</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 RUE VICTOR HUGO</Street>
+<PostalCode>59350</PostalCode>
+<City>SAINT ANDRE LEZ LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>83331605200012</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28749</SupplierNumber>
+<Name>COSIUM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>7 rue Jean Mermoz</Street>
+<PostalCode>78000</PostalCode>
+<City>VERSAILLES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44764885800028</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28718</SupplierNumber>
+<Name>DOMISYS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE OLIVIER DE SERRES</Street>
+<PostalCode>44119</PostalCode>
+<City>GRANDCHAMPS-DES-FONTAINES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>41537824900148</TaxCode>
+<TelephoneNumber>0240929191</TelephoneNumber>
+<FaxNumber>0240929190</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28681</SupplierNumber>
+<Name>SODIFRANCE ISIS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Avenue Saint VincentParc d'Activités de la BretècheCS26804</Street>
+<PostalCode>35768</PostalCode>
+<City>ST GRÉGOIRE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42045838200017</TaxCode>
+<TelephoneNumber>0299234600</TelephoneNumber>
+<FaxNumber>0299234610</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28668</SupplierNumber>
+<Name>HUMELAB</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ROUTE DE PARIS</Street>
+<PostalCode>28100</PostalCode>
+<City>DREUX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43890278500023</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28663</SupplierNumber>
+<Name>C.E.P.I.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 rue de Chenonceaux</Street>
+<PostalCode>37270</PostalCode>
+<City>SAINT MARTIN LE BEAU</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40212876300057</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28657</SupplierNumber>
+<Name>C.S.T.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>144 RUE NATIONALE</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48516121000037</TaxCode>
+<TelephoneNumber>0671649773</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28598</SupplierNumber>
+<Name>ICON INTERNATIONAL FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>7 rue Auvray de la Bataille</Street>
+<PostalCode>14610</PostalCode>
+<City>COLOMBY-ANGUERNY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>78909819100024</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28588</SupplierNumber>
+<Name>ABC FEU</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>56 Bis Rue Jean Duvert</Street>
+<PostalCode>33290</PostalCode>
+<City>BLANQUEFORT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31716619700044</TaxCode>
+<TelephoneNumber>0556577589</TelephoneNumber>
+<FaxNumber>0556579303</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28581</SupplierNumber>
+<Name>BOUDART AURELIE SYLVIE MURIEL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>42 RUE DU GENERAL SARRAIL</Street>
+<PostalCode>59100</PostalCode>
+<City>ROUBAIX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>53341833100039</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28572</SupplierNumber>
+<Name>LA SEGUE OPTIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Lieu-Dit Millet1 Avenue Jean Monnet</Street>
+<PostalCode>31390</PostalCode>
+<City>CARBONNE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>83006585000018</TaxCode>
+<TelephoneNumber>0561976410</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28568</SupplierNumber>
+<Name>EPSON FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>148 RUE VICTOR HUGO</Street>
+<PostalCode>92300</PostalCode>
+<City>LEVALLOIS PERRET</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>69202695800276</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28561</SupplierNumber>
+<Name>ISIDORE RESTAURATION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>23 rue Raymond Aron</Street>
+<PostalCode>76130</PostalCode>
+<City>MONT-SAINT-AIGNAN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>32756255900614</TaxCode>
+<TelephoneNumber>0235592010</TelephoneNumber>
+<FaxNumber>0235616743</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28545</SupplierNumber>
+<Name>CH TI CLIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 RUE PIERRE ET MARIE CURIE</Street>
+<PostalCode>59126</PostalCode>
+<City>LINSELLES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48153040000011</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28544</SupplierNumber>
+<Name>VOTRE SERVICE DU PERSONNEL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>114, Zone artisanale les 10 Muids</Street>
+<PostalCode>59770</PostalCode>
+<City>MARLY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40021976200012</TaxCode>
+<TelephoneNumber>0327322215</TelephoneNumber>
+<FaxNumber>0327334602</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28541</SupplierNumber>
+<Name>CAMi</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Chaussée de Charleroi 215-217</Street>
+<PostalCode>1060</PostalCode>
+<City>BRUSSEL</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE 0424 607 503</TaxCode>
+<TelephoneNumber>+3225380152</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28527</SupplierNumber>
+<Name>LOKOA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>37 BOULEVARD BERTHELOT</Street>
+<PostalCode>63400</PostalCode>
+<City>CHAMALIERES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44260197700030</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28500</SupplierNumber>
+<Name>HIPPOS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Rue du Progrès 5</Street>
+<PostalCode>7503</PostalCode>
+<City>FROYENNES</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE 0807 958 134</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28455</SupplierNumber>
+<Name>GLASTINT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 RUE JOSEPH BRESSAN</Street>
+<PostalCode></PostalCode>
+<City>MONACO</City>
+<CountryName>MC</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49979374300018</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28443</SupplierNumber>
+<Name>TOSHIBA SYSTEMES (FRANCE) S.A.S.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>7 RUE AMPERE</Street>
+<PostalCode>92800</PostalCode>
+<City>PUTEAUX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>33803624700041</TaxCode>
+<TelephoneNumber>0147282828</TelephoneNumber>
+<FaxNumber>0147282829</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>28437</SupplierNumber>
+<Name>CAISS'MAG SYSTEMES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>3 rue Claude Debussy</Street>
+<PostalCode>59155</PostalCode>
+<City>FACHES THUMESNIL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38858134000030</TaxCode>
+<TelephoneNumber>0320878880</TelephoneNumber>
+<FaxNumber>0320879491</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27583</SupplierNumber>
+<Name>AGENCE COMMERCIALE AUTOMOBILE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>9rue des Behis</Street>
+<PostalCode>54840</PostalCode>
+<City>VELAINE EN HAYE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>79127840100017</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27564</SupplierNumber>
+<Name>TABLETTE STORE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>9 rue Thomas Edison</Street>
+<PostalCode>35690</PostalCode>
+<City>ACIGNE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>53074423400036</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27549</SupplierNumber>
+<Name>PROVETIQ INDUSTRIE GROUP</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>270 AVENUE DU PIC DE BERTAGNE</Street>
+<PostalCode>13420</PostalCode>
+<City>GEMENOS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31662265300053</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27537</SupplierNumber>
+<Name>SITACI</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>130 RUE GEORGES CHARPAK</Street>
+<PostalCode>44115</PostalCode>
+<City>HAUTE GOULAINE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34160485800074</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27502</SupplierNumber>
+<Name>FITTINGBOX</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>644 L OCCITANE</Street>
+<PostalCode>31670</PostalCode>
+<City>LABEGE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49145299100038</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27482</SupplierNumber>
+<Name>EXERTIS FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>99 avenue de la PyramideZI Paris Nord 2 CS64060</Street>
+<PostalCode>95972</PostalCode>
+<City>ROISSY CDG Cedex</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34006217300067</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27481</SupplierNumber>
+<Name>JARLTECH</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street></Street>
+<PostalCode></PostalCode>
+<City></City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27458</SupplierNumber>
+<Name>TNT EXPRESS NATIONAL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>58 Avenue LeclercCS 17237</Street>
+<PostalCode>59354</PostalCode>
+<City>LYON CEDEX 07</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31888323800392</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27447</SupplierNumber>
+<Name>ADEMIS INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>12 RUE JULES FERRY</Street>
+<PostalCode>35300</PostalCode>
+<City>FOUGERES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>53877430800034</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27423</SupplierNumber>
+<Name>2SI LEASE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 Avenue de Laon</Street>
+<PostalCode>02200</PostalCode>
+<City>SOISSONS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44237274400015</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27411</SupplierNumber>
+<Name>INFOSEC COMMUNICATION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 RUE DE LA RIGOTIERE</Street>
+<PostalCode>44700</PostalCode>
+<City>ORVAULT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38324971100045</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>27396</SupplierNumber>
+<Name>AIDC SHOP</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE DE LA CENSE DES RAISNES</Street>
+<PostalCode>59710</PostalCode>
+<City>ENNEVELIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49247007500010</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>26870</SupplierNumber>
+<Name>LES PLEIADES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>PARC D'ACTIVITES DU PONTEIX</Street>
+<PostalCode>24750</PostalCode>
+<City>BOULAZAC</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>41808230100031</TaxCode>
+<TelephoneNumber>0553053581</TelephoneNumber>
+<FaxNumber>0553055383</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24300</SupplierNumber>
+<Name>IT2I</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>16 place J-B Hennion</Street>
+<PostalCode>59211</PostalCode>
+<City>SANTES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48104569800059</TaxCode>
+<TelephoneNumber>0320151212</TelephoneNumber>
+<FaxNumber>0320153638</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24296</SupplierNumber>
+<Name>2SI TELECOM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 Place de Laon</Street>
+<PostalCode>02200</PostalCode>
+<City>SOISSONS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>78971288200016</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24194</SupplierNumber>
+<Name>BRIE PIECES ET OUTILLAGE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>25 Rue Davene</Street>
+<PostalCode>77120</PostalCode>
+<City>COULOMMIERS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>47921393600012</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24150</SupplierNumber>
+<Name>MAINTRONIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>1856 Chemin de St Bernard</Street>
+<PostalCode>06220</PostalCode>
+<City>VALLAURIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>96750494500155</TaxCode>
+<TelephoneNumber>0492919090</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24139</SupplierNumber>
+<Name>DECOR HEYTENS BELGIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Avenue Lavoisier 9</Street>
+<PostalCode>1300</PostalCode>
+<City>WAVRE - BELGIQUE</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24138</SupplierNumber>
+<Name>VAL DECO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Parc Atout SudRoute de Pornic</Street>
+<PostalCode>44400</PostalCode>
+<City>REZE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80395901400025</TaxCode>
+<TelephoneNumber>0240341252</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24057</SupplierNumber>
+<Name>AXA FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street></Street>
+<PostalCode></PostalCode>
+<City></City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24048</SupplierNumber>
+<Name>INSTORE SOLUTION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE DE LA CENSE DES RAINES</Street>
+<PostalCode>59710</PostalCode>
+<City>ENNEVELIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49114233700022</TaxCode>
+<TelephoneNumber>0328777888</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24009</SupplierNumber>
+<Name>LORA DECO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>21 avenue du Général de Gaulle</Street>
+<PostalCode>69410</PostalCode>
+<City>CHAMPAGNE AU MONT D'OR</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>81885557900012</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24008</SupplierNumber>
+<Name>2A-DECO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Avenue des GoissesChemin de Puisieux</Street>
+<PostalCode>51350</PostalCode>
+<City>CORMONTREUIL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>81906135900017</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>24007</SupplierNumber>
+<Name>DECOR HEYTENS FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>90 avenue du Grand SudRN 10</Street>
+<PostalCode>37170</PostalCode>
+<City>CHAMBRAY LES TOURS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>96750575102574</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23949</SupplierNumber>
+<Name>DOMO PLUS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 PLACE DES HAUTS TILLIERS</Street>
+<PostalCode>92230</PostalCode>
+<City>GENNEVILLIERS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43804336600170</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23939</SupplierNumber>
+<Name>S G U I</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>5 T RUE CLEMENT ADER</Street>
+<PostalCode>60200</PostalCode>
+<City>COMPIEGNE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>39022702300061</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23920</SupplierNumber>
+<Name>BE.WAN</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Drève Richelle, 161 L</Street>
+<PostalCode>1410</PostalCode>
+<City>WATERLOO</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE0469203054</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23910</SupplierNumber>
+<Name>SARL IDEAL CONCEPT INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>22 RUE DE PARIS</Street>
+<PostalCode>35500</PostalCode>
+<City>VITRE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45026792700017</TaxCode>
+<TelephoneNumber>0299751398</TelephoneNumber>
+<FaxNumber>0299745046</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23904</SupplierNumber>
+<Name>NZATI JACQUES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>10 AVENUE MARIE CURIE</Street>
+<PostalCode>59910</PostalCode>
+<City>BONDUES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50864555300035</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23899</SupplierNumber>
+<Name>INTEGR-IT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>349 rue Léona Occre</Street>
+<PostalCode>62690</PostalCode>
+<City>AUBIGNY EN ARTOIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49963214900021</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23855</SupplierNumber>
+<Name>DEFI LIGNE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>37 RUE DE LA CRESSONNIERE</Street>
+<PostalCode>78930</PostalCode>
+<City>VERT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>81495330300017</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23794</SupplierNumber>
+<Name>E-FINANCES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>1 RUE DU PROFESSEUR JEAN ROUXEL</Street>
+<PostalCode>44470</PostalCode>
+<City>CARQUEFOU</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43457686400046</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23324</SupplierNumber>
+<Name>HYLIAD DISTRIBUTION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>10 BOULEVARD MARIUS VIVIER MERLETour Oxygène</Street>
+<PostalCode>69003</PostalCode>
+<City>LYON 3EME</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>81033728700017</TaxCode>
+<TelephoneNumber>+33472538399</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23307</SupplierNumber>
+<Name>SARL SATCOMS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>CHEMIN DE CROISETTE</Street>
+<PostalCode>62118</PostalCode>
+<City>ROEUX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>32506104200025</TaxCode>
+<TelephoneNumber>0321239100</TelephoneNumber>
+<FaxNumber>0321074510</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23306</SupplierNumber>
+<Name>LEROY MERLIN FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE CHANZYM. Benjamin TRONQUIT</Street>
+<PostalCode>59260</PostalCode>
+<City>LEZENNES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38456094200045</TaxCode>
+<TelephoneNumber>0328808080</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23299</SupplierNumber>
+<Name>OPTIMUM CIT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 RUE DE LA SEYNE SUR MER</Street>
+<PostalCode>83140</PostalCode>
+<City>SIX FOURS LES PLAGES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>32337885100055</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23297</SupplierNumber>
+<Name>GROUPE ID LOG</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2203 chemin de Saint-ClaudeLe Chorus</Street>
+<PostalCode>06600</PostalCode>
+<City>ANTIBES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>442 610 713 00012</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23273</SupplierNumber>
+<Name>VIT'S</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>8 RUE DU PONCEAU</Street>
+<PostalCode>95000</PostalCode>
+<City>CERGY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>41866372000054</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23261</SupplierNumber>
+<Name>PRINTRONIX FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>13 RUE SALOMON ROTHSCHILD</Street>
+<PostalCode>92150</PostalCode>
+<City>SURESNES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42220467700039</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23255</SupplierNumber>
+<Name>KOHA SOLUTIONS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>144 AVENUE CHARLES DE GAULLE</Street>
+<PostalCode>92200</PostalCode>
+<City>NEUILLY SUR SEINE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>53348951400034</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23238</SupplierNumber>
+<Name>EURL DEIIS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>81 AV DU GENERAL LECLERC</Street>
+<PostalCode>95480</PostalCode>
+<City>PIERRELAYE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45197077600014</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23231</SupplierNumber>
+<Name>TPA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>31 VOIE DE LA LIBERTE</Street>
+<PostalCode>57160</PostalCode>
+<City>SCY CHAZELLES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50792920600021</TaxCode>
+<TelephoneNumber>0326077919</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>23220</SupplierNumber>
+<Name>I.T.A.2000</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>45 CHEMIN DEPARTEMENTAL 915</Street>
+<PostalCode>95520</PostalCode>
+<City>OSNY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42138789500020</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20642</SupplierNumber>
+<Name>JDC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 RUE CHRISTIAN FRANCERIES</Street>
+<PostalCode>33520</PostalCode>
+<City>BRUGES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>35075312500235</TaxCode>
+<TelephoneNumber>0326477057</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20639</SupplierNumber>
+<Name>LE SWID</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>8 RUE ANDRE CAPELLE</Street>
+<PostalCode>95390</PostalCode>
+<City>SAINT PRIX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50929138100010</TaxCode>
+<TelephoneNumber>0608934254</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20631</SupplierNumber>
+<Name>SYNEOTEC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>27 RUE DE L ALOUETTE</Street>
+<PostalCode>59553</PostalCode>
+<City>CUINCY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>75072843800011</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20622</SupplierNumber>
+<Name>DECATHLON SA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 BD DE MONS</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>30613890001294</TaxCode>
+<TelephoneNumber>0320916103</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20604</SupplierNumber>
+<Name>LENI</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>94 B RUE MARCEAU</Street>
+<PostalCode>93100</PostalCode>
+<City>MONTREUIL SOUS BOIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42139904900053</TaxCode>
+<TelephoneNumber>0149204545</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20600</SupplierNumber>
+<Name>IFG</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 PL DES COMBATTANTS</Street>
+<PostalCode>59310</PostalCode>
+<City>ORCHIES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38141448100022</TaxCode>
+<TelephoneNumber>0320648731</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20553</SupplierNumber>
+<Name>ELIONA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Schaarbeeklei   636</Street>
+<PostalCode>1800</PostalCode>
+<City>Vilvoorde</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>046335989200000</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20543</SupplierNumber>
+<Name>ADD-ON CONSULTING</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>16 RUE AMPERE</Street>
+<PostalCode>95300</PostalCode>
+<City>PONTOISE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42421896400049</TaxCode>
+<TelephoneNumber>0134353690</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20537</SupplierNumber>
+<Name>BOUYGUES TELECOM ENTREPRISES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>37-39 rue Boissière</Street>
+<PostalCode>75116</PostalCode>
+<City>PARIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>397 480 930 03498</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20536</SupplierNumber>
+<Name>ORANGE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>78 RUE OLIVIER DE SERRES</Street>
+<PostalCode>75015</PostalCode>
+<City>PARIS 15</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38012986646850</TaxCode>
+<TelephoneNumber>0144442222</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>20535</SupplierNumber>
+<Name>BE CLOUD</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>6 RUE DE LA BOULE ROUGE</Street>
+<PostalCode>75009</PostalCode>
+<City>PARIS 9</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>75181890700022</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>12939</SupplierNumber>
+<Name>SOFINOR</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Parc d'activités de la HoussoyeRue Ambroise Paré</Street>
+<PostalCode>59280</PostalCode>
+<City>BOIS GRENIER</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>47050109900027</TaxCode>
+<TelephoneNumber>0320103490</TelephoneNumber>
+<FaxNumber>0320359595</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>12936</SupplierNumber>
+<Name>D L M</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>32 PL DE LA GARE</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>46950054000015</TaxCode>
+<TelephoneNumber>0321675900</TelephoneNumber>
+<FaxNumber>0321674340</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>11994</SupplierNumber>
+<Name>TUPOS GRAPHIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ZA DES MARLIERES 7 RUE DES MARLIERES</Street>
+<PostalCode>59710</PostalCode>
+<City>AVELIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>33034515800027</TaxCode>
+<TelephoneNumber>0320165190</TelephoneNumber>
+<FaxNumber>0320326145</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>11714</SupplierNumber>
+<Name>ETABLISSEMENTS ROCHES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>1903 RUE DU BEAU MARAISBP 679</Street>
+<PostalCode>62100</PostalCode>
+<City>CALAIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>30335722200023</TaxCode>
+<TelephoneNumber>0321975510</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9994</SupplierNumber>
+<Name>RADIOSHOP</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ZI La Lauze7 rue Saint Exupéry</Street>
+<PostalCode>34430</PostalCode>
+<City>SAINT JEAN DE VEDAS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48486992000047</TaxCode>
+<TelephoneNumber>0467150303</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9993</SupplierNumber>
+<Name>PLANET MONETIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 rue Tournefort</Street>
+<PostalCode>42000</PostalCode>
+<City>SAINT ETIENNE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45043872600033</TaxCode>
+<TelephoneNumber>0975332431</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9990</SupplierNumber>
+<Name>LIEVIN 2R</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 RUE FRANCOIS COURTIN</Street>
+<PostalCode>62800</PostalCode>
+<City>LIEVIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80883883300016</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9988</SupplierNumber>
+<Name>ALARME TELESURVEILLANCE ILE DE FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>8 rue de Saint Laurent Loisy</Street>
+<PostalCode>60950</PostalCode>
+<City>ERMENONVILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38274405000016</TaxCode>
+<TelephoneNumber>0344543694</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9945</SupplierNumber>
+<Name>SAB SYSTEM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>91 RUE LEGENDRE</Street>
+<PostalCode>75017</PostalCode>
+<City>PARIS 17</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>52320717300015</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9941</SupplierNumber>
+<Name>365 IT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>21 AVENUE DE LA CREATIVITE</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>52939170800029</TaxCode>
+<TelephoneNumber>0320194711</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>9940</SupplierNumber>
+<Name>MEDIA COMMUNICATION IDF</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>3 RUE DE LA LIBERATION</Street>
+<PostalCode>95450</PostalCode>
+<City>CONDECOURT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>41790604700036</TaxCode>
+<TelephoneNumber>0134351979</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6739</SupplierNumber>
+<Name>"BUREAUTIQUE SERVICES 95"</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>55 RUE DE PARIS CD 84</Street>
+<PostalCode>95500</PostalCode>
+<City>GONESSE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43930467600026</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6738</SupplierNumber>
+<Name>SATO FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Parc d'ActivitésRue Jacques Messager</Street>
+<PostalCode>59175</PostalCode>
+<City>TEMPLEMARS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31007041200062</TaxCode>
+<TelephoneNumber>0320629640</TelephoneNumber>
+<FaxNumber>0320629655</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6737</SupplierNumber>
+<Name>IRIS INFORMATIQUE.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>CHEMIN DE COYEZA Artois-Flandres</Street>
+<PostalCode>95270</PostalCode>
+<City>CHAUMONTEL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>39239852500080</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6733</SupplierNumber>
+<Name>OFP</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>41/47 rue de la Granges aux Belles</Street>
+<PostalCode>75010</PostalCode>
+<City>PARIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>65203164200018</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6732</SupplierNumber>
+<Name>GLOBAL POS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>985 chemin de Mas de Rochet</Street>
+<PostalCode>34170</PostalCode>
+<City>CASTELNAU LE LEZ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45190295100024</TaxCode>
+<TelephoneNumber>0499522528</TelephoneNumber>
+<FaxNumber>0499522529</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6731</SupplierNumber>
+<Name>TILLSTER, INC.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>5959 Cornerstone Court West, Suite 100</Street>
+<PostalCode>92121</PostalCode>
+<City>SAN DIEGO - CALIFORNIE</City>
+<CountryName>US</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6730</SupplierNumber>
+<Name>AC2D</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 impasse Emile Combres</Street>
+<PostalCode>95560</PostalCode>
+<City>MONTSOULT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31033830600049</TaxCode>
+<TelephoneNumber>0134083250</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6729</SupplierNumber>
+<Name>MYTEC S.R.L.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Via Confalonieri 48/g</Street>
+<PostalCode>20835</PostalCode>
+<City>MUGGIO</City>
+<CountryName>IT</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber>+390399466362</TelephoneNumber>
+<FaxNumber>+390362630225</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6728</SupplierNumber>
+<Name>ZENCONNECT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>14 rue SoleilletBL30</Street>
+<PostalCode>75020</PostalCode>
+<City>PARIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>75156549000024</TaxCode>
+<TelephoneNumber>0147973897</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6727</SupplierNumber>
+<Name>ALLIANCE INTERNATIONALE INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>6 rue des martires</Street>
+<PostalCode>75009</PostalCode>
+<City>PARIS 9</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40372878500011</TaxCode>
+<TelephoneNumber>0153200959</TelephoneNumber>
+<FaxNumber>0144532854</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6720</SupplierNumber>
+<Name>AGSCOM TV</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>20 RUE LAVOISIER</Street>
+<PostalCode>95300</PostalCode>
+<City>PONTOISE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80863273100010</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6712</SupplierNumber>
+<Name>BLUE-PRINT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>68 AV DES GUILLERAIES</Street>
+<PostalCode>92000</PostalCode>
+<City>NANTERRE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44270556200035</TaxCode>
+<TelephoneNumber>0130255338</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6707</SupplierNumber>
+<Name>FLANDRES ARTOIS PICARDIE INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>15 RUE DE LA DISTILLERIE</Street>
+<PostalCode>59493</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34082888800024</TaxCode>
+<TelephoneNumber>0320415000</TelephoneNumber>
+<FaxNumber>0320415001</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6688</SupplierNumber>
+<Name>AXE PERF</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>5 PL DU GRAND MARTROY</Street>
+<PostalCode>95300</PostalCode>
+<City>PONTOISE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50892464400026</TaxCode>
+<TelephoneNumber>0134240325</TelephoneNumber>
+<FaxNumber>0130320015</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6658</SupplierNumber>
+<Name>TECHNIPRINT SERVICES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>68 AV DES GUILLERAIES</Street>
+<PostalCode>92000</PostalCode>
+<City>NANTERRE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42181659600033</TaxCode>
+<TelephoneNumber>0147821988</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6644</SupplierNumber>
+<Name>PLAETEVOET SPORT ET PAYSAGES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>87 RTE DE STEENDAM</Street>
+<PostalCode>59210</PostalCode>
+<City>COUDEKERQUE BRANCHE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>35058499100011</TaxCode>
+<TelephoneNumber>0328631025</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6639</SupplierNumber>
+<Name>TRANSMATIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Via E. Ferrari 9/11/13</Street>
+<PostalCode>20824</PostalCode>
+<City>LAZZATE</City>
+<CountryName>IT</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6635</SupplierNumber>
+<Name>GPE INFORMAT DEVELOPP TECHNOLOGIQUES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>17 RUE LEVACHER CINTRAT</Street>
+<PostalCode>91460</PostalCode>
+<City>MARCOUSSIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40860142500049</TaxCode>
+<TelephoneNumber>0169633090</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6626</SupplierNumber>
+<Name>TRANSFERTPRESS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>21 rue Denis Papin</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>52515288000023</TaxCode>
+<TelephoneNumber>0320161461</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6622</SupplierNumber>
+<Name>IMPRESSIONS SYSTEMES BUREAUTIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>6 CHE DE LA CHAPELLE ST ANTOINE</Street>
+<PostalCode>95300</PostalCode>
+<City>ENNERY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48025692400022</TaxCode>
+<TelephoneNumber>0130732010</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6609</SupplierNumber>
+<Name>ISWITCH</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>54 boulevard Emile Basly</Street>
+<PostalCode>62300</PostalCode>
+<City>LENS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50240602800022</TaxCode>
+<TelephoneNumber>0366070178</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6589</SupplierNumber>
+<Name>ZTECH</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>21 AV DES GENOTTES</Street>
+<PostalCode>95800</PostalCode>
+<City>CERGY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44324452000047</TaxCode>
+<TelephoneNumber>0134488727</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6584</SupplierNumber>
+<Name>OKI SYSTEMES FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>21 RUE DU JURA</Street>
+<PostalCode>94150</PostalCode>
+<City>RUNGIS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38508514700044</TaxCode>
+<TelephoneNumber>0145604416</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6581</SupplierNumber>
+<Name>TILM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 RTE D HARGEVILLE</Street>
+<PostalCode>78790</PostalCode>
+<City>ARNOUVILLE LES MANTES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>54008834100016</TaxCode>
+<TelephoneNumber>0953566037</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6576</SupplierNumber>
+<Name>MOBILIER BUREAU SCOLAIRE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>15 RUE DE LA BRIQUETERIE</Street>
+<PostalCode>95330</PostalCode>
+<City>DOMONT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>30798123300041</TaxCode>
+<TelephoneNumber>0139354180</TelephoneNumber>
+<FaxNumber>0139916033</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6570</SupplierNumber>
+<Name>MOKA WORKS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>25 RUE SAINTE APOLLINE</Street>
+<PostalCode>75002</PostalCode>
+<City>PARIS 2</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43943528000029</TaxCode>
+<TelephoneNumber>0155805831</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6565</SupplierNumber>
+<Name>EASYSCOM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>16 RUE DES CHAMPS</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48146559900035</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6536</SupplierNumber>
+<Name>ADAGE ASBL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE DES SAPINS 31</Street>
+<PostalCode>7603</PostalCode>
+<City>PERUWELZ</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>475845277</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6511</SupplierNumber>
+<Name>DOMETIC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>ZA DU PRE DE LA DAME JEANNE</Street>
+<PostalCode>60128</PostalCode>
+<City>PLAILLY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43863642500037</TaxCode>
+<TelephoneNumber>0344633500</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6508</SupplierNumber>
+<Name>2 SI SYSTEMES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 PLACE DE LAON</Street>
+<PostalCode>02200</PostalCode>
+<City>SOISSONS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34873105000046</TaxCode>
+<TelephoneNumber>0323763500</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6501</SupplierNumber>
+<Name>TOP OFFICE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>145 BD DE VALMY</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40405219300160</TaxCode>
+<TelephoneNumber>0320799490</TelephoneNumber>
+<FaxNumber>0328800101</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6484</SupplierNumber>
+<Name>KERL@N INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>PL LYAUTEY</Street>
+<PostalCode>62114</PostalCode>
+<City>SAINS EN GOHELLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>52897636800019</TaxCode>
+<TelephoneNumber>0321445150</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6471</SupplierNumber>
+<Name>BICOM SYSTEMS EURL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>68 RUE PRINCIPALE MOULIN LE COMTE</Street>
+<PostalCode>62120</PostalCode>
+<City>AIRE SUR LA LYS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>47899396700023</TaxCode>
+<TelephoneNumber>0950906531</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6469</SupplierNumber>
+<Name>SIX FOURS PIECES AUTOS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>799 AV DOCTEUR CALMETTE</Street>
+<PostalCode>83210</PostalCode>
+<City>LA FARLEDE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38093206100027</TaxCode>
+<TelephoneNumber>0494004000</TelephoneNumber>
+<FaxNumber>0494230105</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6454</SupplierNumber>
+<Name>ORDITECH SA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Rue de la Terre à Briques 29B</Street>
+<PostalCode>7522</PostalCode>
+<City>MARQUAIN</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE0.458.737.843</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6433</SupplierNumber>
+<Name>ALPHA 3 INFORMATIQUE PICARDIE CHAMPAGN</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>78 AV DE LAON</Street>
+<PostalCode>02200</PostalCode>
+<City>SOISSONS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>39774398000013</TaxCode>
+<TelephoneNumber>0323763196</TelephoneNumber>
+<FaxNumber>0323594367</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6424</SupplierNumber>
+<Name>HAXES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>43 RUE CROIX SAINT FIRMIN</Street>
+<PostalCode>80090</PostalCode>
+<City>AMIENS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>43217290600021</TaxCode>
+<TelephoneNumber>0322729309</TelephoneNumber>
+<FaxNumber>0322729309</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6419</SupplierNumber>
+<Name>SARL LEO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>154 RUE NATIONALE</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40077329700025</TaxCode>
+<TelephoneNumber>0366724267</TelephoneNumber>
+<FaxNumber>0320151111</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6416</SupplierNumber>
+<Name>E PROGEST</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>19 RUE NESTOR GREHANT</Street>
+<PostalCode>02000</PostalCode>
+<City>LAON</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44141552800039</TaxCode>
+<TelephoneNumber>0323237878</TelephoneNumber>
+<FaxNumber>0323237879</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6412</SupplierNumber>
+<Name>BURGER KING FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>1 RUE DU CHEVALIER DE ST GEORGES</Street>
+<PostalCode>75008</PostalCode>
+<City>PARIS 8</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>79788286700014</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6404</SupplierNumber>
+<Name>Q MATIC FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>108 AV DE STALINGRAD</Street>
+<PostalCode>94800</PostalCode>
+<City>VILLEJUIF</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34862955100055</TaxCode>
+<TelephoneNumber>0140530904</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6400</SupplierNumber>
+<Name>FLAG 2000</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>30 rue des artisans</Street>
+<PostalCode>5150</PostalCode>
+<City>FLOREFFE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE00408366</TaxCode>
+<TelephoneNumber>0032495302735</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6385</SupplierNumber>
+<Name>AXECOM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>6 D RUE DE LILLE</Street>
+<PostalCode>59223</PostalCode>
+<City>RONCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80753595000016</TaxCode>
+<TelephoneNumber>0320031070</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6376</SupplierNumber>
+<Name>HELLA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 AV ALBERT EINSTEIN</Street>
+<PostalCode>93150</PostalCode>
+<City>LE BLANC MESNIL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>78549506000010</TaxCode>
+<TelephoneNumber>0149395959</TelephoneNumber>
+<FaxNumber>0148674052</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6374</SupplierNumber>
+<Name>IRIS INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>459 Rue d’AthènesZA Artois Flandres</Street>
+<PostalCode>62138</PostalCode>
+<City>BILLY BERCLAU</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>39239852500098</TaxCode>
+<TelephoneNumber>0988660300</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6367</SupplierNumber>
+<Name>DETAMECO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>142 RUE NATIONALE</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45023362200015</TaxCode>
+<TelephoneNumber>0328523532</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6365</SupplierNumber>
+<Name>VALCKE SERVICES BVBA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>Menenstraat 423</Street>
+<PostalCode>B8560</PostalCode>
+<City>Wevelgem</City>
+<CountryName>BE</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>BE 0424.878.905</TaxCode>
+<TelephoneNumber>003256438555</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6361</SupplierNumber>
+<Name>A.KA.O. INFORMATIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>22 AV ANATOLE FRANCE</Street>
+<PostalCode>59410</PostalCode>
+<City>ANZIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44286115900030</TaxCode>
+<TelephoneNumber>0327202222</TelephoneNumber>
+<FaxNumber>0327202220</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6347</SupplierNumber>
+<Name>FRANFINANCE LOCATION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>57 AV DE CHATOU</Street>
+<PostalCode>92500</PostalCode>
+<City>RUEIL MALMAISON</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31497580600055</TaxCode>
+<TelephoneNumber>0141295556</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6345</SupplierNumber>
+<Name>INFORMAT CONCEPT ADM RESEAUX SYSTEMES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>2 VOIE D ESPAGNE</Street>
+<PostalCode>13127</PostalCode>
+<City>VITROLLES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48426673900032</TaxCode>
+<TelephoneNumber>0442893971</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6343</SupplierNumber>
+<Name>SOLUCIA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>105 AV DE LA REPUBLIQUE</Street>
+<PostalCode>59110</PostalCode>
+<City>LA MADELEINE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>44473295200031</TaxCode>
+<TelephoneNumber>0320063205</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6332</SupplierNumber>
+<Name>ISYNUX</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>44 RUE MONTLUC</Street>
+<PostalCode>62610</PostalCode>
+<City>ARDRES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>51937984600016</TaxCode>
+<TelephoneNumber>0321172993</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6320</SupplierNumber>
+<Name>MAGENTA OFFICE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>45 RUE ROLLIN</Street>
+<PostalCode>59100</PostalCode>
+<City>ROUBAIX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>80174705600019</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6309</SupplierNumber>
+<Name>ELMA BUREAUTIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>7 Rue des Erables</Street>
+<PostalCode>41240</PostalCode>
+<City>OUZOUER LE MARCHE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber>0254825909</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6304</SupplierNumber>
+<Name>M' EXPERIENCES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>92 RUE DU GENERAL DE GAULLE</Street>
+<PostalCode>59139</PostalCode>
+<City>WATTIGNIES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49456680500029</TaxCode>
+<TelephoneNumber>0954669138</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6297</SupplierNumber>
+<Name>S.EM.R.</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>62 rue de Versailles</Street>
+<PostalCode>78150</PostalCode>
+<City>LE CHESNAY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>79443709500027</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6294</SupplierNumber>
+<Name>RASTERTECH</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>137 RUE DE L ABBE COULON</Street>
+<PostalCode>59250</PostalCode>
+<City>HALLUIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45360146000018</TaxCode>
+<TelephoneNumber>0320031637</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6289</SupplierNumber>
+<Name>JPLS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>51 RUE MARCEL HENAUX</Street>
+<PostalCode>59000</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>50324901300015</TaxCode>
+<TelephoneNumber>0320525404</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6283</SupplierNumber>
+<Name>PC LOGICIELS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>52 RUE DU GENERAL LECLERC</Street>
+<PostalCode>59840</PostalCode>
+<City>PERENCHIES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42972313300030</TaxCode>
+<TelephoneNumber>0320179085</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6265</SupplierNumber>
+<Name>SHOPPERTRAK FRANCE SARL</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>32 RUE CHAPSAL</Street>
+<PostalCode>94340</PostalCode>
+<City>JOINVILLE LE PONT</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>40904053200031</TaxCode>
+<TelephoneNumber>0155121000</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6256</SupplierNumber>
+<Name>LEADER INFORMAT INGENIERIE INTERNET</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>144 ALL HELENE BOUCHER</Street>
+<PostalCode>59118</PostalCode>
+<City>WAMBRECHIES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49889038300025</TaxCode>
+<TelephoneNumber>0359391259</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6241</SupplierNumber>
+<Name>ALSO FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>10 AV DES LOUVRESSES</Street>
+<PostalCode>92230</PostalCode>
+<City>GENNEVILLIERS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>39114114000122</TaxCode>
+<TelephoneNumber>0147987963</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6238</SupplierNumber>
+<Name>SPIRAL VERTICAL SOLUTIONS</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>12 B RUE DU 35E REGIMENT D AVIATION</Street>
+<PostalCode>69500</PostalCode>
+<City>BRON</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>45100934400057</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6233</SupplierNumber>
+<Name>OCTANT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE HENRI POTEZ</Street>
+<PostalCode>37210</PostalCode>
+<City>PARCAY MESLAY</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42242959700020</TaxCode>
+<TelephoneNumber>0247290431</TelephoneNumber>
+<FaxNumber>0247291530</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6228</SupplierNumber>
+<Name>PREMIUM COMPUTER SERVICES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>3 AV DU MARECHAL JUIN</Street>
+<PostalCode>95500</PostalCode>
+<City>GONESSE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>38395877400036</TaxCode>
+<TelephoneNumber>0139875694</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6226</SupplierNumber>
+<Name>NEXTIRAONE FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>340 AV DE LA MARNE</Street>
+<PostalCode>59700</PostalCode>
+<City>MARCQ EN BAROEUL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>42469104600025</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6224</SupplierNumber>
+<Name>MICRO SERVICES INFORMATIQUES</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>15 RUE JULES LAMMENS</Street>
+<PostalCode>59370</PostalCode>
+<City>MONS EN BAROEUL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>33143010800034</TaxCode>
+<TelephoneNumber>0320195239</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6216</SupplierNumber>
+<Name>INOVAXO</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>11 RUE DU PETIT CHATELIER</Street>
+<PostalCode>44300</PostalCode>
+<City>NANTES</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>51351906600049</TaxCode>
+<TelephoneNumber>0890710288</TelephoneNumber>
+<FaxNumber>0251132849</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6206</SupplierNumber>
+<Name>AMAZON</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street></Street>
+<PostalCode></PostalCode>
+<City></City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6196</SupplierNumber>
+<Name>SARL LEMAIRE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>139 AV GEORGES CLEMENCEAU</Street>
+<PostalCode>59500</PostalCode>
+<City>DOUAI</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>75107238000015</TaxCode>
+<TelephoneNumber>0327714805</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6195</SupplierNumber>
+<Name>LOGICIELS APPLICATION FORMATION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>10 AVENUE DES LOUVRESSES</Street>
+<PostalCode>92230</PostalCode>
+<City>GENNEVILLIERS</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34166419100192</TaxCode>
+<TelephoneNumber>0971550399</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6193</SupplierNumber>
+<Name>CANON FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street></Street>
+<PostalCode></PostalCode>
+<City></City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6182</SupplierNumber>
+<Name>CAP RECOUVREMENT</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>144 rue Nationale</Street>
+<PostalCode>59800</PostalCode>
+<City>LILLE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>39246844300099</TaxCode>
+<TelephoneNumber>0328167130</TelephoneNumber>
+<FaxNumber>0320976882</FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6162</SupplierNumber>
+<Name>JCA BATI-TECH</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>17 RUE DU ONZE NOVEMBRE 1918</Street>
+<PostalCode>69320</PostalCode>
+<City>FEYZIN</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>52224901000011</TaxCode>
+<TelephoneNumber>0437258645</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6144</SupplierNumber>
+<Name>ALTERNATIVE BUREAUTIQUE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>RUE DE L HORLOGERIE</Street>
+<PostalCode>62400</PostalCode>
+<City>BETHUNE</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>79937046500012</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6136</SupplierNumber>
+<Name>COFIRHAD</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>16 B AV VICTOR HUGO</Street>
+<PostalCode>38170</PostalCode>
+<City>SEYSSINET PARISET</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>35143823900011</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6132</SupplierNumber>
+<Name>WERTHER FRANCE</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>16 RUE ALBERT ET PAUL THOUVENIN</Street>
+<PostalCode>18100</PostalCode>
+<City>VIERZON</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>31196115500067</TaxCode>
+<TelephoneNumber>0248533030</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6129</SupplierNumber>
+<Name>DJP SOLUTIONS D'IMPRESSION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>4 GRANDE RUE FENELON</Street>
+<PostalCode>59400</PostalCode>
+<City>CAMBRAI</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>79461835500018</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6114</SupplierNumber>
+<Name>PROVAC</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>12 voie d'AngleterreZAC de l'Anjoly - BP 20127</Street>
+<PostalCode>13744</PostalCode>
+<City>VITROLLES CEDEX</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode></TaxCode>
+<TelephoneNumber>0442153535</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6110</SupplierNumber>
+<Name>SARL ARD COM</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>340 AV DE LA MARNE</Street>
+<PostalCode>59700</PostalCode>
+<City>MARCQ EN BAROEUL</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>48087350400025</TaxCode>
+<TelephoneNumber>0320800098</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6107</SupplierNumber>
+<Name>RAYONNANCE DISTRIBUTION</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>25 RUE DE PONTHIEU</Street>
+<PostalCode>75008</PostalCode>
+<City>PARIS 8</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>49120366700010</TaxCode>
+<TelephoneNumber></TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+<Supplier>
+<SupplierNumber>6106</SupplierNumber>
+<Name>AVENIR TELEMATIQUE SA</Name>
+<OrganizationNumber>001</OrganizationNumber>
+<Street>21 AV DE LA CREATIVITE</Street>
+<PostalCode>59650</PostalCode>
+<City>VILLENEUVE D'ASCQ</City>
+<CountryName>FR</CountryName>
+<Blocked>0</Blocked>
+<TaxCode>34760776400011</TaxCode>
+<TelephoneNumber>0328800300</TelephoneNumber>
+<FaxNumber></FaxNumber>
+</Supplier>
+</Suppliers>

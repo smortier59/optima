@@ -4,336 +4,384 @@
 * @package Optima
 */
 require_once dirname(__FILE__)."/../pointage.class.php";
-class pointage_demo extends pointage { 
+/**
+ * @codeCoverageIgnore
+ */
+class pointage_absystech extends pointage {
 	/**
 	* Contructeur
 	*/
 	public function __construct() {
 		parent::__construct();
-		
-		$this->addPrivilege("planification","update");
-		$this->addPrivilege("getPointageByUser");
-		$this->addPrivilege("updateTemps","update");
-		$this->addPrivilege("updateTache","update");
-		$this->addPrivilege("exportXLS","update");
-	}	
-	
-	public function getPointageByUser($infos) {
-		
-		$date = mktime(0,0,0,$infos['month']+2,0,$infos['year']);
-		$this->q->reset()
-					->addField('pointage.date','date')
-					->addField('pointage.id_user','id_user')
-					->addField('pointage.id_pointage_tache','id_pointage_tache')
-					->addField('user.login')
-					->addField('SUM(temps)','temps')
-					->from('pointage','id_user','user','id_user')
-					->where('pointage.date',date("Y-m",$date)."-%","OR", false, "LIKE")
-					->where('pointage.daynight',$infos['daynight'])
-					->addGroup('id_user')
-					->addGroup('date')
-					->addOrder("nom","asc");
-		
-//		$this->q->setToString();
-//		log::logger($this->sa(),'qjanon');
-//		$this->q->unsetToString();
-		$sa = $this->sa();
-		$total = 1;
-		foreach ($sa as $k=>$i) {
-			$date = explode("-",$i['date']);
-			
-			$return[$i['id_user']]["matricule"] = $i['user.login'];
-			$return[$i['id_user']]["user"] = ATF::user()->nom($i['id_user']);
-			$return[$i['id_user']]["id_user"] = ATF::user()->cryptId($i['id_user']);
-			$return[$i['id_user']]["$date[2]"] =$i['temps'];
-//			$return[$i['id_user']]["type_".$date[2]] = ATF::pointage_tache()->nom($i['id_pointage_tache']);
-			if ($i['id_pointage_tache']) {
-				$return[$i['id_user']]["type_label_".$date[2]] = ATF::pointage_tache()->nom($i['id_pointage_tache']);
-				$return[$i['id_user']]["type_".$date[2]] = $i['id_pointage_tache'];
-			}
-			$return[$i['id_user']]["id_".$date[2]] = $i['pointage.id_pointage'];
-			
-		}
-		
-		$pointageTaches = ATF::pointage_tache()->getAllLib();
-		// Pour enlever les index du tableaux qui font chier le store
-		foreach ($return as $k=>$i) {
-			// Ajout de pointage manquant sinon la gestion des index foire complètement.
-			for ($j=1; $j<32; $j++) {
-				if ($j<10) $j = "0".$j;
-				if (!$i[$j]) $i[$j] = 0;
-			}
-			
-			$semaine = 0;
-			$total = 0;
-			// Pour chaque entrée du tableau qui concerne le temps journalier
-			// Ici on calcule le total en parcourant le tableau de pointage.
-			for ($forVal=1; $forVal<32; $forVal++) {
-				if ($forVal<10) $forVal = "0".$forVal;
-				$date = mktime(0,0,0,$infos['month']+1,$forVal,$infos['year']);
-				
-				
-				// Total de la semaine pour un user
-				$i['total'.$semaine] += $i[$forVal];
-				// Total de la semaine pour tous les user
-				$tot['total'.$semaine] += $i[$forVal];
-				
-				// Si la date tombe un dimanche, on incrémente le compteur pour passer al a semaine suivante
-				if (date('N',$date)==7) {
-					$semaine++;
-				}
-				
-				// Total des temps de travail du lundi au vendredi pour un user
-				if (date('N',$date)!=7 && date('N',$date)!=6) {
-					$i['totalSemaine'] += $i[$forVal];
-					$tot['totalSemaine'] += $i[$forVal];
-				}
-				
-				// Total des temps de travail du week end pour un user
-				if (date('N',$date)==7 || date('N',$date)==6) {
-					$i['totalWeek'] += $i[$forVal];
-					$tot['totalWeek'] += $i[$forVal];
-				}
-				
-				// Total de la ligne pour un user
-				$i['total'] += $i[$forVal];
-				
-				// Total journalier
-				$tot[$forVal] += $i[$forVal];
-				
-				// Total par tâches
-				foreach ($pointageTaches as $tache) {
-					if ($i["type_label_".$forVal] == $tache) {
-						$totalTaches[$tache][$forVal] += $i[$forVal];
-						$totalTaches[$tache]["total"] += $i[$forVal];
-					} else {
-						$totalTaches[$tache][$forVal] += 0;
-						$totalTaches[$tache]["total"] += 0;
-					}
-				}
-			}
-			
-			// Total du total
-			$tot['total'] += $i['total'];
-			$result[] = $i;	
-		}
-		
-		foreach ($pointageTaches as $k=>$i) {
-			$semaine = 0;
-			$addToResult = array();
-			$addToResult["matricule"] = $k?"":"<b>Total</b>";
-			$addToResult["user"] = "<b>".$i."</b>";
-			foreach ($totalTaches[$i] as $k_=>$i_) {
-				
-				$addToResult[$k_] += $i_;
-				$addToResult["type_label_".$k_] = $i;
-				if (is_numeric($k_)) {
-					$date = mktime(0,0,0,$infos['month']+1,$k_,$infos['year']);
-					// Total de la semaine
-					$addToResult['total'.$semaine] += $i_;
-					// Si la date tombe un dimanche, on incrémente le compteur pour passer al a semaine suivante
-					if (date('N',$date)==7) {
-						$semaine++;
-					}
-					// Total des temps de travail du lundi au vendredi pour un user
-					if (date('N',$date)!=7 && date('N',$date)!=6) {
-						$addToResult['totalSemaine'] += $i_;
-					}
-					
-					// Total des temps de travail du week end pour un user
-					if (date('N',$date)==7 || date('N',$date)==6) {
-						$addToResult['totalWeek'] += $i_;
-					}
-				}
-				$addToResult['cls'] = 'total-row';
-				$addToResult['rowId'] = 'total'.$k_;
-			}
-			$result[] = $addToResult;
-		}
-//		log::logger($addToResult,'qjanon');
-		$tot['matricule'] = "";
-		$tot['user'] = "<b>Toutes tâches confondues</b>";
-		$tot['rowId'] = "total";
-		$result[] = $tot;
 
-		ATF::$json->add('totalCount',count($result));
-		return $result;
-		
+		$this->type = array('production'=>'Production', 'rd'=>'Recherche & Developpement');
+		$this->no_update = true;
+		$this->no_insert = true;
+		ATF::tracabilite()->no_trace[$this->table]=1;
+
+		$this->addPrivilege("pointages");
+		$this->addPrivilege("getCategorieScheduler");
 	}
-	
-	public function planification($infos) {
-		//Si un jour les checkbox group fonctionne avec les crochet dans le name, je pourrais retirer ce bout de code.
-		if ($infos['lundi']) $infos['pointage']['jours'][1] = $infos['lundi'];
-		if ($infos['mardi']) $infos['pointage']['jours'][2] = $infos['mardi'];
-		if ($infos['mercredi']) $infos['pointage']['jours'][3] = $infos['mercredi'];
-		if ($infos['jeudi']) $infos['pointage']['jours'][4] = $infos['jeudi'];
-		if ($infos['vendredi']) $infos['pointage']['jours'][5] = $infos['vendredi'];
-		if ($infos['samedi']) $infos['pointage']['jours'][6] = $infos['samedi'];
-		if ($infos['dimanche']) $infos['pointage']['jours'][7] = $infos['dimanche'];
-		$this->infoCollapse($infos);
-		if ($infos['tache']) {
-			$id_pointage_tache = ATF::pointage_tache()->getByLibelle($infos['tache'],'id_pointage_tache');
+
+	/** EXPERIMENTAL : Retourne des infos pour le scheduler
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param string $infos : Arguments postés en ajax
+	*/
+	public function pointages(&$infos){
+//		$infos['display'] = true;
+		// On récupère tous le pointage de l'utilisateur
+		$this->q->reset()->where('id_user',ATF::$usr->getId())->addOrder("date","desc");
+		$sa = $this->sa();
+		foreach ($sa as $k=>$i) {
+			if (!$i['id_gep_projet']) continue;
+			$startDate = $i['date']." "+$i['temps'];
+			$endDate = $i['date']." 18:00";
+			$time = $this->selectHoraire($i['date'],$i['sujet'],ATF::$usr->getId());
+
+			$return[] = array(
+				"Group"=>"default"
+				,"Id"=>"e".$k
+				,"ResourceId"=>$i['id_gep_projet']
+				,"StartDate"=>$startDate
+				,"EndDate"=>$endDate
+				,"Time"=>$time['temps']
+			);
 		}
-		$this->q->reset();
-		foreach (explode(",",$infos['userSelector']) as $k=>$i) {
-			if (!$i) continue;
-			$id_user = ATF::user()->decryptId($i);
-			$checkDate = $infos['startDate'];
-			$endDate = date('Y-m-d',strtotime($infos['endDate']." + 1 day"));
-			while ($endDate!=$checkDate) {
-				$j = date('N',strtotime($checkDate));
-				if (array_key_exists($j,$infos['jours'])) {
-					$this->q
-						->orWhere("date",$checkDate,"temps".$checkDate."_".$id_user."_".$infos['daynight'])
-						->andWhere("id_user",$id_user,"temps".$checkDate."_".$id_user."_".$infos['daynight'])
-						->andWhere("daynight",$infos['daynight'],"temps".$checkDate."_".$id_user."_".$infos['daynight'])
-						->addSuperCondition("user".$id_user.",temps".$checkDate."_".$id_user."_".$infos['daynight'],"OR","user".$id_user,false);
-//					if ($d = $this->selectWithDate($checkDate,$id_user,$infos['daynight'])) {
-//						$d['temps'] = $infos['temps'];
-//						$d['id_pointage_tache'] = $id_pointage_tache;
-//						$this->u($d);
-//					} else {
-						$insert[] = array(
-							"date"=>$checkDate
-							,"id_user"=>$id_user
-							,'id_pointage_tache'=>$id_pointage_tache
-							,"temps"=>$infos['temps']
-							,"daynight"=>$infos['daynight']
-						);
-//						$this->i($insert);
-//					}
-				}
-				
-				$checkDate = date('Y-m-d',strtotime($checkDate." + 1 day"));
-			}
-			$this->q->addSuperCondition("user".$id_user.",users","OR","users");
-		}
-		ATF::tracabilite()->maskTrace($this->table);
-		$this->delete();
-		$this->multi_insert($insert);
-		ATF::tracabilite()->unmaskTrace($this->table);
-		return true;
+
+		ATF::$json->add('totalCount',count($return));
+		return $return;
 	}
-	
-	public function selectWithDate($date,$id_user=false,$daynight='day'){
+
+	/** EXPERIMENTAL : Retourne des infos pour le scheduler
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param string $infos : Arguments postés en ajax
+	*/
+	public function getCategorieScheduler($infos){
 		$this->q->reset()
-					->where('date',$date)
-					->where('id_user',$id_user)
-					->where('daynight',$daynight)
-					->setDimension('row');
+					->addField("id_gep_projet")
+					->addField("type")
+					->setDistinct()
+					->addGroup('id_gep_projet')
+					->where('id_user',ATF::$usr->getId());
+		foreach ($this->sa() as $k=>$i) {
+			if (!$i['id_gep_projet']) continue;
+			$projet = ATF::gep_projet()->nom($i['id_gep_projet']);
+			$projetInfos = ATF::gep_projet()->select($i['id_gep_projet']);
+
+			/* rangement par projet
+			if (strstr($projet,"Optima")) {
+				$cat = "Optima";
+			} elseif (strstr($projet,"Nebula")) {
+				$cat = "Nebula";
+			} elseif (strstr($projet,"Ginger")) {
+				$cat = "Ginger";
+			} else {
+				$cat = $projet;
+			}*/
+
+			/* Rangement par société */
+			$cat = ATF::societe()->nom($projetInfos['id_societe']);
+
+			/* Rangement par type
+			$cat = $i['type'];*/
+
+
+			$return[] = array(
+				"Id"=>$i['id_gep_projet']
+				,"Name"=>$projet
+				,"Type"=>$i['type']
+				,"Category"=>$cat
+			);
+
+		}
+		ATF::$json->add('totalCount',count($return));
+
+		return $return;
+	}
+	/**
+	* Compte le nombre d'heures passees sur un mois et sur un projet
+	* @param : date date
+	* @param : int id_user
+	* @return float le nombre d'heures
+	*/
+	public function totalHeure($date,$id_user,$type=NULL,$sujet=NULL){
+		$this->q->reset()
+			->addField(array(
+			"REPLACE(
+				SUBSTRING_INDEX(
+					SEC_TO_TIME(
+						SUM(
+							TIME_TO_SEC(temps)
+						)
+					)
+				 ,':', 2 )
+			,':','h')"
+			))
+			->addCondition("`date`",$date."%","AND",false,"LIKE")
+			->addCondition("id_user",$this->decryptId($id_user),"AND");
+
+		if ($type) {
+			$this->q->addCondition("type",$type,"AND");
+		}
+		if ($sujet) {
+			$this->q->addCondition("sujet",$sujet,"AND");
+		}
+
+		$this->q->setDimension("cell");
+
 		return $this->sa();
 	}
 
-	public function updateTemps($infos) {
-		if (!$infos['id_user']) return false;
-		else $infos['id_user'] = ATF::user()->decryptId($infos['id_user']);
-		
-		if ($infos['year'] && $infos['month'] && $infos['day']) {
-			$infos['date'] = date('Y-m-d',mktime(0,0,0,$infos['month'],$infos['day']	,$infos['year']));
-			unset($infos['year'],$infos['month'],$infos['day']);
-		} else return false;
-		
-		if ($infos['id_pointage']) {
-			return $this->update($infos);
-		} else {
-			unset($infos['id_pointage']);
-			return $this->insert($infos);
-		}
-		
-	}
-
-	public function updateTache($infos) {
-		if (!$infos['id_pointage'] || !$infos['id_pointage_tache']) return false;
-		
-		foreach (json_decode($infos['id_pointage']) as $k=>$i) {
-			$u = array("id_pointage"=>$i,"id_pointage_tache"=>$infos['id_pointage_tache']);
-			$this->update($u);
-		}
-		
-		return true;
-	}
-
-	/** Insertion des données pour le premier onglet de l'export
-	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	/**
+	* Donne les requêtes de la journée par utilisateur AVEC LES RESULTATS HORAIRES DU POINTAGE (et non de la hotline)
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param string $date La date au format Y-m-d
+	* @param int $id_user l'utilisateur désiré !!
+	* @return array Un joli tableau contenant le num de la requête, le nom de L'entité, le résumé et le temps consacré
 	*/
-	public function exportXLS($infos){
-		session_write_close();
-	
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/php_writeexcel/class.writeexcel_workbook.inc.php";
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/php_writeexcel/class.writeexcel_worksheet.inc.php";
-		
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+	public function getRequetesByDays($date,$id_user){
+		$this->q->reset()
+			->addField("pointage.id_hotline")
+			->addField("pointage.id_societe")
+			->addField("societe")
+			->addField("hotline")
+			->addField(
+			"REPLACE(
+				SUBSTRING_INDEX(
+					SEC_TO_TIME(
+						SUM(
+							TIME_TO_SEC(pointage.temps)
+						)
+					)
+				 ,':', 2 )
+			,':','h')"
+			,"temps_calcule")
+			->addCondition("pointage.date",$date)
+			->addCondition("pointage.id_user",$this->decryptId($id_user),"AND")
+			->addJointure("pointage","id_hotline","hotline","id_hotline")
+			->addJointure("pointage","id_societe","societe","id_societe")
+			->addGroup("pointage.id_hotline")
+			->setStrict()
+			->setToString();
 
-		$workbook = new writeexcel_workbook($fname);
-		
-		$date = mktime(0,0,0,$infos['month']+1,1,$infos['year']);
-		$worksheet =& $workbook->addworksheet("Export ".date('F',$date)." ".date("Y",$date));
-		
-		$line = 1;
-		$r = $this->getPointageByUser($infos);
+		$subQuery=$this->sa();
+		$this->q->reset()
+            ->setSubQuery($subQuery,"a")
+			->addCondition("a.temps_calcule","00h00","AND","false","!=");
 
-		foreach ($r as $k=>$i) {
-			if (!$k) {
-				$worksheet->set_column(0,0,15);
-				$worksheet->set_column(1,1,20);
-				$worksheet->set_column(2,100,5);
-			}
-			
-			$worksheet->write(0, 0, "Matricule");  
-			$worksheet->write(0, 1, "Utilisateur");  
-			$incrementation=2;
-			$countTotal = 0;
-			$worksheet->write($line, 0, $i['matricule']);  
-			$worksheet->write($line, 1, $i['user']); 
+		return ATF::db($this->db)->select_all($this);
+	}
 
-			ksort($i);
 
-			foreach($i as $k_=>$i_){
-				if (!is_numeric($k_)) continue;
-				
-				$timestamp = mktime(0,0,0,$infos['month']+1,$k_,$infos['year']);
-				if (date('m',$timestamp) != $infos['month']+1) continue;
-				
-				$worksheet->write(0, $k_+1+$countTotal, date('D',$timestamp)."\n".$k_);  
-				
-//				if ($line==3) log::logger($k_.date("D",$timestamp)." et ".$countTotal." = ".($k_+1+$countTotal)." ecrire : ".$i_,"qjanon");
-				
-				$worksheet->write($line, $k_+1+$countTotal, $i_);  
-				
-				if (date("N",$timestamp)==7) {
-					$worksheet->write(0, $k_+2+$countTotal, "Total\nSemaine"); 
-					$worksheet->write($line, $k_+2+$countTotal, $i["total".$countTotal]);  
-					$countTotal++; 
-				}
-				
-				if (date("N",$timestamp)==7 || date("N",$timestamp)==6) {
-					$totalWE += $i_;
-					$total += $i_;
-				} else {
-					$totalSE += $i_;	
-					$total += $i_;
-				}
-			}
-			$worksheet->write(0, $k_+2+$countTotal, "SE"); 
-			$worksheet->write($line, $k_+2+$countTotal, $totalSE);  
-			$worksheet->write(0, $k_+3+$countTotal, "WE"); 
-			$worksheet->write($line, $k_+3+$countTotal, $totalWE);  
-			$worksheet->write(0, $k_+4+$countTotal, "Total"); 
-			$worksheet->write($line, $k_+4+$countTotal, $total);  
-			$line++;
-			$total = $totalSE = $totalWE = 0;
+	/**
+	* Selection des projets pour un user et une date donnée
+	* @author : Maïté Glinkowski
+	* @param : string date
+	* @param : int id_user
+	* @param : string type
+	* @return array
+	*/
+	public function selectSujet($date,$id_user,$type=NULL) {
+		$this->q->reset()
+			->addField('sujet,id_gep_projet,type')
+			->addCondition("pointage.id_user",$this->decryptId($id_user))
+			->addCondition("pointage.date",$date."%","AND",false,"LIKE")
+			->addGroup("sujet")
+			->addOrder("type,id_gep_projet,sujet");
+
+		if ($type) {
+			$this->q
+				->addCondition("type",$type,"AND")
+				->setDistinct();
+
+		} else {
+			$this->q
+
+				// Désativer les hotline (temporaire)
+				->addCondition("type","hotline","AND",false,"!=")
+
+			->addCondition("type","conge_sans_solde","AND",false,"!=")
+			->addCondition("type","arret","AND",false,"!=")
+			->addCondition("type","conge_annuel","AND",false,"!=")
+			->addCondition("type","conge_legaux","AND",false,"!=");
+
 		}
-		
-		$workbook->close();
 
-		header("Content-Type: application/x-msexcel; name=Export_pointage".date("_F_Y",$date).".xls");
-		header("Content-Disposition: attachment; filename=Export_pointage".date("_F_Y",$date).".xls");;
-		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");
-		fpassthru($fh);
-		unlink($fname);
+		return $this->sa();
+	}
+
+	/**
+	* Sélection du temps et de l'id du pointage pour un sujet, une date et un id_user donnés
+	* @param : string date
+	* @param : string sujet
+	* @param : int id_user
+	* @return array
+	*/
+	public function selectHoraire($date,$sujet,$id_user){
+		$this->q->reset()
+			->addField('id_pointage')
+			->addField(array("SUBSTR(`temps`,'1','5')"=>array("alias"=>"temps")))
+			->addCondition("pointage.date",$date)
+			->addCondition("pointage.sujet",$sujet)
+			->addCondition("pointage.id_user",$this->decryptId($id_user))
+			->setStrict()
+			->setDimension("row");
+
+		return $this->sa();
+	}
+
+	/**
+	* Supprime toutes les entrées dans la base où = $sujet & $date & $id_user
+	* @todo querier de suppression
+	* @param : string sujet
+	* @param : date date
+	* @param : int id_user
+	* @return boolean
+	*/
+	public function deleteHoraire($sujet,$date,$id_user) {
+		$query = "DELETE FROM `pointage`
+					WHERE `date` LIKE '".$date."%'
+					AND `sujet`='".addslashes($sujet)."'
+					AND `id_user`=".$this->decryptId($id_user)."
+					AND type!='conge'";
+		return ATF::db()->query($query);
+	}
+
+	/**
+	* Ajoute un nouveau pointage
+	* @param int $id_hotline L'identifiant de la hotline
+	* @param int $id_hotline_interaction L'identifiant de l'interaction (utilisé pour une meilleure traçabilité du pointage !)
+	* @param int $id_user L'utilisateur
+	* @param int $date La date
+	* @param string $tps le temps (H:i exemple 1:30 correspond à une heure et trente minutes)
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	*/
+	public function addPointage($id_hotline,$id_hotline_interaction,$id_user,$date,$temps){
+		$dateYmd = substr($date,0,10);
+		//Pointage actuel ?
+		$pointage=$this->select_special("id_hotline_interaction",$id_hotline_interaction);
+		if(is_array($pointage) && isset($pointage[0]["id_pointage"])){
+			$update = array(
+				"id_pointage"=>$pointage[0]["id_pointage"]
+				,"id_user"=>$id_user
+				,"date"=>$dateYmd
+				,"temps"=>$temps
+			);
+			parent::update($update);
+		}else{
+			$this->insert(
+				"hotline"
+				,$id_hotline
+				,$id_hotline_interaction
+				,$id_user
+				,$dateYmd
+				,$temps
+			);
+		}
+	}
+
+	/**
+	* Formatage des données pour le insert de classes
+	* @author : Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param string $choix gep, cours, personnalisé ou hotline
+	* @param int $id_hotline L'identifiant de la hotline
+	* @param int $id_hotline_interaction L'identifiant de l'interaction (utilisé pour une meilleure traçabilité du pointage !)
+	* @param int $id_user L'utilisateur
+	* @param int $date La date
+	* @param string $tps le temps (H:i exemple 1:30 correspond à une heure et trente minutes)
+	* @param string $personnalise Le nom du sujet personnalise
+	* @param string $type Un type de pointage person
+	* @param : array infos
+	*/
+	public function insert($choix,$id_hotline,$id_hotline_interaction,$id_user,$date,$tps,$personnalise=NULL,$type=NULL){
+		$insert=array();
+		switch($choix){
+			case "hotline":
+				if(is_numeric($id_hotline)){
+					$hotline = ATF::hotline()->select($id_hotline);
+				}
+				$insert = array(
+					"sujet"=>"Requete ".$hotline['id_hotline']
+					,"id_societe"=>$hotline['id_societe']
+					,"type"=>'hotline'
+					,"id_hotline"=>$hotline['id_hotline']
+					,"id_gep_projet"=>$hotline['id_gep_projet']
+					,"id_hotline_interaction"=>$id_hotline_interaction
+				);
+			break;
+			default:
+				$insert['sujet'] = $personnalise;
+				$insert['type'] = "production";
+			break;
+		}
+		//Type personnalisé
+		if ($type) {
+			$insert['type'] = $type;
+		}
+		//Utilisateur
+		$insert["id_user"] = $id_user;
+		//Date du jour (Y-m-d)
+		$insert['date'] = $date;
+		//Temps
+		$insert['temps'] = $tps;
+
+		return parent::insert($insert);
+	}
+
+	/**
+	* Supprime toutes les entrées d'un projet dans la table de pointage pour un user et une date donnés
+	* @atuhor : Maïté Glinkowski
+	* @param : array infos
+	* @return boolean
+	*/
+	public function delete($infos,&$s,$files=NULL,&$cadre_refreshed){
+		if(!$this->isMySheet($infos["id_user"])) return false;
+
+		ATF::db($this->db)->begin_transaction();
+		$id = $this->decryptId($infos["id_pointage"]);
+
+		$this->q->reset()
+			->addField("date")
+			->addField("sujet")
+			->addField("id_user")
+			->addCondition("id_pointage",$id);
+		$res=$this->sa();
+		if(!$res[0]) throw new errorATF("pointage_not_found");
+
+		$res=$res[0];
+		$id_user = $res["id_user"];
+		$date = explode('-',$res["date"]);
+		$mois = $date[1];
+		$annee = $date[0];
+		$date = $annee.'-'.$mois;
+		$sujet = $res["sujet"];
+
+		$this->deleteHoraire($sujet,$date,$id_user);
+		ATF::db()->commit_transaction();
+		ATF::$cr->add("main","pointage-select.tpl.htm",array('id_user'=>$id_user,'id_pointage'=>$id));
+		return true;
+
+	}
+
+	/**
+	* Mise à jour le temps passé pour une journée sur un pointage
+	* @author : Maïté Glinkowski
+	* @param : array $post : informations passées en post
+	* @return boolean
+	*/
+	public function maj($post,&$s,$files=NULL,&$cadre_refreshed){
+		ATF::$cr->rm("top");//Optimisation
+		if(!$this->isMySheet($post["id_user"])) return false;
+
+		$update['pointage'] = $post;
+		return $this->update($update,$s,$files);
 
 	}
 
 };
+
+class pointage_att extends pointage_absystech {
+};
+class pointage_demo extends pointage_absystech { };
+
 ?>

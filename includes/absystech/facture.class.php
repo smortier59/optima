@@ -416,10 +416,13 @@ class facture_absystech extends facture {
 				case 31: // prélèvement bancaire
 				case 38: // prélèvement annuel
 					$dayFacture = date('d', strtotime($infos['date']));
-					$monthFacture = date('m', strtotime($infos['date']));
-					if ($dayFacture > 15) $monthFacture += 1; // On incrémente si on a dépassé le 15 du mois
-					if ($monthFacture < 10) $monthFacture = "0".(int)$monthFacture; // On push des 0 significatif pour que la date soit correcte
-					$infos["date_previsionnelle"] = date('Y-'.$monthFacture.'-15',strtotime($infos['date']));
+
+					if ($dayFacture > 15) {
+						$infos["date_previsionnelle"] = date('Y-m-15',strtotime($infos['date'].' +1 month'));
+					} else {
+						$infos["date_previsionnelle"] = date('Y-m-15',strtotime($infos['date']));
+					}
+
 				break;
 				case 1: // A reception
 					$infos["date_previsionnelle"] = $infos['date'];
@@ -429,7 +432,7 @@ class facture_absystech extends facture {
 				break;
 			}
 		}
-
+		log::logger($infos['date_previsionnelle'], "qjanon");
 		$societe=ATF::societe()->select($infos["id_societe"]);
 
 		//Seuls les associés et Emma peuvent modifier la tva
@@ -462,11 +465,11 @@ class facture_absystech extends facture {
 				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 
-			$parent = $this->select($infos["id_facture_parente"]);
-			unset($parent['ref']);
+			//$parent = $this->select($infos["id_facture_parente"]);
+			//unset($parent['ref']);
 			//$infos = $parent;
 			$infos["type_facture"]="avoir";
-			$infos['prix'] = 0-$parent["prix"];
+			//$infos['prix'] = 0-$parent["prix"];
 
 			// ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
 			// if($id_commande_factures=ATF::commande_facture()->select_all()){
@@ -495,11 +498,13 @@ class facture_absystech extends facture {
 		//*****************************Transaction********************************
 
 			// Affaire
-			$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
-			if ($etat_affaire=="devis" || $etat_affaire=="commande") {
-				$affaire["id_affaire"]=$infos["id_affaire"];
-				$affaire["etat"]="facture";
-				ATF::affaire()->u($affaire,$s);
+			if($infos["id_affaire"]){
+				$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
+				if ($etat_affaire=="devis" || $etat_affaire=="commande") {
+					$affaire["id_affaire"]=$infos["id_affaire"];
+					$affaire["etat"]="facture";
+					ATF::affaire()->u($affaire,$s);
+				}
 			}
 			unset($infos["affaire_sans_devis_libelle"]);
 
@@ -1219,57 +1224,59 @@ class facture_absystech extends facture {
 				parent::delete($id,$s);
 
 				//On recupere les factures précédente pour récuperer la date de fin la plus proche
-				$this->q->reset()->where("facture.id_affaire", $facture["id_affaire"])->addField("facture.date_fin_periode");
-				$factures = $this->select_all();
+				if ($facture["id_affaire"]) {
+					$this->q->reset()->where("facture.id_affaire", $facture["id_affaire"])->addField("facture.date_fin_periode");
+					$factures = $this->select_all();
 
-				//Si pas d'autre facture la date de fin de période devient NULL
+					//Si pas d'autre facture la date de fin de période devient NULL
 
-				if(is_array($factures)){
-					$dateFin = "";
-					foreach($factures as $k=>$v){
-						if($v["facture.date_fin_periode"]){
-							$nbJours = ATF::facture_absystech()->date_diff($dateFin, $v["facture.date_fin_periode"]);
-							 if(($dateFin === "") || ($dateFin === NULL)){
-								$dateFin = $v["facture.date_fin_periode"];
-							}
-							else{
-								if($nbJours > 1){
+					if(is_array($factures)){
+						$dateFin = "";
+						foreach($factures as $k=>$v){
+							if($v["facture.date_fin_periode"]){
+								$nbJours = ATF::facture_absystech()->date_diff($dateFin, $v["facture.date_fin_periode"]);
+								 if(($dateFin === "") || ($dateFin === NULL)){
 									$dateFin = $v["facture.date_fin_periode"];
+								}
+								else{
+									if($nbJours > 1){
+										$dateFin = $v["facture.date_fin_periode"];
+									}
 								}
 							}
 						}
-					}
-					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => $dateFin));
-				}else{
-					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => NULL));
-				}
-
-
-				//Affaire
-				$this->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
-				$autre_affaire=parent::sa();
-
-				//S'il n'y a pas d'autres factures pour cette affaire
-				if($autre_affaire["count"]==0){
-					$affaire["id_affaire"]=$facture["id_affaire"];
-					ATF::devis()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
-					$devis = ATF::devis()->sa();
-					ATF::commande()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
-					$commande=ATF::commande()->sa();
-
-					//S'il y a au moins une commande pour cette affaire
-					if($commande["count"]>0){
-						$affaire["etat"]="commande";
-						ATF::affaire()->u($affaire,$s);
-					//S'il y a au moins un devis
-					}elseif($devis["count"]>0){
-						$affaire["etat"]="devis";
-						$affaire["forecast"]="20";
-						ATF::affaire()->u($affaire,$s);
-					//Sinon on peut tout supprimer
+						ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => $dateFin));
 					}else{
-						ATF::affaire()->delete($affaire["id_affaire"],$s);
-						unset($facture["id_affaire"]);
+						ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => NULL));
+					}
+
+
+					//Affaire
+					$this->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
+					$autre_affaire=parent::sa();
+
+					//S'il n'y a pas d'autres factures pour cette affaire
+					if($autre_affaire["count"]==0){
+						$affaire["id_affaire"]=$facture["id_affaire"];
+						ATF::devis()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
+						$devis = ATF::devis()->sa();
+						ATF::commande()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
+						$commande=ATF::commande()->sa();
+
+						//S'il y a au moins une commande pour cette affaire
+						if($commande["count"]>0){
+							$affaire["etat"]="commande";
+							ATF::affaire()->u($affaire,$s);
+						//S'il y a au moins un devis
+						}elseif($devis["count"]>0){
+							$affaire["etat"]="devis";
+							$affaire["forecast"]="20";
+							ATF::affaire()->u($affaire,$s);
+						//Sinon on peut tout supprimer
+						}else{
+							ATF::affaire()->delete($affaire["id_affaire"],$s);
+							unset($facture["id_affaire"]);
+						}
 					}
 				}
 
@@ -1421,7 +1428,6 @@ class facture_absystech extends facture {
 
 				$this->q->addField("YEAR(`date`)","year")
 						->addField("MONTH(`date`)","month")
-//						->addField("FLOOR(MONTH(`date`)/3)*3","month")
 						->addField("SUM(`prix`)","nb")
 						->addCondition("etat","impayee")
 						->addGroup("year")
@@ -1432,21 +1438,12 @@ class facture_absystech extends facture {
 				$this->q->addField("DISTINCT YEAR(`date`)","year");
 				$stats['YEARS'] =parent::select_all();
 
-//				foreach (util::month() as $k => $i) {
-//					if (((int)($k)-1)%3==0) {
-//						$Q = floor(((int)($k))/3)+1;
-//						$stats['categories']["category"][] = array("label"=>"Q".$Q,"hoverText"=>$i);
-//					}
-//				}
 				return parent::stats($stats,$type,$widget);
 
 			case "top10negatif":
 				$result=ATF::societe()->solde_total_global();
 				foreach ($result as $i) {
 					$graph['categories']["category"][] = array("label"=>"");
-//					if (count($graph['categories']["category"])==10) {
-//						break; // Pas plus de 10 sur le widget
-//					}
 				}
 				$graph['params']['showLegend'] = "0";
 				$graph['params']['bgAlpha'] = "0";
@@ -1464,9 +1461,6 @@ class facture_absystech extends facture {
 						,"color"=>$i["credits"]<-100?"FF0033":($i["soldeTotal"]<-10?"FF6600":"FFFF00")
 						,"link"=>urlencode("societe-select-".classes::cryptId($i["id_societe"]).".html")
 					);
-//					if (count($graph['dataset']["solde"]['set'])==10) {
-//						break; // Pas plus de 10 sur le widget
-//					}
 				}
 				return $graph;
 
@@ -1628,23 +1622,6 @@ class facture_absystech extends facture {
 		}
 	}
 
-//	/**
-//	* Donne le mail actuel
-//	* @return mixed
-//	*/
-//	public function getCurrentMail(){
-//		//Current mail
-//		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
-//		return $this->current_mail;
-//	}
-//
-//	/**
-//	* Initialise le mail courant
-//	* @param string $mail le nom du mail courant
-//	*/
-//	public function setCurrentMail($mail){
-//		$this->current_mail=&$this->$mail;
-//	}
 
 	/**
     * Select classique qui ne prend pas en compte certaines données lors du cloner
@@ -1767,7 +1744,6 @@ class facture_absystech extends facture {
 				 ->reset()
 				 ->addCondition("id_societe",$values["id_societe"])
 				 ->addCondition("prix",($montant+2),false,false,"<=")
-//				 ->addCondition("etat","impayee")
 				 ->addOrder("prix");
 
 			$dataToutes=parent::sa();
@@ -2249,9 +2225,13 @@ class facture_absystech extends facture {
 				}
 
 				$prelevement = "";
+				$journalCode = "VT";
 				if ($facture['id_termes'] == 24 || $facture['id_termes'] == 25 || $facture['id_termes'] == 38 || $facture['id_termes'] == 31) {
 					$prelevement = utf8_decode("Prélévement");
+					$journalCode = "VT2";
+					log::logger("PRELEVEMENT IDENTIFIE","export-comptable");
 				}
+				log::logger("JournalCode = ".$journalCode,"export-comptable");
 
 				// Si on a la période, on utilise les debut/fin dans le libellé, sinon la date de facture
 				if ($facture['date_debut_periode']) {
@@ -2260,8 +2240,9 @@ class facture_absystech extends facture {
 					$date_ou_periodes = date("Y-m-d",strtotime($facture['date']));
 				}
 
+
 				$line = array(
-					"VT",
+					$journalCode,
 					date('d/m/Y',strtotime($facture['date'])),
 					$societe['ref_comptable'] ? $societe['ref_comptable'] : $post['ref_comptable'][$societe['id_societe']],
 					$societe['societe'],
@@ -2279,7 +2260,7 @@ class facture_absystech extends facture {
 			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
 					$facture['prix'] = number_format($facture['prix'], 2, ".", "");
 					$line = array(
-						"VT",
+						$journalCode,
 						date('d/m/Y',strtotime($facture['date'])),
 						"419000",
 						$societe['societe'],
@@ -2312,7 +2293,7 @@ class facture_absystech extends facture {
 
 					  // LIGNES DE VENTILATION
 						$line = array(
-							"VT",
+							$journalCode,
 							date('d/m/Y',strtotime($facture['date'])),
 							ATF::compte_absystech()->select($id_compte,'code'),
 							$societe['societe'],
@@ -2333,7 +2314,7 @@ class facture_absystech extends facture {
   			  	foreach ($this->sa() as $acompte) {
 							$acompte['prix'] = number_format($acompte['prix'], 2, ".", "");
 							$line = array(
-								"VT",
+								$journalCode,
 								date('d/m/Y',strtotime($facture['date'])),
 								"419000",
 								$societe['societe'],
@@ -2353,7 +2334,7 @@ class facture_absystech extends facture {
 			  // Uniquement si présent, ou si facture type différend d'une facture d'acompte.
 			  if ($facture['frais_de_port'] > 0 && ($facture['type_facture']!='acompte' || $type_parent == 'acompte')) {
 					$line = array(
-						"VT",
+						$journalCode,
 						date('d/m/Y',strtotime($facture['date'])),
 						"708500",
 						$societe['societe'],
@@ -2376,7 +2357,7 @@ class facture_absystech extends facture {
 				}
 			  // LIGNES DE TVA
 				$line = array(
-					"VT",
+					$journalCode,
 					date('d/m/Y',strtotime($facture['date'])),
 					"445710",
 					$societe['societe'],
@@ -2392,6 +2373,7 @@ class facture_absystech extends facture {
 
 			}
 			fclose($file);
+
 		} catch (Exception $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
@@ -2480,5 +2462,8 @@ class facture_att extends facture_absystech {
 
 };
 class facture_wapp6 extends facture_absystech { };
+class facture_atoutcoms extends facture_absystech { };
 class facture_demo extends facture_absystech { };
+
+class facture_nco extends facture_absystech { };
 ?>

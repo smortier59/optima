@@ -672,7 +672,8 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "redevance"=> "oui",
                                     'date_rejet' => NULL,
                                     'date_regularisation' => NULL,
-                                    'nature' => null
+                                    'nature' => null,
+                                    'id_fournisseur_prepaiement'=> NULL
                                     )
                             ,$this->obj->select($id_facture)
                             ,"La facture s'est mal inséré");
@@ -2370,7 +2371,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $facture2 = ATF::facture()->select_row();
 
 
-        $this->assertEquals(277.96,$facture2["facture.prix"], "Prix incorrect facture prorata trimestrielle");
+        $this->assertEquals("1476.31",$facture2["facture.prix"], "Prix incorrect facture prorata trimestrielle");
         $this->assertEquals("2017-06-15",$facture2["facture.date_periode_debut"], "Debut periode facture prorata trimestrielle");
         $this->assertEquals("2017-06-30",$facture2["facture.date_periode_fin"], "Fin periode facture prorata trimestrielle");
         $this->assertEquals("prorata",$facture2["facture.nature"], "nature facture prorata trimestrielle");
@@ -2556,7 +2557,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
     // @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     private function beginTransaction($codename){
-        ATF::db()->select_db("extranet_v3_".$codename);
+        ATF::db()->select_db("optima_".$codename);
         ATF::$codename = $codename;
         ATF::db()->begin_transaction(true);
     }
@@ -2565,7 +2566,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     private function RollBackTransaction($codename){
         ATF::db()->rollback_transaction(true);
         ATF::$codename = "cleodis";
-        ATF::db()->select_db("extranet_v3_cleodis");
+        ATF::db()->select_db("optima_cleodis");
     }
 
 

@@ -1031,7 +1031,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                 "date_arret"=>NULL,
                                 "date_demande_resiliation"=>NULL,
                                 "date_prevision_restitution"=>NULL,
-                                "date_restitution_effective"=>NULL
+                                "date_restitution_effective"=>NULL,
+                                'etat_service1' => NULL,
+                                'type_contrat' => 'LS'
                             )
                             ,$selectCommande,'Erreur sur la commande');
 
@@ -1046,14 +1048,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "produit"=>"ZywallVis 5 - dispositif de sécurité",
                                     "quantite"=>"3",
                                     "id_fournisseur"=>1583,
-                                    "prix_achat"=>"1.00",
+                                    "prix_achat"=>"1.0000",
                                     "code"=>NULL,
                                     "id_affaire_provenance"=>NULL,
                                     "serial"=>NULL,
                                     "visible"=>"oui",
                                     "neuf"=>"oui",
                                     'date_achat' => NULL,
-                                    'commentaire' => NULL
+                                    'commentaire' => NULL,
+                                    'charge_fournisseur' => 'non',
+                                    'confirmation_arret_service' => null,
+                                    'date_arret_service' => null,
+                                    'prix_achat_ttc' => 0.00,
+                                    'prix_achat_ttc' => '0.00',
+                                    'duree' => null,
+                                    'loyer' => null,
+                                    'ean' => null,
+                                    'id_pack_produit' => null,
+                                    'id_sous_categorie' => null,
+                                    'pack_produit' => null,
+                                    'sous_categorie' => null,
+                                    'id_categorie' => null,
+                                    'categorie' => null,
+                                    'commentaire_produit' => null,
+                                    'visible_sur_site' => 'non',
+                                    'visible_pdf' => 'oui',
+                                    'ordre' => '1'
                                 ),
                                 array(
                                     "id_commande_ligne"=>$commande_ligne[1]["id_commande_ligne"],
@@ -1063,14 +1083,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "produit"=>"ZywallInvis 5 - dispositif de sécurité",
                                     "quantite"=>"3",
                                     "id_fournisseur"=>1583,
-                                    "prix_achat"=>"1.00",
+                                    "prix_achat"=>"1.0000",
                                     "code"=>NULL,
                                     "id_affaire_provenance"=>NULL,
                                     "serial"=>NULL,
                                     "visible"=>"non",
                                     "neuf"=>"oui",
                                     'date_achat' => NULL,
-                                    'commentaire' => NULL
+                                    'commentaire' => NULL,
+                                    'charge_fournisseur' => 'non',
+                                    'confirmation_arret_service' => null,
+                                    'date_arret_service' => null,
+                                    'prix_achat_ttc' => 0.00,
+                                    'prix_achat_ttc' => '0.00',
+                                    'duree' => null,
+                                    'loyer' => null,
+                                    'ean' => null,
+                                    'id_pack_produit' => null,
+                                    'id_sous_categorie' => null,
+                                    'pack_produit' => null,
+                                    'sous_categorie' => null,
+                                    'id_categorie' => null,
+                                    'categorie' => null,
+                                    'commentaire_produit' => null,
+                                    'visible_sur_site' => 'non',
+                                    'visible_pdf' => 'oui',
+                                    'ordre' => '1'
                                 )
                             )
                             ,$commande_ligne,'Erreur sur les lignes de commande');
@@ -1150,7 +1188,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                 "date_arret"=>NULL,
                                 "date_demande_resiliation"=>NULL,
                                 "date_prevision_restitution"=>NULL,
-                                "date_restitution_effective"=>NULL
+                                "date_restitution_effective"=>NULL,
+                                'etat_service1' => NULL,
+                                'type_contrat' => 'LS'
                             )
                             ,$selectCommande,'Erreur sur la commande');
 
@@ -1166,14 +1206,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "produit"=>"Zywall 5 - dispositif de sécurité",
                                     "quantite"=>"3",
                                     "id_fournisseur"=>1583,
-                                    "prix_achat"=>"1.00",
+                                    "prix_achat"=>"1.0000",
                                     "code"=>NULL,
                                     "id_affaire_provenance"=>NULL,
                                     "serial"=>NULL,
                                     "visible"=>"oui",
                                     "neuf"=>"oui",
                                     'date_achat' => NULL,
-                                    'commentaire' => NULL
+                                    'commentaire' => NULL,
+                                    'prix_achat_ttc' => '0.00',
+                                    'charge_fournisseur' => 'non',
+                                    'confirmation_arret_service' => null,
+                                    'date_arret_service' => null,
+                                    'prix_achat_ttc' => 0.00,
+                                    'duree' => null,
+                                    'loyer' => null,
+                                    'ean' => null,
+                                    'id_pack_produit' => null,
+                                    'id_sous_categorie' => null,
+                                    'pack_produit' => null,
+                                    'sous_categorie' => null,
+                                    'id_categorie' => null,
+                                    'categorie' => null,
+                                    'commentaire_produit' => null,
+                                    'visible_sur_site' => 'non',
+                                    'visible_pdf' => 'oui',
+                                    'ordre' => '1'
                                 ),
                                 array(
                                     "id_commande_ligne"=>$commande_ligne[1]["id_commande_ligne"],
@@ -1183,14 +1241,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "produit"=>"Optiplex GX520 TFT 17 DVD 48X",
                                     "quantite"=>"1",
                                     "id_fournisseur"=>1351,
-                                    "prix_achat"=>"100.00",
+                                    "prix_achat"=>"100.0000",
                                     "code"=>NULL,
                                     "id_affaire_provenance"=>26,
                                     "serial"=>NULL,
                                     "visible"=>"oui",
                                     "neuf"=>"oui",
                                     'date_achat' => NULL,
-                                    'commentaire' => NULL
+                                    'commentaire' => NULL,
+                                    'charge_fournisseur' => 'non',
+                                    'confirmation_arret_service' => null,
+                                    'date_arret_service' => null,
+                                    'prix_achat_ttc' => 0.00,
+                                    'prix_achat_ttc' => '0.00',
+                                    'duree' => null,
+                                    'loyer' => null,
+                                    'ean' => null,
+                                    'id_pack_produit' => null,
+                                    'id_sous_categorie' => null,
+                                    'pack_produit' => null,
+                                    'sous_categorie' => null,
+                                    'id_categorie' => null,
+                                    'categorie' => null,
+                                    'commentaire_produit' => null,
+                                    'visible_sur_site' => 'non',
+                                    'visible_pdf' => 'oui',
+                                    'ordre' => '1'
                                 )
                             )
                             ,$commande_ligne,'Erreur sur les lignes de commande');
@@ -1353,7 +1429,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         // Tests des notices
         $notices = ATF::$msg->getNotices();
-        $this->assertEquals(count($notices),30,'Le nombre de notices est incorrect');
+        $this->assertEquals(count($notices),31,'Le nombre de notices est incorrect');
     }
 
 /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
@@ -1414,7 +1490,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>NULL,
                                         "existence" =>"inactif",
-                                        'date_achat' => null),
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null),
                                     $parcAncien[0],
                                     "L'ancien parc n'est pas cohérent !");
 
@@ -1519,7 +1597,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $facturation=ATF::facturation()->sa();
-        $this->assertEquals(array(
+        $this->assertEquals(
                                 array(
                                         "id_facturation" => $facturation[0]["id_facturation"],
                                         "id_affaire" => $affaire["id_affaire"],
@@ -1532,14 +1610,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "type" => "contrat",
                                         "envoye" => "non",
                                         "date_periode_fin" =>$c->get("date_evolution"),
-                                        'serenite' => '0.00',
-                                        'maintenance' => '0.00',
-                                        'hotline' => '0.00',
-                                        'supervision' => '0.00',
-                                        'support' => '0.00'
+                                        'nature' => 'engagement'
                                         )
-                                    ),
-                                    $facturation,
+                                    ,
+                                    $facturation[0],
                                     "La facturation n'est pas cohérente démarré !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -1569,7 +1643,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>43,
                                         "existence" =>"actif",
-                                        'date_achat' => null)
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null)
                                     ),
                                     $parc,
                                     "Le nouveau parc n'est pas cohérent démarré !");
@@ -1593,7 +1669,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>NULL,
                                         "existence" =>"inactif",
-                                        'date_achat' => null),
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null
+                                    ),
                                     $parcAncien[0],
                                     "L'ancien parc n'est pas cohérent démarré !");
 
@@ -1690,6 +1769,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                 array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -1731,7 +1816,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>NULL,
                                         "existence" =>"inactif",
-                                        'date_achat' => null),
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null),
                                     $parcAncien[0],
                                     "L'ancien parc n'est pas cohérent !");
 
@@ -1755,6 +1842,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -1812,7 +1905,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $facturation=ATF::facturation()->sa();
-        $this->assertEquals(array(
+        $this->assertEquals(
                                 array(
                                         "id_facturation" => $facturation[0]["id_facturation"],
                                         "id_affaire" => $affaire["id_affaire"],
@@ -1825,14 +1918,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "type" => "contrat",
                                         "envoye" => "non",
                                         "date_periode_fin" =>$c->get("date_evolution"),
-                                        'serenite' => '0.00',
-                                        'maintenance' => '0.00',
-                                        'hotline' => '0.00',
-                                        'supervision' => '0.00',
-                                        'support' => '0.00'
+                                        'nature' => 'engagement'
                                         )
-                                    ),
-                                    $facturation,
+                                    ,
+                                    $facturation[0],
                                     "La facturation n'est pas cohérente démarré !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -1862,7 +1951,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>43,
                                         "existence" =>"inactif",
-                                        'date_achat' => null)
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null)
                                     ),
                                     $parc,
                                     "Le nouveau parc n'est pas cohérent démarré !");
@@ -1886,7 +1977,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>NULL,
                                         "existence" =>"actif",
-                                        'date_achat' => null),
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null),
                                     $parcAncien[0],
                                     "L'ancien parc n'est pas cohérent démarré !");
 
@@ -1919,6 +2012,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -1994,7 +2093,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>43,
                                         "existence" =>"inactif",
-                                        'date_achat' => null)
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null)
                                     ),
                                     $parc,
                                     "Le nouveau parc n'est pas cohérent quand c'est ré-initialisée non démarré !");
@@ -2018,7 +2119,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>NULL,
                                         "existence" =>"actif",
-                                        'date_achat' => null),
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null),
                                     $parcAncien[0],
                                     "L'ancien parc n'est pas cohérent quand c'est ré-initialisée non démarré !");
 
@@ -2040,6 +2143,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals($c->get("date_debut"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -2085,7 +2194,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $facturation=ATF::facturation()->sa();
-        $this->assertEquals(array(
+        $this->assertEquals(
                                 array(
                                         "id_facturation" => $facturation[0]["id_facturation"],
                                         "id_affaire" => $affaire["id_affaire"],
@@ -2098,14 +2207,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "type" => "contrat",
                                         "envoye" => "non",
                                         "date_periode_fin" =>$c->get("date_evolution"),
-                                        'serenite' => '0.00',
-                                        'maintenance' => '0.00',
-                                        'hotline' => '0.00',
-                                        'supervision' => '0.00',
-                                        'support' => '0.00'
+                                        'nature' => 'engagement'
                                         )
-                                    ),
-                                    $facturation,
+                                    ,
+                                    $facturation[0],
                                     "La facturation n'est pas cohérente !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -2135,7 +2240,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>43,
                                         "existence" =>"inactif",
-                                        'date_achat' => null)
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null)
                                     ),
                                     $parc,
                                     "Le nouveau parc n'est pas cohérent non démarré !");
@@ -2159,7 +2266,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_garantie" =>"2009-11-01",
                                         "provenance" =>NULL,
                                         "existence" =>"actif",
-                                        'date_achat' => null),
+                                        'date_achat' => null,
+                                        'provenanceParcReloue' => null,
+                                        'date_recuperation' => null),
                                     $parcAncien[0],
                                     "L'ancien parc n'est pas cohérent non démarré !");
     }
@@ -2207,6 +2316,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                             array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'Prolong.'",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
                                     "title" => null,
                                     "timer" => null,
                                     "type" => "success"
@@ -2314,6 +2429,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "timer" => null,
                                     "type" => "success"
                                     ),
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                             array(
                                 "msg" => "Email envoyé au(x) notifié(s)",
                                 "title" => null,
@@ -2372,6 +2493,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "timer" => null,
                                     "type" => "success"
                                     ),
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                             array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -2420,6 +2547,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -2537,6 +2670,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
                                 array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
+                                array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
                                     "timer" => null,
@@ -2585,6 +2724,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "timer" => null,
                                     "type" => "success"
                                     ),
+                            array(
+                                "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
+                                "title" => null,
+                                "timer" => null,
+                                "type" => "success"
+                                ),
                             array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -2717,6 +2862,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
                                 array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
+                                array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
                                     "timer" => null,
@@ -2793,6 +2944,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -2911,6 +3068,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
                                 array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
+                                array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
                                     "timer" => null,
@@ -2947,6 +3110,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -3026,6 +3195,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
                                 array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
+                                array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
                                     "timer" => null,
@@ -3068,6 +3243,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "timer" => null,
                                     "type" => "success"
                                         ),
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -3395,7 +3576,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "bdcExist"=>false,
                                         "demandeRefiExist"=>false,
                                         "factureAllow"=>false,
-                                        "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                        "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire),
+                                        'langue' => 'FR',
+                                        //'abandonAllow' => false,
+                                        'code_client' => null
                                         //,'ctSigneExists' => true
                                         )
                                         ,$r["data"][0]
@@ -3423,7 +3607,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "bdcExist"=>false,
                                         "demandeRefiExist"=>true,
                                         "factureAllow"=>false,
-                                        "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                        "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire),
+                                        'code_client' => null,
+                                        'langue' => 'FR'
+
                                         )
                                         ,$r["data"][0]
                                         ,'select_all pb Vente');
@@ -3450,7 +3637,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "bdcExist"=>false,
                                         "demandeRefiExist"=>false,
                                         "factureAllow"=>false,
-                                        "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                        "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire),
+                                        'code_client' => null,
+                                        'langue' => 'FR'                                        
                                         )
                                         ,$r["data"][0]
                                         ,'select_all pb prolongationAllow');
@@ -3478,9 +3667,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "demandeRefiExist"=>true,
                                         "factureAllow"=>false,
                                         "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                        ,'code_client' => null
+                                        ,'langue' => 'FR'
                                         )
                                         ,$r["data"][0]
-                                        ,'select_all pb prolongationAllow vente');
+                                        ,'select_all pb prolongationAllow vente'
+                                    );
 
             ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"affaire"));
 
@@ -3535,6 +3727,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "demandeRefiExist"=>false,
                                     "factureAllow"=>false,
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                    ,'code_client' => null
+                                    ,'langue' => 'FR'
                                     )
                                     ,$r["data"][0]
                                     ,'select_all pb prolongationAllow bdc 1');
@@ -3567,6 +3761,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "demandeRefiExist"=>false,
                                     "factureAllow"=>false,
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                    ,'code_client' => null
+                                    ,'langue' => 'FR'
                                     )
                                     ,$r["data"][0]
                                     ,'select_all pb prolongationAllow bdc 2');
@@ -3597,6 +3793,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "demandeRefiExist"=>true,
                                     "factureAllow"=>false,
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                    ,'code_client' => null
+                                    ,'langue' => 'FR'
                                     )
                                     ,$r["data"][0]
                                     ,'select_all pb Demande refi');
@@ -3662,6 +3860,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "demandeRefiExist"=>true,
                                     "factureAllow"=>true,
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
+                                    ,'code_client' => null
+                                    ,'langue' => 'FR'
                                     )
                                     ,$r["data"][0]
                                     ,'select_all pb Facture');
@@ -3697,6 +3897,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'En cours'",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                    ),
+                                array(
+                                    "msg" => "Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie",
                                     "title" => null,
                                     "timer" => null,
                                     "type" => "success"
@@ -3755,6 +3961,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
+                                array(
+                                    "msg" => "Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie",
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                        ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
@@ -4086,7 +4298,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     /* @author Nicolas BERTEMONT <nbertemont@absystech.fr> */
     public function test_commandeMidas(){
         $cm=new commande_midas();
-        $this->assertEquals('a:9:{s:12:"commande.ref";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"16";s:7:"default";N;s:5:"width";i:70;}s:12:"specificDate";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:8:"renderer";s:15:"dateCleCommande";s:5:"width";i:300;}s:19:"commande.id_societe";a:4:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;}s:19:"commande.id_affaire";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:17:"commande.id_devis";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:13:"commande.etat";a:6:{s:4:"type";s:4:"enum";s:5:"xtype";s:5:"combo";s:4:"data";a:10:{i:0;s:9:"non_loyer";i:1;s:9:"mis_loyer";i:2;s:12:"prolongation";i:3;s:2:"AR";i:4;s:7:"arreter";i:5;s:5:"vente";i:6;s:11:"restitution";i:7;s:21:"mis_loyer_contentieux";i:8;s:24:"prolongation_contentieux";i:9;s:23:"restitution_contentieux";}s:7:"default";s:9:"non_loyer";s:5:"width";i:70;s:8:"renderer";s:4:"etat";}s:5:"files";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:8:"renderer";s:11:"pdfCommande";s:5:"width";i:120;}s:6:"retour";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"width";i:70;}s:8:"retourPV";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"width";i:70;}}',serialize($cm->colonnes['fields_column']),"Le constructeur de la classe midas a changé");
+        $this->assertEquals('a:9:{s:12:"commande.ref";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"16";s:7:"default";N;s:5:"width";i:70;}s:12:"specificDate";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:8:"renderer";s:15:"dateCleCommande";s:5:"width";i:300;}s:19:"commande.id_societe";a:4:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;}s:19:"commande.id_affaire";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:17:"commande.id_devis";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:13:"commande.etat";a:6:{s:4:"type";s:4:"enum";s:5:"xtype";s:5:"combo";s:4:"data";a:12:{i:0;s:9:"non_loyer";i:1;s:9:"mis_loyer";i:2;s:12:"prolongation";i:3;s:2:"AR";i:4;s:7:"arreter";i:5;s:5:"vente";i:6;s:11:"restitution";i:7;s:21:"mis_loyer_contentieux";i:8;s:24:"prolongation_contentieux";i:9;s:23:"restitution_contentieux";i:10;s:7:"pending";i:11;s:7:"abandon";}s:7:"default";s:9:"non_loyer";s:5:"width";i:70;s:8:"renderer";s:4:"etat";}s:5:"files";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:8:"renderer";s:11:"pdfCommande";s:5:"width";i:120;}s:6:"retour";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"width";i:70;}s:8:"retourPV";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"width";i:70;}}',serialize($cm->colonnes['fields_column']),"Le constructeur de la classe midas a changé");
 
     }
 
@@ -4213,7 +4425,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $return = $this->obj->commande_mep_stats(NULL, "reseau", "true" , 2015,1);
         $return = $this->obj->commande_mep_stats(NULL, "les_S", "false" , 2015,1);
-        $this->assertEquals(285.0, $return["dataset"]["objectif"]["01"]["value"] , "Retour incorrect 3");
+        $this->assertEquals(278.0, $return["dataset"]["objectif"]["01"]["value"] , "Retour incorrect 3");
         $this->assertEquals(7.0, $return["dataset"]["moyenne"]["01"]["value"] , "Retour incorrect 4");
 
 

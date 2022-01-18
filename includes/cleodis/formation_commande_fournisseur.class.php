@@ -100,6 +100,3 @@ class formation_commande_fournisseur extends classes_optima {
 	}
 
 };
-
-class formation_commande_fournisseur_cleodisbe extends formation_commande_fournisseur { };
-class formation_commande_fournisseur_cap extends formation_commande_fournisseur { };

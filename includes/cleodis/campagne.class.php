@@ -10,11 +10,17 @@ class campagne extends classes_optima {
 
 		$this->field_nom="campagne";
 
-		$this->fieldstructure();		
-		
+		$this->fieldstructure();
+
 	}
 
 };
 
 class campagne_cleodisbe extends campagne {};
 class campagne_cap extends campagne {};
+
+
+class campagne_bdomplus extends campagne { };
+class campagne_boulanger extends campagne { };
+
+class campagne_assets extends campagne { };

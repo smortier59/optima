@@ -1,0 +1,26 @@
+Ref Requête : {$infos.ref}
+
+Bonjour {$infos.contact},
+
+{if $infos.hotline_detail.facturation_ticket=="oui"}
+Votre requête a été étudiée et ne fait PAS l'objet d'une garantie ou d'un contrat de maintenance. 
+Par conséquent, le travail effectué pour honorer votre demande vous sera facturé au nombre d'heures passées.
+Bien entendu la facturation prendra effet une fois le problème résolu.
+Afin de nous permettre d'intervenir au plus vite, nous vous remercions de valider dès maintenant ces conditions (ou au contraire de refuser et d'annuler votre demande) 
+{$infos.portail_hotline_url}
+Sans réponse de votre part dans les 5 jours, le principe de facturation sera accepté automatiquement.
+{else}
+{if $infos.hotline_detail.charge=="maintenance"}
+Votre requête a été étudiée et fait l'objet d'une garantie ou d'un contrat de maintenance.
+{else}
+Votre requête est prise en charge.
+{/if}
+{/if}
+
+Rappel de votre requête :
+{$infos.detail|strip_tags:true|html_entity_decode:$smarty.const.ENT_QUOTES:"UTF-8"} 
+
+N'hésitez pas à consulter l'avancement de vos requêtes sur le portail hotline : {$infos.portail_hotline_url}
+
+Cordialement,
+L'équipe 2T Management

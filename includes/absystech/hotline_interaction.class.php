@@ -50,6 +50,7 @@ class hotline_interaction extends classes_optima {
 			,"duree_dep"=>array("disabled"=>true, "min"=>"00:00")
 			,"credit_dep"=>array("listeners"=>array("change"=>"ATF.changeCreditDep"))
 			,"matos"=>array("xtype"=>"switchbutton","default"=>"non")
+			,"teamviewer"=>array("xtype"=>"switchbutton","default"=>"non")
 			,"champ_alerte"=>array("custom"=>true, "xtype"=>"textarea","targetCols"=>1,"hidden"=>true)
 		);
 		$this->panels['duree_credit_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
@@ -171,9 +172,7 @@ class hotline_interaction extends classes_optima {
 	* @return boolean true
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true) {
-
 		$this->infoCollapse($infos);
-
 		/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
 			$data = array(
@@ -303,8 +302,8 @@ class hotline_interaction extends classes_optima {
 		$temps = $duree_presta + $duree_dep;
 		$temps = gmdate("H:i:s", $temps*60);
 
-
-
+		
+		
 		/*---------------Gestion de l'ordre de mission----------------------*/
 		if($infos["id_ordre_de_mission"]) ATF::ordre_de_mission()->update(array("id_ordre_de_mission"=>$infos["id_ordre_de_mission"],"etat"=>"termine"));
 
@@ -356,6 +355,7 @@ class hotline_interaction extends classes_optima {
 			,"id_hotline"=>$infos["id_hotline"]
 			,"visible"=>$infos["visible"]
 			,"nature"=>$infos["nature"]
+			,"teamviewer"=>$infos["teamviewer"]
 			,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 		);
 
@@ -370,6 +370,9 @@ class hotline_interaction extends classes_optima {
 			$data["detail"]="Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".$infos["transfert_pole"]."<br />".$data["detail"];
 		}
 
+
+
+
 		//Gestion de la mise à jour (update)
 		if($infos["update"]){
 			$id_hotline_interaction=$this->decryptId($infos["id_hotline_interaction"]);
@@ -382,30 +385,6 @@ class hotline_interaction extends classes_optima {
 		}else{
 			$id_hotline_interaction = parent::insert($data,$s,$files);
 		}
-
-		// GESTION DES ALERTES
-		/*if(!$no_test_credit){
-			if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
-				if(!$infos["champ_alerte"]){
-					ATF::db($this->db)->rollback_transaction();
-					throw new errorATF("Merci de saisir votre justification !",1020);
-				}
-				$alerte = array(
-					"alerte"=>$infos["champ_alerte"]
-					,"id_user"=>ATF::$usr->getID()
-					,"id_hotline"=>$infos["id_hotline"]
-					,"id_hotline_interaction"=>$id_hotline_interaction
-				);
-				if ($infos['id_champ_alerte']) {
-					$alerte['id_alerte'] = $infos['id_champ_alerte'];
-					ATF::alerte()->u($alerte);
-				} else {
-					ATF::alerte()->i($alerte);
-				}
-
-			}
-		}*/
-
 
 		//L'interaction fait mention de materiel a facturer
 		//On notifie Emma
@@ -587,7 +566,9 @@ class hotline_interaction extends classes_optima {
 		return $temps;
 	}
 
-
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function getCreditV2($id_hotline_interaction){
 		$id_hotline = $this->select($id_hotline_interaction , "id_hotline");
 
@@ -621,6 +602,7 @@ class hotline_interaction extends classes_optima {
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
 	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	* @codeCoverageIgnore
 	*/
 	public function getBillingTime($id_hotline_interaction){
 		return $this->getTime($id_hotline_interaction,"temps");
@@ -631,6 +613,7 @@ class hotline_interaction extends classes_optima {
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
 	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	* @codeCoverageIgnore
 	*/
 	public function getTotalTime($id_hotline_interaction){
 		return $this->getTime($id_hotline_interaction,"temps_passe");
@@ -748,6 +731,7 @@ class hotline_interaction extends classes_optima {
 	* @param string pole
 	* @param string id_user
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function stats_special($annee,$id_societe=NULL,$id_user=NULL,$groupe){
 		$this->q->reset();
@@ -975,6 +959,7 @@ class hotline_interaction extends classes_optima {
 	* @param array session
 	* @param date date_fin : date a laquelle les données ne doivent pas dépassées
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function statsChargeParUser($date_fin){
 		$this->q->reset()
@@ -1042,6 +1027,7 @@ class hotline_interaction extends classes_optima {
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param string annee
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function statsProduction($annee){
 		$this->q->reset();
@@ -1971,7 +1957,6 @@ class hotline_interaction extends classes_optima {
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/
 	public function _POST($get,$post) {
-
 		$return = array();
 
 		try {
@@ -2014,13 +1999,22 @@ class hotline_interaction extends classes_optima {
 			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
 			else $post['send_mail'] = "non";
 
+			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
+			else $post['teamviewer'] = "non";
+
+			if($post['en_attente']=="on") $post["etat_wait"] = "oui";
+
 			// Calcul du nombre de crédit
-			if (!$post['credit_presta']) {
-				$tmp = explode(":", $post['temps_passe']);
+			if (!$post['credit_presta'] && $post["nature"] == "interaction") {
+				//Si on ne donne pas de raison on force le calcul normal
+				if(!$post["champ_alerte"]){
+					$tmp = explode(":", $post['temps_passe']);
 
-				$creditMin = $tmp[1]/60;
+					$creditMin = $tmp[1]/60;
 
-				$post['credit_presta'] = round($creditMin + $tmp[0],2);
+					$post['credit_presta'] = round($creditMin + $tmp[0],2);
+				}
+
 			}
 
 			if (!$post['id_user']) {
@@ -2061,7 +2055,6 @@ class hotline_interaction extends classes_optima {
 	* @return boolean true
 	*/
 	public function insertTS($infos,$mail = true, $files) {
-
 		$recipient = array();
 		//Ajout des actifs selectionné
 		$lesactifs = is_array($infos["actifNotify"])?$infos["actifNotify"]:explode(",",$infos["actifNotify"]);
@@ -2084,24 +2077,22 @@ class hotline_interaction extends classes_optima {
 		$res= implode(', ', $recipient);
 			/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
-			log::logger("INTERNAL INTERACTION","hotline");
 			$data = array(
 				 "duree_presta"=>$infos["duree_presta"]?$infos["duree_presta"]:"00:00"
 				,"heure_debut_presta"=>date("h:i")
 				,"heure_fin_presta"=>date("h:i")
-				,"detail"=>$infos["detail"]
+				,"detail"=>addcslashes($infos["detail"],"\\")
 				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 				,"id_hotline"=>$infos["id_hotline"]
 				,"visible"=>$infos["visible"]
 				,"recipient"=> $res
 				,"nature"=>"internal"
+				,"teamviewer"=>$infos["teamviewer"]
+				,"etat_wait"=>$infos['etat_wait']
 			);
-			log::logger($data,"hotline");
 			return parent::insert($data,$s,$files);
 		}
 
-		log::logger("INTERACTION NON INTERNAL","hotline");
-		log::logger($infos,"hotline");
 		// Début de transaction
 		ATF::db($this->db)->begin_transaction();
 
@@ -2137,10 +2128,6 @@ class hotline_interaction extends classes_optima {
 			sscanf($infos["heure_arrive_dep"], "%d:%d", $hours, $minutes);
 			$fin_dep = $hours * 60 + $minutes;
 
-			log::logger("debut_presta = ".$debut_presta,"hotline");
-			log::logger("fin_presta = ".$fin_presta,"hotline");
-			log::logger("debut_dep = ".$debut_dep,"hotline");
-			log::logger("fin_dep = ".$fin_dep,"hotline");
 
 			if($debut_dep > $debut_presta){
 				ATF::db($this->db)->rollback_transaction();
@@ -2158,8 +2145,6 @@ class hotline_interaction extends classes_optima {
 			sscanf($infos["duree_presta"], "%d:%d:%d", $hours, $minutes, $second);
 			$duree_presta = $hours * 60 + $minutes;
 
-			log::logger("duree_presta minutes = ".$duree_presta,"hotline");
-
 			// SI on a mis un temps de pause
 			$duree_pause = 0;
 			if($infos["duree_pause"]){
@@ -2172,9 +2157,7 @@ class hotline_interaction extends classes_optima {
 				$duree_presta -= $duree_pause;
 
 			}
-			log::logger("duree_pause minutes = ".$duree_pause,"hotline");
-			log::logger("duree_presta minutes moins la pause = ".$duree_presta,"hotline");
-
+			
 			// Check de la durée de prestation, si négatif alors on a inverser les horaires
 			if($duree_presta < 0){
 				ATF::db($this->db)->rollback_transaction();
@@ -2184,7 +2167,6 @@ class hotline_interaction extends classes_optima {
 			// Calcul du nombre de ticket pour l'interaction (via la durée de presta ou on a déjà enlevé la pause)
 			$p = array('tps'=>util::convertToHoursMinute($duree_presta));
 			$ticket_presta = $this->_credit($p);
-			log::logger("ticket_presta = ".$ticket_presta,"hotline");
 
 			$duree_dep = 0;
 			if($infos["duree_dep"] && ($infos["duree_dep"] !=="00:00" && $infos["duree_dep"] !=="0:00" && $infos["duree_dep"] !=="00:00:00")){
@@ -2192,41 +2174,31 @@ class hotline_interaction extends classes_optima {
 				sscanf($infos["duree_dep"], "%d:%d:%d", $hours, $minutes, $second);
 				$duree_dep = $hours * 60 + $minutes;
 			}
-			log::logger("duree_dep minute = ".$duree_dep,"hotline");
 
 
 			$p = array('tps'=>util::convertToHoursMinute($duree_dep),"field"=>"credit_dep");
 			$ticket_dep = $this->_credit($p);
-			log::logger("ticket_dep = ".$ticket_dep,"hotline");
 
 
 			/*---------------Gestion de l'ordre de mission----------------------*/
 			if($infos["id_ordre_de_mission"]) {
-				log::logger("ODM = ".$infos["id_ordre_de_mission"],"hotline");
 				ATF::ordre_de_mission()->update(array("id_ordre_de_mission"=>$infos["id_ordre_de_mission"],"etat"=>"termine"));
 			}
 
 			$hotline = ATF::hotline()->select($infos["id_hotline"]);
 			$id_societe = $hotline["id_societe"];
-			log::logger("TH infos = ","hotline");
-			log::logger($hotline,"hotline");
 
 			/*---------------Gestion de l'état de la requête----------------------*/
 			// 1ère contrainte : Changement de l'état suite à la mise en attente du client ($infos["etat_wait"]=true)
 			// 2ème contrainte : Requête en état wait/fixing uniquement (les requêtes terminées ou non prises en charge ne peuvent pas avoir de changement d'état)
 			// 3ème contrainte : Les requêtes en état wait passent en état fixing lors d'une interaction
 			// 4ème contrainte : Seulement si la facturation est validée ou qu'il n'y a pas de facturation
-			if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){
+			if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){				
 				if($infos["etat_wait"]=="oui" || ($hotline["facturation_ticket"]=="oui" && !$hotline["ok_facturation"]) || ($hotline["facturation_ticket"]=="oui" && $hotline["ok_facturation"]=="non")){
-					log::logger("TH mise en attente","hotline");
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
-				}else{
-					log::logger("TH mise en fixing","hotline");
-					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
-				}
+				}		
 				/*---------------Gestion de la mise en attente de MEP one shot----------------------*/
 				if ($infos['mep_mail']=="oui") {
-					log::logger("TH mise en attente de MEP","hotline");
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"wait_mep"=>"oui","etat"=>"fixing","disabledInternalInteraction"=>true));
 				}
 			}
@@ -2235,7 +2207,6 @@ class hotline_interaction extends classes_optima {
 			/*---------------Cas de le requête non encore validée----------------------*/
 			// Lorsque la requête n'est pas encore validée il ne faut pas passer celle-ci en fixing !
 			if($hotline["facturation_ticket"]=="oui" && !$hotline["ok_facturation"] || $hotline["facturation_ticket"]=="oui" && $hotline["ok_facturation"]=="non"){
-				log::logger("On garde le statut en attente du ticket car la factu n'est pas accepté","hotline");
 				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
 			}
 
@@ -2255,7 +2226,7 @@ class hotline_interaction extends classes_optima {
 				,"credit_dep"=>$infos["credit_dep"]
 				,"credit_presta"=>$infos["credit_presta"]
 				,"date"=>$infos["date"]
-				,"detail"=>$infos["detail"]
+				,"detail"=>addcslashes($infos["detail"],"\\")
 				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 				,"id_contact"=>$infos["id_contact"]
 				,"id_hotline"=>$infos["id_hotline"]
@@ -2263,6 +2234,7 @@ class hotline_interaction extends classes_optima {
 				,"nature"=>$infos["nature"]
 				,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 				,'recipient'=>$res
+				,"teamviewer"=>$infos["teamviewer"]
 			);
 
 
@@ -2281,45 +2253,10 @@ class hotline_interaction extends classes_optima {
 			//Gestion de la mise à jour (update)
 			if($infos["update"]){
 				$id_hotline_interaction = $data["id_hotline_interaction"] = $this->decryptId($infos["id_hotline_interaction"]);
-
-				log::logger("UPDATE INTERACTION","hotline");
-				log::logger($data,"hotline");
 				parent::update($data,$s,$files);
 			}else{
-				log::logger("INSERT INTERACTION","hotline");
-				log::logger($data,"hotline");
 				$id_hotline_interaction = parent::insert($data,$s,$files);
 			}
-
-			// GESTION DES ALERTES
-			/*log::logger($ticket_presta." > ".$infos["credit_presta"],"hotline");
-			log::logger($ticket_dep." > ".$infos["credit_dep"],"hotline");
-			if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
-				log::logger("ALERTE POUR SOUS FACTURATION","hotline");
-
-				if(!$infos["champ_alerte"]){
-					ATF::db($this->db)->rollback_transaction();
-					throw new errorATF("Merci de saisir votre justification !",1020);
-				}
-				$alerte = array(
-					"alerte"=>$infos["champ_alerte"]
-					,"id_user"=>ATF::$usr->getID()
-					,"id_hotline"=>$infos["id_hotline"]
-					,"id_hotline_interaction"=>$id_hotline_interaction
-				);
-				if ($infos['id_alerte']) {
-					$alerte['id_alerte'] = $infos['id_alerte'];
-					log::logger("UPDATE ALERTE","hotline");
-					log::logger($alerte,"hotline");
-					ATF::alerte()->u($alerte);
-				} else {
-					log::logger("INSERT ALERTE","hotline");
-					log::logger($alerte,"hotline");
-					ATF::alerte()->i($alerte);
-				}
-
-			}*/
-
 
 			//L'interaction fait mention de materiel a facturer
 			//On notifie Emma
@@ -2331,16 +2268,12 @@ class hotline_interaction extends classes_optima {
 					"id_user"=>ATF::$usr->getID(),
 					"nature"=>"materiel"
 				);
-				log::logger("INSERT ALERTE POUR MATOS","hotline");
-				log::logger($alerte_matos,"hotline");
 				ATF::alerte()->insert($alerte_matos);
 			}
 
 
 			// Calcul du total temps de la prestation : deplacement + presta + pause (la pause a été enlevé de la presta plus haut)
 			$total_presta = $duree_presta + $duree_pause + $duree_dep;
-			log::logger("Total presta pour le pointage = ".$total_presta." = ".$duree_presta." + ".$duree_pause." + ".$duree_dep,"hotline");
-
 			/*---------------Gestion de la feuille de pointage----------------------*/
 			//Si on ne trouve rien c'est que la ligne de pointage n'est pas créée, exemple :
 			//On créer une interaction sur un tickets qui n'est pas a notre charge.
@@ -2351,7 +2284,6 @@ class hotline_interaction extends classes_optima {
 			/*---------------Transfert à l'utilisateur----------------------*/
 
 			if ($infos["transfert"]) {
-				log::logger("TRANSFERT USER","hotline");
 				//Récupération du pôle de l'utilisateur
 				$pole=explode(",",ATF::user()->select($infos["transfert"],"pole"));
 				$h2update = array(
@@ -2360,10 +2292,8 @@ class hotline_interaction extends classes_optima {
 					,"pole_concerne"=>((is_array($pole) && isset($pole[0]) && !empty($pole[0]))?$pole[0]:"dev")
 					,"disabledInternalInteraction"=>true
 				);
-				log::logger($h2update,"hotline");
 				ATF::hotline()->update($h2update);
 				//Mise à jour de l'état
-				log::logger("Mise a jour de l'état en fixing","hotline");
 				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
 				//Récupération de l'email du nouvel utilisateur en charge
 				$email=ATF::user()->select($infos["transfert"],"email");
@@ -2377,14 +2307,13 @@ class hotline_interaction extends classes_optima {
 
 			/*---------------Transfert de Pôle----------------------*/
 			if($infos['transfert_pole']){
-				log::logger("TRANSFERT POLE","hotline");
 				$h2update = array(
 					"id_hotline"=>$infos["id_hotline"],
 					"pole_concerne"=>$infos["transfert_pole"],
 					"disabledInternalInteraction"=>true,
 					"id_user"=>$infos["transfert"]?$infos["transfert"]:NULL
 				);
-				log::logger($h2update,"hotline");
+
 				ATF::hotline()->update($h2update);
 				//Récupération de l'email du nouveau utilisateur en charge
 				$email="hotline.".$infos["transfert_pole"]."@absystech.fr";
@@ -2398,7 +2327,6 @@ class hotline_interaction extends classes_optima {
 
 			/*---------------Gestion de l'envoi de mail----------------------*/
 			if($mail && $infos["send_mail"]=="oui" && $infos["visible"]=="oui"){
-				log::logger("SEND MAIL CLIENT","hotline");
 
 				ATF::hotline_mail()->createMailInteraction($hotline["id_hotline"],$id_hotline_interaction,$infos["filestoattach"]["fichier_joint"],$infos["anotherNotify"],$infos['mep_mail']);
 
@@ -2422,13 +2350,12 @@ class hotline_interaction extends classes_optima {
 			//Recherche des intervenant ayant travaillé sur la hotline
 			$inters=$this->ss("id_hotline",$infos["id_hotline"],"id_user");
 			$team=array();
-			log::logger("RECHERCHE DES INTERVENANT DU TICKET","hotline");
 			foreach($inters as $inter){
 				if(!empty($inter["id_user"]) && ATF::$usr->getId()!=$inter["id_user"] && !in_array($inter["id_user"])){
 					array_push($team,ATF::user()->select($inter["id_user"],"email"));
 				}
 			}
-			log::logger($team,"hotline");
+			
 
 			//Ajout des actifs selectionné
 			$lesactifs = is_array($infos["actifNotify"])?$infos["actifNotify"]:explode(",",$infos["actifNotify"]);
@@ -2437,8 +2364,6 @@ class hotline_interaction extends classes_optima {
 					array_push($team,ATF::user()->select($actif,"email"));
 				}
 			}
-			log::logger("APRES FILTRAGE DES ACTIFS","hotline");
-			log::logger($team,"hotline");
 
 			if(count($team)>0){
 				$team = array_flip(array_flip($team)); // Suppression des doublons
@@ -2456,7 +2381,6 @@ class hotline_interaction extends classes_optima {
 			}
 
 			/*---------------Mise à jour de la date de modification hotline----------------------*/
-			log::logger("MAJ TH DATE DE MODIFICATION ".date("Y-m-d H:i:s"),"hotline");
 			ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"date_modification"=>date("Y-m-d H:i:s"),"disabledInternalInteraction"=>true));
 
 			/*--------------- Notice----------------------*/
@@ -2529,8 +2453,11 @@ class hotline_interaction extends classes_optima {
 			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
 			else $post['send_mail'] = "non";
 
+			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
+			else $post['teamviewer'] = "non";
+
 			// Calcul du nombre de crédit
-			if (!$post['credit_presta']) {
+			if (!$post['credit_presta'] && $post["nature"] == "interaction") {
 				$tmp = explode(":", $post['temps_passe']);
 
 				$creditMin = $tmp[1]/60;
@@ -2603,6 +2530,9 @@ class hotline_interaction extends classes_optima {
 
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _indicateurs($get, $post){
 
 		$workedDay = (ATF::hotline()->getJoursOuvres(date("Y-m-01"), date("Y-m-d")))*ATF::user()->select(ATF::$usr->getID(), "temps_partiel");
@@ -2632,6 +2562,9 @@ class hotline_interaction extends classes_optima {
 	}
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _getMoyennePointage($get, $post){
 		$date = date('Y-m');
 
@@ -2660,7 +2593,6 @@ class hotline_interaction extends classes_optima {
 			FROM `hotline_interaction`
 			WHERE DATE_FORMAT(date, '%Y-%m-%d') = '".$date2."'";
 		if ($get['id']) $q2 .= " AND id_user=".ATF::$usr->getID();
-		log::logger($q2, 'alahlah');
 		$r['global'] = ATF::db()->ffc($q);
 		$r['today'] = ATF::db()->ffc($q2);
 

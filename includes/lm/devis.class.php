@@ -250,10 +250,24 @@ class devis_lm extends devis {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 
+
+		/*
 		if(!$infos["type_affaire"]){
 		  $pack = ATF::produit()->select($infos_ligne[0]["devis_ligne__dot__id_produit"], "id_pack_produit");
 		  $infos["type_affaire"] = ATF::pack_produit()->select($pack, "type_contrat");
+		}*/
+
+
+		$nb_produit = $nb_service = 0;
+		foreach ($infos_ligne as $key => $value) {
+			if(ATF::produit()->select($value["devis_ligne__dot__id_produit_fk"], "nature") === 'produit') $nb_produit++;
+			if(ATF::produit()->select($value["devis_ligne__dot__id_produit_fk"], "nature") === 'service') $nb_service++;
 		}
+
+		if($nb_produit !== 0 && $nb_service !== 0){ $infos["type_affaire"]="LS"; }
+		elseif($nb_produit !== 0){ $infos["type_affaire"]= "LP"; }
+		else { $infos["type_affaire"]= "SP"; }
+
 
 
 		//Vérification du devis
@@ -1658,6 +1672,7 @@ class devis_lm extends devis {
 		$infos["tva"] = __TVA__;
 		$infos["date"] = date("Y-m-d");
 		$infos["validite"] = date("Y-m-d",strtotime("+15 day"));
+		$infos["subscriber_reference"] = $affaire_parent["subscriber_reference"];
 
 		ATF::contact()->q->reset()->where("id_societe", $infos["id_societe"])->where("etat", "actif");
 		$contact = ATF::contact()->select_row();
@@ -1695,7 +1710,7 @@ class devis_lm extends devis {
 											 ));
 
 			$cp_adresse_livraison = $infos["cp_adresse_livraison"];
-
+			$parent = 	$infos["id_parent"];
 			unset(  $infos["adresse_livraison"],
 					$infos["adresse_facturation"],
 					$infos["adresse_facturation_2"],
@@ -1715,7 +1730,9 @@ class devis_lm extends devis {
 					$infos["type_souscription"],
 					$infos["id_parent"],
 					$infos["nature"],
-					$infos["type_affaire"]);
+					$infos["type_affaire"],
+					$infos["subscriber_reference"]
+				);
 
 			$affaire=ATF::affaire()->select($infos["id_affaire"]);
 			$infos["ref"]=$affaire["ref"];
@@ -1810,6 +1827,39 @@ class devis_lm extends devis {
 				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "LP"));
 			} else {
 				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "SP"));
+			}
+
+			//On crée le parc repris (quantité -)
+			foreach ($infos_ligne as $key => $value) {
+				if($value["quantite"] < 0){
+					for($i=0; $i>$value["quantite"]; $i--){
+						//On recherche le parc associé au produit de l'affaire parente
+						ATF::parc()->q->reset()->where("id_affaire", $parent)
+											   ->where("id_produit", $value["id_produit"])
+											   ->where("existence","actif");
+
+
+						if($parc = ATF::parc()->sa()){
+							log::logger($parc , "mfleurquin");
+							//On passe le parc associé de l'affaire parente en inactif
+							ATF::parc()->u(array("id_parc"=>$parc[0]["id_parc"],
+												 "existence"=> "inactif",
+												 "date_inactif"=>date("Y-m-d")
+												)
+											);
+
+							//On crée le nouveau parc en attente de location sur l'avenant avec une date de reprise pour ne pas toucher l'etat lorsqu'on passe la routine
+							$nouveau_parc = $parc[0];
+							unset($nouveau_parc["id_parc"]);
+							$nouveau_parc["provenance"] = $nouveau_parc["id_affaire"];
+							$nouveau_parc["id_affaire"] = $infos["id_affaire"];
+							$nouveau_parc["date_recuperation"] = date("Y-m-d");
+							$nouveau_parc["etat"] = "attente_location";
+							ATF::parc()->i($nouveau_parc);
+						}
+
+					}
+				}
 			}
 
 			if($preview){

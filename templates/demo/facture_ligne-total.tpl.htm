@@ -1,0 +1,9 @@
+{foreach from=$smarty.session['facture'] key=key item=item}
+	<div id="total">
+		<span>
+            {ATF::$usr->trans($key)}
+        </span>
+        <input type="text" disabled="disabled" id="{$key}" name="{$key}"  value="{$item|string_format:"%.2f"} €" />
+	</div>
+    <div class="ClearRight"></div>
+{/foreach}

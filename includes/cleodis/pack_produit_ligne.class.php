@@ -10,6 +10,7 @@ class pack_produit_ligne extends classes_optima {
 		$this->controlled_by = "pack_produit";
 		$this->colonnes['fields_column'] = array(
 			 'pack_produit_ligne.produit'
+			,'pack_produit_ligne.principal'
 			,'pack_produit_ligne.quantite'
 			,'pack_produit_ligne.type'
 			,'pack_produit_ligne.ref'
@@ -24,6 +25,7 @@ class pack_produit_ligne extends classes_optima {
 			,"id_produit"=>array("autocomplete"=>array(
 				"mapping"=>ATF::produit()->autocompleteMapping
 			))
+			,'principal'
 			,"id_fournisseur"
 			,"id_partenaire"
 		);
@@ -32,6 +34,7 @@ class pack_produit_ligne extends classes_optima {
 		$this->colonnes['ligne'] =  array(
 			 "pack_produit_ligne.id_produit"=>array("hidden"=>true)
 			,"pack_produit_ligne.produit"
+			,"pack_produit_ligne.principal"
 			,"pack_produit_ligne.quantite"
 			,'pack_produit_ligne.ordre'
 			,"pack_produit_ligne.type"

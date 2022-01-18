@@ -16,12 +16,12 @@
 	, "{$current_class->table}.afficher"
 ]}
 {if ATF::_r(id_commande)}
-	{$q->reset()->addCondition("id_commande",classes::decryptId(ATF::_r(id_commande)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->addCondition("visible","oui","AND")->setView([order=>$fields])->end()}
+	{$q->reset()->addCondition("id_commande",classes::decryptId(ATF::_r(id_commande)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->addCondition("visible_pdf","oui")->setView([order=>$fields])->end()}
 	{include file="produits-update.tpl.js" proxyUrl="commande_ligne,extJSgsa.ajax,pager={$pager}" function="toFactureLigne"}
 {elseif ATF::_r(id_facture)}
-	{$q->reset()->addCondition("id_facture",classes::decryptId(ATF::_r(id_facture)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->addCondition("visible","oui","AND")->setView([order=>$fields])->end()}
+	{$q->reset()->addCondition("id_facture",classes::decryptId(ATF::_r(id_facture)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->addCondition("visible_pdf","oui")->setView([order=>$fields])->end()}
 	{include file="produits-update.tpl.js"}
 {else}
-	{$q->reset()->addCondition("id_facture",0)->addCondition("visible","oui","AND")->setView([order=>$fields])->end()}
+	{$q->reset()->addCondition("id_facture",0)->addCondition("visible_pdf","oui","AND")->setView([order=>$fields])->end()}
 	{include file="produits-update.tpl.js"}
 {/if}

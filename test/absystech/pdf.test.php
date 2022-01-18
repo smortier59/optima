@@ -77,7 +77,7 @@ class pdf_test extends ATF_PHPUnit_Framework_TestCase {
 		$md5 = system($this->MD5cmd);
 		$md5 = substr($md5,0,32);
 		ob_get_clean();
-		$this->assertEquals("36c28e16caa1cb09044a8a6c1fdff23a",$md5,"Erreur de génération du piede de page du PDF.");
+		$this->assertEquals("cb3e7e27ec4541e1af0fa8feae1157e1",$md5,"Erreur de génération du piede de page du PDF.");
 	}
 	
 	/**

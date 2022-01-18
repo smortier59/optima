@@ -1,0 +1,16 @@
+{*
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Cl enregistrement
+*}
+{if !$current_class->no_{$i}}
+	<div class="quickAction {$i}" style="display:inline;">
+		<a href="etiquette_logo-1.pdf" 
+			rel="{ATF::$usr->trans($i,null,_info)}" 
+			title="{ATF::$usr->trans($i)}"
+			target="_blank">
+			<img src="{ATF::$staticserver}images/icones/etiquette.png" />
+		</a>
+	</div>
+{/if}

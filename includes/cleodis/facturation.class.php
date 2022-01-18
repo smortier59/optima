@@ -5,6 +5,9 @@
 * @subpackage Cléodis
 */
 class facturation extends classes_optima {
+
+	public $user_facturation = array(16,91);
+
 	function __construct() {
 		$this->table="facturation";
 		parent::__construct();
@@ -46,6 +49,11 @@ class facturation extends classes_optima {
 		$this->files["global_prolongationSociete"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_prolongationCode"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_prolongationDate"] = array("type"=>"pdf","no_upload"=>true);
+
+		$this->files["global_prolongation_envoye"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_prolongation_envoyeSociete"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_prolongation_envoyeCode"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_prolongation_envoyeDate"] = array("type"=>"pdf","no_upload"=>true);
 
 		$this->files["grille_prolongationclientSociete"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["grille_prolongationclientCode"] = array("type"=>"pdf","no_upload"=>true);
@@ -252,7 +260,7 @@ class facturation extends classes_optima {
 	function insert_facturations($commande,$affaire,$affaires_parentes=false,$devis,$type) {
 		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"));
 		$loyer = ATF::loyer()->sa();
-		if($commande->get("etat")!="arreter" && $commande->get("etat")!="vente" && $commande->get("etat")!="restitution" && $commande->get("etat")!="restitution_contentieux" && !$commande->isAR() && $loyer){
+		if($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux" && $commande->get("etat")!="vente" && $commande->get("etat")!="restitution" && $commande->get("etat")!="restitution_contentieux" && !$commande->isAR() && $loyer){
 
 			//***************FACTURATION************************
 			$this->delete_special($commande->get("id_affaire"));
@@ -366,7 +374,7 @@ class facturation extends classes_optima {
 	function insert_facturation($commande,$affaire) {
 		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"));
 		$loyer = ATF::loyer()->sa();
-		if($commande->get("etat")!="arreter" && $commande->get("etat")!="vente" && ($commande->get("etat")!="restitution" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && ($commande->get("etat")!="restitution_contentieux" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && !$commande->isAR() && $loyer){
+		if($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux" && $commande->get("etat")!="vente" && ($commande->get("etat")!="restitution" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && ($commande->get("etat")!="restitution_contentieux" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && !$commande->isAR() && $loyer){
 			//***************PROLONGATION************************
 
 			$date_debut_periode = date("Y-m-d",mktime(0,0,0,date("m"),01,date("Y")));
@@ -633,11 +641,23 @@ class facturation extends classes_optima {
 
 		$totaux=$this->sa();
 
+		$assurance_sans_tva = false;
+		$type_affaire = ATF::affaire()->select($id_affaire, "id_type_affaire");
+		if ($type_affaire) {
+			if (ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") == "oui") {
+				$assurance_sans_tva = true;
+			}
+		}
+
 		$totaux["loyer"]=$totaux["total_ht"];
 
 		$infos_commande = ATF::affaire()->getCommande($id_affaire)->infos;
 
-		$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		if ($assurance_sans_tva) {
+			$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		} else {
+			$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		}
 
 		$totaux["total"]=round($totaux["tva"]+($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"]),2);
 
@@ -729,7 +749,8 @@ class facturation extends classes_optima {
 		}
 
 		//Suppression du fichier de facturation
-		ATF::affaire()->delete_file($id_affaire);
+		ATF::affaire()->delete_file($id_affaire,"facturation");
+
 /**********************Fin Transaction**************************/
 
 		return true;
@@ -745,6 +766,19 @@ class facturation extends classes_optima {
 	function periode_facturation($id_affaire,$date=false) {
 		$this->q->reset()->Where("id_affaire",$id_affaire,"AND",1)
 						 ->Where("date_periode_debut",date("Y-m-d"),"AND",1,">=")
+						 ->setDimension("row")
+						 ->addOrder("date_periode_debut","asc");
+
+		if($date){
+			$this->q->Where("id_facture",NULL,"AND",1,"IS NULL");
+		}
+
+		return $this->sa();
+
+	}
+
+	function next_echeance($id_affaire,$date=false) {
+		$this->q->reset()->Where("id_affaire",$id_affaire,"AND",1)
 						 ->setDimension("row")
 						 ->addOrder("date_periode_debut","asc");
 
@@ -797,13 +831,23 @@ class facturation extends classes_optima {
 		$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
 
 		$facture_contrat = array();
-		$facture_prolongation = array();
-		$facture_contrat_envoye = array();
 		$facture_contrat_2SI = array();
+		$facture_prolongation = array();
 		$facture_prolongation_2SI = array();
-		$facture_contrat_envoye_2SI = array();
+
+		$facture_contrat_envoye = array();
+		$facture_contrat_2SI_envoye = array();
+		$facture_prolongation_envoye = array();
+		$facture_prolongation_2SI_envoye = array();
+
+
 		$facturer = array();
 		$non_envoye = array();
+
+		ATF::type_affaire()->q->reset()->where("type_affaire", "2SI");
+		$type_affaire2SI = ATF::type_affaire()->select_row();
+
+
 
 		$cleodis=ATF::societe()->select(246);
 
@@ -821,13 +865,13 @@ class facturation extends classes_optima {
 				->addCondition("`facturation`.`id_facture`",NULL,"AND",false,"IS NULL")
 				->addCondition("`affaire`.`etat`","perdue","AND",false,"<>")
 				->addCondition("`commande`.`etat`","arreter","AND",false,"<>")
+				->addCondition("`commande`.`etat`","arreter_contentieux","AND",false,"<>")
 				->addCondition("commande.date_prevision_restitution",NULL,"AND","date_prevision","IS NULL")
 					->addCondition("commande.date_prevision_restitution", date("Y-m-d",strtotime(date("Y-m-01")."+1 month")), "OR", "date_prevision", ">=")
 				->addCondition("`commande`.`etat`","restitution","AND","restidate","<>")
 					->addCondition("commande.date_prevision_restitution", date("Y-m-d",strtotime(date("Y-m-01")."+1 month")), "OR", "restidate", ">=")
 				->addCondition("`commande`.`etat`","restitution_contentieux","AND","restidatecontentieux","<>")
 					->addCondition("commande.date_prevision_restitution", date("Y-m-d",strtotime(date("Y-m-01")."+1 month")), "OR", "restidatecontentieux", ">=")
-				->addCondition("`commande`.`etat`","arreter","AND",false,"<>")
 				->addCondition("`commande`.`etat`","AR","AND",false,"<>")
 				->addCondition("`affaire`.`nature`","vente","AND",false,"<>");
 
@@ -836,20 +880,28 @@ class facturation extends classes_optima {
 		}
 //$this->q->addCondition("`societe`.`id_societe`",1499);
 
+
 		$facturation=$this->sa();
+
 		//Pour chacune des facturations on envoi un mail au client concerné
 		foreach ($facturation as $key=>$item) {
+			$code_refi = NULL;
 			ATF::facture()->q->reset()->addCondition("type_facture","refi")
 									  ->addCondition("id_affaire",$item["id_affaire"]);
 			$facture_refi = ATF::facture()->sa();
-			if($facture_refi){
-				$code_refi=ATF::refinanceur()->select($facture_refi[0]["id_refinanceur"],"code_refi");
-			}
+
 			//Il faut aussi vérifier que l'affaire ne va pas être céder
 			$demande_refi=ATF::demande_refi()->existDemandeRefi($item["id_affaire"]);
+			if($facture_refi){
+				$code_refi=ATF::refinanceur()->select($facture_refi[0]["id_refinanceur"],"code_refi");
+			}else{
+				if($demande_refi) $code_refi=ATF::refinanceur()->select($demande_refi[0]["id_refinanceur"],"code_refi");
+			}
+
+
 			$contact = NULL;
 
-			if(!$facture_refi || ($demande_refi[0]["date_cession"] && ($demande_refi[0]["date_cession"]>$date_debut)) || $code_refi=="REFACTURATION" || $item["type"]=="prolongation"){
+			if(!$demande_refi || ($demande_refi[0]["date_cession"] && ($demande_refi[0]["date_cession"]>$date_debut)) || $code_refi=="REFACTURATION" || $item["type"]=="prolongation"){
 
 				$affaire = ATF::affaire()->select($item["id_affaire"]);
 				$societe = ATF::societe()->select($affaire["id_societe"]);
@@ -866,66 +918,68 @@ class facturation extends classes_optima {
 					$item["id_facture"]=$id_facture;
 
 					if($id_facture!="montant_zero"){
-						if($item["type"]=="prolongation"){
-							if($affaire["type_affaire"] == "2SI"){
-								$facture_prolongation_2SI=$this->formateTabfacturer($facture_prolongation_2SI,$item,"prolongation",$id_facture);
-							}else{
-								$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
-							}
-						}else{
+
+						if($item["type"]!="prolongation"){
 							//Enlever les factures envoyées par mail
-							if(!$contact["email"]){
-								if($affaire["type_affaire"] == "2SI"){
+							if(!$contact["email"] && !$contact["email_perso"]){
+								if($affaire["id_type_affaire"] == $type_affaire2SI){
 									$facture_contrat_2SI=$this->formateTabfacturer($facture_contrat_2SI,$item,"facture",$id_facture);
 								}else{
 									$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
 								}
 							}else{
-								if($affaire["type_affaire"] == "2SI"){
+								if($affaire["id_type_affaire"] == $type_affaire2SI){
 									$facture_contrat_envoye_2SI=$this->formateTabfacturer($facture_contrat_envoye_2SI,$item,"facture_contrat_envoye",$id_facture);
 								}else{
 									$facture_contrat_envoye=$this->formateTabfacturer($facture_contrat_envoye,$item,"facture_contrat_envoye",$id_facture);
 								}
 							}
-						}
-						if($contact && $item["type"] !=="prolongation"){
-							if($item["type"] =="liberatoire"){
-								$item["type"] = "contrat";
-							}
 
-							if($contact["email"]){
+							if($contact){
 
-								$path=array("facture"=>"fichier_joint");
+								if($item["type"] =="liberatoire"){
+									$item["type"] = "contrat";
+								}
 
-								$email["email"]=$contact["email"];
-								$email["texte"]="Votre facture pour la période ".$item["date_periode_debut"]." - ".$item["date_periode_fin"];
+								if($contact["email"] || $contact["email_perso"]){
 
-								//ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
-								$data_fact_attente = array("mail"=> json_encode($email),
-														   "id_facture"=> $id_facture,
-														   "nom_table"=>"facture",
-														   "path"=> json_encode($path),
-														   "id_facturation"=> $item["id_facturation"]
-														  );
-								ATF::facturation_attente()->insert($data_fact_attente);
+									$path=array("facture"=>"fichier_joint");
+
+									if($contact["email"]) {
+										$email["email"]=$contact["email"];
+									}else{
+										$email["email"]=$contact["email_perso"];
+									}
+
+									$email["texte"]="Votre facture pour la période ".$item["date_periode_debut"]." - ".$item["date_periode_fin"];
+
+									//ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
+									$data_fact_attente = array("mail"=> json_encode($email),
+															   "id_facture"=> $id_facture,
+															   "nom_table"=>"facture",
+															   "path"=> json_encode($path),
+															   "id_facturation"=> $item["id_facturation"]
+															  );
+									ATF::facturation_attente()->insert($data_fact_attente);
 
 
-								$item["email"]=$contact["email"];
-								$item["envoye"]='non';
-								$facturer=$this->formateTabfacturer($facturer,$item,"client",false,$item["type"]);
+									$item["email"]=$email["email"];
+									$item["envoye"]='non';
+									$facturer=$this->formateTabfacturer($facturer,$item,"client",false,$item["type"]);
 
-								$tab=$this->incrementeFacture($tab,$item["type"],true);
-								$this->u(array("id_facturation"=>$item["id_facturation"],"envoye"=>"non"));
+									$tab=$this->incrementeFacture($tab,$item["type"],true);
+									$this->u(array("id_facturation"=>$item["id_facturation"],"envoye"=>"non"));
 
+								}else{
+									$item["cause"]="an";
+									$non_envoye=$this->formateTabfacturer($non_envoye,$item,"client_non_envoye",false,$item["type"]);
+									$tab=$this->incrementeFacture($tab,$item["type"],false);
+								}
 							}else{
-								$item["cause"]="an";
+								$item["cause"]="pc";
 								$non_envoye=$this->formateTabfacturer($non_envoye,$item,"client_non_envoye",false,$item["type"]);
 								$tab=$this->incrementeFacture($tab,$item["type"],false);
 							}
-						}else{
-							$item["cause"]="pc";
-							$non_envoye=$this->formateTabfacturer($non_envoye,$item,"client_non_envoye",false,$item["type"]);
-							$tab=$this->incrementeFacture($tab,$item["type"],false);
 						}
 
 						log::logger("Création facture contrat de l'affaire ".$affaire["ref"],__CLASS__);
@@ -952,6 +1006,7 @@ class facturation extends classes_optima {
 					OR  `prolongation`.`date_arret` <  '".$date_fin."'
 				)
 				AND `commande`.`etat` != 'arreter'
+				AND `commande`.`etat` != 'arreter_contentieux'
 				AND `commande`.`etat` != 'AR'
 				AND (
 				        commande.date_prevision_restitution IS NULL
@@ -989,7 +1044,12 @@ class facturation extends classes_optima {
 
 		$prolongation=ATF::db()->sql2array($query);
 		foreach ($prolongation as $key=>$item) {
-			$objAffaire = new affaire_cleodis($item['id_affaire']);
+			if(ATF::$codename== "cleodisbe"){
+				$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+			}else{
+				$objAffaire = new affaire_cleodis($item['id_affaire']);
+			}
+
 			$objCommande = $objAffaire->getCommande();
 
 			try {
@@ -1001,23 +1061,42 @@ class facturation extends classes_optima {
 				$facturation["ltrimsociete"]=$item["ltrimsociete"];
 				$facturation["ltrimcode_client"]=$item["ltrimcode_client"];
 				$affaire = ATF::affaire()->select($item["id_affaire"]);
+
+				$contact = NULL;
+
 				if($id_facture=$this->insert_facture($affaire,$facturation)){
 					$facturation["id_facture"]=$id_facture;
 					if($id_facture!="montant_zero"){
-						if($affaire["type_affaire"] == "2SI"){
-							$facture_prolongation_2SI=$this->formateTabfacturer($facture_prolongation_2SI,$facturation,"prolongation",$id_facture);
-						}else{
-							$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$facturation,"prolongation",$id_facture);
-
-						}
 						$societe = ATF::societe()->select($affaire["id_societe"]);
 						if($societe["id_contact_facturation"]){
 							$contact= ATF::contact()->select($societe["id_contact_facturation"]);
 						}
-						/*if($contact){
-							if($contact["email"]){
+
+						//Enlever les factures envoyées par mail
+						if(!$contact || (!$contact["email"] && !$contact["email_perso"])){
+							if($affaire["id_type_affaire"] == $type_affaire2SI){
+								$facture_prolongation_2SI=$this->formateTabfacturer($facture_prolongation_2SI,$facturation,"prolongation",$id_facture);
+							}else{
+								$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$facturation,"prolongation",$id_facture);
+							}
+						}else{
+							if($affaire["id_type_affaire"] == $type_affaire2SI){
+								$facture_prolongation_envoye_2SI=$this->formateTabfacturer($facture_prolongation_envoye_2SI,$item,"prolongation_envoye",$id_facture);
+							}else{
+								$facture_prolongation_envoye=$this->formateTabfacturer($facture_prolongation_envoye,$item,"prolongation_envoye",$id_facture);
+							}
+						}
+
+						if($contact){
+							if($contact["email"] || $contact["email_perso"]){
 								$path=array("facture"=>"fichier_joint");
-								$email["email"]=$contact["email"];
+
+								if($contact["email"]) {
+									$email["email"]=$contact["email"];
+								}else{
+									$email["email"]=$contact["email_perso"];
+								}
+								$path=array("facture"=>"fichier_joint");
 								$email["texte"]="Votre facture pour la période ".$facturation["date_periode_debut"]." - ".$facturation["date_periode_fin"];
 
 								//ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
@@ -1041,20 +1120,20 @@ class facturation extends classes_optima {
 								$non_envoye=$this->formateTabfacturer($non_envoye,$facturation,"client_non_envoye",false,"prolongation");
 								$tab=$this->incrementeFacture($tab,"prolongation",false);
 							}
-						}else{ */
+						}else{
 							$facturation["cause"]="pc";
 							$non_envoye=$this->formateTabfacturer($non_envoye,$facturation,"client_non_envoye",false,"prolongation");
 							$tab=$this->incrementeFacture($tab,"prolongation",false);
-						/*}*/
+						}
 						log::logger("Création prolongation contrat de l'affaire ".$affaire["ref"],__CLASS__);
 					}else{
 						log::logger("------------------------------------Facture à zéro prol ".$affaire["ref"],__CLASS__);
 					}
-				// }else{
-					// $this->d($facturation["id_facturation"]);
-					// $facturation["cause"]="pi";
-					// $non_envoye=$this->formateTabfacturer($non_envoye,$facturation,"client_non_envoye",false,"prolongation");
-					// $tab=$this->incrementeFacture($tab,"prolongation",false);
+				}else{
+					$this->d($facturation["id_facturation"]);
+					$facturation["cause"]="pi";
+					$non_envoye=$this->formateTabfacturer($non_envoye,$facturation,"client_non_envoye",false,"prolongation");
+					$tab=$this->incrementeFacture($tab,"prolongation",false);
 				}
 			} else {
 				log::logger("Facturation non trouvee, alors on ignore l'affaire ".$objAffaire->get('ref'),__CLASS__);
@@ -1089,26 +1168,38 @@ class facturation extends classes_optima {
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye,"global_","Factures contrat envoyées",$s);
 
-		//Envoi d'un pdf contenant toutes les factures contrat
-		log::logger("Envoi d'un pdf contenant toutes les factures contrat...",__CLASS__);
-		$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures contrat 2SI",$s);
-
-		//Envoi d'un pdf contenant toutes les factures prolongation
-		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
-		$this->sendFactures($date_debut,$date_fin,$facture_prolongation_2SI,"global_","Factures prolongation 2SI",$s);
-
-		//Envoi d'un pdf contenant toutes les factures contrat
-		log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
-		$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye_2SI,"global_","Factures contrat envoyées 2SI",$s);
+		log::logger("Envoi d'un pdf contenant toutes les factures prolongation qui seront envoyées...",__CLASS__);
+		$this->sendFactures($date_debut,$date_fin,$facture_prolongation_envoye,"global_","Factures prolongation envoyées",$s);
 
 		$return["facturer"]=$facturer;
 		$return["non_envoye"]=$non_envoye;
+
 		$return["facture_contrat"]=$facture_contrat;
 		$return["facture_contrat_envoye"]=$facture_contrat_envoye;
 		$return["facture_prolongation"]=$facture_prolongation;
-		$return["facture_contrat_2SI"]=$facture_contrat_2SI;
-		$return["facture_contrat_envoye_2SI"]=$facture_contrat_envoye_2SI;
-		$return["facture_prolongation_2SI"]=$facture_prolongation_2SI;
+		$return["facture_prolongation_envoye"]=$facture_prolongation_envoye;
+
+		/*
+		if(ATF::$codename != "bdomplus"){
+
+			//Envoi d'un pdf contenant toutes les factures contrat
+			log::logger("Envoi d'un pdf contenant toutes les factures contrat...",__CLASS__);
+			$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures contrat 2SI",$s);
+
+			//Envoi d'un pdf contenant toutes les factures prolongation
+			log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
+			$this->sendFactures($date_debut,$date_fin,$facture_prolongation_2SI,"global_","Factures prolongation 2SI",$s);
+
+			//Envoi d'un pdf contenant toutes les factures contrat
+			log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
+			$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye_2SI,"global_","Factures contrat envoyées 2SI",$s);
+
+			$return["facture_contrat_2SI"]=$facture_contrat_2SI;
+			$return["facture_contrat_envoye_2SI"]=$facture_contrat_envoye_2SI;
+			$return["facture_prolongation_2SI"]=$facture_prolongation_2SI;
+		}*/
+
+
 		$return["date_debut"]=$date_debut;
 		$return["date_fin"]=$date_fin;
 
@@ -1137,6 +1228,9 @@ class facturation extends classes_optima {
 
 		$cleodis=ATF::societe()->select(246);
 
+		ATF::type_affaire()->q->reset()->where("type_affaire", "2SI");
+		$type_affaire2SI = ATF::type_affaire()->select_row();
+
 		/*
 		 * RESTITUTION
 		 * Si la date de fin de contrat est atteinte, on génère une facturation à m+1 comme une prolongation par rapport à la date de prévision de restitution
@@ -1153,6 +1247,7 @@ class facturation extends classes_optima {
 				AND `commande`.`etat` != 'prolongation'
 				AND `commande`.`etat` != 'AR'
 				AND `commande`.`etat` != 'arreter'
+				AND `commande`.`etat` != 'arreter_contentieux'
 				AND `commande`.`etat` != 'vente'
 				AND `commande`.`etat` != 'mis_loyer_contentieux'
 				AND `commande`.`etat` != 'prolongation_contentieux'
@@ -1168,7 +1263,7 @@ class facturation extends classes_optima {
 		$restitution=ATF::db()->sql2array($query);
 		//log::logger($restitution , "mfleurquin");
 		foreach($restitution as $key => $item){
-
+			$contact = NULL;
 			/*if(strtotime($item["date_evolution"]) > strtotime($date_deb)){
 				//En restitution mais dans la periode du contrat
 				//Facturation normale
@@ -1274,7 +1369,11 @@ class facturation extends classes_optima {
 				//Si il n'y a pas de facture
 				if(!$facturePresente){
 					//En restitution et fin de contrat dépassée
-					$objAffaire = new affaire_cleodis($item['id_affaire']);
+					if(ATF::$codename== "cleodisbe"){
+						$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+					}else{
+						$objAffaire = new affaire_cleodis($item['id_affaire']);
+					}
 					$objCommande = $objAffaire->getCommande();
 
 					$affaire = ATF::affaire()->select($item["id_affaire"]);
@@ -1295,7 +1394,7 @@ class facturation extends classes_optima {
 								if($societe["id_contact_facturation"]){
 									$contact= ATF::contact()->select($societe["id_contact_facturation"]);
 								}
-								if($affaire["type_affaire"] == "2SI"){
+								if($affaire["id_type_affaire"] == $type_affaire2SI){
 									$facture_prolongation_2SI=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
 								}else{
 									$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
@@ -1412,7 +1511,11 @@ class facturation extends classes_optima {
 
 	public function sendFactures($date_debut,$date_fin,$facture_contrat,$type,$texte,$s){
 		//$emailGlobalFacture["email"]=ATF::societe()->select(246,"email");
-		$emailGlobalFacture["email"] =ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
+		foreach ($this->user_facturation as $key => $value) {
+			$emailGlobalFacture["email"] .= ATF::user()->select($value, "email").",";
+		}
+		$emailGlobalFacture["email"] = substr($emailGlobalFacture["email"], 0, -1);
+
 		$emailGlobalFacture["texte"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		$emailGlobalFacture["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		foreach($facture_contrat as $key => $item){
@@ -1427,7 +1530,10 @@ class facturation extends classes_optima {
 
 	public function sendGrille($facturer,$fc,$fp,$date_debut,$date_fin,$type,$texte,$s){
 		//$emailGrille["email"]=ATF::societe()->select(246,"email");
-		$emailGrille["email"] = ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
+		foreach ($this->user_facturation as $key => $value) {
+			$emailGrille["email"] .= ATF::user()->select($value, "email").",";
+		}
+		$emailGrille["email"] = substr($emailGrille["email"], 0, -1);
 		$emailGrille["texte"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		$emailGrille["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 
@@ -1494,10 +1600,20 @@ class facturation extends classes_optima {
 
 					//Insertion des factures
 					$facture_date_previsionnelle=date('Y-m-d',strtotime($facturation["date_periode_debut"]."+".$day." day"));
+
+					$prix = $facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
+					$prix_sans_tva = 0;
+					$type_affaire = ATF::affaire()->select($affaire["id_affaire"], "id_type_affaire");
+					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
+						$prix = $facturation["montant"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
+						$prix_sans_tva = $facturation["assurance"];
+					}
+
 					$facture=array(
 						"id_societe"=>$commande["id_societe"],
 						"ref"=>$ref,
-						"prix"=>$facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"],
+						"prix"=>$prix,
+						"prix_sans_tva"=>$prix_sans_tva,
 						"etat"=>"impayee",
 						"date"=>$date_debut,
 						"date_periode_debut"=>$facturation["date_periode_debut"],
@@ -1512,9 +1628,28 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
+					if(ATF::$codename == "bdomplus") $facture["ref_externe"] = ATF::facture()->getRefExterne();
+
 					if($facturation["type"] == "liberatoire"){
 						$facture["type_libre"] = "liberatoire";
 					}
+
+
+
+					if($facture["mode_paiement"] == "prelevement"){
+						if(ATF::$codename != "bdomplus"){
+							$facture["etat"] = "payee";
+							$facture["date_paiement"] = $facture["date"];
+						}else{
+							$facture["etat"] = "impayee";
+							$facture["date_paiement"] = NULL;
+						}
+					}else{
+						$facture["etat"] = "impayee";
+						$facture["date_paiement"] = NULL;
+					}
+
+					if(ATF::$codename == "bdomplus") $facture["date_paiement"] = NULL;
 
 					$id_facture=ATF::facture()->i($facture);
 
@@ -1570,4 +1705,13 @@ class facturation extends classes_optima {
 
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
-?>
+
+class facturation_bdomplus extends facturation {
+	public $user_facturation = array(16,116);
+};
+class facturation_bdom extends facturation { };
+class facturation_boulanger extends facturation { };
+
+class facturation_go_abonnement extends facturation {
+	public $user_facturation = array(16,116);
+ };

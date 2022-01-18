@@ -1,0 +1,13 @@
+{$infos=$requests["{$current_class->table}"]}
+<tr>
+	<td class="field">
+        {ATF::$usr->trans("termine",$current_class->table)} 
+    </td>
+    <td class="value inputField" {if $info && !$item.color}{tip text=$info caption=ATF::$usr->trans("Details")}{/if}>
+        {if $infos['etat']!="terminee"}
+            <a href="javascript:;" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)}')) ATF.tpl2div('{$current_class->table},u.ajax','id_{$current_class->table}={$infos["id_{$current_class->table}"]|cryptid}&amp;etat=terminee');" {tip text=ATF::$usr->trans("affaire_terminee")} onclick="return confirm('Etes-vous sur(e) ?');"><img src="{ATF::$staticserver}images/icones/finish.png" height="16" width="16" alt="" /></a>
+        {else}
+            -
+        {/if}
+    </td>
+</tr>

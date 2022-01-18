@@ -63,8 +63,18 @@ class commande_ligne_absystech extends commande_ligne {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all["count"]>0){
 			foreach($select_all["data"] as $key=>$item){
-				$select_all["data"][$key]["commande_ligne.marge"]=(($select_all["data"][$key]["commande_ligne.prix"]-$select_all["data"][$key]["commande_ligne.prix_achat"])/$select_all["data"][$key]["commande_ligne.prix"])*100;
-				$select_all["data"][$key]["commande_ligne.marge_absolue"]=($select_all["data"][$key]["commande_ligne.prix"]*$select_all["data"][$key]["commande_ligne.quantite"])-($select_all["data"][$key]["commande_ligne.prix_achat"]*$select_all["data"][$key]["commande_ligne.quantite"]);
+				$item["commande_ligne.prix"] = (float)$item["commande_ligne.prix"];
+				$item["commande_ligne.prix_achat"] = (float)$item["commande_ligne.prix_achat"];
+				if (!$item["commande_ligne.prix"] || !$item["commande_ligne.prix_achat"]) {
+					$select_all["data"][$key]["commande_ligne.marge"] = 0;
+					$select_all["data"][$key]["commande_ligne.marge_absolue"] = 0;
+				} else {
+					$marge = (($item["commande_ligne.prix"]-$item["commande_ligne.prix_achat"])/$item["commande_ligne.prix"])*100;
+					$select_all["data"][$key]["commande_ligne.marge"] = max(0,$marge);
+
+					$marge_absolue = ($item["commande_ligne.prix"]*$item["commande_ligne.quantite"])-($item["commande_ligne.prix_achat"]*$item["commande_ligne.quantite"]);
+					$select_all["data"][$key]["commande_ligne.marge_absolue"]=max(0,$marge_absolue);
+				}
 			}
 		}
 		return $select_all;
@@ -126,7 +136,8 @@ class commande_ligne_absystech extends commande_ligne {
 
 		$q = ATF::_s("pager")->create($post["pager"],NULL,true);
 		$q->reset('where')
-			->where("commande_ligne.id_compte_absystech",1) // Vente de marchandise uniquement !
+			//->where("commande_ligne.id_compte_absystech",1) // Vente de marchandise uniquement !
+			->where("compte_absystech.type","marchandise")
 			->where("commande_ligne.id_commande",ATF::commande()->decryptId($post["id_commande"]))
 		/*if($post["id_fournisseur"]){
 			$fournisseurs = explode(",", $post["id_fournisseur"]);
@@ -334,5 +345,7 @@ class commande_ligne_absystech extends commande_ligne {
 };
 class commande_ligne_att extends commande_ligne_absystech { };
 class commande_ligne_wapp6 extends commande_ligne_absystech { };
+class commande_ligne_atoutcoms extends commande_ligne_absystech { };
 class commande_ligne_demo extends commande_ligne_absystech { };
+class commande_ligne_nco extends commande_ligne_absystech { };
 ?>

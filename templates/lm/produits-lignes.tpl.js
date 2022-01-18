@@ -391,7 +391,7 @@ ATF.buildGridEditor({
 				header: 'Référence',
 				dataIndex: '{$current_class->table}__dot__ref',
 				width:30,
-				{if $current_class->table==facture_fournisseur_ligne ||  $current_class->table==parc}
+				{if $current_class->table==facture_fournisseur_ligne}
 					}, {
 						header: 'Prix TTC',
 						width:20,
@@ -399,6 +399,8 @@ ATF.buildGridEditor({
 						editor: new Ext.form.TextField({
 							value:0
 						})
+				{/if}
+				{if $current_class->table==facture_fournisseur_ligne ||  $current_class->table==parc}
 					}, {
 						header: 'Prix HT',
 						width:20,

@@ -1,0 +1,25 @@
+<p style="font-weight:bold;">Ref Requête : {$infos.ref}</p>
+
+<p>Bonjour {$infos.contact},</p>
+
+<p style="text-indent:30px;">Votre requête a été résolue. Cette demande a nécessité au total {util::hoursToString(ATF::hotline()->getBillingTime($infos.ref))|default:"0h"} de travail. <strong>Vous avez la possibilité de valider ou d'annuler la résolution de requête en <a href="{$infos.portail_hotline_url}" title="Valider la requête sur le portail hotline">cliquant ici</a>.</strong>
+</p>
+
+<p>
+{if $infos.hotline_detail.facturation_ticket=="oui"}
+Conformément aux conditions entendues, 2T Management procèdera prochainement au débit correspondant sur votre solde de tickets. <br />
+Dans le cas où celui-ci serait insuffisant, nos services vous recontacterons.
+<br/>
+<b>En l'absence de votre validation la requête sera facturée automatiquement dans 2 jours.</b>
+{else}
+Conformément aux conditions entendues, 2T Management a pris ce temps à sa charge.
+{/if}
+</p>
+
+<p><span style=" text-decoration:underline;">Rappel de votre requête <span style="color:#990033;">{$infos.hotline}</span> :</span></p>
+
+<div style="font-size:13px; font-style:italic; color:grey; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</div>
+
+
+<p>Cordialement,<br /></p>
+<p style="margin-left:50px;">L'équipe 2T Management</p>

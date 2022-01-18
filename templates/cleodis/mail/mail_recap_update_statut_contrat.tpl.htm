@@ -1,0 +1,24 @@
+
+<table style="border:1px solid #000;">
+	<thead>
+		<th>N° Affaire</th>
+		<th>Client</th>
+		<th>Libellé de l'affaire</th>
+		<th>Ancien Statut</th>
+		<th>Nouveau Statut</th>
+	</thead>
+	<tbody>
+
+	{foreach from=$infos.commande item=data key=index}
+		<tr style="border-bottom:1px solid #000; {if $index%2==1}background: #cecece;{/if}">
+			<td >{ATF::commande()->select($data.id_commande , "ref")}</td>
+			<td >{ATF::societe()->select($data.client, "societe")}</td>
+			<td >{ATF::commande()->select($data.id_commande , "commande")}</td>
+			<td >{$data.ancien_etat}</td>
+			<td >{$data.nouvel_etat}</td>
+
+
+		</tr>
+	{/foreach}
+	</tbody>
+</table>

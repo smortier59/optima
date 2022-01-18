@@ -62,7 +62,3 @@ class produit_besoins extends classes_optima {
 
 	
 };
-
-class produit_besoins_cleodisbe extends produit_besoins { };
-class produit_besoins_cap extends produit_besoins { };
-?>

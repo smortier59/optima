@@ -1,19 +1,21 @@
-<?	
-/** 
+<?
+/**
 * Classe commande
 * @package Optima
 * @subpackage Cléodis
 */
 require_once dirname(__FILE__)."/../commande_ligne.class.php";
-class commande_ligne_cleodis extends commande_ligne {	
+class commande_ligne_cleodis extends commande_ligne {
 	function __construct() {
-		parent::__construct(); 
+		parent::__construct();
 		$this->controlled_by = "commande";
-		$this->colonnes['fields_column'] = array( 
+		$this->colonnes['fields_column'] = array(
 			 'commande_ligne.produit'
 			,'commande_ligne.quantite'
+			,'commande_ligne.caracteristique'
 			,'commande_ligne.ref'
 			,'commande_ligne.neuf'
+			,"commande_ligne.frequence_fournisseur"
 			,'commande_ligne.prix_achat'=>array("renderer"=>"money")
 		);
 
@@ -24,19 +26,21 @@ class commande_ligne_cleodis extends commande_ligne {
 			))
 			,"id_fournisseur"
 		);
-		
+
 		$this->colonnes['bloquees']['insert'] = array('id_commande_ligne','id_commande');
-		$this->colonnes['ligne'] =  array( 	
+		$this->colonnes['ligne'] =  array(
 			"commande_ligne.id_produit"=>array("hidden"=>true)
 			,"commande_ligne.produit"
 			,"commande_ligne.quantite"
+			,'commande_ligne.caracteristique'
 			,"commande_ligne.ref"
 			,"commande_ligne.id_fournisseur"
 			,"commande_ligne.prix_achat"
 			,"commande_ligne.serial"
 			,"commande_ligne.neuf"
+			,"commande_ligne.frequence_fournisseur"
 		);
-		
+
 		$this->fieldstructure();
 
 		$this->addPrivilege("toFactureLigne");
@@ -45,12 +49,12 @@ class commande_ligne_cleodis extends commande_ligne {
 		$this->no_update=true;
 		$this->no_delete=true;
 	}
-	
+
 	/**
 	* Retourne les lignes d'un devis pour le grid des commande ligne
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param array $infos
-	*/	
+	*/
   	function toFactureLigne() {
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(util::keysOrValues($this->colonnes['ligne']));
@@ -63,7 +67,7 @@ class commande_ligne_cleodis extends commande_ligne {
 				$return[$kRow]["facture_ligne.afficher"]="oui";
 			}
 			$res["data"] = $return;
-		}		
+		}
 		return $res;
 	}
 
@@ -73,12 +77,13 @@ class commande_ligne_midas extends commande_ligne_cleodis {
 	function __construct() {
 		parent::__construct();
 		$this->table = "commande_ligne";
-		$this->colonnes['fields_column'] = array( 
+		$this->colonnes['fields_column'] = array(
 			 'commande_ligne.produit'
 			,'commande_ligne.quantite'
+			,'commande_ligne.caracteristique'
 			,'commande_ligne.ref'
 		);
-												
+
 		$this->fieldstructure();
 	}
 
@@ -87,4 +92,10 @@ class commande_ligne_midas extends commande_ligne_cleodis {
 class commande_ligne_cleodisbe extends commande_ligne_cleodis { };
 class commande_ligne_cap extends commande_ligne_cleodis { };
 
-?>
+
+class commande_ligne_bdomplus extends commande_ligne_cleodis { };
+class commande_ligne_boulanger extends commande_ligne_cleodis { };
+
+class commande_ligne_assets extends commande_ligne_cleodis { };
+
+class commande_ligne_go_abonnement extends commande_ligne_cleodis { };

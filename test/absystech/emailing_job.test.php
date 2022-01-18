@@ -201,7 +201,7 @@ class emailing_job_test extends emailing_test {
 		$sa = ATF::emailing_job_email()->sa();
 
 		$this->assertEquals('oui',$sa['retour'],"Erreur On devrait avoir un retour a oui sur ce contact");
-		$this->assertEquals("ERROR (#2) : L'email n'est pas valide Phoque !",$sa['erreur_brute'],"Erreur On devrait avoir un retour a oui sur ce contact");
+		$this->assertEquals("ERROR (#1002) : L'email n'est pas valide Phoque !",$sa['erreur_brute'],"Erreur On devrait avoir un retour a oui sur ce contact");
 	}
  
 

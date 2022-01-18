@@ -1,0 +1,78 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline}
+{$type = tpsPriseCharge}
+<div id="{$module}_graphetpsPriseCharge" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->statsTps(true,true)} 
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_graphetpsPriseCharge',
+            type: 'column'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+            ,style :{
+                fontSize: '11px'
+            }
+        },
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        yAxis: {
+            title: {
+                text: "Jours"                 
+            }
+        },
+        legend: {
+                enabled: false
+            },
+        series: [           
+               {
+                   type: 'column'
+                   ,name: "Temps moyen"                   
+                   ,data: [
+                          {foreach $data["categories"]["category"] as $key => $cat}
+                            {if $data["dataset"]["dif"]["set"][$key]["alpha"] == "100"}
+                            {
+                                y: {$data["dataset"]["dif"]["set"][$key]["value"]},
+                                color: '#BF0B23'
+                            }
+                          {else}
+                            {$data["dataset"]["dif"]["set"][$key]["value"]}
+                           {/if}
+                            {if !$key@last},{/if}
+                          {/foreach} 
+                        ]
+                    ,dataLabels: {
+                        enabled: true,
+                        rotation: -90,
+                        color: '#FFFFFF',
+                        align: 'left',
+                        x: 3,
+                        y: 30,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Verdana, sans-serif'
+                                }
+                        }
+               }
+                           
+           ]        
+    });
+});
+    
+</script>
+
+<div>
+    Temps entre la création<br />et la prise en charge dans les 365 derniers jours
+</div>
+{/strip}

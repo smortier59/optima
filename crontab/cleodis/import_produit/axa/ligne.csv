@@ -1,0 +1,55 @@
+"TYPE";"N°";"Ref Produit";"Produit principal";"Quantité";"Min";"Max";"option_incluse";"option_incluse_obligatoire";"Afficher sur le site";"Ordre";"Lignes de produits visible";"visible_sur_pdf";"Prix d'achat dont ecotaxe"
+"PRODUIT PRINCIPAL";1;"MX421ade_Axa_36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";580
+"PRODUIT PRINCIPAL";2;"MX421ade_Axa_48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";580
+"PRODUIT PRINCIPAL";3;"MX421ade_Axa_60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";580
+"PRODUIT PRINCIPAL";4;"MX522adhe_Axa_36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";776,67
+"PRODUIT PRINCIPAL";5;"MX522adhe_Axa_48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";776,67
+"PRODUIT PRINCIPAL";6;"MX522adhe_Axa_60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";776,67
+"PRODUIT PRINCIPAL";7;"CX522ade_Axa_36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";758,33
+"PRODUIT PRINCIPAL";8;"CX522ade_Axa_48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";758,33
+"PRODUIT PRINCIPAL";9;"CX522ade_Axa_60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";758,33
+"PRODUIT PRINCIPAL";10;"CX522adebac_Axa_36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";918,33
+"PRODUIT PRINCIPAL";11;"CX522adebac_Axa_48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";918,33
+"PRODUIT PRINCIPAL";12;"CX522adebac_Axa_60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";918,33
+"PRODUIT PRINCIPAL";13;"CX825dte_Axa_36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2076,58
+"PRODUIT PRINCIPAL";14;"CX825dte_Axa_48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2076,58
+"PRODUIT PRINCIPAL";15;"CX825dte_Axa_60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2076,58
+"PRODUIT PRINCIPAL";16;"CX921de_Axa_36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2596,29
+"PRODUIT PRINCIPAL";17;"CX921de_Axa_48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2596,29
+"PRODUIT PRINCIPAL";18;"CX921de_Axa_60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2596,29
+"GARANTIE";1;"Garantie_Axa_36";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";2;"Garantie_Axa_48";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";3;"Garantie_Axa_60";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";4;"Garantie_Axa_36";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";5;"Garantie_Axa_48";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";6;"Garantie_Axa_60";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";7;"Garantie_Axa_36";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";8;"Garantie_Axa_48";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";9;"Garantie_Axa_60";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";10;"Garantie_Axa_36";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";11;"Garantie_Axa_48";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";12;"Garantie_Axa_60";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";13;"Garantie_Axa_36";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";14;"Garantie_Axa_48";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";15;"Garantie_Axa_60";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";16;"Garantie_Axa_36";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";17;"Garantie_Axa_48";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"GARANTIE";18;"Garantie_Axa_60";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";0
+"LIVRAISON";1;"Livraison_Axa_36";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";2;"Livraison_Axa_48";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";3;"Livraison_Axa_60";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";4;"Livraison_Axa_36";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";5;"Livraison_Axa_48";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";6;"Livraison_Axa_60";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";7;"Livraison_Axa_36";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";8;"Livraison_Axa_48";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";9;"Livraison_Axa_60";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";10;"Livraison_Axa_36";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";11;"Livraison_Axa_48";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";12;"Livraison_Axa_60";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";13;"Livraison_Axa_36";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";14;"Livraison_Axa_48";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";15;"Livraison_Axa_60";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";16;"Livraison_Axa_36";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";17;"Livraison_Axa_48";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0
+"LIVRAISON";18;"Livraison_Axa_60";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";0

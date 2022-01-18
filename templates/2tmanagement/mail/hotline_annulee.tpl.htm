@@ -1,0 +1,15 @@
+<p style="font-weight:bold;">Ref Requête : {$infos.ref}</p>
+
+<p>Bonjour {$infos.contact},</p>
+
+<p style="text-indent:30px;">Votre requête a été annulée.<br />
+Elle ne sera donc pas facturée et il n'est plus possible de la continuer. Vous devez recréer une requête si votre problème n'est pas résolu.
+</p>
+
+<p><span style=" text-decoration:underline;">Rappel de votre requête <span style="color:#990033;">{$infos.hotline}</span> :</span></p>
+
+<div style="font-size:13px; font-style:italic; color:grey; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</div>
+
+
+<p>Cordialement,<br /></p>
+<p style="margin-left:50px;">L'équipe 2T Management</p>

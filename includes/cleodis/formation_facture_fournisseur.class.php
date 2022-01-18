@@ -99,7 +99,3 @@ class formation_facture_fournisseur extends classes_optima {
 
 
 };
-
-class formation_facture_fournisseur_cleodisbe extends formation_facture_fournisseur { };
-class formation_facture_fournisseur_cap extends formation_facture_fournisseur { };
-?>

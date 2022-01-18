@@ -180,12 +180,18 @@ class bon_de_commande_ligne_lm extends bon_de_commande_ligne {
 						}else{
 							$qte=($return[$k]["parc.quantite"]-(count(explode(" ",$commande_ligne["serial"]))));
 						}
-						for($i=0;$i<$qte;$i++){
+						/*for($i=0;$i<$qte;$i++){
 							$return[$k+$i]=$return[$k];
 							$return[$k+$i]["parc.quantite"]=1;
 							$return[$k+$i]["parc.serial"]="";
+						}*/
+						if($qte){
+							$return[$k]=$return[$k];
+							$return[$k]["parc.quantite"]=1;
+							$return[$k]["parc.serial"]="";
 						}
-						$k+=$i;
+
+
 					}
 					$k++;
 				}

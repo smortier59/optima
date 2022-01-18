@@ -71,7 +71,7 @@ class facture_paiement extends classes_optima {
 			$prix_avoir = abs($avoir["prix"]*$avoir["tva"]);
 			$prix_facture = $facture['prix']*$facture['tva'];
 
-			if ($prix_facture!=$prix_avoir) throw new errorATF("Impossible d'effectuer ce mode de paiement, car le montant (".$prix_facture.") est différend de celui de l'avoir (".$prix_avoir.")");
+			//if ($prix_facture!=$prix_avoir) throw new errorATF("Impossible d'effectuer ce mode de paiement, car le montant (".$prix_facture.") est différend de celui de l'avoir (".$prix_avoir.")");
 
 			$infos['montant'] = $prix_avoir;
 
@@ -117,7 +117,7 @@ class facture_paiement extends classes_optima {
 		$paiement = array("id_facture"=>$infos['id_facture_avoir'],"montant"=>$infos['montant'],"mode_paiement"=>"lettrage","date"=>$infos["date"]);
 		$id_p_avoir=parent::insert($paiement,$s,$files);
 
-		$avoirToUpdate = array("id_facture"=>$infos['id_facture_avoir'],"etat"=>"payee");
+		$avoirToUpdate = array("id_facture"=>$infos['id_facture_avoir'],"etat"=>"payee", "date_effective"=>date("Y-m-d"));
 		ATF::facture()->u($avoirToUpdate);
 
 		return $last_id;
@@ -281,7 +281,7 @@ class facture_paiement extends classes_optima {
 		ATF::facture()->u(array("id_facture"=>$id_facture,"date_effective"=>NULL,"etat"=>"impayee","date_modification"=>date("Y-m-d H:i:s")));
 		//L'état de la facture passe en facturée
 		$facture=ATF::facture()->select($id_facture);
-		ATF::affaire()->u(array("id_affaire"=>$facture["id_affaire"],"etat"=>"facture"));
+		if($facture["id_affaire"]) ATF::affaire()->u(array("id_affaire"=>$facture["id_affaire"],"etat"=>"facture"));
 		return true;
 	}
 
@@ -326,5 +326,6 @@ class facture_paiement extends classes_optima {
 
 class facture_paiement_att extends facture_paiement { };
 class facture_paiement_wapp6 extends facture_paiement { };
+class facture_paiement_atoutcoms extends facture_paiement { };
 class facture_paiement_demo extends facture_paiement { };
 ?>

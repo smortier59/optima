@@ -1,0 +1,17 @@
+<td class="field">
+    {ATF::$usr->trans($key,$current_class->table)} :
+</td>
+<td class="value">
+    {$text=ATF::contact()->select($requests[$current_class->table].id_contact,gsm)} 
+    {if $text}
+    	<a href="javascript:;" rel="{ATF::$usr->trans(tel_callBtn)|mt:[numero=>$text]}" title="{ATF::$usr->trans(click2call)}" onclick="ATF.tpl2div('asterisk,createCall.ajax','id={$requests[$current_class->table].id_contact|cryptid}&table=contact&field=gsm');"><img src="{ATF::$staticserver}images/icones/call.png" height="16" width="16" alt="" /></a> {$text|tel}<br />
+    {/if}
+    {$text=ATF::contact()->select($requests[$current_class->table].id_contact,tel)} 
+    {if $text}
+    	<a href="javascript:;" rel="{ATF::$usr->trans(tel_callBtn)|mt:[numero=>$text]}" title="{ATF::$usr->trans(click2call)}" onclick="ATF.tpl2div('asterisk,createCall.ajax','id={$requests[$current_class->table].id_contact|cryptid}&table=contact&field=tel');"><img src="{ATF::$staticserver}images/icones/call.png" height="16" width="16" alt="" /></a> {$text|tel}<br />
+    {/if}
+    {$text=ATF::societe()->select($requests[$current_class->table].id_societe,tel)}
+    {if $text}
+    	<a href="javascript:;" rel="{ATF::$usr->trans(tel_callBtn)|mt:[numero=>$text]}" title="{ATF::$usr->trans(click2call)}" onclick="ATF.tpl2div('asterisk,createCall.ajax','id={$requests[$current_class->table].id_societe|cryptid}&table=societe&field=tel');"><img src="{ATF::$staticserver}images/icones/call.png" height="16" width="16" alt="" /></a> {$text|tel}
+    {/if}
+</td>

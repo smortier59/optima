@@ -235,7 +235,7 @@ class gestion_ticket_test extends ATF_PHPUnit_Framework_TestCase {
 
 		//test du contenu
 		$this->assertEquals("Mars",$stat_normale['categories']['category']['2']['label'],"Le nom des catégories n'est pas correct");
-		$this->assertEquals("106",$stat_normale['dataset'][2015]['set']["03"]['value'],'Les valeurs ne sont pas correctes');
+		$this->assertEquals("3",$stat_normale['dataset'][2015]['set']["03"]['value'],'Les valeurs ne sont pas correctes');
 		
 		$c_gt=new gt_tu();
 		$stat_widget=$c_gt->stats(false,false,true,1,10,2011);

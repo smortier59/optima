@@ -1,0 +1,4 @@
+{$societe=ATF::hotline()->select_special("hotline.id_hotline",ATF::hotline()->decryptId($smarty.request.id_hotline))}
+{if $societe[0].id_societe}
+	{include file="generic_field.tpl.htm" key=$key item=$item condition_field=id_societe condition_value=$societe[0].id_societe}
+{/if}

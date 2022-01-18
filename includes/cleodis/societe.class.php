@@ -32,17 +32,29 @@ class societe_cleodis extends societe {
     $this->colonnes['primary'] = array(
       "code_client"
       ,"ref"
+      ,"id_famille"=>array("listeners"=>array("change"=>"ATF.changeFamille"))
+      ,"code_client_partenaire"
       ,"nom"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
         "societe"
         ,"nom_commercial"
       ))
-      ,"sirens"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+      ,'mauvais_payeur'
+      ,'contentieux_depuis'
+    );
+
+    //Reinitialise les panels poru remettre dans l'ordre
+    $panel = $this->colonnes['panel'];
+    $this->colonnes['panel'] = array();
+
+
+    $this->colonnes['panel']['societe_fs'] = array(
+      "sirens"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
         "siren"
         ,"siret"
       ))
-      ,"id_famille"
       ,"avis_credit"
       ,"cs_avis_credit"
+      ,"lastScoreDate"
       ,"score"
       ,"cs_score"
       ,"contentieux"
@@ -53,7 +65,43 @@ class societe_cleodis extends societe {
       ,"date_creation"
       ,"relation"
       ,"joignable"
+
     );
+    $this->panels['societe_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
+
+    $this->colonnes['panel']['particulier_fs'] = array(
+      "client"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+           "particulier_civilite"
+          ,"particulier_nom"
+          ,"particulier_prenom"
+      )),
+      "particulier_portable",
+      "particulier_fixe",
+      "particulier_fax",
+      "particulier_email"
+    );
+    $this->panels['particulier_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
+
+
+
+
+    foreach ($panel as $key => $value) {
+      $this->colonnes['panel'][$key] = $value;
+    }
+
+
+    $this->colonnes['panel']['fidelite'] = array(
+      'num_carte_fidelite',
+      'dernier_magasin'
+    );
+    $this->panels['fidelite'] = array('nbCols'=>2,'collapsible'=>true,'visible'=>false);
+
+    $this->colonnes['panel']['optin'] = array(
+      'optin_offre_commerciales',
+      'optin_offre_commerciale_partenaire'
+    );
+    $this->panels['optin'] = array('nbCols'=>2,'collapsible'=>true,'visible'=>false);
+
 
     /* Définition statique des clés étrangère de la table */
     $this->onglets = array(
@@ -142,8 +190,11 @@ class societe_cleodis extends societe {
 
 
     if(ATF::$codename == "cleodisbe"){
-      $this->colonnes['primary']["sirens"]["fields"][0] = "num_ident";
-      $this->colonnes['primary']["sirens"]["fields"][1] = "reference_tva";
+
+      $this->colonnes['primary']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+        "num_ident"
+        ,"reference_tva"
+      ));
 
       $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
 
@@ -163,7 +214,7 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
 
-    $this->files["logo"] = array("type"=>"png","no_upload"=>false,"no_generate"=>true);
+    $this->files["logo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 
 
@@ -187,6 +238,7 @@ class societe_cleodis extends societe {
     $this->addPrivilege("autocompleteAvecFiliale");
     $this->addPrivilege("autocompleteFournisseurFormationDevis");
     $this->addPrivilege("importProspect","insert");
+    $this->addPrivilege("autocompleteSociete");
 
     $this->autocomplete = array(
       "field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
@@ -199,12 +251,12 @@ class societe_cleodis extends societe {
   }
 
 
-
   /** Fonction qui génère les résultat pour les champs d'auto complétion société pour CLEOSCOPE
   * @authorMorgan FLEURQUIN <mfleurquin@absystech.fr>
   */
   public function _ac($get,$post) {
-    $this->q->reset();
+    $this->q->reset()->setLimit(10);
+
 
     // On ajoute les champs utiles pour l'autocomplete
     $this->q->addField("id_societe")->addField("societe")->addField("ref")->addField("societe");
@@ -249,6 +301,8 @@ class societe_cleodis extends societe {
     }
     parent::export($infos,$s);
   }
+
+
 
 
   /** Permet d'exporter les sociétés ATOL ayant au moins 1 bon de commande
@@ -540,6 +594,7 @@ class societe_cleodis extends societe {
 
 
 
+
   /**
   * Autocomplete retournant seulement les fournisseurs ayant des produits dans les ligne de la commande passée en paramètre,
   * des lignes qui ne sont pas reprise (sans id_affaire_provenance)
@@ -549,6 +604,7 @@ class societe_cleodis extends societe {
   * @param boolean $reset VRAI si on reset lme querier, FAUX si on a initialisé qqch de précis avant...
   * @return string HTML de retour
   */
+
   public function autocompleteFournisseursDeCommande($infos,$reset=true) {
     if ($reset) {
       $this->q->reset();
@@ -612,6 +668,20 @@ class societe_cleodis extends societe {
   */
   public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 
+    //Si on insere un particulier, il faut un Nom Prénom et civilité et on renseigne le champs société pour les listing
+    if($infos['label_societe']['famille'] === "Foyer"){
+        if(!$infos['societe']["particulier_civilite"]){
+          throw new errorATF("Le champs civilite est obligatoire pour un particulier!",878);
+        } elseif(!$infos['societe']["particulier_nom"]){
+          throw new errorATF("Le champs nom est obligatoire pour un particulier!",878);
+        }elseif(!$infos['societe']["particulier_prenom"]){
+          throw new errorATF("Le champs prenom est obligatoire pour un particulier!",878);
+        }else{
+          $infos["societe"]["societe"] = $infos['societe']["particulier_civilite"]." ".$infos['societe']["particulier_nom"]." ".$infos['societe']["particulier_prenom"];
+        }
+    }
+
+
     if($infos["societe"]["siret"] != NULL){
       //On check si le siret existe déja
       $this->q->reset()->where("siret",$infos["societe"]["siret"],"AND")->where("id_societe",$this->decryptId($infos["societe"]["id_societe"]),"AND",false,"!=");
@@ -625,7 +695,10 @@ class societe_cleodis extends societe {
 
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
-    $notifie = "106,21"; // 106 Lesueur Jennifer et 21 Severine Mazars
+
+    $notifie = ATF::user()->getDestinataireFromConstante(' __NOTIFIE_AVIS_CREDIT_SOCIETE_UPDATE__');
+
+
     if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
       $notifie .= ",".$this->select($infos["id_societe"],"id_owner");
     }
@@ -671,6 +744,7 @@ class societe_cleodis extends societe {
   * @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
   */
   public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
     if($infos["societe"]["siret"] != NULL){
       //On check si le siret existe déja
       $this->q->reset()->where("siret",$infos["societe"]["siret"]);
@@ -678,14 +752,94 @@ class societe_cleodis extends societe {
         throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
       }
     }
+
+    //Si on insere un particulier, il faut un Nom Prénom et civilité et on renseigne le champs société pour les listing
+    if($infos['label_societe']['id_famille'] === "Foyer"){
+        if(!$infos['societe']["particulier_civilite"]){
+          throw new errorATF("Le champs civilite est obligatoire pour un particulier!",878);
+        } elseif(!$infos['societe']["particulier_nom"]){
+          throw new errorATF("Le champs nom est obligatoire pour un particulier!",878);
+        }elseif(!$infos['societe']["particulier_prenom"]){
+          throw new errorATF("Le champs prenom est obligatoire pour un particulier!",878);
+        }else{
+          $infos["societe"]["societe"] = $infos['societe']["particulier_civilite"]." ".$infos['societe']["particulier_prenom"]." ".$infos['societe']["particulier_nom"];
+        }
+    }
+
+    //Creation d'un Nouveau RUM automatique
+    if(!$infos["societe"]['RUM']){
+      $infos["societe"]['RUM'] = $this->create_rum();
+      if($infos["societe"]['code_client']){
+
+        if(strlen($infos["societe"]['code_client']) === 6){
+
+          $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
+        }elseif(strlen($infos["societe"]['code_client']) > 6){
+          $infos["societe"]['RUM'] .= substr($infos["societe"]['code_client'], -6);
+        }else{
+          for ($i=0; $i < 6 - strlen($infos["societe"]['code_client']); $i++) {
+            $infos["societe"]['RUM'] .= '0';
+          }
+          $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
+        }
+      }else{
+        $infos["societe"]['RUM'] .= '000000';
+      }
+    }
+
+
     return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
   }
+
+
+  /**
+   * Permet de générer un nouveau RUM automatique
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @return String RUM du type A123456
+   */
+  public function create_rum(){
+
+    $prefixe = "A";
+
+    //On recupere le dernier RUM automatique généré du type A123456
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(RUM, 2,6))','max')
+      ->addCondition('RUM',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+
+    if($max<10){
+      $ref.='00000'.$max;
+    }elseif($max<100) {
+      $ref.= '0000'.$max;
+    }elseif($max<1000){
+      $ref.='000'.$max;
+    }elseif($max<10000){
+      $ref.='00'.$max;
+    }elseif($max<100000){
+      $ref.='0'.$max;
+    }elseif($max<1000000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('RUM trop grand'),80853);
+    }
+    return $prefixe.$ref;
+
+
+  }
+
 
   public function autocompleteFournisseurFormationDevis($infos,$reset=true,$count=false){
     if($reset){
       $this->q->reset();
     }
-
 
     $this->q->from("societe","id_societe","formation_devis_fournisseur","id_societe")
         ->from("formation_devis_fournisseur","id_formation_devis","formation_devis","id_formation_devis")
@@ -701,6 +855,30 @@ class societe_cleodis extends societe {
 
     return $return;
   }
+
+  /*
+  Fonction non utilisée dans OPTIMA
+
+  public function autocompleteFournisseurPrePaiement($infos,$reset=true,$count=false){
+    if($reset){
+      $this->q->reset();
+    }
+
+
+    $this->q->from("facture","id_commande","commande","id_commande")
+        ->from("commande","id_commande","commande_ligne","id_commande")
+        ->where("facture.id_commande",ATF::facture()->decryptId($infos["condition_value"]))
+        ->addField("societe.id_societe","id_societe")
+        ->addField("societe.societe","nom");
+    if($count){
+      $this->q->setCount();
+      $return = $this->select_all();
+    }else{
+      $return = parent::autocomplete($infos,false);
+    }
+
+    return $return;
+  }*/
 
 
 
@@ -956,9 +1134,7 @@ class societe_cleodis extends societe {
 
 
   public function getUrlSign($id_affaire){
-    $url = "https://";
-    if (__PRE__===true) $url .= "pre-";
-    $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
+    $url = __SIGN_URL__."#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
     return $url/*."&sref=".urlencode($url)*/;
   }
   public function _getUrlSign($get,$post){
@@ -966,7 +1142,7 @@ class societe_cleodis extends societe {
   }
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
   */
   public function _signAndGetPDF($post,$get){
@@ -982,7 +1158,12 @@ class societe_cleodis extends societe {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-    ATF::societe()->u(array("id_societe"=>$id_societe, "tel"=>$tel , "BIC"=>$bic , "IBAN"=>$iban));
+    ATF::societe()->u(array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban));
+
+    //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
+    if(ATF::societe()->select($id_societe, "tel") === NULL) {
+      ATF::societe()->u(array("id_societe"=>$id_societe, 'tel'=>$tel));
+    }
 
     $societe = ATF::societe()->select($id_societe);
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
@@ -991,11 +1172,23 @@ class societe_cleodis extends societe {
 
     ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
 
+    //On stocke les infos de signature sur l'affaire
+    ATF::affaire()->u(array('id_affaire'=>$id_affaire,
+                            'tel_signature'=> $tel,
+                            'mail_signataire'=> $contact["email"],
+                            'date_signature'=> date('Y-m-d H:i:s'),
+                            'signataire'=> $contact["prenom"]." ".$contact["nom"].", ".$contact["fonction"]
+                            )
+                      );
+
+
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
+      "id_contact"=> $societe["id_contact_signataire"],
+      "fonction"=> $contact["fonction"],
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
       "address_1"=>$societe["adresse"],
@@ -1041,10 +1234,7 @@ class societe_cleodis extends societe {
     return $return;
   }
 
-  public function getCodeClient($site_associe){
-    $prefixe = "TO";
-
-
+  public function getCodeClient($site_associe, $prefixe = "TO"){
     //Recherche du max en base
     $this->q->reset()
       ->addField('MAX(SUBSTRING(code_client FROM -4))','max')
@@ -1082,11 +1272,16 @@ class societe_cleodis extends societe {
    */
   public function _sendDataToshiba($get, $post){
 
+
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
     $email = $post["email"];
     $fournisseur = 6241;
     $data = self::getInfosFromCREDITSAFE($post);
+
+
+    ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+    $type_affaireNormal = ATF::type_affaire()->select_row();
 
     if($data){
       $gerants = $data["gerant"];
@@ -1095,13 +1290,15 @@ class societe_cleodis extends societe {
       if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
 
 
-      ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+      /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                  ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+      ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
       $res = ATF::societe()->select_row();
 
       try {
 
           if($res){
+
             $id_societe = $res["id_societe"];
             if(!$res["code_client"]){
               $code_client = $this->getCodeClient("toshiba");
@@ -1109,7 +1306,18 @@ class societe_cleodis extends societe {
                                       "code_client"=>$code_client
                                      ));
             }
+
+            if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
+                ATF::societe()->u(array("id_societe"=>$id_societe,
+                                        "adresse"=>$data["adresse"],
+                                        "cp"=>$data["cp"],
+                                        "ville"=>$data["ville"]
+                                     ));
+            }
+
+
           } else {
+
             $code_client = $this->getCodeClient("toshiba");
             $data["code_client"]= $code_client;
             $data_soc = $data;
@@ -1119,9 +1327,12 @@ class societe_cleodis extends societe {
 
 
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
-            $id_societe = $this->insert($data_soc);
+
+            $id_societe = $this->insert(array("societe"=>$data_soc));
 
             $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => $fournisseur));
+
+            $res['id_societe'] = $id_societe;
 
           }
 
@@ -1179,7 +1390,7 @@ class societe_cleodis extends societe {
                   "type_devis" => "normal",
                   "id_contact" => $gerant[0]["id_contact"],
                   "prix_achat"=>0,
-                  "type_affaire" => "normal");
+                  "id_type_affaire" => $type_affaireNormal["id_type_affaire"]);
           $values_devis =array();
 
           $montantLoyer = $duree = 0;
@@ -1289,9 +1500,8 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id,
                                   "devis_ligne__dot__visible"=>$visible
                                 );
-                log::logger($produits , "mfleurquin");
 
-              $devis["prix_achat"] += $ligne["prix_achat"];
+              $devis["prix_achat"] += ($ligne["prix_achat"] * $qte);
 
             }
           }
@@ -1316,8 +1526,6 @@ class societe_cleodis extends societe {
               ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
             break;
           }
-
-
           ATF::affaire_etat()->insert(array(
                                         "id_affaire"=>$devis["id_affaire"],
                                         "etat"=>"reception_demande"
@@ -1347,7 +1555,7 @@ class societe_cleodis extends societe {
 
           $creation = new DateTime( $data["date_creation"] );
           $creation = $creation->format("Ymd");
-          $past2Years = new DateTime( date("Y-m-d", strtotime("-5 years")) );
+          $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
           $past2Years = $past2Years->format("Ymd");
 
           if($data["cs_score"] > 50 && $creation < $past2Years ){
@@ -1355,7 +1563,7 @@ class societe_cleodis extends societe {
             $comite["decisionComite"] = "Accepté automatiquement";
           }else{
             $comite["etat"] = "refuse";
-            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 5ans";
+            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
           }
 
           $comite["reponse"] = date("Y-m-d");
@@ -1409,42 +1617,74 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
+    log::logger($post, "creditsafe");
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
 
+    if($post["api"]) $api = true;
+    if(!$post["langue"]) $post["langue"] = "FR";
+
     if(ATF::$codename == "cleodisbe"){
       $post["num_ident"] = $post["siret"];
-      $data = ATF::societe_cleodisbe()->getInfosFromCREDITSAFE($post);
-
-      if(!$data["societe"]){
-        throw new errorATF("erreurCS BELGIQUE",404);
-      }
-      //On ne recupere pas de dirigeant pour CLEODIS BE, on simule un retour vide dans ce cas
-      //$data["gerant"] = array();
-    }else{
-       $data = self::getInfosFromCREDITSAFE($post);
     }
+    $data = self::getInfosFromCREDITSAFE($post);
+
+    if(!$data["societe"]){
+      throw new errorATF("erreurCS",404);
+    }
+
+    log::logger($data, "creditsafe");
 
     if($data){
         $gerants = $data["gerant"];
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
         if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
-        ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+        /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+        if(ATF::$codename === "cleodisbe"){
+          $data["num_ident"] = 'BE'.$post["num_ident"];
+
+          ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string($data["num_ident"]),"OR","siret")
+                                    ->where("reference_tva",$data["reference_tva"],"OR","siret");
+        }else{
+          ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
+        }
+
         $res = ATF::societe()->select_row();
+
         try {
+
             if($res){
                 $id_societe = $res["id_societe"];
+
                 if($res["langue"] !== $post["langue"]) $this->u(array("id_societe"=>$id_societe, "langue"=>$post["langue"]));
 
+                if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
+                  ATF::societe()->u(array("id_societe"=>$id_societe,
+                                          "adresse"=>$data["adresse"],
+                                          "cp"=>$data["cp"],
+                                          "ville"=>$data["ville"]
+                                       ));
+                }
+
+
+
             }else {
+                log::logger("ICI societe inexistante" , "creditsafe");
                 $data_soc = $data;
+
+                if ($post['site_associe']=='boulangerpro') {
+                  ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
+                  $id_apporteur = ATF::societe()->select_cell();
+                  $data_soc['id_apporteur'] = $id_apporteur;
+                }
 
                 $data_soc["langue"] = $post["langue"];
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
-                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
+                if($apporteur) $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
+                if($post["site_associe"]) $this->u(array("id_societe"=> $id_societe, "code_client" => $code_client));
             }
 
 
@@ -1492,13 +1732,27 @@ class societe_cleodis extends societe {
                 "societe"=>ATF::societe()->select($id_societe),
                 "gerants"=>$gerant
             );
+        } catch (errorSQL $e) {
+            log::logger("====================================================================", "creditsafe");
+            log::logger("ERREUR SQL : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+            log::logger($e->getMessage(), "creditsafe");
+            log::logger($data, "creditsafe");
+            throw $e;
         } catch (ATFerror $e) {
+            log::logger("====================================================================", "creditsafe");
+            log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+            log::logger($data, "creditsafe");
             throw new errorATF("erreurCS inside",500);
-
         }
     } else{
-        throw new errorATF("erreurCS",404);
+        log::logger("====================================================================", "creditsafe");
+        log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+        log::logger($data, "creditsafe");
+        log::logger($post, "creditsafe");
+
+        throw new errorATF("erreurCS : Il n'y a aucun retour de créditsafe",500);
     }
+
   }
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
@@ -1580,7 +1834,8 @@ class societe_cleodis extends societe {
             "id_societe" => $devis["id_societe"],
             "date" => date("d-m-Y"),
             "id_affaire" => $id_affaire,
-            "id_devis" => $devis["id_devis"]
+            "id_devis" => $devis["id_devis"],
+            "prix_achat" => $devis["prix_achat"]
         );
 
     $produits = array();
@@ -1653,6 +1908,224 @@ class societe_cleodis extends societe {
       ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$post["id_contact"]));
     }
   }
+
+  /**
+  * Retourne le préfixe utilisé, peut être surchargé
+  * @author Yann GAUTHERON <ygautheron@absystech.fr>
+  * @return string $prefix
+  */
+  public function create_ref_prefix($s){
+    return $s['id_famille'] == 9 ? "P" : "S";
+  }
+
+  /**
+  * Construit la référence de l'entité (spécifique à chaque Optima)
+  * @author Jérémie Gwiazdowski <jgw@absystech.fr>
+  * @author Yann GAUTHERON <ygautheron@absystech.fr>
+  * @param array $s La session
+  * @return string $ref la référence de l'entité
+  */
+  public function create_ref(&$s){
+    $ref=$this->create_ref_prefix($s);
+    $id_agence = ATF::$usr->get('id_agence');
+    if (!$id_agence) {
+      ATF::agence()->q->reset()->addField('id_agence')->addOrder('id_agence','asc')->setLimit(1);
+      $id_agence = ATF::agence()->select_cell();
+    }
+    //Recherche agence + date
+    $ref.=strtoupper(
+      substr(
+        ATF::agence()->select($id_agence,'agence'),0,2)
+      ).date('ym');
+
+    //Recherche du maximum
+    $max=$this->get_max_ref($ref);
+    if($max<10){
+      $ref.='000'.$max;
+    }elseif($max<100){
+      $ref.='00'.$max;
+    }elseif($max<1000){
+      $ref.='0'.$max;
+    }elseif($max<10000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+
+    return $ref;
+
+  }
+
+  /**
+   * Recherche pour une société si il y a des contrats en contentieux et met à jour le champs mauvais payeur et contentieux depuis sur sa fiche
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  int $id_societe ID de la société
+   */
+  public function checkMauvaisPayeur($id_societe){
+    log::logger("##########################" , "mauvais_payeur");
+    log::logger("### ID SOCIETE -> ".$id_societe , "mauvais_payeur");
+
+    $contentieux_depuis = null;
+
+    ATF::commande()->q->reset()->where("id_societe", $id_societe, "AND")
+                               ->where("etat", "%contentieux%", "AND", false, "LIKE");
+
+    if($contentieux = ATF::commande()->sa()){
+      ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "oui"));
+
+      ATF::facture()->q->reset()->where("id_societe", $id_societe)
+                                ->where("etat", "impayee", "AND", "impayee")
+                                ->whereIsNotNull("date_rejet", "AND", "impayee");
+      $date_max_impayee = NULL;
+
+      foreach (ATF::facture()->sa() as $key => $value) {
+        if($value["date_periode_debut"]){
+          if($date_max_impayee == NULL || str_replace("-", "", $date_max_impayee) > str_replace("-", "", $value["date_periode_debut"])){
+            $date_max_impayee = $value["date_periode_debut"];
+          }
+        }else{
+          if($date_max_impayee == NULL || str_replace("-", "", $date_max_impayee) > str_replace("-", "", $value["date"])){
+            $date_max_impayee = $value["date"];
+          }
+        }
+      }
+
+      log::logger("###Max date => ".$date_max_impayee , "mauvais_payeur");
+      log::logger("###Max date => ".date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
+
+
+
+
+      if((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 1 ){
+        log::logger("### 1 mois ou moins" , "mauvais_payeur");
+        $contentieux_depuis = "1_mois";
+      }elseif((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 2 ){
+        log::logger("### Entre 1 et 2 mois" , "mauvais_payeur");
+        $contentieux_depuis = "2_mois";
+      }else{
+        log::logger("### Plus de 3 mois" , "mauvais_payeur");
+        $contentieux_depuis = "plus_3_mois";
+      }
+
+      log::logger("### ".date("Ym") , "mauvais_payeur");
+      log::logger("### ".date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
+      log::logger("### ".(date("Ym") - date("Ym", strtotime($date_max_impayee))), "mauvais_payeur");
+
+      ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "oui", "contentieux_depuis"=> $contentieux_depuis));
+    }else{
+      log::logger("### pas de contentieux" , "mauvais_payeur");
+      ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "non", "contentieux_depuis"=> $contentieux_depuis));
+    }
+  }
+
+
+  public function demande_creation_compte_espace_client ($client, $url_front_espace_client, $id_commande=null){
+    try{
+      if(!$client){
+        // On va chercher les infos clients à partir du contrat
+        if(!$id_commande) throw new errorATF("ID Commande manquante");
+
+        $id_commande = ATF::commande()->decryptId($id_commande);
+        $id_client = ATF::commande()->select($id_commande , "id_societe");
+        $dataSociete = ATF::societe()->select($id_client);
+
+        if(ATF::societe()->select($id_client,"id_famille") == 9){
+          $client = array("id_societe" => $dataSociete["id_societe"],
+                          "nom" => $dataSociete["particulier_nom"],
+                          "prenom" => $dataSociete["particulier_prenom"],
+                          "email" => $dataSociete["particulier_email"],
+                          "ref" => ATF::commande()->select($id_commande , "ref"),
+                          "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+                      );
+        } else {
+          if ($dataSociete["id_contact_signataire"]) {
+            $signataire = ATF::contact()->select($dataSociete["id_contact_signataire"]);
+            if ($signataire["email"]) {
+              $client = array("id_societe" =>$dataSociete["id_societe"],
+                              "nom" => $signataire["nom"],
+                              "prenom" => $signataire["prenom"],
+                              "email" => $signataire["email"],
+                              "ref" => ATF::commande()->select($id_commande , "ref"),
+                              "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+                          );
+            }
+          } else if ($dataSociete['email']) {
+            $client = array("id_societe" => $dataSociete["id_societe"],
+            "email" => $dataSociete["email"],
+            "ref" => ATF::commande()->select($id_commande , "ref"),
+            "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+            );
+          }
+        }
+      }
+
+
+      if(!$url_front_espace_client) {
+        try {
+          $url_front_espace_client = ATF::espace_client_conseiller()->getUrlFront();
+        } catch (errorATF $e) {
+          throw $e;
+        }
+      }
+
+      if (ATF::$codename === "bdomplus") {
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+        $colors = array(
+          "dominant" => "#FD5300",
+          "footer" => "#161C5F",
+          "links" => "#161C5F",
+          "titles" => "#161C5F"
+        );
+      } else {
+        ATF::societe()->q->reset()->where("siret", "45307981600055");
+        $partenaire = ATF::societe()->select_row();
+        $colors = array(
+          "dominant" => "#94c030",
+          "footer" => "#94c030",
+          "links" => "#23527c",
+          "titles" => "#23527c"
+        );
+      }
+
+      // Envoyer le mail uniquement si on a un email dans $client
+      if ($client['email']) {
+        $infos_mail = array(
+          "recipient" => $client["email"],
+          "objet" => "Création de votre compte espace client",
+          "template" => "demande_creation_compte_espace_client",
+          "client" => $client,
+          "lien_espace_client" => $url_front_espace_client . "/register",
+          "colors" => $colors,
+          "partenaire"=> $partenaire
+        );
+
+        $mail = new mail( $infos_mail );
+        if($mail->send()){
+            ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
+            ATF::suivi()->insert(array(
+              "id_societe"=>$client["id_societe"],
+              "type"=>"email",
+              "texte"=>"Envoi du mail de création de compte client à ".$client["email"],
+            ));
+        }else{
+            log::logger("------------------------------------------------------", "error_mail_creation_compte");
+            log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
+            log::logger($mail, "error_mail_creation_compte");
+            ATF::suivi()->insert(array(
+              "id_societe"=>$client["id_societe"],
+              "type"=>"email",
+              "texte"=>"Erreur lors de l'envoi du mail de création de compte à " . $client['email']. " (voir les logs error_mail_creation_compte)",
+            ));
+        }
+
+      }
+    } catch(errorATF $e){
+        throw $e;
+    }
+  }
+
+
 };
 
 class societe_cleodisbe extends societe_cleodis {
@@ -1666,71 +2139,6 @@ class societe_cleodisbe extends societe_cleodis {
 
 
     $this->fieldstructure();
-  }
-
-
-
-  /** Interroge Credit Safe pour récupérer les informations des sociétés.
-  * @author Quentin JANON <qjanon@absystech.fr>
-  * @author Cyril Charlier <ccharlier@absystech.fr>
-  */
-  public function getInfosFromCREDITSAFE($infos) {
-
-    $infos["num_ident"] = str_replace(" ", "", $infos["num_ident"]);
-    $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
-
-
-    $client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
-
-    $params = (object)array
-    ( 'countries' => array ('BE'),
-      'searchCriteria' => (object) array
-      (
-        'RegistrationNumber' => $infos['num_ident'],
-      ),
-      'customData' => null,
-      'chargeReference' => 'example searchCriteria with name',
-    );
-
-
-    $response = $client->__soapCall('FindCompanies',array($params));
-
-
-    $xml = $response;
-
-    // response/Messages / Message type = error
-    $error = False;
-    $messageSociete =$xml->FindCompaniesResult->Messages->Message;
-    if($messageSociete && $messageSociete->Type == "Error"){
-      ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-      return $error = True;
-    }
-    if($error == False){
-      $param = (object)array
-      (
-        'companyId' => $xml->FindCompaniesResult->Companies->Company->Id,
-        'reportType' => 'Full',
-        'language' => 'FR',
-        'customData' => null,
-        'chargeReference' => 'example charge reference value',
-        'storeInReportbox' => false
-      );
-      $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
-
-      $messageReport =$res->FindCompaniesResult->Messages->Message;
-      if(!$messageReport){
-        $data = $this->cleanGGSResponse($res);
-      }else{
-        if($messageReport->Type == "Error"){
-          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"));
-          throw new errorATF((string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"),500);
-        }
-      }
-    }else{
-      throw new errorATF((string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"),500);
-
-    }
-    return $data;
   }
 };
 
@@ -1811,4 +2219,116 @@ class societe_midas extends societe_cleodis {
 };
 
 
-?>
+
+class societe_bdomplus extends societe_cleodis {
+
+  public function getCodeClient($site_associe, $prefixe = "TO"){
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(code_client FROM -8))','max')
+      ->addCondition('code_client',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+    if($max<10){
+      $ref.='0000000'.$max;
+    }elseif($max<100){
+      $ref.='000000'.$max;
+    }elseif($max<1000){
+      $ref.='00000'.$max;
+    }elseif($max<10000){
+      $ref.='0000'.$max;
+    }elseif($max<100000){
+      $ref.='0000'.$max;
+    }elseif($max<1000000){
+      $ref.='00'.$max;
+    }elseif($max<10000000){
+      $ref.='0'.$max;
+    }elseif($max<100000000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $prefixe.$ref;
+
+  }
+
+};
+
+class societe_boulanger extends societe_cleodis { };
+
+
+class societe_assets extends societe_cleodis {
+
+  /**
+  * Construit la référence de l'entité (spécifique à chaque Optima)
+  * @author Jérémie Gwiazdowski <jgw@absystech.fr>
+  * @author Yann GAUTHERON <ygautheron@absystech.fr>
+  * @param array $s La session
+  * @return string $ref la référence de l'entité
+  */
+  public function create_ref(&$s){
+
+    $ref = "DI";
+
+    //Recherche du maximum
+    $max=$this->get_max_ref($ref);
+
+    if($max<10){
+      $ref.='00000'.$max;
+    }elseif($max<100){
+      $ref.='0000'.$max;
+    }elseif($max<1000){
+      $ref.='000'.$max;
+    }elseif($max<10000){
+      $ref.='00'.$max;
+    }elseif($max<100000){
+      $ref.='0'.$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $ref;
+
+  }
+
+
+};
+
+class societe_go_abonnement extends societe_cleodis {
+
+  /**
+  * Construit la référence de l'entité (spécifique à chaque Optima)
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param array $s La session
+  * @return string $ref la référence de l'entité
+  */
+  public function create_ref(&$s){
+
+    $ref = "GO";
+
+    //Recherche du maximum
+    $max=$this->get_max_ref($ref);
+
+    if($max<10){
+      $ref.='00000'.$max;
+    }elseif($max<100){
+      $ref.='0000'.$max;
+    }elseif($max<1000){
+      $ref.='000'.$max;
+    }elseif($max<10000){
+      $ref.='00'.$max;
+    }elseif($max<100000){
+      $ref.='0'.$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $ref;
+
+  }
+
+};

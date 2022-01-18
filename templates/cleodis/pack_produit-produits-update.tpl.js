@@ -4,6 +4,7 @@
 {$q=ATF::_s(pager)->getAndPrepare($pager)}
 {$fields=[
 	  "{$current_class->table}.produit"
+	, "{$current_class->table}.principal"
 	, "{$current_class->table}.quantite"
 	, "{$current_class->table}.min"
 	, "{$current_class->table}.max"
@@ -15,6 +16,7 @@
 	, "{$current_class->table}.code"
 	, "{$current_class->table}.id_produit"
 	, "{$current_class->table}.id_fournisseur"
+	, "{$current_class->table}.frequence_fournisseur"
 	, "{$current_class->table}.visibilite_prix"
 	, "{$current_class->table}.date_achat"
 	, "{$current_class->table}.commentaire"

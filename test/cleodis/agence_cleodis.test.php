@@ -3,7 +3,7 @@ class agence_cleodis_test  extends ATF_PHPUnit_Framework_TestCase {
 	   
     private function beginTransaction($codename, $begin, $commit){
         if($begin){
-            ATF::db()->select_db("extranet_v3_".$codename);
+            ATF::db()->select_db("optima_".$codename);
             ATF::$codename = $codename;
             ATF::db()->begin_transaction(true);
         }
@@ -11,7 +11,7 @@ class agence_cleodis_test  extends ATF_PHPUnit_Framework_TestCase {
         if($commit){
             ATF::db()->rollback_transaction(true);
             ATF::$codename = "cleodis";
-            ATF::db()->select_db("extranet_v3_cleodis");
+            ATF::db()->select_db("optima_cleodis");
         }
         
     }

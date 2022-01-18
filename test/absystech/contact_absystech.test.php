@@ -122,9 +122,10 @@ class contact_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			"email"=> "test@absystech.fr",
 			'id_societe' => $this->societe
 		));
-		$ret= ATF::contact()->sendMailTeamViewer($infos);
+		ATF::contact()->sendMailTeamViewer($infos);
+		$ret = ATF::$msg->getNotices();
 		$this->assertEquals('Mail envoyé pour le téléchargement de Teamviewer',$ret[0]['msg'],"Mauvais message retourné");
-		$this->assertEquals('success',$ret[0]['type'],"Mauvais type retourné");
+		$this->assertEquals('success',$ret[0]['type'],"Mauvais type retourné");
 	}
 	/*
 	Get filter par logique -> retourne plus de ligne que prévu.

@@ -41,5 +41,7 @@ class opportunite_cleodis extends opportunite {
 };
 
 class opportunite_cleodisbe extends opportunite { };
-class opportunite_cap extends opportunite { };
-?>
+class opportunite_bdomplus extends opportunite { };
+class opportunite_boulanger extends opportunite { };
+class opportunite_assets extends opportunite { };
+class opportunite_go_abonnement extends opportunite { };

@@ -1,0 +1,9 @@
+{assign var=hotline value=ATF::hotline()->select(ATF::hotline()->decryptId($smarty.request["id_hotline"]))}
+<tr>
+	<td class="field">{ATF::$usr->trans("hotline","hotline")}</td>
+	<td class="value">{$hotline.hotline}</td>
+</tr>
+<tr>
+	<td class="field">{ATF::$usr->trans("detail","hotline")}</td>
+	<td class="value">{$hotline.detail|nl2br}</td>
+</tr>

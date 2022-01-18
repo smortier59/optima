@@ -28,7 +28,3 @@ class processeur extends classes_optima {
 		$this->controlled_by = "produit";
 	}
 };
-
-class processeur_cleodisbe extends processeur { };
-class processeur_cap extends processeur { };
-?>

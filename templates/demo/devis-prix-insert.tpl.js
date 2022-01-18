@@ -1,0 +1,1 @@
+{include file="generic-field-textfield.tpl.js" value=$value readonly=true}

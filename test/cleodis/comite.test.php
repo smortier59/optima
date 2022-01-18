@@ -92,11 +92,11 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 		$r = $this->obj->getInfosFromCREDITSAFE($infos);
 
 		$this->assertEquals("04/2004",$r['date_creation'],"La date de création de société n'est pas bonne. Elle a changée sur Credit Safe ?");
-		$this->assertEquals("31/12/2015",$r['date_compte'],"La date de création n'est pas bonne. Elle a changée sur Credit Safe ?");
-		$this->assertEquals("55",$r['note'],"Le note de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("50000",$r['limite'],"Le limite de société n'est pas bon. Il a changé sur Credit Safe ?");
+		$this->assertEquals("31/12/2017",$r['date_compte'],"La date de création n'est pas bonne. Elle a changée sur Credit Safe ?");
+		$this->assertEquals("48",$r['note'],"Le note de société n'est pas bon. Il a changé sur Credit Safe ?");
+		$this->assertEquals("20000",$r['limite'],"Le limite de société n'est pas bon. Il a changé sur Credit Safe ?");
 		$this->assertEquals("Location et location-bail d'autres machines, équipements et biens matériels n.c.a. ",$r['activite'],"Le activite de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("4239770",$r['ca'],"Le ca de société n'est pas bon. Il a changé sur Credit Safe ?");
+		$this->assertEquals("3525892",$r['ca'],"Le ca de société n'est pas bon. Il a changé sur Credit Safe ?");
 	}
 
 	//@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -105,16 +105,19 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_comite2=$this->obj->i(array("date"=>"01/01/2015","id_contact"=>$this->id_contact,"id_refinanceur"=>1,"id_affaire"=>$this->id_affaire,"id_societe"=>$this->id_societe,"description"=>"Tu description"));
 
 
-		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"refus_comite", "id"=>$id_comite2, "commentaire"=>"Commentaire"));
+		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"refus_comite", "id"=>$id_comite2, "commentaire"=>"Commentaire", "id_affaire"=>$this->id_affaire));
 		$this->assertEquals("refuse",$this->obj->select($id_comite2, "etat"),"Error decision 1");
 
-		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"attente_retour", "id"=>$id_comite2, "commentaire"=>"Commentaire"));
+		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"attente_retour", "id"=>$id_comite2, "commentaire"=>"Commentaire", "id_affaire"=>$this->id_affaire));
 		$this->assertEquals("en_attente",$this->obj->select($id_comite2, "etat"),"Error decision 2");
 
-		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"autre", "id"=>$id_comite2, "commentaire"=>"Commentaire"));
+		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"accord_portage", "id"=>$id_comite2, "commentaire"=>"Commentaire", "id_affaire"=>$this->id_affaire));
+		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"accord_portage_recherche_cession", "id"=>$id_comite2, "commentaire"=>"Commentaire", "id_affaire"=>$this->id_affaire));
+		$this->obj->decision(array("date"=>"01/01/2015","comboDisplay"=>"accord_portage_recherche_cession_groupee", "id"=>$id_comite2, "commentaire"=>"Commentaire", "id_affaire"=>$this->id_affaire));
 		$this->assertEquals("accepte",$this->obj->select($id_comite2, "etat"),"Error decision 3");
 		$this->assertEquals("Commentaire",$this->obj->select($id_comite2, "commentaire"),"Error decision 4");
 		$this->assertEquals("accord_non utilise",$this->obj->select($id_comite, "etat"),"Error decision 5");
+
 
 		ATF::$msg->getNotices();
 	}
@@ -230,13 +233,20 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
-};
+	public function test_sendMailDemandeRefi(){
+		$id_comite=$this->obj->i(array("date"=>"01/01/2015","id_contact"=>$this->id_contact,"id_refinanceur"=>1,"id_affaire"=>$this->id_affaire,"etat"=>"accepte","id_societe"=>$this->id_societe,"description"=>"Tu description"));
 
+		ATF::refinanceur()->u(array("id_refinanceur"=> 1, "email"=>"toto@toto.fr"));
+		$this->obj->sendMailDemandeRefi(array("id"=> $id_comite));
 
-class mock_mail extends mail {
+		ATF::suivi()->q->reset()->addAllFields("suivi")->where("suivi.id_affaire", $this->id_affaire)->addOrder("suivi.id_suivi", "DESC")->setLimit(1);
+		$suivi = ATF::suivi()->select_row();
 
-	public function send(){
-		return true;
+		$this->assertEquals($suivi["suivi.texte"], "Envoi du mail au refinanceur ING LEASE France", "Erreur Suivi ?");
+		$this->assertEquals($suivi["suivi.type_suivi"], "Passage_comite", "Erreur Suivi 2 ?");
+
 	}
+
 };
+
 ?>

@@ -1,5 +1,5 @@
 <?
-class article_history extends classes_optima {
+class article_history_boisethome extends classes_optima {
 	public function __construct() {
 		parent::__construct();
 		$this->controlled_by = "article";
@@ -10,7 +10,7 @@ class article_history extends classes_optima {
 			,'article_history.id_fournisseur'
 			,'article_history.prix_achat'=>array("aggregate"=>array("min","avg","max"),"align"=>"right")
 		);
-		$this->table = __CLASS__;
+		$this->table = "article_history";
 		$this->field_nom = "id_article";
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->fieldstructure();

@@ -129,20 +129,6 @@ class societe_absystech extends societe {
 
 		$this->selectExtjs=true;
 	}
-/*
-		public function select($id,$f=false) {
-				$r = parent::select($id,$f);
-				$r['societe'] = addslashes($r['societe']);
-				$r['societe'] = str_replace("'","OO",$r['societe']);
-				return $r;
-		}
-
-		public function nom($id) {
-				$r = parent::nom($id);
-				$r = addslashes($r);
-				return $r;
-		}
-*/
 
 	/**
 	* Surcharge de l'insertion pour les socits
@@ -161,6 +147,9 @@ class societe_absystech extends societe {
 		ATF::db($this->db)->begin_transaction();
 
 		try {
+
+			if(!$infos['id_commercial']) $infos['id_commercial'] = ATF::$usr->getID();
+
 			//Unset du crédit pour les duplicates
 			unset($infos["credits"]);
 			$id_societe = parent::insert($infos,$s,$files,$cadre_refreshed);
@@ -242,22 +231,6 @@ class societe_absystech extends societe {
 			"+IF(LENGTH(societe.cp)>0,1,0)".
 			"+IF(LENGTH(societe.ville)>0,1,0))*100/11","completer");
 
-//		// Derrnier crédit restant basé sur gestion_ticket
-//		$g = new gestion_ticket();
-//		$g->q->addField("solde")->addField("id_societe")->addOrder("id_gestion_ticket","desc")->setToString();
-//		$this->q
-//			->addField("g.solde","credits")
-//			->from("societe","id_societe","(".$g->sa().")","id_societe","g");
-//
-//		// Date de dernier suivi effectué
-//		$s = new suivi();
-//		$s->q->addField("date")->addField("id_societe")->addOrder("id_suivi","desc")->setToString();
-//		$this->q
-//			->addField("s.date","dernierSuivi")
-//			->from("societe","id_societe","(".$s->sa().")","id_societe","s");
-//
-//		// Nécessaire pour que les jointures ne retournent que le dernier suivi, et derneir crédit
-//		$this->q->addGroup('societe.id_societe');
 
 		// Derrnier crédit restant basé sur gestion_ticket
 		$g = new gestion_ticket();
@@ -337,6 +310,10 @@ class societe_absystech extends societe {
 		return ATF::gestion_ticket()->add_ticket($infos,$s,$files,$cadre_refreshed);
 	}
 
+	public function _add_ticket($get,$post){
+		return $this->add_ticket($post);
+	}
+
 	/**
 		* Redirection vers le portail hotline
 		* @author Fanny DECLERCK <fdeclerck@absystech.fr>
@@ -354,6 +331,12 @@ class societe_absystech extends societe {
 		return $this->redirect_hotline($post["ref"],$post["divers_5"]);
 
 	}
+
+
+	public function _send_identifiants_hotline($get, $post){
+		return $this->send_identifiants_hotline($post);
+	}
+
 
 	/**
 	* Envoi les identifiants hotline par mail via le contact concerné
@@ -760,7 +743,6 @@ class societe_absystech extends societe {
 				$this->update(array("id_societe"=>$item["id_societe"],"meteo"=>$meteo[$key]["meteo"],"meteo_calcul"=>$meteo[$key]["meteo_calcul"]));
 				$nb_tot++;
 				$meteo_tot+=$meteo[$key]["meteo"];
-//print_r($meteo[$key]);
 				if($meteo[$key]["meteo"]>=$big["chiffre"]){
 					$big["chiffre"]=$meteo[$key]["meteo"];
 					$big["societe"]=$item["societe"];
@@ -814,7 +796,6 @@ class societe_absystech extends societe {
 		array_multisort($trie, SORT_DESC, $meteo);
 
 		foreach ($meteo as $key => $item) {
-//print_r("\n".$key." : ".$item["societe"]." : ".$item["meteo"]);
 		}
 
 		//Calcul de la moyenne 'relative'
@@ -830,26 +811,6 @@ class societe_absystech extends societe {
 		$id_constante=ATF::constante()->getConstante("__METEO_SMALL__");
 		ATF::constante()->update(array("id_constante"=>$id_constante,"valeur"=>round($small["chiffre"],4)));
 
-//		$moyenne=$meteo_tot/$nb_tot;
-// print_r("\nmoyenne : ".$moyenne);
-// print_r("\nmeteo_moyenne : ".$meteo_moyenne);
-// print_r("\n+ Gros chiffre = ".$big["societe"]." : ".$big["chiffre"]);
-// print_r("\n+ Petit chiffre = ".$small["societe"]." : ".$small["chiffre"]);
-//
-// print_r("\n+ Gros chiffre datediff ".$big["datediff_societe"]." : ".$big["datediff"]);
-// print_r("\n+ Petit chiffre datediff ".$small["datediff_societe"]." : ".$small["datediff"]);
-//
-// print_r("\n+ Gros chiffre marge ".$big["marge_societe"]." : ".$big["marge"]);
-// print_r("\n+ Petit chiffre marge ".$small["marge_societe"]."  : ".$small["marge"]);
-//
-// print_r("\n+ Gros chiffre solde_total ".$big["solde_total_societe"]."  : ".$big["solde_total"]);
-// print_r("\n+ Petit chiffre solde_total ".$small["solde_total_societe"]." : ".$small["solde_total"]);
-//
-// print_r("\n+ Gros chiffre devis_perdu_pourcent ".$big["affaire_perdu"]['devis_perdu_pourcent_societe']."  : ".$big["affaire_perdu"]['devis_perdu_pourcent']);
-// print_r("\n+ Petit chiffre devis_perdu_pourcent ".$small["affaire_perdu"]['devis_perdu_pourcent_societe']."  : ".$small["affaire_perdu"]['devis_perdu_pourcent']);
-//
-//
-// print_r("\nRatio societe/meteo = ".$nb_tot." / ".$nb_societe);
 	}
 
 	/**
@@ -1007,7 +968,6 @@ class societe_absystech extends societe {
 			$begin="BEGIN:ATCARD\nVERSION:1.0\n";
 			fwrite($fichier,$begin);
 			$societe = $this->select($id);
-//			$societe['societe'] = "ZorianSpecialTU";
 			//Infos de la société
 			$atcf['societe'] = "===BEGIN:SOCIETE===";
 			$atcf['societe'] .= "\n";
@@ -1477,4 +1437,25 @@ class societe_att extends societe_absystech {
 
 class societe_demo extends societe_absystech { }
 class societe_wapp6 extends societe_absystech { }
+class societe_atoutcoms extends societe_absystech {
+	/**
+	* Retourne le prfixe utilis, peut tre surcharg
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return string $prefix
+	*/
+	public function create_ref_prefix(){
+		return "CS";
+	}
+}
+
+class societe_nco extends societe_absystech {
+	/**
+	* Retourne le prfixe utilis, peut tre surcharg
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return string $prefix
+	*/
+	public function create_ref_prefix(){
+		return "N";
+	}
+}
 ?>

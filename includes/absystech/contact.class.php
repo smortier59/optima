@@ -178,4 +178,6 @@ class contact_absystech extends contact {
 };
 
 class contact_att extends contact_absystech { };
+class contact_atoutcoms extends contact_absystech { };
+class contact_nco extends contact_absystech { };
 ?>

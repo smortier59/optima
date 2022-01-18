@@ -73,4 +73,11 @@ class sous_categorie_cleodis extends sous_categorie {
 
 class sous_categorie_cleodisbe extends sous_categorie_cleodis { };
 class sous_categorie_cap extends sous_categorie_cleodis { };
-?>
+
+class sous_categorie_bdomplus extends sous_categorie_cleodis { };
+
+class sous_categorie_boulanger extends sous_categorie_cleodis { };
+
+class sous_categorie_assets extends sous_categorie_cleodis { };
+
+class sous_categorie_go_abonnement extends sous_categorie_cleodis { };

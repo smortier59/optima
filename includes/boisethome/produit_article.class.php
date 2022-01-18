@@ -1,5 +1,5 @@
 <?
-class produit_article extends classes_optima {
+class produit_article_boisethome extends classes_optima {
 	function __construct() {
 		parent::__construct();
 		$this->controlled_by = "produit";

@@ -19,6 +19,7 @@ foreach ($ths as $k=>$th) {
                             ->where("id_hotline",$th['id_hotline'])
                             ->where('id_user',12/* Quentin */)
                             ->where('id_user',63/* Anthony */)
+                            ->where('id_user',55/* Morgan */)
                             ->where('visible','oui');
 
   $th_is = ATF::hotline_interaction()->sa();

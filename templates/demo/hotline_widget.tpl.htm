@@ -1,0 +1,67 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline}
+<div id="{$module}_grapheHotline" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->stats(true)} 
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_grapheHotline',
+            type: 'column'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },
+        colors :[
+            '#FF0004',
+            '#FFCF23',
+            '#19FF30'            
+        ],
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        tooltip: {           
+            shared: true
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: null
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});
+    
+</script>
+
+
+<div>
+    <div>Temps total non résolu : <span style="font-weight:bold">{ATF::hotline()->getTempsTotalNonResolu()|number_format:0:".":" "} j.</span></div>
+</div>
+{/strip}

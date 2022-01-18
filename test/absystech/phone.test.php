@@ -21,9 +21,10 @@ class phone_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->id_asterisk=ATF::asterisk()->insert(array(
 			"asterisk"=>"serveur de test"
 			,"host"=>"localhost"
+			,"token"=>"token"
 			,"url_webservice"=>"https://asterisk.absystech.netttt/webservices/index.php"
-			,"login"=>"test"
-			,"password"=>"test"
+			//,"login"=>"test"
+			//,"password"=>"test"
 			));
 		$this->assertNotNull($this->id_asterisk,"pb creation serveur");
 		
@@ -52,9 +53,10 @@ class phone_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->id_asterisk=ATF::asterisk()->insert(array(
 			"asterisk"=>"serveur de test"
 			,"host"=>"localhost"
+			,"token"=>"token"
 			,"url_webservice"=>"https://asterisk.absystech.netttt/webservices/index.php"
-			,"login"=>"test"
-			,"password"=>"test"
+			//,"login"=>"test"
+			//,"password"=>"test"
 			));
 		$this->assertNotNull($this->id_asterisk,"pb creation serveur");
 		

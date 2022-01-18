@@ -39,8 +39,3 @@ class questionnaire_bk_ligne extends classes_optima {
   	
 	
 };
-
-class questionnaire_bk_ligne_cleodisbe extends questionnaire_bk_ligne { };
-class questionnaire_bk_ligne_cap extends questionnaire_bk_ligne { };
-
-?>

@@ -1,0 +1,62 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline}
+{$type = requetebyUser}
+<div id="{$module}_requeteByUser" class="widget"></div>
+
+
+<script type="text/javascript">
+{$data = ATF::hotline()->stats(true,$type)} 
+
+Ext.onReady(function(){       
+    var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: '{$module}_requeteByUser',
+                plotBackgroundColor: null,
+                plotBorderWidth: 1,
+                plotShadow: false
+            },            
+            colors : [
+                  "#FF0FC7",
+                  "#02FF0F",
+                  "#022EE0"
+            ],
+
+            title: {
+                text: '{$data["params"]["caption"]}'
+                ,style :{
+                    fontSize: '12px'
+                }
+            }, 
+            tooltip: {           
+                shared: true
+             },          
+            plotOptions: {
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        formatter: function() {
+                            return '<b>'+ this.point.name +'</b>:<br /> '+ this.y +' %';
+                        }
+                    }
+                }
+            }, 
+            series: [{
+                type: 'pie',
+                name: "Part d'activité",
+                data: [
+                    {foreach $data["dataset"] as $k=>$v}
+                        ['{$k}',  {$v["pourcentage"]}]
+                        {if !$k@last},{/if}
+                    {/foreach}
+                ]
+            }]
+        });
+});
+</script>

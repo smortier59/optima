@@ -1,0 +1,10 @@
+N°;Nom;Etat;Site associé;Visible sur le site;Description
+1;Réseau privé LoRaWAN d’intérieur - passerelle Kerlink Wirnet iFemtoCell;actif;h2c;Oui;Ce réseau Privé LoRa d’intérieur avce connexion Ethernet est construit autour de la passerelle LoRaWAN intérieure Kerlink Wirnet iFemtoCell 868 MHz
+2;Réseau privé LoRaWAN d’extérieur – passerelle Kerlink Wirnet iStation;actif;h2c;Oui;Ce pack réseau Privé LoRa extérieur est construit autour de la passerelle LoRaWAN extérieure Kerlink Wirnet iStation 868 MHz
+3;Pack 4G pour une connectivité fiable– routeur Sierra LX40 LTE avec WiFi;actif;h2c;Oui;Ce pack réseau 4G avec Wifi est construit autour du routeur Sierra LX40 LTE cat 4 avec WiFi
+4;Pack LTE Cat 1 pour réseau OT– passerelle Sierra FX30 NR avec Node-RED;actif;h2c;Oui;Ce pack réseau LTE Cat1 est construit autour de la plate-forme Sierra FX30 NR LTE Cat 1 avec Node-RED
+5;Pack LTE Cat M pour l’IoT – passerelle Sierra FX30S NR avec Node-RED;actif;h2c;Oui;Ce pack Réseau LTE-M ( IoT) est construit autour de la plate-forme Sierra FX30 NR LTE-M NB-IoT avec Node-RED , connexion série
+6;Réseau privé LoRaWAN d’extérieur – passerelle Kerlink Wirnet IBTS compact, 4G et Ethernet;actif;h2c;Oui;Ce pack réseau privé LoRa d’intérieur avec connexion Ethernet et 4G est construit autour de la passerelle LoRaWAN extérieure Kerlink Wirnet IBTS compact, connexion 4G et Ethernet
+7;Réseau privé LoRaWAN d’extérieur – passerelle Kerlink Wirnet IBTS compact Ethernet;actif;h2c;Oui;Concevez un réseau privé LoRa d’intérieur avec la passerelle LoRaWAN Kerlink Wirnet iFemtoCell-Evolution
+8;Ancre LoRaWAN Kerlink Wanesy Wave 868 MHz;actif;h2c;Oui;Ancre LoRaWAN Kerlink Wanesy Wave - 868 MHz
+9;Pack 5G pour site fixe ou temporaire - routeur Sierra XR90;actif;h2c;Oui;Ce pack réseau 5G avec Wifi est construit autour du routeur Sierra XR90.

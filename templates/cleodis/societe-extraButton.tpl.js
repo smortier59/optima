@@ -43,6 +43,7 @@
 	id: 'creditsafe _{$current_class->table}',
 	disabled : false,
 	handler: function(){
+
 		var siret = Ext.getCmp('societe[siret]').getValue();
  		if (!siret) {
 			Ext.Msg.show({
@@ -68,8 +69,14 @@
 
 							}
 						}
-
 					});
+
+					/* On ouvre les panels pour l'envoi du formulaire */
+					if(Ext.getCmp('panel_facturation_fs').collapsed == true ) Ext.getCmp('panel_facturation_fs').toggleCollapse(true);
+					if(Ext.getCmp('panel_coordonnees_supplementaires_fs').collapsed == true ) Ext.getCmp('panel_coordonnees_supplementaires_fs').toggleCollapse(true);
+					if(Ext.getCmp('panel_caracteristiques').collapsed == true ) Ext.getCmp('panel_caracteristiques').toggleCollapse(true);
+
+
 
 					ATF.loadMask.hide();
 				}

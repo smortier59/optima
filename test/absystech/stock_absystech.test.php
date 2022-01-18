@@ -256,7 +256,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         
         $this->assertFileExists($this->obj->filepath($id, "photo"),"Le fichier image n'est pas sur le serveur");
     }
-    
+    /*
     public function test_getImageFromIcecatNoImage() {
         $s = array(
             "ref" => "WB708ET_EF227AT",
@@ -310,7 +310,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertArrayHasKey("poids", $d);
         
     }
-
+    */
     public function test_switch_stock(){
         $oldid = $this->_stock[0]["id_stock"];
         $oldAffaire = $this->_stock[0]["id_affaire"];
@@ -404,7 +404,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertTrue($erreur,"Pas d'erreur de remontée");
     }        
 */
-
+/*
     public function test_getDataFromIcecat() {
         
         $s = array(
@@ -423,7 +423,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("5,75 kg",$r['poids'],"Pas le bon poids ce n'est pas normal");
                 
     }
-    
+    */
     //* @test Test du constructeur stock. 
     public function test_stock_constructeur(){
         $this->_stock = new stock();    
@@ -1171,7 +1171,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
     }
         
     // @author Quentin JANON <qjanon@absystech.fr>
-    public function test_updateForMagentoSend() {
+    /*public function test_updateForMagentoSend() {
 
         $infos = array("libelle" => "HP TU", "ref" => "BONANA", 'quantite' => 2, "prix"=>115);
         $this->obj->insert($infos);
@@ -1208,7 +1208,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(189,$p2After["prix"],"Le deuxième produit de même ref n'as pas vu son prix mise a jour automatiquement");
         $this->assertEquals("divers",$p2After["categories_magento"],"Le deuxième produit de même ref n'as pas vu son prix mise a jour automatiquement");
 
-    }
+    }*/
     /**
       * Test Method _GET avec id_stock
       * @author Cyril Charlier <ccharlier@absystech.net>
@@ -1244,7 +1244,6 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
     /**
       * Test Method _GET avec avec une adresse mac inconnue
       * @author Cyril Charlier <ccharlier@absystech.net>
-    */
     public function test_GETUnknowMac() {
 
         $insertStock = ATF::stock()->i(array("libelle" =>"other one",
@@ -1262,6 +1261,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("affaire test", $ret['id_affaire'],"Erreur affaire de retour");
         $this->assertEquals("Societe Test", $ret['societe'],"Erreur societe de retour");
     }
+    */
     /**
       * Test Method _GET sans params
       * @author Cyril Charlier <ccharlier@absystech.net>

@@ -173,7 +173,3 @@ class formation_commande_cleodis extends formation_commande {
 
 
 };
-
-class formation_commande_cleodisbe extends formation_commande_cleodis { };
-class formation_commande_cap extends formation_commande_cleodis { };
-?>

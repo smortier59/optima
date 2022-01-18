@@ -1,0 +1,7 @@
+Un ticket hotline à été créé pour vous
+
+
+Titre : {$infos.hotline} (#{$infos.id_hotline})
+
+
+{$infos.detail|stripslashes|nl2br}

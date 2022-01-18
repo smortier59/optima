@@ -1,0 +1,89 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline}
+{$type = nbreCloture}
+<div id="{$module}_grapheNbreCloture" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->statNbCloture()} 
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_grapheNbreCloture',
+            type: 'column'
+        },        
+        title: {
+           text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },
+        colors :[            
+            '#FF0004',
+            '#19FF30'  
+        ],
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        tooltip: {           
+            shared: true
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal'
+            }
+        },
+        yAxis: {
+            title: {
+                text: null
+            }
+        },        
+        series: [ 
+                
+               {                   
+                   type: 'column'
+                   ,name: "Requêtes cloturées AT"                   
+                   ,data: [
+                          {foreach $data["categories"]["category"] as $key => $cat}
+                              [  
+                                 {$data["dataset"]["dif"]["set"][$key]["value2"]}
+                                 {if !$key@last},{/if}
+                              ] 
+                              {if !$key@last},{/if}
+                         {/foreach}    
+                         ] 
+              },          
+               {                   
+                   type: 'column'
+                   ,name: "Requêtes cloturées"                   
+                   ,data: [
+                          {foreach $data["categories"]["category"] as $key => $cat}
+                          [  
+                                {$data["dataset"]["dif"]["set"][$key]["value"]}
+                                                           
+                          ]
+                          {if !$key@last},{/if}
+                        {/foreach} 
+                        ]
+                   ,dataLabels: {
+                    enabled: true,
+                    color: '#000000',
+                    style: {
+                        fontWeight: 'bold',
+                        fontSize: '11px',
+                        fontFamily: 'Verdana, sans-serif'
+                        }                   
+                    }
+              }                      
+           ]        
+    });
+});
+    
+</script>
+<div>
+    Requêtes cloturées dans les 30 derniers jours<br /> hors requêtes AT & ATT
+</div>
+{/strip}

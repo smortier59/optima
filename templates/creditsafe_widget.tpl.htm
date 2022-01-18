@@ -1,0 +1,60 @@
+{strip}
+{* @param string $module *}
+
+{log::logger("On est la CS", "mfleurquin")}
+
+{$infos = ATF::accueil()->type_agence(ATF::_g(type))}
+{$id_agence = $infos.id_agence}
+
+
+<div id="creditsafe_graphe_{$infos.type}_{$id_agence}" class="widget"></div>
+
+    <script type="text/javascript">
+        {$data = ATF::creditsafe()->getSolde(false)}
+
+        Ext.onReady(function(){
+            var chart = new Highcharts.Chart({
+                    chart: {
+                        renderTo: 'creditsafe_graphe_{$infos.type}_{$id_agence}',
+                        plotBackgroundColor: null,
+                        plotBorderWidth: 1,
+                        plotShadow: false
+                    },
+                    colors : [
+                        "#e00223",
+                        "#02FF0F"
+                    ],
+                    title: {
+                        text: "{$data["title"]}"
+                        ,style :{
+                            fontSize: '12px'
+                        }
+                    },
+                    tooltip: {
+                        shared: true
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: false,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                color: '#000000',
+                                connectorColor: '#000000'
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'pie',
+                        name: "{$data["serie"]}",
+                        data: [
+                            ['Utilisé',  {$data["utilise"]} ],
+                            ['Restant',  {$data["restant"]} ]
+                        ]
+                    }]
+                });
+        });
+    </script>
+
+
+{/strip}
