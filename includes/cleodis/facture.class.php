@@ -3689,6 +3689,57 @@ class facture_go_abonnement extends facture_cleodis {
 	}
 
 
+	function getRef($id_affaire,$type="facture"){
+		$affaire=ATF::affaire()->select($id_affaire);
+
+		$this->q->reset()
+				->addCondition("id_affaire",$id_affaire)
+				->addCondition("type_facture",$type)
+				->addOrder("ref_reel","DESC")
+				->setDimension("row");
+
+		if($affaire["nature"]=='avenant'){
+			$this->q->addField('ROUND( SUBSTRING(  `ref` , 15 ) )',"ref_reel");
+		}else{
+			$this->q->addField('ROUND( SUBSTRING(  `ref` , 11 ) )',"ref_reel");
+		}
+
+		$facture=$this->sa();
+
+		if(!$facture){
+			$suffix=0;
+		}else{
+			$suffix=$facture["ref_reel"];
+		}
+
+		if($type=="ap"){
+			$sufType="-AP";
+		}elseif($type=="refi"){
+			$sufType="-RE";
+		}elseif($type=="libre"){
+			$sufType="-LI";
+		}elseif($type=="facture"){
+			$sufType="";
+		}
+
+		//Si jamais pour une raison x ou y la ref existe déjà il faut incrémenter jusqu'à trouver une ref dispo (problème lorsque cléodis se trompe de type et que l'on doit modifier le type sans changer la ref...)
+		$find=false;
+		$i=1;
+		while($find==false){
+			$this->q->reset()->addCondition("ref",$affaire["ref"]."-".($suffix+$i).$sufType);
+			if(!$this->sa()){
+				$ref=$affaire["ref"]."-".($suffix+$i).$sufType;
+				$find=true;
+			}else{
+				$i++;
+			}
+		}
+
+		return $ref;
+
+	}
+
+
 	/**
 	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
