@@ -1205,16 +1205,10 @@ class facture_cleodis extends facture {
 
 		//ajout des donnÃ©es
 		if($infos){
-			 $this->ajoutDonnees($sheet,$infos);
-
-			 if(ATF::$codename == "cleodisbe" OR  ATF::$codename == "cleodis"){
-
-				foreach($infos as $facture){
-					ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "oui"));
-				}
-
-			 }
-
+			$this->ajoutDonnees($sheet,$infos);
+			foreach($infos as $facture){
+				ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "oui"));
+			}
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
@@ -1345,7 +1339,6 @@ class facture_cleodis extends facture {
 				if($ResRefinancement){
 					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
 				}
-
 
 				$choix = "defaut";
 
