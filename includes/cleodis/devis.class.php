@@ -585,13 +585,14 @@ class devis_cleodis extends devis {
 		}
 
 		if ($infos_loyer_prolongation) {
-			foreach($infos_loyer_prolongation as $key=>$item){
-				$id_prolongation = ATF::prolongation()->i(array(
-					"id_affaire" => $infos['id_affaire'],
-					"ref" => $infos["ref"],
-					"id_societe" => $infos["id_societe"]
-				));
 
+			$id_prolongation = ATF::prolongation()->i(array(
+				"id_affaire" => $infos['id_affaire'],
+				"ref" => $infos["ref"],
+				"id_societe" => $infos["id_societe"]
+			));
+
+			foreach($infos_loyer_prolongation as $key=>$item){
 				foreach($item as $k=>$i){
 					$k_unescape=util::extJSUnescapeDot($k);
 					$item[str_replace("loyer.","",$k_unescape)]=$i;
