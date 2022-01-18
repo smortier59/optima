@@ -332,7 +332,7 @@ class commande_cleodis extends commande {
 						if($commande['commande']){
 							$type = $commande['type'];
 						}elseif($commande['devis']){
-							$type = "prelevement";
+							$type = ATF::societe()->select($commande["id_societe"], "divers_2");
 						}
 						return $type;
 				case "email":
