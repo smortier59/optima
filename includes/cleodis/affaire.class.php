@@ -3125,7 +3125,7 @@ class affaire_cleodis extends affaire {
 	public function createTacheAffaireFromSite($id_affaire){
 		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe' && ATF::$codename != 'go_abonnement') return;
 
-		$dest = ATF::user()->getDestinataireFromConstante("__NOTIFIE_CREATE_TACHE_PARTENAIRE__");
+		$dest = ATF::user()->getDestinataireFromConstante("__DESTINATAIRE_NOTIFIE_TACHE_AFFAIRE_PARTENAIRE__");
 
 
 		$affaire = ATF::affaire()->select($id_affaire);
