@@ -271,10 +271,8 @@ class comite extends classes_optima {
 			return $this->cryptId($infos["id_comite"]);
 		}else{
 			if(!$tu) $this->move_files($infos["id_comite"],$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$infos["etat"]));
-
-
 			if($infos["etat"]){
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$infos["etat"]));
 				$suivi = array(
 					 "id_user"=>ATF::$usr->get('id_user')
 					,"id_societe"=>$infos['id_societe']
