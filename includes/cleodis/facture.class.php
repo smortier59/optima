@@ -321,6 +321,8 @@ class facture_cleodis extends facture {
 				if ($facture["id_affaire"]) {
 					if(ATF::affaire()->select($facture["id_affaire"],"nature")=="vente"){
 						return "cheque";
+					} else {
+						return ATF::commande()->select($facture["id_commande"], "type");
 					}
 				}
 				break;
@@ -520,7 +522,7 @@ class facture_cleodis extends facture {
 				$facture["facture"] = array(
 		            "id_societe" => $affaire["id_societe"],
 		            "type_facture" => "libre",
-		            "mode_paiement" => "prelevement",
+		            "mode_paiement" => $commande["type"],
 		            "id_affaire" => $affaire["id_affaire"],
 		            "type_libre" => "normale",
 		            "date" => date("d-m-Y"),
@@ -617,10 +619,8 @@ class facture_cleodis extends facture {
 		$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
 		$dateFinPeriode = $dateFinPeriode->format('d-m-Y');
 
-
-
 		if($prix != 0){
-			$mode_paiement = "prelevement";
+			$mode_paiement = $commande["type"];
 			if($affaire["site_associe"] === 'toshiba') $mode_paiement = "cb";
 			if($affaire["site_associe"] === 'btwin') $mode_paiement = "pre-paiement";
 
@@ -1190,8 +1190,6 @@ class facture_cleodis extends facture {
      * @param array $infos : contient tous les enregistrements
      */
      public function export_xls_special(&$infos){
-
-
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
@@ -1206,11 +1204,12 @@ class facture_cleodis extends facture {
 		//mise en place des titres
 		$this->ajoutTitre($sheet);
 
-
-
 		//ajout des donnÃ©es
 		if($infos){
-			 $this->ajoutDonnees($sheet,$infos);
+			$this->ajoutDonnees($sheet,$infos);
+			foreach($infos as $facture){
+				ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "oui"));
+			}
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
@@ -1341,7 +1340,6 @@ class facture_cleodis extends facture {
 				if($ResRefinancement){
 					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
 				}
-
 
 				$choix = "defaut";
 
@@ -3686,6 +3684,57 @@ class facture_go_abonnement extends facture_cleodis {
 
 		$this->addPrivilege("aPrelever");
 		$this->addPrivilege("massPrelevementSlimpay");
+	}
+
+
+	function getRef($id_affaire,$type="facture"){
+		$affaire=ATF::affaire()->select($id_affaire);
+
+		$this->q->reset()
+				->addCondition("id_affaire",$id_affaire)
+				->addCondition("type_facture",$type)
+				->addOrder("ref_reel","DESC")
+				->setDimension("row");
+
+		if($affaire["nature"]=='avenant'){
+			$this->q->addField('ROUND( SUBSTRING(  `ref` , 15 ) )',"ref_reel");
+		}else{
+			$this->q->addField('ROUND( SUBSTRING(  `ref` , 11 ) )',"ref_reel");
+		}
+
+		$facture=$this->sa();
+
+		if(!$facture){
+			$suffix=0;
+		}else{
+			$suffix=$facture["ref_reel"];
+		}
+
+		if($type=="ap"){
+			$sufType="-AP";
+		}elseif($type=="refi"){
+			$sufType="-RE";
+		}elseif($type=="libre"){
+			$sufType="-LI";
+		}elseif($type=="facture"){
+			$sufType="";
+		}
+
+		//Si jamais pour une raison x ou y la ref existe déjà il faut incrémenter jusqu'à trouver une ref dispo (problème lorsque cléodis se trompe de type et que l'on doit modifier le type sans changer la ref...)
+		$find=false;
+		$i=1;
+		while($find==false){
+			$this->q->reset()->addCondition("ref",$affaire["ref"]."-".($suffix+$i).$sufType);
+			if(!$this->sa()){
+				$ref=$affaire["ref"]."-".($suffix+$i).$sufType;
+				$find=true;
+			}else{
+				$i++;
+			}
+		}
+
+		return $ref;
+
 	}
 
 
