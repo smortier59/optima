@@ -3956,7 +3956,10 @@ class facture_go_abonnement extends facture_cleodis {
 						} else {
 							$choix = "avoir_facture_prorata";
 						}
-					}elseif ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat") {
+					}elseif (
+							($item["facture.type_facture"] === "avoir" || ($item["facture.type_facture"] == "libre" && $item["facture.prix"] < 0))
+						 && ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat"))
+					{
 						$choix = "avoir_facture_mensuelle";
 					}elseif ($item["facture.nature"] == "prolongation") {
 						if ($item["facture.prix"] > 0) {
@@ -4040,6 +4043,8 @@ class facture_go_abonnement extends facture_cleodis {
 
 					break;
 				}
+
+				log::logger($item["facture.ref_externe"] ." --- ". $choix , "mfleurquin");
 
 				//insertion des donnÃ©es
 				foreach ($ligne as $key => $value) {
