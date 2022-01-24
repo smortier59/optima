@@ -3943,7 +3943,7 @@ class facture_go_abonnement extends facture_cleodis {
 				}
 
 				$choix = "defaut";
-				$code_libelle = "F";
+
 
 				if ($item["facture.type_facture"] === "facture") {
 					if ($item["facture.prix"] > 0) {
@@ -3955,17 +3955,15 @@ class facture_go_abonnement extends facture_cleodis {
 							$choix = "facture_prorata";
 						} else {
 							$choix = "avoir_facture_prorata";
-							$code_libelle = "A";
 						}
 					}elseif ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat") {
 						$choix = "avoir_facture_mensuelle";
-						$code_libelle = "A";
 					}elseif ($item["facture.nature"] == "prolongation") {
 						if ($item["facture.prix"] > 0) {
 							$choix = "facture_prolongation";
 						} else {
 							$choix = "avoir_facture_prolongation";
-							$code_libelle = "A";
+
 						}
 					}
 				}
@@ -3978,6 +3976,7 @@ class facture_go_abonnement extends facture_cleodis {
 				switch ($choix) {
 					case "facture_mensuelle":
 					case "avoir_facture_mensuelle":
+						$code_libelle = "F";
 
 						$ligne[2]["D"] = "706200";
 						$ligne[3]["D"] = "445712";
@@ -3985,6 +3984,7 @@ class facture_go_abonnement extends facture_cleodis {
 						$ligne[4]["F"] = "C";
 
 						if ($choix === "avoir_facture_mensuelle") {
+							$code_libelle = "A";
 							$ligne[1]["F"] = "C";
 							$ligne[2]["F"] = "D";
 							$ligne[3]["F"] = "D";
@@ -3998,8 +3998,10 @@ class facture_go_abonnement extends facture_cleodis {
 						$ligne[3]["D"] = "445715";
 						$ligne[4]["D"] = "706500";
 						$ligne[4]["F"] = "C";
+						$code_libelle = "F";
 
 						if ($choix === "avoir_facture_prorata") {
+							$code_libelle = "A";
 							$ligne[1]["F"] = "C";
 							$ligne[2]["F"] = "D";
 							$ligne[3]["F"] = "D";
@@ -4009,11 +4011,13 @@ class facture_go_abonnement extends facture_cleodis {
 
 					case "facture_prolongation":
 					case "avoir_facture_prolongation":
+						$code_libelle = "F";
 						$ligne[2]["D"] = "706220";
 						$ligne[3]["D"] = "445713";
 						$ligne[4]["D"] = "706500";
 						$ligne[4]["F"] = "C";
 						if ($choix === "avoir_facture_prolongation") {
+							$code_libelle = "A";
 							$ligne[1]["F"] = "C";
 							$ligne[2]["F"] = "D";
 							$ligne[3]["F"] = "D";
@@ -4025,6 +4029,7 @@ class facture_go_abonnement extends facture_cleodis {
 
 						$ligne[2]["D"] = "706400";
 						$ligne[3]["D"] = "445710";
+						$code_libelle = "F";
 
 						if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
 							$code_libelle = "A";
@@ -4048,6 +4053,7 @@ class facture_go_abonnement extends facture_cleodis {
 					$row_data["D"] = $value["D"];
 					$row_data["E"] = $code_libelle;
 					$row_data["F"] = $value["F"];
+
 
 					switch($key) {
 						case "1":
@@ -4080,7 +4086,7 @@ class facture_go_abonnement extends facture_cleodis {
 					$row_data["L"] = ($item['facture.date_periode_fin']) ? $item['facture.date_periode_fin'] : "";
 					$row_data["M"] = ($item['facture.date_previsionnelle']) ? $item['facture.date_previsionnelle'] : "";
 
-					if ($key == 4 && $item["facture.prix_sans_tva"] == 0) {
+					if ($key == 4 && (!$sans_tva || $item["facture.prix_sans_tva"] == 0)) {
 						$row_data = array();
 					}
 
