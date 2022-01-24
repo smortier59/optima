@@ -68,7 +68,7 @@ class prelevement extends classes_optima{
                 // On recherche la ref Client par rapport à la facutre
                 ATF::facture()->q->reset()->where("facture.ref", $data[2]);
                 $fac = ATF::facture()->select_row();
-                $id_soc = $fac["id_societe"];
+                $id_soc = $fac["facture.id_societe_fk"];
                 $ref_client = ATF::societe()->select($id_soc, "ref");
               }
 
@@ -106,6 +106,7 @@ class prelevement extends classes_optima{
                           $refs_facture = $item['facture.ref'];
                             if($item['prix_ttc'] == $value['montant'] && $item['facture.etat'] == "impayee"){
                                   $array[$key]['canPayment'] = true;
+
                                   // Mettre les réfs facture, séparés par virgule, dans une variable $refs_facture
                                   if ($item != end($factures)) $refs_facture .= ',';
                             }else{
