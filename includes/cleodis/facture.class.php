@@ -3863,6 +3863,9 @@ class facture_go_abonnement extends facture_cleodis {
 					if ($item["facture.prix"] > 0) {
 						$choix = "facture_mensuelle";
 					}
+				} elseif ($item["facture.type_facture"] == "avoir" && ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat")) {
+					$choix = "avoir_facture_mensuelle";
+
 				} elseif ($item["facture.type_facture"] == "libre") {
 					if ($item["facture.type_libre"] == "prorata") {
 						if ($item["facture.prix"] > 0) {
@@ -3870,10 +3873,7 @@ class facture_go_abonnement extends facture_cleodis {
 						} else {
 							$choix = "avoir_facture_prorata";
 						}
-					}elseif (
-							($item["facture.type_facture"] === "avoir" || ($item["facture.type_facture"] == "libre" && $item["facture.prix"] < 0))
-						 && ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat"))
-					{
+					}elseif (($item["facture.prix"] < 0 && ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat"))) {
 						$choix = "avoir_facture_mensuelle";
 					}elseif ($item["facture.nature"] == "prolongation") {
 						if ($item["facture.prix"] > 0) {
