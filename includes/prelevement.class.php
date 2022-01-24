@@ -43,9 +43,9 @@ class prelevement extends classes_optima{
         $array = [];
         $row = 0;
 
-        if (($open = fopen($filepath, "r")) !== FALSE) 
+        if (($open = fopen($filepath, "r")) !== FALSE)
         {
-          while (($data = fgetcsv($open, 1000, ";")) !== FALSE) 
+          while (($data = fgetcsv($open, 1000, ";")) !== FALSE)
           {
               $dateInput = explode('/',$data[8]);
               $array[$row]['date'] = $dateInput[2].'-'.$dateInput[1].'-'.$dateInput[0];
@@ -56,42 +56,42 @@ class prelevement extends classes_optima{
               if (ATF::$codename == "att") {
                 $pattern = '/ASLI[0-9]{8}/';
               } else {
-                  $pattern = '/SLI[0-9]{8}/';
+                 $pattern = '/SLI[0-9]{8}/';
               }
+
               preg_match($pattern, $data[29], $sli);
               $m = preg_split($pattern, $data[29]);
-              $ref_client = $sli[0];
+              $ref_client = NULL;
+              if ($sli[0]) {
+                $ref_client = $sli[0];
+              } else {
+                // On recherche la ref Client par rapport à la facutre
+                ATF::facture()->q->reset()->where("facture.ref", $data[2]);
+                $fac = ATF::facture()->select_row();
+                $id_soc = $fac["id_societe"];
+                $ref_client = ATF::societe()->select($id_soc, "ref");
+              }
+
+
+
               $name_societe = $m[0];
 
               $array[$row]['name_client'] = $name_societe;
               $array[$row]['ref_client'] = $ref_client;
               $array[$row]['canPayment'] = false;
             $row++;
-          
+
           }
-        
+
           fclose($open);
         }
 
         array_shift($array);
 
+        // log::logger($array , "mfleurquin");
         foreach ($array as $key=>$value) {
           $refs_facture = "";
 
-           //verifier si la ref n'existe pas dans le RUM au niveau du fichier si oui, on recupére le ref_client de la societe via la ref_factures
-          if(!$value['ref_client']){
-
-            ATF::facture()->q->reset()->where('facture.ref',$value['refs_facture']);
-            $factures = ATF::facture()->select_all();
-            foreach($factures as $facture){
-              ATF::societe()->q->reset()->where('societe.id_societe',$facture['facture.id_societe_fk']);
-              $societes = ATF::societe()->select_all();
-              foreach($societes as $item){
-                $array[$key]['ref_client'] = $item['ref'];
-              }
-            }
-
-          }
 
           // verifier si les factures si les sociétés existent en base
           if ($array[$key]['ref_client']) {
@@ -122,7 +122,6 @@ class prelevement extends classes_optima{
         $this->facturesFile = $array;
         return $array;
       }else{
-        log::logger("Fichier inexistant", "qjanon");
         throw new errorATF("Le fichier n'existe pas", 500);
       }
     }
@@ -173,11 +172,11 @@ class prelevement extends classes_optima{
               $response[$k]["ref_client"] = ATF::societe()->select($val,"ref");
             }
             $response[$k][$tmp[1]] = $val;
-            
+
             unset($response[$k][$k_]);
           }
         }
-       
+
       }
 
       return $response;
@@ -189,7 +188,7 @@ class prelevement extends classes_optima{
                               ->where('facture.etat','impayee')
                               ->where('facture.id_termes',24,'AND',false,"!=")
                               ->where('facture.id_termes',25,'AND',false,"!=");
-                              
+
       $result = ATF::facture()->select_all();
 
       foreach ($result as $k=>$lines) {
@@ -200,11 +199,11 @@ class prelevement extends classes_optima{
               $result[$k]["ref_client"] = ATF::societe()->select($val,"ref");
             }
             $result[$k][$tmp[1]] = $val;
-            
+
             unset($result[$k][$k_]);
           }
         }
-       
+
       }
 
       $return = [];
@@ -219,7 +218,7 @@ class prelevement extends classes_optima{
       elseif($get["date_debut"] && $get['date_fin'] && !$get['id_societe'] && !$get['numero_facture']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -238,7 +237,7 @@ class prelevement extends classes_optima{
             ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
             $affaires = ATF::affaire()->sa();
           }
-         
+
 
           foreach($societes as $item){
             $result[$key]['ref_client'] = $item['ref'];
@@ -261,7 +260,7 @@ class prelevement extends classes_optima{
       elseif($get["date_debut"] && $get['date_fin'] && $get['id_societe'] && !$get['numero_facture']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -280,7 +279,7 @@ class prelevement extends classes_optima{
             ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
             $affaires = ATF::affaire()->sa();
           }
-         
+
 
           foreach($societes as $item){
             $result[$key]['ref_client'] = $item['ref'];
@@ -312,7 +311,7 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_debut_periode,"AND",false,">=");
-           
+
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -329,7 +328,7 @@ class prelevement extends classes_optima{
             $result[$key]['id_societe_fk'] = $item['id_societe'];
             $result[$key]['prix_ttc'] = $result[$key]['prix'];
             $result[$key]['id_societe'] = $item['societe'];
-  
+
             foreach($affaires as $affaire){
               $result[$key]['id_affaire'] = $affaire['affaire'] ;
             }
@@ -343,7 +342,7 @@ class prelevement extends classes_optima{
 
       }elseif($get["date_fin"] && !$get['date_debut'] && !$get['id_societe'] && !$get['numero_facture']){
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
         ATF::facture()->q->reset()
@@ -351,7 +350,7 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_fin_periode,"AND",false,"<=");
-           
+
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -368,7 +367,7 @@ class prelevement extends classes_optima{
             $result[$key]['id_societe_fk'] = $item['id_societe'];
             $result[$key]['prix_ttc'] = $result[$key]['prix'];
             $result[$key]['id_societe'] = $item['societe'];
-  
+
             foreach($affaires as $affaire){
               $result[$key]['id_affaire'] = $affaire['affaire'] ;
             }
@@ -386,7 +385,7 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=");
-  
+
         $response = ATF::facture()->select_all();
 
         foreach ($response as $k=>$lines) {
@@ -397,13 +396,13 @@ class prelevement extends classes_optima{
                 $response[$k]["ref_client"] = ATF::societe()->select($val,"ref");
               }
               $response[$k][$tmp[1]] = $val;
-              
+
               unset($response[$k][$k_]);
             }
           }
-         
+
         }
-  
+
         $return =  $response;
       }
 
@@ -422,7 +421,7 @@ class prelevement extends classes_optima{
       }elseif($get['id_societe'] && $get["date_debut"] && $get['date_fin'] && !$get['numero_facture']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -464,7 +463,7 @@ class prelevement extends classes_optima{
       }elseif($get['numero_facture'] && $get["date_debut"] && $get['date_fin'] && !$get['id_societe']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -482,9 +481,9 @@ class prelevement extends classes_optima{
 
           if($value['id_affaire']){
             ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
-            $affaires = ATF::affaire()->sa();  
+            $affaires = ATF::affaire()->sa();
           }
-         
+
 
           foreach($societes as $item){
 
@@ -511,7 +510,7 @@ class prelevement extends classes_optima{
       }elseif($get['numero_facture'] && $get["date_debut"] && $get['date_fin'] && $get['id_societe']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -529,9 +528,9 @@ class prelevement extends classes_optima{
 
           if($value['id_affaire']){
             ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
-            $affaires = ATF::affaire()->sa();  
+            $affaires = ATF::affaire()->sa();
           }
-         
+
 
           foreach($societes as $item){
 
@@ -558,7 +557,7 @@ class prelevement extends classes_optima{
       }elseif($get["date_debut"] && $get['id_societe'] && !$get['date_fin']  && !$get['numero_facture']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -576,7 +575,7 @@ class prelevement extends classes_optima{
 
           if($value['id_affaire']){
             ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
-            $affaires = ATF::affaire()->sa();  
+            $affaires = ATF::affaire()->sa();
           }
 
           foreach($societes as $item){
@@ -603,7 +602,7 @@ class prelevement extends classes_optima{
       }elseif($get['date_fin'] && $get['id_societe'] && !$get["date_debut"]  && !$get['numero_facture']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
-       
+
         $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
         $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
 
@@ -621,7 +620,7 @@ class prelevement extends classes_optima{
 
           if($value['id_affaire']){
             ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
-            $affaires = ATF::affaire()->sa();  
+            $affaires = ATF::affaire()->sa();
           }
 
           foreach($societes as $item){
@@ -647,7 +646,7 @@ class prelevement extends classes_optima{
 
       }
 
-    
+
 
 
       return  $return;
@@ -669,7 +668,7 @@ class prelevement extends classes_optima{
         ->where('facture.id_termes',25,'AND',false,"!=")
         ->addOrder("facture.id_societe", "ASC");
       }
-      
+
 
       $response = ATF::facture()->select_all();
 
@@ -682,16 +681,16 @@ class prelevement extends classes_optima{
               $response[$k]["ref_client"] = ATF::societe()->select($val,"ref");
             }
             $response[$k][$tmp[1]] = $val;
-            
+
             unset($response[$k][$k_]);
           }
         }
-       
+
       }
 
-     
+
       return $response;
-  
+
     }
 
 
@@ -702,7 +701,7 @@ class prelevement extends classes_optima{
       $remarque = $post['specification'][5]["value"];
 
       $date = explode('-',$date_paiement);
-      
+
       $date_payment = $date[2]."-".$date[1]."-".$date[0];
 
       try {
@@ -712,11 +711,11 @@ class prelevement extends classes_optima{
         if (!$mode_paiement) throw new errorATF("Mode de paiement manquant", 500);
         //if ($mode_paiement == "cheque" && !$numero_cheque)  throw new errorATF("Veuillez renseigner le numero de cheque", 500);
         foreach ($post['ref'] as $key=>$r) {
-    
+
             $facture = ATF::facture()->getByRef($r);
             if (!$facture) throw new errorATF("Facture non trouvée", 500);
             if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
-            
+
             $paiement = array(
               "id_facture" => $facture['facture.id_facture'],
               "montant" => $facture['prix_ttc'],
@@ -728,7 +727,7 @@ class prelevement extends classes_optima{
 
             // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
             $id = ATF::facture_paiement()->insert($paiement);
-          
+
         }
       } catch (errorATF $e){
         ATF::db()->rollback_transaction();
@@ -736,7 +735,7 @@ class prelevement extends classes_optima{
       }
       ATF::db()->commit_transaction();
     }
-  
+
 };
 
 ?>
