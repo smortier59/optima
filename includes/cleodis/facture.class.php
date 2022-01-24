@@ -3948,8 +3948,6 @@ class facture_go_abonnement extends facture_cleodis {
 				if ($item["facture.type_facture"] === "facture") {
 					if ($item["facture.prix"] > 0) {
 						$choix = "facture_mensuelle";
-					} else {
-
 					}
 				} elseif ($item["facture.type_facture"] == "libre") {
 					if ($item["facture.type_libre"] == "prorata") {
@@ -3976,9 +3974,6 @@ class facture_go_abonnement extends facture_cleodis {
 				$ligne[1]["F"] = "D";
 				$ligne[2]["F"] = "C";
 				$ligne[3]["F"] = "C";
-
-
-
 
 				switch ($choix) {
 					case "facture_mensuelle":
@@ -4027,25 +4022,17 @@ class facture_go_abonnement extends facture_cleodis {
 					break;
 
 					default:
-						if ($item["facture.tva"] > 1) {
-							$ligne[2]["D"] = "706400";
-							$ligne[3]["D"] = "445710";
-							if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
-								$code_libelle = "A";
-								$ligne[1]["F"] = "C";
-								$ligne[2]["F"] = "D";
-								$ligne[3]["F"] = "D";
-							}
-						} else {
-							$ligne[2]["D"] = "706500";
-							$ligne[3]["D"] = "445710";
-							if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
-								$code_libelle = "A";
-								$ligne[1]["F"] = "C";
-								$ligne[2]["F"] = "D";
-								$ligne[3]["F"] = "D";
-							}
+
+						$ligne[2]["D"] = "706400";
+						$ligne[3]["D"] = "445710";
+
+						if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
+							$code_libelle = "A";
+							$ligne[1]["F"] = "C";
+							$ligne[2]["F"] = "D";
+							$ligne[3]["F"] = "D";
 						}
+
 					break;
 				}
 
