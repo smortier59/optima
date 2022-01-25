@@ -35,6 +35,28 @@ class user_cleodis extends user {
 	}
 
 
+	public function getDestinataireFromConstante($constanteName) {
+		ATF::constante()->q->reset()->where("constante", $constanteName);
+		$login_fact_partenaire = ATF::constante()->select_row();
+
+		if ($login_fact_partenaire) {
+			$login_fact_partenaire = $login_fact_partenaire["valeur"];
+
+			ATF::user()->q->reset();
+			foreach (explode(",", $login_fact_partenaire) as $key => $value) {
+				ATF::user()->q->where("login", $value, "OR", "notifie");
+			}
+			$notifie = ATF::user()->sa();
+
+			$dest = array();
+			foreach ($notifie as $key => $value) {
+				$dest[] = $value["id_user"];
+			}
+			return $dest;
+		}
+		return false;
+	}
+
 	public function export_prospection($infos){
 		if($infos['id_contact']){
 			$infos['id_contact'] = ATF::contact()->decryptId($infos['id_contact']);

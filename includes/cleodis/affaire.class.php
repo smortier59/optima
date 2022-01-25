@@ -1075,7 +1075,15 @@ class affaire_cleodis extends affaire {
 	* @return float
 	*/
 	public function getCompteTLoyerActualise(&$infos) {
-		$a = new affaire_cleodis($infos["id_affaire"]);
+		if (ATF::$codename == "go_abonnement") {
+			$a = new affaire_go_abonnement($infos["id_affaire"]);
+		}
+		elseif (ATF::$codename == "bdomplus") {
+			$a = new affaire_bdomplus($infos["id_affaire"]);
+		} else {
+			$a = new affaire_cleodis($infos["id_affaire"]);
+		}
+
 		if ($c = $a->getCommande()) {
 			$date_debut = $c->get("date_debut");
 		}
@@ -1774,7 +1782,8 @@ class affaire_cleodis extends affaire {
 				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk'], true);
 				if($commande){
 					$data['data'][$key]["id_commande_crypt"] = ATF::commande()->cryptId($commande['commande.id_commande']);
-					$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+					$data["data"][$key]['contat_signe'] = true;
+					// $data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
 					$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 				}else{
@@ -2789,17 +2798,8 @@ class affaire_cleodis extends affaire {
 			ATF::tache()->insert($tache);
 
             if($post["commentaire"]){
-            	//Creer un suivi pour alisson, Severine, jeanne
-            	ATF::user()->q->reset()->where("login", "tdelattre", "OR", "filles")
-            						   ->where("login", "jvasut", "OR", "filles")
-            						   ->where("login", "egerard", "OR", "filles")
-									   ->where("login", "mmysoet", "OR", "filles");
-            	$filles = ATF::user()->sa();
-            	$notifie = array();
 
-            	foreach ($filles as $key => $value) {
-            		$notifie[] = $value["id_user"];
-            	}
+				$notifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_COMMENTAIRE_AFFAIRE_PARTENAIRE__");
 
             	$suivi = array(
 					 "id_societe"=>$id_societe
@@ -3123,32 +3123,10 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe') return;
+		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe' && ATF::$codename != 'go_abonnement') return;
 
-		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
-								//->where("login", "abowe", "OR", "filles")
-								->where("login", "mmysoet", "OR", "filles")
-								->where("login", "egerard", "OR", "filles")
-								->where("login", "btronquit", "OR", "filles")
-								->where("login", "pcaminel", "OR", "filles")
-								//->where("login", "smazars", "OR", "filles")
-								->where("login", "lhochart", "OR", "filles");
+		$dest = ATF::user()->getDestinataireFromConstante("__DESTINATAIRE_NOTIFIE_TACHE_AFFAIRE_PARTENAIRE__");
 
-
-		$filles = ATF::user()->sa();
-        $dest = array();
-        foreach ($filles as $key => $value) {
-        	$dest[] = $value["id_user"];
-     	}
-
-
-		// $dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
-		// $id_user = 116; //Benjamin Tronquit
-
-		// if(ATF::$codename === "cleodisbe"){
-		// 	$dest = array("18", "21", "104", "124");  //Pierre, Allison, Severine,  Jeanne
-		// 	$id_user = 113;  //Benjamin Tronquit
-		// }
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
