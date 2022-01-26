@@ -696,16 +696,7 @@ class societe_cleodis extends societe {
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
 
-    ATF::user()->q->reset()->where("login", "lhochart", "OR", "filles")
-							   ->where("login", "jlesueur", "OR", "filles");
-    $filles = ATF::user()->sa();
-
-    $notifie = "";
-    // $notifie = "106,133"; // 106 Lesueur Jennifer et 21 Severine Mazars, 133 Laure Hochart
-		foreach ($filles as $key => $value) {
-      $notifie .= ','.$value["id_user"];
-    }
-    $notifie = substr($notifie, 1);
+    $notifie = ATF::user()->getDestinataireFromConstante(' __NOTIFIE_AVIS_CREDIT_SOCIETE_UPDATE__');
 
 
     if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
@@ -746,7 +737,7 @@ class societe_cleodis extends societe {
 
   /**
   * Insert
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
   * @param array &$s La session
   * @param array $files $_FILES
@@ -1691,7 +1682,7 @@ class societe_cleodis extends societe {
                 $data_soc["langue"] = $post["langue"];
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
-                $id_societe = $this->insert($data_soc);
+                $id_societe = $this->insert(array("societe" => $data_soc));
                 if($apporteur) $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
                 if($post["site_associe"]) $this->u(array("id_societe"=> $id_societe, "code_client" => $code_client));
             }

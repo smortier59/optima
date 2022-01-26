@@ -57,6 +57,7 @@
 					Ext.getCmp('combofacture[type_libre]').disable();
 					Ext.getCmp('combofacture[nature]').disable();
 					Ext.getCmp('combofacture[redevance]').disable();
+					Ext.getCmp('panel_hors_tva').hide();
 				}else if(n.data.myId=='facture'){
 					Ext.getCmp('panel_refi').hide();
 					Ext.getCmp('panel_midas').hide();
@@ -65,6 +66,7 @@
 					Ext.getCmp('combofacture[type_libre]').disable();
 					Ext.getCmp('combofacture[nature]').disable();
 					Ext.getCmp('combofacture[redevance]').disable();
+					Ext.getCmp('panel_hors_tva').show();
 				}else if(n.data.myId=='libre'){
 					Ext.getCmp('panel_refi').hide();
 					Ext.getCmp('panel_dates_facture').hide();
@@ -76,11 +78,13 @@
 					Ext.getCmp('combofacture[type_libre]').enable();
 					Ext.getCmp('combofacture[redevance]').enable();
 					Ext.getCmp('combofacture[nature]').enable();
+					Ext.getCmp('panel_hors_tva').hide();
 				}else if(n.data.myId=='ap'){
 					Ext.getCmp('panel_midas').hide();
 					Ext.getCmp('combofacture[type_libre]').disable();
 					Ext.getCmp('combofacture[nature]').disable();
 					Ext.getCmp('combofacture[redevance]').disable();
+					Ext.getCmp('panel_hors_tva').hide();
 				}else if(n.data.myId=='midas'){
 					Ext.getCmp('panel_midas').show();
 					Ext.getCmp('combofacture[nature]').disable();
@@ -91,6 +95,7 @@
 					Ext.getCmp('combofacture[redevance]').disable();
 					Ext.getCmp('facture[prix_midas]').show();
 					Ext.getCmp('facture[periode_midas]').show();
+					Ext.getCmp('panel_hors_tva').hide();
 				}
 			}
 		}

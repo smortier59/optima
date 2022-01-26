@@ -639,11 +639,23 @@ class facturation extends classes_optima {
 
 		$totaux=$this->sa();
 
+		$assurance_sans_tva = false;
+		$type_affaire = ATF::affaire()->select($id_affaire, "id_type_affaire");
+		if ($type_affaire) {
+			if (ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") == "oui") {
+				$assurance_sans_tva = true;
+			}
+		}
+
 		$totaux["loyer"]=$totaux["total_ht"];
 
 		$infos_commande = ATF::affaire()->getCommande($id_affaire)->infos;
 
-		$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		if ($assurance_sans_tva) {
+			$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		} else {
+			$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		}
 
 		$totaux["total"]=round($totaux["tva"]+($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"]),2);
 
