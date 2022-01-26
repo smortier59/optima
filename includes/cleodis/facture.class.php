@@ -3482,8 +3482,8 @@ class facture_bdomplus extends facture_cleodis {
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
-			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
-			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
+			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
 			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
 		}
 
@@ -3698,8 +3698,8 @@ class facture_assets extends facture_cleodis {
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
-			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
-			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
+			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
 			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]) , 2 , ".", "");
 		}
 
@@ -3908,15 +3908,15 @@ class facture_go_abonnement extends facture_cleodis {
 			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
 			  AND etat = 'impayee'
 			  AND date_paiement IS NULL
-			  ORDER BY `facture`.`id_societe`, `facture`.`id_affaire`";
+			  ORDER BY facture.date_periode_debut, `facture`.`id_societe`, `facture`.`id_affaire`";
 
 		$return = ATF::db()->sql2array($q);
 
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
-			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
-			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
+			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
 			$return[$key]["prix_ttc"] =  number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
 
 			$id_type_affaire = ATF::affaire()->select($value["id_affaire"], "id_type_affaire");
