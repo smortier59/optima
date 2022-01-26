@@ -1075,7 +1075,15 @@ class affaire_cleodis extends affaire {
 	* @return float
 	*/
 	public function getCompteTLoyerActualise(&$infos) {
-		$a = new affaire_cleodis($infos["id_affaire"]);
+		if (ATF::$codename == "go_abonnement") {
+			$a = new affaire_go_abonnement($infos["id_affaire"]);
+		}
+		elseif (ATF::$codename == "bdomplus") {
+			$a = new affaire_bdomplus($infos["id_affaire"]);
+		} else {
+			$a = new affaire_cleodis($infos["id_affaire"]);
+		}
+
 		if ($c = $a->getCommande()) {
 			$date_debut = $c->get("date_debut");
 		}
@@ -1189,8 +1197,17 @@ class affaire_cleodis extends affaire {
 		if(ATF::$usr->getID()){
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
-			$societe = ATF::societe()->select(246);
-			$from = $societe["societe"]." <".$societe["email"].">";
+			if (ATF::$codename != "cleodis" && ATF::$codename != "cleodisbe" ) {
+				ATF::constante()->q->reset()->where("constante","__MAIL_SOCIETE__");
+				$mail_societe = ATF::constante()->select_row();
+				ATF::constante()->q->reset()->where("constante","__SOCIETE__");
+				$optima_societe = ATF::constante()->select_row();
+
+				$from = $optima_societe["valeur"]." <". $mail_societe["valeur"] .">";
+			} else {
+				$societe = ATF::societe()->select(246);
+				$from = $societe["societe"]." <".$societe["email"].">";
+			}
 		}
 
 		if(!$email["objet"]){
@@ -1212,7 +1229,10 @@ class affaire_cleodis extends affaire {
 			$path = ATF::$table()->filepath($last_id,$item);
 			$mail->addFile($path,$key.$enregistrement["ref"].".pdf",true);
 		}
+		log::logger($info_mail , "mfleurquin");
 		$mail->send();
+
+
 
 		if($email["emailCopie"]){
 			$info_mail["recipient"] = $email["emailCopie"];
@@ -2542,6 +2562,7 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+
 		$utilisateur  = ATF::$usr->get("contact");
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
@@ -2605,11 +2626,10 @@ class affaire_cleodis extends affaire {
 
 			ATF::societe()->q->reset()
 				->select("id_societe")
-				->addOrder('ref',"ASC")
+				->addOrder('id_societe',"ASC")
 				->setDimension("row")
 				->setLimit(1);
 			$id_societe_codename = ATF::societe()->select_row();
-
 
 			$produits[0] = array(
 			  "devis_ligne__dot__produit"=> $post['libelle'],
@@ -2624,7 +2644,7 @@ class affaire_cleodis extends affaire {
 			  "devis_ligne__dot__commentaire"=>"",
 			  "devis_ligne__dot__neuf"=>"oui",
 			  "devis_ligne__dot__id_produit_fk"=>"",
-			  "devis_ligne__dot__id_fournisseur_fk"=>$id_societe_codename["id_societe"]
+			  "devis_ligne__dot__id_fournisseur_fk"=>$utilisateur["id_societe"]
 			);
 			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
@@ -2635,9 +2655,6 @@ class affaire_cleodis extends affaire {
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
-			if ($apporteur){
-				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
-			}
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
@@ -3114,16 +3131,19 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe') return;
+		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe' && ATF::$codename != 'go_abonnement') return;
 
-		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
-								//->where("login", "abowe", "OR", "filles")
-								->where("login", "mmysoet", "OR", "filles")
-								->where("login", "egerard", "OR", "filles")
-								->where("login", "btronquit", "OR", "filles")
-								->where("login", "pcaminel", "OR", "filles")
-								//->where("login", "smazars", "OR", "filles")
-								->where("login", "lhochart", "OR", "filles");
+		ATF::constante()->q->reset()->where("constante", "__DESTINATAIRE_NOTIFIE_TACHE_AFFAIRE_PARTENAIRE__");
+		$destinataire_notifie_tache_affaire_partenaire = ATF::constante()->select_row();
+		$destinataires = $destinataire_notifie_tache_affaire_partenaire["valeur"];
+		$destinataires = explode(',', $destinataires);
+
+
+		ATF::user()->q->reset();
+
+		foreach ($destinataires as $key => $value) {
+			ATF::user()->q->where("login", $value, "OR", "destinataires");
+		}
 
 
 		$filles = ATF::user()->sa();
@@ -3131,15 +3151,6 @@ class affaire_cleodis extends affaire {
         foreach ($filles as $key => $value) {
         	$dest[] = $value["id_user"];
      	}
-
-
-		// $dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
-		// $id_user = 116; //Benjamin Tronquit
-
-		// if(ATF::$codename === "cleodisbe"){
-		// 	$dest = array("18", "21", "104", "124");  //Pierre, Allison, Severine,  Jeanne
-		// 	$id_user = 113;  //Benjamin Tronquit
-		// }
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
@@ -3408,6 +3419,8 @@ class affaire_bdomplus extends affaire_cleodis {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
 
+		$this->colonnes['fields_column'][] = 'affaire.renouveller';
+
 		$this->onglets = array(
 			'affaire_etat'
 			,"sell_and_sign"
@@ -3435,6 +3448,9 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		$this->colonnes['primary']['licence'] = array("custom"=>true);
 		$this->fieldstructure();
+
+		$this->addPrivilege("activeDesactiveRenouvellement");
+
 	}
 
 
@@ -3577,17 +3593,19 @@ class affaire_bdomplus extends affaire_cleodis {
 	}
 
 
-	/*
+	/**
 	* Pour toutes les affaires dont la date de debut = M+11 et qu'il n'y a pas de condition de prolongation
 	* On envoi un mail au client pour l'avertir du renouvellement et on crée un suivi
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function process_envoi_mail_information_renouvellement(){
-		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
-								   ->where("etat", "arreter_contentieux","AND", false, "!=")
-								   ->where("etat", "vente", "AND", false, "!=")
-								   ->where("etat", "non_loyer", "AND", false, "!=")
-								   ->where("etat", "AR", "AND", false, "!=");
+		ATF::commande()->q->reset()->from("commande","id_affaire","affaire","id_affaire")
+								   ->where("commande.etat", "arreter", "AND", false, "!=")
+								   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+								   ->where("commande.etat", "vente", "AND", false, "!=")
+								   ->where("commande.etat", "non_loyer", "AND", false, "!=")
+								   ->where("commande.etat", "AR", "AND", false, "!=")
+								   ->where("affaire.renouveller", "oui", "AND");
 
 		$contrats_en_cours = ATF::commande()->sa();
 
@@ -3603,7 +3621,6 @@ class affaire_bdomplus extends affaire_cleodis {
 			}
 
 			if($a_renouveller){
-
 				//log::logger($value , "mfleurquin");
 				$affaire = ATF::affaire()->select($value["id_affaire"]);
 
@@ -3664,11 +3681,14 @@ class affaire_bdomplus extends affaire_cleodis {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function process_envoi_mail_non_renouvellement_client_contentieux(){
-		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
-								   ->where("etat", "arreter_contentieux","AND", false, "!=")
-								   ->where("etat", "vente", "AND", false, "!=")
-								   ->where("etat", "non_loyer", "AND", false, "!=")
-								   ->where("etat", "AR", "AND", false, "!=");
+
+		ATF::commande()->q->reset()->from("commande","id_affaire","affaire","id_affaire")
+								   ->where("commande.etat", "arreter", "AND", false, "!=")
+								   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+								   ->where("commande.etat", "vente", "AND", false, "!=")
+								   ->where("commande.etat", "non_loyer", "AND", false, "!=")
+								   ->where("commande.etat", "AR", "AND", false, "!=")
+								   ->where("affaire.renouveller", "oui", "AND");
 								   //->where("etat", "%contentieux", "AND", false, "LIKE");
 
 		$contrats_en_cours = ATF::commande()->sa();
@@ -3831,7 +3851,18 @@ class affaire_bdomplus extends affaire_cleodis {
 					      $suivi["texte"] =  "Probleme lors de l'envoi du ".$suivi["texte"];
 					    }
 					    ATF::suivi()->i($suivi);
-					}else{
+					} else if(ATF::affaire()->select($value["id_affaire"], "renouveller") === "non") {
+						log::logger("Non renouvellée car affaire ref: ".ATF::affaire()->select($value["id_affaire"], "ref")." à ne pas renouveller, on stop juste l'affaire" , "renouvellement_ok");
+						$suivi = array(
+							"id_contact" => $contact["id_contact"],
+							"id_societe" => $value["id_societe"],
+							"id_affaire" => $affaire["id_affaire"],
+							"type"=> "note",
+							"type_suivi"=> "Contrat",
+							"texte" => "Non renouvellement de l'affaire, car il a été demandé de ne pas renouveller cette affaire"
+						  );
+						  ATF::suivi()->i($suivi);
+					} else{
 						log::logger("BON PAYEUR" , "renouvellement_ok");
 						log::logger($value["id_affaire"] , "renouvellement_ok");
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
@@ -3996,6 +4027,47 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		}
 
+	}
+
+	/**
+	* Permet de mettre a jour une date en ajax
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos
+	* @return bool
+	*/
+	public function activeDesactiveRenouvellement($infos){
+		if(!isset($infos["renouveller"])) throw new errorATF("MISSING DATA renouveller", 500);
+		if(!isset($infos["id_affaire"])) throw new errorATF("MISSING DATA ID AFFAIRE", 500);
+
+
+		if(isset($infos['renouveller']) && $infos['id_affaire']){
+			//Mode transactionel
+			ATF::db($this->db)->begin_transaction();
+
+			try {
+				$affaire = new affaire_bdomplus($infos['id_affaire']);
+				$affaire->set("renouveller",$infos['renouveller']);
+				//On commit le tout
+				ATF::db($this->db)->commit_transaction();
+
+				if ($infos["renouveller"] == "oui") {
+					ATF::$msg->addNotice("Votre demande de reactivation du renouvellement est bien prise en compte");
+				} else {
+					ATF::$msg->addNotice("Votre demande de desactivation du renouvellement est bien prise en compte");
+				}
+
+				$this->redirection("select",$infos['id_affaire']);
+
+				return true;
+
+			} catch(errorATF $e) {
+				//On commit le tout
+				ATF::db($this->db)->rollback_transaction();
+				throw $e;
+			}
+		}else{
+			return false;
+		}
 	}
 
 

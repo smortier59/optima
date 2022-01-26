@@ -127,13 +127,13 @@ class devis_cleodis extends devis {
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			,"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
 		$this->colonnes['panel']['commentaire'] = array(
 			"commentaire_facture"=>array("custom"=>true,"xtype"=>"textfield"),
 			"commentaire_facture2"=>array("custom"=>true,"xtype"=>"textfield"),
 			"commentaire_facture3"=>array("custom"=>true,"xtype"=>"textfield")
-
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
@@ -159,7 +159,7 @@ class devis_cleodis extends devis {
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['clone'] =
-		$this->colonnes['bloquees']['update'] =  array_merge(array('first_date_accord','date_accord','ref','etat','id_user','id_affaire','devis_etendre','perdu'));
+		$this->colonnes['bloquees']['update'] =  array_merge(array('first_date_accord','date_accord','ref','etat','id_user','id_affaire','devis_etendre','perdu', 'prix_sans_tva'));
 
 
 		// Ne pas afficher sur le select les panels spécifiques aux insert/update
@@ -201,6 +201,7 @@ class devis_cleodis extends devis {
 		$this->addPrivilege("extjs","update");
 		$this->addPrivilege("uploadFile","update");
 		$this->addPrivilege("export_devis_loyer");
+		$this->addPrivilege("getLoyerForUpdate");
 
 		$this->formExt=true;
 		$this->no_insert = true;
@@ -280,7 +281,15 @@ class devis_cleodis extends devis {
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
-		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
+		$loyers = json_decode($infos["values_".$this->table]["loyer"],true);
+
+		foreach ($loyers as $key => $value) {
+			if ($value["loyer__dot__type"] === 'prolongation') {
+				$infos_loyer_prolongation[] = $value;
+			} else {
+				$infos_loyer[] = $value;
+			}
+		}
 
 		//Gestion AR/Avenant : soit l'un soit l'autre
 		if($infos["panel_AR-checkbox"]){
@@ -379,10 +388,6 @@ class devis_cleodis extends devis {
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
 
 
-
-
-
-
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
 		if(!$RUM){
@@ -435,6 +440,10 @@ class devis_cleodis extends devis {
 
 		////////////////Opportunité
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
+
+
+		$id_type_affaire = $infos["id_type_affaire"];
+
 
 		////////////////Devis
 		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
@@ -493,7 +502,6 @@ class devis_cleodis extends devis {
 						         	'devis_ligne_dot_visible_pdf'=> 'non');
 		}
 
-		log::logger($infos_ligne , "ligne_devis");
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
@@ -504,8 +512,6 @@ class devis_cleodis extends devis {
 					throw new errorATF("Ligne de devis sans fournisseur",882);
 				}
 				unset($item["id_parc"]);
-
-				log::logger($item , "ligne_devis");
 
 				ATF::devis_ligne()->i($item);
 			}
@@ -541,6 +547,8 @@ class devis_cleodis extends devis {
 		if($infos["loyer_unique"]=="oui"){
 			$this->loyer_unique($infos['id_affaire'],$infos_avenant["affaire"][0],$loyer_unique);
 		}elseif($infos_loyer){
+			$prix = $prix_sans_tva = 0;
+
 			foreach($infos_loyer as $key=>$item){
 				foreach($item as $k=>$i){
 					$k_unescape=util::extJSUnescapeDot($k);
@@ -557,11 +565,53 @@ class devis_cleodis extends devis {
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Il n'y a pas de fréquence pour un loyer",876);
 				}
+
+				if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === 'oui' ){
+					$prix += (	$item["loyer"]
+								+$item["frais_de_gestion"]
+								+$item["serenite"]
+								+$item["maintenance"]
+								+$item["supervision"]
+								+$item["support"]
+							)*$item["duree"];
+					$prix_sans_tva += $item["assurance"] * $item["duree"];
+
+					ATF::devis()->u(array("id_devis"=> $last_id, "prix"=> $prix, "prix_sans_tva"=>$prix_sans_tva));
+				}
 			}
 		}elseif($infos["type_contrat"]=="vente"){
 			$loyer_vente["id_affaire"]=$infos["id_affaire"];
 			ATF::loyer()->i($loyer_vente);
 		}
+
+		if ($infos_loyer_prolongation) {
+			foreach($infos_loyer_prolongation as $key=>$item){
+				$id_prolongation = ATF::prolongation()->i(array(
+					"id_affaire" => $infos['id_affaire'],
+					"ref" => $infos["ref"],
+					"id_societe" => $infos["id_societe"]
+				));
+
+				foreach($item as $k=>$i){
+					$k_unescape=util::extJSUnescapeDot($k);
+					$item[str_replace("loyer.","",$k_unescape)]=$i;
+					unset($item[$k]);
+				}
+
+				$item["id_affaire"]=$infos["id_affaire"];
+				$item["id_prolongation"] = $id_prolongation;
+				unset($item["loyer_total"]);
+				unset($item["type"]);
+				unset($item["avec_option"]);
+				if($item["frequence_loyer"]){
+					ATF::loyer_prolongation()->i($item);
+				}else{
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Il n'y a pas de fréquence pour un loyer de prolongation",876);
+				}
+			}
+		}
+
 
 		if(ATF::$codename !== "bdomplus"){
 			if($preview){
@@ -1796,4 +1846,62 @@ class devis_boulanger extends devis_cleodis { };
 
 class devis_assets extends devis_cleodis { };
 
-class devis_go_abonnement extends devis_cleodis { };
+class devis_go_abonnement extends devis_cleodis {
+
+	public function getLoyerForUpdate($post,$s) {
+
+		$loyers = $prolongations = array();
+
+		ATF::loyer()->q->reset()->where("id_affaire", $post["id_affaire"])->addOrder("id_loyer");
+		$loyers = ATF::loyer()->select_all();
+
+		ATF::loyer_prolongation()->q->reset()->where("id_affaire", $post["id_affaire"])->addOrder("id_loyer_prolongation");
+		$prolongations = ATF::loyer_prolongation()->select_all();
+
+		$res = [];
+		if ($loyers) {
+			foreach ($loyers as $key => $value) {
+				$res[] = [
+					"loyer.loyer" => $value["loyer"],
+					"loyer.id_loyer" => $value["id_loyer"],
+					"loyer.id_affaire" => $value["id_affaire"],
+					"loyer.duree" => $value["duree"],
+					"loyer.type" =>  $value["type"],
+					"loyer.assurance" => $value["assurance"],
+					"loyer.frais_de_gestion" => $value["frais_de_gestion"],
+					"loyer.serenite" => $value["serenite"],
+					"loyer.maintenance" => $value["mainteance"],
+					"loyer.hotline" =>  $value["hotline"],
+					"loyer.supervision" => $value["supervision"],
+					"loyer.support" => $value["support"],
+					"loyer.frequence_loyer" =>  $value["frequence_loyer"],
+					"loyer.avec_option" => $value["avec_option"]
+				];
+			}
+		}
+
+
+		if ($prolongations) {
+			foreach ($prolongations as $key => $value) {
+				$res[] = [
+					"loyer.id_loyer" => $value["id_loyer"],
+					"loyer.id_affaire" => $value["id_affaire"],
+					"loyer.loyer" => $value["loyer"],
+					"loyer.duree" => $value["duree"],
+					"loyer.type" =>  "prolongation",
+					"loyer.assurance" => $value["assurance"],
+					"loyer.frais_de_gestion" => $value["frais_de_gestion"],
+					"loyer.serenite" => $value["serenite"],
+					"loyer.maintenance" => $value["mainteance"],
+					"loyer.hotline" =>  $value["hotline"],
+					"loyer.supervision" => $value["supervision"],
+					"loyer.support" => $value["support"],
+					"loyer.frequence_loyer" =>  $value["frequence_loyer"],
+					"loyer.avec_option" => "non"
+				];
+			}
+		}
+		return $res;
+	}
+
+ };

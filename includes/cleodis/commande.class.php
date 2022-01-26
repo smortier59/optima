@@ -67,6 +67,7 @@ class commande_cleodis extends commande {
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			,"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
@@ -331,7 +332,7 @@ class commande_cleodis extends commande {
 						if($commande['commande']){
 							$type = $commande['type'];
 						}elseif($commande['devis']){
-							$type = "prelevement";
+							$type = ATF::societe()->select($commande["id_societe"], "divers_2");
 						}
 						return $type;
 				case "email":
@@ -347,6 +348,8 @@ class commande_cleodis extends commande {
 					return $commande['prix_achat'];
 				case "prix":
 					return $commande['prix'];
+				case "prix_sans_tva":
+					return $commande['prix_sans_tva'];
 				case "id_devis":
 					return $commande['id_devis'];
 			}
@@ -539,6 +542,7 @@ class commande_cleodis extends commande {
 	* @return bool
     */
 	public function updateDate($infos,&$s,&$request){
+
 		if (!$infos['id_commande']) return false;
 
 		if ($infos['value'] == "undefined") $infos["value"] = "";
@@ -601,6 +605,7 @@ class commande_cleodis extends commande {
 						,"date"=>$d[$infos['key']]
 					));
 					if($infos['key'] === "date_debut" && $infos['value']){
+
 						//Creation de la facture prorata si besoin
 						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
 						$affaire = ATF::affaire()->select($id_affaire);
@@ -618,7 +623,6 @@ class commande_cleodis extends commande {
 										"date_debut_contrat" => $infos['value'],
 										"id_commande"=> $infos["id_commande"]
 									 );
-
 						//Creation de la premiere facture
 						ATF::facture()->createPremiereFacture($data);
 
@@ -809,7 +813,64 @@ class commande_cleodis extends commande {
 						$commande->set("date_evolution",$date_fin_calculee);
 					}
 
+					if(ATF::$codename === "go_abonnement") {
+						// Si on a des prolongations deja créées, il faut mettre à jour les dates de début et fin de prolongation et génerer les echeanciers de prolongation
+						ATF::prolongation()->q->reset()->where("id_affaire", $affaire->get("id_affaire"), "AND")
+						->whereIsNull("prolongation.date_debut", "AND")
+						->addOrder("id_prolongation");
+						$prolongations = ATF::prolongation()->select_all();
+
+						if ($prolongations) {
+
+							$date_debut=date("Y-m-d",strtotime($date_fin_calculee."+1 day"));
+
+							foreach($prolongations as $kp => $vp) {
+								// On recupere le loyer de prolongation associé à la prolongation
+								ATF::loyer_prolongation()->q->reset()->where('id_prolongation', $vp["id_prolongation"]);
+								$lp = ATF::loyer_prolongation()->select_row();
+
+								if($lp['duree']){
+									if($lp['frequence_loyer']=="an"){
+										$frequence=12;
+									}elseif($lp['frequence_loyer']=="semestre"){
+										$frequence=6;
+									}elseif($lp['frequence_loyer']=="trimestre"){
+										$frequence=3;
+									}else{
+										$frequence=1;
+									}
+									$lp["date_debut"] = $date_debut;
+
+									$lp["date_fin"]=date("Y-m-d",strtotime($date_debut."+".($frequence*$lp['duree'])." month"));
+									$lp["date_fin"]=date("Y-m-d",strtotime($lp["date_fin"]."- 1 day"));
+
+									$date_debut=date("Y-m-d",strtotime($lp["date_fin"]."+ 1 day"));
+
+									ATF::loyer_prolongation()->u(array(
+											"id_loyer_prolongation"=> $lp["id_loyer_prolongation"],
+											"date_debut" => $lp["date_debut"],
+											"date_fin" => $lp["date_fin"]
+
+										)
+									);
+
+									ATF::prolongation()->u(array(
+											"id_prolongation"=> $lp["id_prolongation"],
+											"date_debut" => $lp["date_debut"],
+											"date_fin" => $lp["date_fin"]
+										)
+									);
+								}
+							}
+						}
+					}
+
+
 					$this->checkEtat($commande,$affaires_parentes);
+
+
+
+
 
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
@@ -818,6 +879,7 @@ class commande_cleodis extends commande {
 						/*Il faut également généré l'echéancier de facturation fournisseur */
 						ATF::facturation_fournisseur()->generate_echeancier($commande,$affaire,$affaires_parentes,$devis);
 					}
+
 
 
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
@@ -863,14 +925,7 @@ class commande_cleodis extends commande {
 							} else {
 								// La date prévue d'évolution de la commande parente n'est pas dépassée
 								$commande_parente->set("etat","non_loyer");
-							}
-
-//							if ($affaire->get("etat") == "facture_refi") {
-//								// L'affaire est en état facture_refi
-//								$affaire_parente->set("etat","facture_refi");
-//							} else {
-//								$affaire_parente->set("etat","facture");
-//							}
+							}//
 						}
 					}
 
@@ -894,8 +949,11 @@ class commande_cleodis extends commande {
 				if (!$commande->get("retour_prel")) {
 					$commande->set("retour_prel",$commande->get("retour_contrat"));
 				}
-				if (!$commande->get("retour_pv")) {
-					$commande->set("retour_pv",$commande->get("retour_contrat"));
+				// SI on est en BDOMPLUS, on met à jour aussi la date retour pv
+				if (ATF::$codename === 'bdomplus') {
+					if (!$commande->get("retour_pv")) {
+						$commande->set("retour_pv",$commande->get("retour_contrat"));
+					}
 				}
 				break;
 			case "date_evolution":
@@ -1252,12 +1310,10 @@ class commande_cleodis extends commande {
 		if (is_numeric($infos) || is_string($infos)) {
 			$id=$this->decryptId($infos);
 			$commande=$this->select($id);
-//log::logger("delete1",'error.log');
 
 			//Commande
 			if($commande){
 //*****************************Transaction********************************
-//log::logger("delete2",'error.log');
 				ATF::db($this->db)->begin_transaction();
 				parent::delete($id,$s);
 
@@ -1285,7 +1341,6 @@ class commande_cleodis extends commande {
 
 				ATF::db($this->db)->commit_transaction();
 	//*****************************************************************************
-//log::logger("redirection",'error.log');
 
 				ATF::affaire()->redirection("select",$commande["id_affaire"]);
 
@@ -1779,8 +1834,8 @@ class commande_cleodis extends commande {
 		foreach($commandeSa["data"] as $key=>$item){
 			unset($affaires_parentes);
 
-//			log::logger($i." \ ".$commandeSa["count"],'cleodis_statut.log');
 			if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($item['id_commande']);
+			elseif(ATF::$codename == "go_abonnement") $commande = new commande_go_abonnement($item['id_commande']);
 			else $commande = new commande_cleodis($item['id_commande']);
 
 			$affaire = $commande->getAffaire();
