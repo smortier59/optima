@@ -73,6 +73,24 @@ class file_cleodis extends file {
 				}
 			}
 
+			ATF::constante()->q->reset()->where("constante","__MAIL_SOCIETE__");
+			$mail_societe = ATF::constante()->select_row();
+			ATF::constante()->q->reset()->where("constante","__SOCIETE__");
+			$optima_societe = ATF::constante()->select_row();
+			ATF::constante()->q->reset()->where("constante","__EMAIL_NOTIFIE_UPLOAD_FILE_PARTENAIRE__");
+			$recipient = ATF::constante()->select_row();
+			
+			$from = $optima_societe["valeur"]." <". $mail_societe["valeur"] .">";
+
+			$info_mail["objet"] = "Nouveau(x) document(s) ajouté(s) depuis le Portail Partenaire";
+			$info_mail["from"] = $from;
+			$info_mail["html"] = false;
+			$info_mail["texte"] = "De nouveaux fichiers ont été ajoutés à l'affaire numéro : ".$affaire["ref"];
+			$info_mail["recipient"] = $recipient;
+			// $info_mail["return_path"] = "ludivine.bowe@cleodis.com";
+	
+			$mail = new mail($info_mail);
+			$mail->send();
 
 		}
 
