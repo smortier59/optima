@@ -3783,7 +3783,7 @@ class facture_go_abonnement extends facture_cleodis {
 
 		$this->q->reset()
 				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
-				->addField('SUBSTRING(`ref_externe`,9)+1',"max_ref")
+				->addField('SUBSTRING(`ref_externe`,2)+1',"max_ref")
 				->addOrder('ref_externe',"DESC")
 				->setDimension("row")
 				->setLimit(1);
@@ -3892,8 +3892,12 @@ class facture_go_abonnement extends facture_cleodis {
 						} else {
 							$choix = "avoir_facture_prorata";
 						}
-					}elseif (($item["facture.prix"] < 0 && ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat"))) {
-						$choix = "avoir_facture_mensuelle";
+					}elseif (($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat")) {
+						if ($item["facture.prix"] < 0) {
+							$choix = "avoir_facture_mensuelle";
+						} else {
+							$choix = "facture_mensuelle";
+						}
 					}elseif ($item["facture.nature"] == "prolongation") {
 						if ($item["facture.prix"] > 0) {
 							$choix = "facture_prolongation";
