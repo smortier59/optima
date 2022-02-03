@@ -32,7 +32,6 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
-
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -109,6 +108,10 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = $sphinx["id_societe"];
       break;
 
+      case 'bymycar':        
+        $this->id_partenaire = null;
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -117,7 +120,6 @@ class souscription_cleodis extends souscription {
     if(!$post["no_iban"]){
       $this->checkIBAN($post['iban']);
     }
-
 
     try {
       mail::check_mail($email);
@@ -130,7 +132,6 @@ class souscription_cleodis extends souscription {
       // Gestion du code client
       $codeClient = $societe['code_client'];
 
-
       if (!$codeClient) {
         // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
         $codeClient = ATF::societe()->getCodeClient($societe, self::getPrefixCodeClient($post['site_associe']));
@@ -140,7 +141,6 @@ class souscription_cleodis extends souscription {
         );
         ATF::societe()->u($toUpdate);
       }
-
 
       // On update le signataire de la societe pour y mettre celui qu'on reçoit.
       if ($post['id_contact']) {
@@ -177,14 +177,10 @@ class souscription_cleodis extends souscription {
                                       ->where("principal", "oui");
 
           $produit_principal_pack = ATF::pack_produit_ligne()->select_row();
-
-
+          
           if($produit_principal_pack){
             // Si $v[id_pack_produit_ligne] == Le produit principal
             if($v["id_pack_produit_ligne"] == $produit_principal_pack["id_pack_produit_ligne"]){
-
-
-
               // On compare la quantité du produit principal par rapport à la quantité par défaut
               $post["pack_quantite"][$v["id_pack_produit"]] = ($v["quantite"] /  $produit_principal_pack["quantite"]);
             }
@@ -193,15 +189,13 @@ class souscription_cleodis extends souscription {
           }
         }
 
-
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
-
+      
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"],  $post["renouvellement"]);
 
         $libelle = substr($libelle, 0, 250);
-
 
         $id_devis = $this->createDevis($post, $libelle);
 
@@ -298,7 +292,7 @@ class souscription_cleodis extends souscription {
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
-
+      
 
 
         if ($post['id_panier']) {
@@ -403,9 +397,23 @@ class souscription_cleodis extends souscription {
    * @return [type]          [description]
    */
   private function createDevis ($post, $libelle, $fournisseur) {
+        
+    ATF::site_associe()->q->reset()->where("site_associe", $post["site_associe"]);
+    $site_associe = ATF::site_associe()->select_row();
+    
+    $assurance_sans_tva = "non";
 
-    ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
-    $type_affaireNormal = ATF::type_affaire()->select_row();
+    if ($site_associe["id_type_affaire"]){
+      $type_affaire = $site_associe["id_type_affaire"];
+      if ($type_affaire) {
+        $devis["id_type_affaire"] = $type_affaire;
+        $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
+      }
+    } else {
+      ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+      $type_affaireNormal = ATF::type_affaire()->select_row();
+      $type_affaire = $type_affaireNormal["id_type_affaire"];
+    }      
 
     // Construction du devis
     $devis = array(
@@ -418,16 +426,12 @@ class souscription_cleodis extends souscription {
         "type_devis" => "normal",
         "id_contact" => $post["id_contact"],
         "prix_achat"=>0,
-        "id_type_affaire" => $type_affaireNormal["id_type_affaire"],
+        "id_type_affaire" => $type_affaire,
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
-
     );
-
-    // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-
-
-
+       
+    /*
     if($post['site_associe'] == "boulangerpro"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Boulanger Pro");
       $type_affaire = ATF::type_affaire()->select_row();
@@ -459,9 +463,7 @@ class souscription_cleodis extends souscription {
     if($post['site_associe'] == "h2c"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "H2C Leasing");
       $type_affaire = ATF::type_affaire()->select_row();
-    }
-
-    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
+    }*/    
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -485,12 +487,11 @@ class souscription_cleodis extends souscription {
         "loyer__dot__avec_option"=>"non"
     );
 
-
-
     foreach ($produits as $k=>$produit) {
 
         ATF::produit()->q->reset()
           ->addField("loyer")
+          ->addField("loyer_sans_tva")
           ->addField("duree")
           ->addField("ean")
           ->addField("id_sous_categorie")
@@ -575,14 +576,35 @@ class souscription_cleodis extends souscription {
         $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
         $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
 
-
-        $devis["prix"] = $toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"];
-
-
+        if ($assurance_sans_tva == "oui") {
+          $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["loyer_sans_tva"] * $produit['quantite'];
+          $devis["prix"] = ($toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
+        } else {
+          $devis["prix"] = $toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"];
+        }        
     }
-
+    
     // Faire sauter les index
     $toInsertProduitDevis = array_values($toInsertProduitDevis);
+    
+    if ($post["prolongations"]) {
+      foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
+        $toInsertLoyer[] = array(
+          "loyer__dot__loyer"=> $vp["loyer"],
+          "loyer__dot__duree"=> $vp["duree"],
+          "loyer__dot__type"=>"prolongation",
+          "loyer__dot__assurance"=>$vp["assurance"],
+          "loyer__dot__frais_de_gestion"=>$vp["frais_de_gestion"],
+          "loyer__dot__frequence_loyer"=> $vp["frequence"],
+          "loyer__dot__serenite"=>"",
+          "loyer__dot__maintenance"=>"",
+          "loyer__dot__hotline"=>"",
+          "loyer__dot__supervision"=>"",
+          "loyer__dot__support"=>"",
+          "loyer__dot__avec_option"=>"non"
+        );
+      }
+    }
 
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
