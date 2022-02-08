@@ -1647,7 +1647,7 @@ class facturation extends classes_optima {
 						$facture["date_paiement"] = NULL;
 					}
 
-					if(ATF::$codename == "bdomplus") $facture["date_paiement"] = NULL;
+					if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement" || ATF::$codename == "assets") $facture["date_paiement"] = NULL;
 
 					$id_facture=ATF::facture()->i($facture);
 
