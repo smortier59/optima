@@ -1621,16 +1621,20 @@ class souscription_bdomplus extends souscription_cleodis {
     return $licence_a_envoyer;
   }
 
-  public function envoiMailVendeurABenjamin($affaires, $vendeur){
-    log::logger("=================envoiMailVendeurABenjamin================", $this->logFileSouscription);
+  public function envoiMailVendeurAuResponsable($affaires, $vendeur){
+    log::logger("=================envoiMailVendeurAuResponsable================", $this->logFileSouscription);
     log::logger($affaires, $this->logFileSouscription);
 
     if ($vendeur && $affaires) {
       $vendeur = json_decode($vendeur, true);
       log::logger($vendeur, $this->logFileSouscription);
 
+      ATF::constante()->q->reset()->where("constante", "__EMAIL_SOUSCRIPTION__");
+      $destinataire_email_souscription = ATF::constante()->select_row();
+      $destinataires = $destinataire_email_souscription["valeur"];
+
       $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
-      $info_mail["recipient"] = "benjamin.tronquit@cleodis.com";
+      $info_mail["recipient"] = $destinataires;
       $info_mail["html"] = true;
       $info_mail["template"] = "bdomplus-mailVendeurMagasin";
       $info_mail["texte"] = "Souscription magasin par le vendeur suivant ";
@@ -1649,12 +1653,12 @@ class souscription_bdomplus extends souscription_cleodis {
       $send = $mail->send();
       log::logger($send, $this->logFileSouscription);
     } else {
-      log::logger("Il manque le vendeur ou les références affaires, on envoi pas le mail a Benjamin." , $this->logFileSouscription);
+      log::logger("Il manque le vendeur ou les références affaires, on envoi pas le mail au Responsable." , $this->logFileSouscription);
       log::logger($affaires , $this->logFileSouscription);
       log::logger($vendeur , $this->logFileSouscription);
     }
 
-    log::logger("=================FIN envoiMailVendeurABenjamin================", $this->logFileSouscription);
+    log::logger("=================FIN envoiMailVendeurAuResponsable================", $this->logFileSouscription);
 
 
   }

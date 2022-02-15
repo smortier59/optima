@@ -116,9 +116,13 @@ if($url_back_espace_client &&  $url_front_espace_client){
 			$partenaire = ATF::societe()->select_row();
 		}
 
+		ATF::constante()->q->reset()->where("constante", "__EMAIL_BATCH_COMPTE_ECP__");
+		$destinataire_email_batch_compte_ecp = ATF::constante()->select_row();
+		$destinataires = $destinataire_email_batch_compte_ecp["valeur"];
+
 		$mail = new mail(
 			array(
-				"recipient" => "benjamin.tronquit@cleodis.com",
+				"recipient" => $destinataires,
 				"objet" => "Client sans compte",
 				"template" => "listing_client_sans_compte",
 				"clients" => $clientSansCompte,
