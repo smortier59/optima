@@ -52,7 +52,7 @@ class pdf_cleodis extends pdf {
 			copy($logo_filepath,str_replace("logo","jpg",$logo_filepath));
 			$this->logo = str_replace("logo","jpg",$logo_filepath);
 		}else{
-            $this->logo = __PDF_PATH__."/".'cleodis/logo.jpg';
+            // $this->logo = __PDF_PATH__."/".'cleodis/logo.jpg';
 		}
 	}
 
@@ -15661,7 +15661,10 @@ class pdf_boulanger extends pdf_cleodis {
 
 
 };
-class pdf_assets extends pdf_cleodis { };
+class pdf_assets extends pdf_cleodis {
+	public $logo = __PDF_PATH__."/".'assets/assets.jpg';
+
+};
 
 class pdf_go_abonnement extends pdf_cleodis {
 	public $logo = __PDF_PATH__."/".'go_abonnement/byMyCar.jpg';
