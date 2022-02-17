@@ -65,7 +65,7 @@ class loyer extends classes_optima {
 			}elseif($item["frequence_loyer"]=="semestre"){
 				$duree+=$item["duree"]*6;
 			}elseif($item["frequence_loyer"]=="trimestre"){
-				$duree+=$item["duree"]*4;
+				$duree+=$item["duree"]*3;
 			}elseif($item["frequence_loyer"]=="mois"){
 				$duree+=$item["duree"];
 			}
