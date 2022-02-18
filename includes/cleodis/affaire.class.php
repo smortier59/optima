@@ -4339,6 +4339,36 @@ class affaire_assets extends affaire_cleodis {
 
 class affaire_go_abonnement extends affaire_cleodis {
 
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+
+		$this->onglets = array(
+			'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
+			,'loyer_kilometrage'
+			,'devis'=>array('opened'=>true)
+			,'comite'=>array('opened'=>true)
+			,'commande'=>array('opened'=>true)
+			,'prolongation'
+			,'loyer_prolongation'
+			,'bon_de_commande'
+			,'demande_refi'
+			,'facture'=>array('opened'=>true)
+			,'facture_fournisseur'
+			,'facture_non_parvenue'
+			,'facturation'
+			,'intervention'
+			,'parc'
+			,'livraison'
+			,'suivi'
+			,'tache'
+			,"pdf_affaire"
+		);
+	}
+
+
+
 	/**
 	* Retourne la ref d'une affaire autre qu'avenant
 	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
