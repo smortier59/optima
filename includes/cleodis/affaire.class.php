@@ -4343,17 +4343,41 @@ class affaire_go_abonnement extends affaire_cleodis {
 	function __construct($table_or_id=NULL) {
 		parent::__construct($table_or_id);
 
+		$this->onglets = array(
+			'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
+			,'loyer_kilometrage'
+			,'devis'=>array('opened'=>true)
+			,'comite'=>array('opened'=>true)
+			,'commande'=>array('opened'=>true)
+			,'prolongation'
+			,'loyer_prolongation'
+			,'bon_de_commande'
+			,'demande_refi'
+			,'facture'=>array('opened'=>true)
+			,'facture_fournisseur'
+			,'facture_non_parvenue'
+			,'facturation'
+			,'intervention'
+			,'parc'
+			,'livraison'
+			,'suivi'
+			,'tache'
+			,"pdf_affaire"
+		);
+	}
+
+
+
 		$this->colonnes['panel']['specifique_goa'] = array(
 			"specifique_goa"=>array("custom"=>true)
 	   	);
 	   	$this->panels['specifique_goa'] = array("visible"=>true, 'nbCols'=>1);
-
 		$this->fieldstructure();
-
-
 		$this->addPrivilege("updateSpecifiqueGOA");
 
-	}
+
 
 	/**
 	* Retourne la ref d'une affaire
