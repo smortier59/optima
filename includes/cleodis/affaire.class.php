@@ -4373,7 +4373,7 @@ class affaire_go_abonnement extends affaire_cleodis {
 	   	$this->panels['specifique_goa'] = array("visible"=>true, 'nbCols'=>1);
 		$this->fieldstructure();
 		$this->addPrivilege("updateSpecifiqueGOA");
-
+	}
 
 
 	/**
