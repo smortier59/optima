@@ -4366,9 +4366,6 @@ class affaire_go_abonnement extends affaire_cleodis {
 			,'tache'
 			,"pdf_affaire"
 		);
-	}
-
-
 
 		$this->colonnes['panel']['specifique_goa'] = array(
 			"specifique_goa"=>array("custom"=>true)
