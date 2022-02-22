@@ -44,6 +44,7 @@ class facture_cleodis extends facture {
      		))
 			,"date"
 			,"date_previsionnelle"
+			,"designation"=>array("xtype"=>"textarea")
 			,"commentaire"=>array("xtype"=>"textarea")
 
 		);
