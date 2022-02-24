@@ -77,7 +77,7 @@
 </tr>
 {/if}
 
-{*if ATF::$codename === "bdomplus" && ATF::affaire()->select($id_affaire, "etat") == "facture" }
+{if ATF::$codename === "bdomplus" && ATF::affaire()->select($id_affaire, "etat") == "facture" }
 <tr>
 	{if ATF::affaire()->select($id_affaire,renouveller) === "oui"}
 		<td colspan="2" style="padding-left: 10px; padding-right: 10px; text-align: center;">
@@ -109,4 +109,4 @@
 </tr>
 
 
-{/if*}
+{/if}
