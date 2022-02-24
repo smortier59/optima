@@ -6,7 +6,7 @@
 */
 class facturation extends classes_optima {
 
-	public $user_facturation = array(16,91);
+	public $user_facturation = array(16);
 
 	function __construct() {
 		$this->table="facturation";
@@ -547,78 +547,76 @@ class facturation extends classes_optima {
 	*/
 	function insert_facturation_prolongation($commande) {
 
-		ATF::prolongation()->q->reset()->addCondition("id_affaire",$commande->get("id_affaire"))
-						   ->setDimension("row");
-		$prolongation=ATF::prolongation()->sa();
+		ATF::prolongation()->q->reset()->addCondition("id_affaire",$commande->get("id_affaire"));
+		$prolongations=ATF::prolongation()->sa();
 
-		if($prolongation){
-			//Il faut vérifier que la date début ne soit pas inférieur à la date de fin du contrat
+		if($prolongations){
+			foreach ($prolongations as $kp => $prolongation) {
 
-//			$date_debut=date("Y-m-d",strtotime($commande->get("date_evolution")."+ 1 day"));
 
-//			$this->delete_special($commande->get("id_affaire"),"prolongation");
+				//Il faut vérifier que la date début ne soit pas inférieur à la date de fin du contrat
+				//On vérifie qu'il y ait au moins une fréquence et une durée
+				ATF::loyer_prolongation()->q->reset()->addCondition("id_prolongation",$prolongation['id_prolongation']);
+				$loyer_prolongation=ATF::loyer_prolongation()->sa();
+	//			$prolongation['date_debut']=$date_debut;
+				$date_debut=$prolongation['date_debut'];
+				foreach($loyer_prolongation as $key=>$item){
+					$item["date_debut"]=$date_debut;
+					if($item["duree"] && (!$prolongation["date_arret"] || $prolongation["date_arret"]>$date_debut) ){
 
-			//On vérifie qu'il y ait au moins une fréquence et une durée
-			ATF::loyer_prolongation()->q->reset()->addCondition("id_prolongation",$prolongation['id_prolongation']);
-			$loyer_prolongation=ATF::loyer_prolongation()->sa();
-//			$prolongation['date_debut']=$date_debut;
-			$date_debut=$prolongation['date_debut'];
-			foreach($loyer_prolongation as $key=>$item){
-				$item["date_debut"]=$date_debut;
-				if($item["duree"] && (!$prolongation["date_arret"] || $prolongation["date_arret"]>$date_debut) ){
-
-					if($item['frequence_loyer']=="an"){
-						$frequence=12;
-					}elseif($item['frequence_loyer']=="semestre"){	$frequence=6;
-					}elseif($item["frequence_loyer"]=="trimestre"){
-						$frequence=3;
-					}elseif($item["frequence_loyer"]=="mois"){
-						$frequence=1;
-					}
-					$item["date_fin"]=$date_debut;
-					//Pour chaque échéance d'une période
-					for($j=1;$j<=$item['duree'];$j++){
-						if(!$date_limite || $date_limite >= $date_debut){
-							$date_fin=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
-							$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
-
-							//La facturatio ne doit pas exister
-							$this->q->reset()->addCondition("id_affaire",$commande->get("id_affaire"))
-											 ->addCondition("date_periode_debut",$date_debut)
-											 ->addCondition("date_periode_fin",$date_fin)
-											 ->WhereIsNotNull("id_facture")
-											 ->setDimension("row");
-
-							$facturationExist=$this->sa();
-							if(!$facturationExist){
-								$facturation["id_societe"]=$prolongation["id_societe"];
-								$facturation["id_affaire"]=$commande->get("id_affaire");
-								$facturation["montant"]=$item["loyer"];
-								$facturation["assurance"]=$item["assurance"];
-								$facturation["frais_de_gestion"]=$item["frais_de_gestion"];
-								$facturation["serenite"]=$item["serenite"];
-								$facturation["maintenance"]=$item["maintenance"];
-								$facturation["hotline"]=$item["hotline"];
-								$facturation["supervision"]=$item["supervision"];
-								$facturation["support"]=$item["support"];
-								$facturation["date_periode_debut"]=$date_debut;
-								$facturation["date_periode_fin"]=$date_fin;
-								$facturation["type"]="prolongation";
-
-								$this->i($facturation);
-							}
-
-							$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
+						if($item['frequence_loyer']=="an"){
+							$frequence=12;
+						}elseif($item['frequence_loyer']=="semestre"){	$frequence=6;
+						}elseif($item["frequence_loyer"]=="trimestre"){
+							$frequence=3;
+						}elseif($item["frequence_loyer"]=="mois"){
+							$frequence=1;
 						}
+						$item["date_fin"]=$date_debut;
+						//Pour chaque échéance d'une période
+						for($j=1;$j<=$item['duree'];$j++){
+							if(!$date_limite || $date_limite >= $date_debut){
+								$date_fin=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
+								$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
+
+								//La facturatio ne doit pas exister
+								$this->q->reset()->addCondition("id_affaire",$commande->get("id_affaire"))
+												->addCondition("date_periode_debut",$date_debut)
+												->addCondition("date_periode_fin",$date_fin)
+												->WhereIsNotNull("id_facture")
+												->setDimension("row");
+
+								$facturationExist=$this->sa();
+								if(!$facturationExist){
+									$facturation["id_societe"]=$prolongation["id_societe"];
+									$facturation["id_affaire"]=$commande->get("id_affaire");
+									$facturation["montant"]=$item["loyer"];
+									$facturation["assurance"]=$item["assurance"];
+									$facturation["frais_de_gestion"]=$item["frais_de_gestion"];
+									$facturation["serenite"]=$item["serenite"];
+									$facturation["maintenance"]=$item["maintenance"];
+									$facturation["hotline"]=$item["hotline"];
+									$facturation["supervision"]=$item["supervision"];
+									$facturation["support"]=$item["support"];
+									$facturation["date_periode_debut"]=$date_debut;
+									$facturation["date_periode_fin"]=$date_fin;
+									$facturation["type"]="prolongation";
+
+									$this->i($facturation);
+								}
+
+								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
+							}
+						}
+						$item["date_fin"]=$date_fin;
 					}
-					$item["date_fin"]=$date_fin;
+					ATF::loyer_prolongation()->u($item);
 				}
-				ATF::loyer_prolongation()->u($item);
+				$prolongation['date_fin']=$date_fin;
+				ATF::prolongation()->u($prolongation);
+				//Génération du fichier pdf  facturation
+				ATF::prolongation()->move_files($prolongation['id_prolongation']);
 			}
-			$prolongation['date_fin']=$date_fin;
-			ATF::prolongation()->u($prolongation);
-			//Génération du fichier pdf  facturation
-			ATF::prolongation()->move_files($prolongation['id_prolongation']);
 		}
 		return true;
 	}
@@ -848,9 +846,6 @@ class facturation extends classes_optima {
 		$type_affaire2SI = ATF::type_affaire()->select_row();
 
 
-
-		$cleodis=ATF::societe()->select(246);
-
 		$this->q->reset()
 				->addField("facturation.*")
 				->addField("LTRIM(`societe`.`societe`)","ltrimsociete")
@@ -878,7 +873,7 @@ class facturation extends classes_optima {
 		if($tu){
 			$this->q->addCondition("`societe`.`code_client`","TU");
 		}
-//$this->q->addCondition("`societe`.`id_societe`",1499);
+
 
 
 		$facturation=$this->sa();
@@ -919,7 +914,10 @@ class facturation extends classes_optima {
 
 					if($id_facture!="montant_zero"){
 
-						if($item["type"]!="prolongation"){
+
+						// On envoi les factures de prolongation dont l"echeance est déja présente, uniquement pour GO Abonnement
+						//if($item["type"]!="prolongation" || ATF::$codename == "go_abonnement"){
+
 							//Enlever les factures envoyées par mail
 							if(!$contact["email"] && !$contact["email_perso"]){
 								if($affaire["id_type_affaire"] == $type_affaire2SI){
@@ -980,7 +978,7 @@ class facturation extends classes_optima {
 								$non_envoye=$this->formateTabfacturer($non_envoye,$item,"client_non_envoye",false,$item["type"]);
 								$tab=$this->incrementeFacture($tab,$item["type"],false);
 							}
-						}
+						//}
 
 						log::logger("Création facture contrat de l'affaire ".$affaire["ref"],__CLASS__);
 					}else{
@@ -1043,6 +1041,7 @@ class facturation extends classes_optima {
 				)";
 
 		$prolongation=ATF::db()->sql2array($query);
+
 		foreach ($prolongation as $key=>$item) {
 			if(ATF::$codename== "cleodisbe"){
 				$objAffaire = new affaire_cleodisbe($item['id_affaire']);
@@ -1051,6 +1050,7 @@ class facturation extends classes_optima {
 			}
 
 			$objCommande = $objAffaire->getCommande();
+
 
 			try {
 				$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
@@ -1466,6 +1466,7 @@ class facturation extends classes_optima {
 		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_prolongation,"global_","Factures RESTITUTIONS prolongation",$s);
 
+
 		//Envoi d'un pdf contenant toutes les factures contrat
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat 2SI...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures RESTITUTIONS contrat 2SI",$s);
@@ -1628,7 +1629,7 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
-					if(ATF::$codename == "bdomplus") $facture["ref_externe"] = ATF::facture()->getRefExterne();
+					if(ATF::$codename == "bdomplus"|| ATF::$codename == "go_abonnement") $facture["ref_externe"] = ATF::facture()->getRefExterne();
 
 					if($facturation["type"] == "liberatoire"){
 						$facture["type_libre"] = "liberatoire";
@@ -1649,7 +1650,7 @@ class facturation extends classes_optima {
 						$facture["date_paiement"] = NULL;
 					}
 
-					if(ATF::$codename == "bdomplus") $facture["date_paiement"] = NULL;
+					if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement" || ATF::$codename == "assets") $facture["date_paiement"] = NULL;
 
 					$id_facture=ATF::facture()->i($facture);
 
@@ -1706,12 +1707,14 @@ class facturation extends classes_optima {
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
 
-class facturation_bdomplus extends facturation {
-	public $user_facturation = array(16,116);
+class facturation_assets extends facturation {
+	public $user_facturation = array(16);
 };
-class facturation_bdom extends facturation { };
-class facturation_boulanger extends facturation { };
+
+class facturation_bdomplus extends facturation {
+	public $user_facturation = array(16);
+};
 
 class facturation_go_abonnement extends facturation {
 	public $user_facturation = array(16,116);
- };
+};

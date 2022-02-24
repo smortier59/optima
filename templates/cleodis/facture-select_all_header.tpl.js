@@ -62,9 +62,16 @@
 							  	el.add(cb);
 
 								Ext.iterate(r.result.lignes, function(key, value) {
+
+									if (key.date_periode_debut) {
+										var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" € ("+key.date_periode_debut+" au "+key.date_periode_fin+")";
+									} else {
+										var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" €";
+									}
+
 									var cb = {
 								  		xtype: "checkbox"
-								  		,boxLabel: "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" € ("+key.date_periode_debut+" au "+key.date_periode_fin+")"
+								  		,boxLabel: label
 								  		,value: key.id_facture
 								  		,name: "factures["+key.id_facture+"]"
 								  	};
@@ -268,7 +275,7 @@
 							html += "</div>";
 							$('#resultDiv').html(html);
 							ATF.loadMask.hide();
-						}, 
+						},
 						failure:function(form, action) {
 							var html = '<div class="alert alert-warning">Certaines erreurs ont rendu impossible l\'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br>';
 							html += '<ul style="text-align: left !important;">';
@@ -280,7 +287,7 @@
 							html += "</ul></div>";
 
 							$('#resultDiv').html(html);
-							ATF.loadMask.hide();						
+							ATF.loadMask.hide();
 						}
 					});
 				}

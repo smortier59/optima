@@ -67,8 +67,6 @@ class slimpay {
         log::logger("createDebit" , "mfleurquin");
 
         $hapiClient = self::connection();
-        log::logger("--HAPI Client","slimpay.log");
-        log::logger($hapiClient,"slimpay.log");
 
         // The Relations Namespace
         $relNs = self::getRelationNamespace();
@@ -95,8 +93,6 @@ class slimpay {
                 ]
             ]
             ));
-            log::logger($follow , "mfleurquin");
-
             log::logger($follow,"slimpay.log");
             $res = $hapiClient->sendFollow($follow);
             log::logger($res , "slimpay.log");
