@@ -2,6 +2,7 @@
 $current_class
 $proxyUrl
 *}
+
 ATF.buildGridEditor({
     title:'{$title}',
     id:'{$id}',
