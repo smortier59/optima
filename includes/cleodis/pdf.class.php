@@ -15800,8 +15800,13 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->cadre(140,$y,60,13,$cadre);
 
 		if ($this->lignes) {
-			$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
-			$w = array(20,60,30,20,25,30);
+			if ($this->facture["prix_sans_tva"] == 0) {
+				$head = array("Quantité","Désignation","Montant HT", 'TVA', 'TOTAL TTC');
+				$w = array(20,85,30,20,30);
+			} else {
+				$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
+				$w = array(20,60,30,20,25,30);
+			}
 			$data = $styles = array();
 
 			$data[0][0] = "1";
@@ -15831,10 +15836,13 @@ class pdf_go_abonnement extends pdf_cleodis {
 			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
 			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
 				$data[0][3] = number_format(abs(round($this->facture["prix"] * ($this->facture['tva']-1),2)),2,'.',' ')." €";
-				$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
-
 				$total = ($this->facture["prix"] * $this->facture['tva']) + $this->facture["prix_sans_tva"];
-				$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
+				if ($this->facture["prix_sans_tva"] == 0) {
+					$data[0][4] = number_format(abs(round($total,2)),2,'.',' ')." €";
+				} else {
+					$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
+					$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
+				}
 			}
 
 			$styles[0][1] = array("align"=>"L");
