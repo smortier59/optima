@@ -3850,7 +3850,7 @@ class facture_go_abonnement extends facture_cleodis {
 
 		$this->q->reset()
 				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
-				->addField('SUBSTRING(`ref_externe`,9)+1',"max_ref")
+				->addField('SUBSTRING(`ref_externe`,2)+1',"max_ref")
 				->addOrder('ref_externe',"DESC")
 				->setDimension("row")
 				->setLimit(1);

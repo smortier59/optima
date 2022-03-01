@@ -827,7 +827,7 @@ class hotline extends classes_optima {
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
-		$tag_recherche = ["[DOSSIER","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
+		$tag_recherche = ["[SUPERVISION]","[DOSSIER","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
 
 
 
