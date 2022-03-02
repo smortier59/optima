@@ -3884,4 +3884,243 @@ class facture_go_abonnement extends facture_cleodis {
 
 	}
 
+
+	/** Mise en place des titres
+	 * @author Morgan Fleurquin <mfleurquin@absystech.fr>
+     * @param array $sheet : contient l'onglet
+     */
+	public function ajoutTitre(&$sheet){
+        $row_data = array(
+        	"A"=>''
+        	,"B"=>'Date d\'écriture'
+			,"C"=>'Journal'
+			,"D"=>'Comptes'
+			,"E"=>'Code libellé'
+			,"F"=>'Sens'
+			,"G"=>'Montant'
+			,"H"=>'Libellé'
+			,"I"=>'N° de pièce'
+			,"J"=>'Centre'
+			,"K"=>'Périodicité - date de début'
+			,"L"=>'Périodicité - date de fin'
+			,"M"=>'Date d\'échéance'
+		);
+
+		 $i=0;
+		 foreach($row_data as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre);
+			$i++;
+        }
+     }
+
+	/** Mise en place du contenu
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+    * @param array $sheets : contient l'onglet
+    * @param array $infos : contient tous les enregistrements
+    */
+    public function ajoutDonnees(&$sheet,$infos){
+
+		$row_auto=1;
+		$increment=0;
+		foreach ($infos as $key => $item) {
+			$increment++;
+			if($item){
+
+				$id_affaire = ATF::facture()->select($item["facture.id_facture_fk"], "id_affaire");
+				$id_societe = ATF::affaire()->select($id_affaire, "id_societe");
+
+				$num_chassis = ATF::affaire()->select($id_affaire, "num_chassis");
+
+				$ligne = [];
+
+				// On recupere l'affaire pour voir si il y a un type d'affaire et si il n'y a pas de TVA sur Assurance
+				$sans_tva = false;
+				$id_type_affaire = ATF::affaire()->select($id_affaire, "id_type_affaire");
+				if ($id_type_affaire) {
+					if (ATF::type_affaire()->select($id_type_affaire , "assurance_sans_tva") == "oui"){
+						$sans_tva = true;
+					}
+				}
+
+				$choix = "defaut";
+
+
+				if ($item["facture.type_facture"] === "facture") {
+					if ($item["facture.prix"] > 0) {
+						$choix = "facture_mensuelle";
+					}
+				} elseif ($item["facture.type_facture"] == "avoir" && ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat")) {
+					$choix = "avoir_facture_mensuelle";
+
+				} elseif ($item["facture.type_facture"] == "libre") {
+					if ($item["facture.type_libre"] == "prorata") {
+						if ($item["facture.prix"] > 0) {
+							$choix = "facture_prorata";
+						} else {
+							$choix = "avoir_facture_prorata";
+						}
+					}elseif (($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat")) {
+						if ($item["facture.prix"] < 0) {
+							$choix = "avoir_facture_mensuelle";
+						} else {
+							$choix = "facture_mensuelle";
+						}
+					}elseif ($item["facture.nature"] == "prolongation") {
+						if ($item["facture.prix"] > 0) {
+							$choix = "facture_prolongation";
+						} else {
+							$choix = "avoir_facture_prolongation";
+
+						}
+					}
+				}
+
+				$ligne[1]["D"] = ATF::societe()->select($id_societe, "ref");
+				$ligne[1]["F"] = "D";
+				$ligne[2]["F"] = "C";
+				$ligne[3]["F"] = "C";
+
+				switch ($choix) {
+					case "facture_mensuelle":
+					case "avoir_facture_mensuelle":
+						$code_libelle = "F";
+
+						$ligne[2]["D"] = "706200";
+						$ligne[3]["D"] = "445712";
+						$ligne[4]["D"] = "706500";
+						$ligne[4]["F"] = "C";
+
+						if ($choix === "avoir_facture_mensuelle") {
+							$code_libelle = "A";
+							$ligne[1]["F"] = "C";
+							$ligne[2]["F"] = "D";
+							$ligne[3]["F"] = "D";
+							$ligne[4]["F"] = "D";
+						}
+					break;
+
+					case "facture_prorata":
+					case "avoir_facture_prorata":
+						$ligne[2]["D"] = "706300";
+						$ligne[3]["D"] = "445715";
+						$ligne[4]["D"] = "706500";
+						$ligne[4]["F"] = "C";
+						$code_libelle = "F";
+
+						if ($choix === "avoir_facture_prorata") {
+							$code_libelle = "A";
+							$ligne[1]["F"] = "C";
+							$ligne[2]["F"] = "D";
+							$ligne[3]["F"] = "D";
+							$ligne[4]["F"] = "D";
+						}
+					break;
+
+					case "facture_prolongation":
+					case "avoir_facture_prolongation":
+						$code_libelle = "F";
+						$ligne[2]["D"] = "706220";
+						$ligne[3]["D"] = "445713";
+						$ligne[4]["D"] = "706500";
+						$ligne[4]["F"] = "C";
+						if ($choix === "avoir_facture_prolongation") {
+							$code_libelle = "A";
+							$ligne[1]["F"] = "C";
+							$ligne[2]["F"] = "D";
+							$ligne[3]["F"] = "D";
+							$ligne[4]["F"] = "D";
+						}
+					break;
+
+					default:
+
+						$ligne[2]["D"] = "706400";
+						$ligne[3]["D"] = "445710";
+						$code_libelle = "F";
+
+						if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
+							$code_libelle = "A";
+							$ligne[1]["F"] = "C";
+							$ligne[2]["F"] = "D";
+							$ligne[3]["F"] = "D";
+						}
+
+					break;
+				}
+
+				log::logger($item["facture.ref_externe"] ." --- ". $choix , "mfleurquin");
+
+				//insertion des donnÃ©es
+				foreach ($ligne as $key => $value) {
+
+
+					$row_data=array();
+
+					$row_data["A"] = '';
+					$row_data["B"] = $item['facture.date'];
+					$row_data["C"] = 'VEN';
+					$row_data["D"] = $value["D"];
+					$row_data["E"] = $code_libelle;
+					$row_data["F"] = $value["F"];
+
+
+					switch($key) {
+						case "1":
+							if ($sans_tva) {
+								$total = ($item["facture.prix"] * $item["facture.tva"]) + $item["facture.prix_sans_tva"];
+							} else {
+								$total = ($item["facture.prix"] * $item["facture.tva"]);
+							}
+						break;
+
+						case "2":
+							$total = $item["facture.prix"];
+						break;
+
+						case "3":
+
+							$total = ($item["facture.prix"] * $item["facture.tva"]) - $item["facture.prix"];
+						break;
+
+						case "4":
+							$total = $item["facture.prix_sans_tva"];
+						break;
+					}
+					$row_data["G"] = round(abs($total),2);
+
+					$row_data["H"] = $item["facture.id_affaire"]."-".$item["facture.id_societe"] ;
+					$row_data["I"] = $item["facture.ref_externe"];
+					$row_data["J"] = substr($num_chassis, -10)." ";
+					$row_data["K"] = ($item['facture.date_periode_debut']) ? $item['facture.date_periode_debut'] : "";
+					$row_data["L"] = ($item['facture.date_periode_fin']) ? $item['facture.date_periode_fin'] : "";
+					$row_data["M"] = ($item['facture.date_previsionnelle']) ? $item['facture.date_previsionnelle'] : "";
+
+					if ($key == 4 && (!$sans_tva || $item["facture.prix_sans_tva"] == 0)) {
+						$row_data = array();
+					}
+
+
+
+					if($row_data){
+						$indexCol = 0;
+						$row_auto++;
+						foreach($row_data as $col=>$valeur){
+							if (($col === "B" || $col === "K" || $col === "L" || $col === "M") && $valeur !== "" ) {
+								$dateTime = new DateTime($valeur);
+								$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+								$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+							} else {
+
+								$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+							}
+							$sheet->getColumnDimension($col)->setAutoSize(true);
+							$indexCol++;
+						}
+
+					}
+				}
+			}
+		}
+	}
+
 };
