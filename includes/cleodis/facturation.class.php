@@ -846,9 +846,6 @@ class facturation extends classes_optima {
 		$type_affaire2SI = ATF::type_affaire()->select_row();
 
 
-
-		$cleodis=ATF::societe()->select(246);
-
 		$this->q->reset()
 				->addField("facturation.*")
 				->addField("LTRIM(`societe`.`societe`)","ltrimsociete")
@@ -876,7 +873,7 @@ class facturation extends classes_optima {
 		if($tu){
 			$this->q->addCondition("`societe`.`code_client`","TU");
 		}
-//$this->q->addCondition("`societe`.`id_societe`",1499);
+
 
 
 		$facturation=$this->sa();
@@ -917,7 +914,10 @@ class facturation extends classes_optima {
 
 					if($id_facture!="montant_zero"){
 
-						if($item["type"]!="prolongation"){
+
+						// On envoi les factures de prolongation dont l"echeance est déja présente, uniquement pour GO Abonnement
+						//if($item["type"]!="prolongation" || ATF::$codename == "go_abonnement"){
+
 							//Enlever les factures envoyées par mail
 							if(!$contact["email"] && !$contact["email_perso"]){
 								if($affaire["id_type_affaire"] == $type_affaire2SI){
@@ -978,7 +978,7 @@ class facturation extends classes_optima {
 								$non_envoye=$this->formateTabfacturer($non_envoye,$item,"client_non_envoye",false,$item["type"]);
 								$tab=$this->incrementeFacture($tab,$item["type"],false);
 							}
-						}
+						//}
 
 						log::logger("Création facture contrat de l'affaire ".$affaire["ref"],__CLASS__);
 					}else{
@@ -1041,6 +1041,7 @@ class facturation extends classes_optima {
 				)";
 
 		$prolongation=ATF::db()->sql2array($query);
+
 		foreach ($prolongation as $key=>$item) {
 			if(ATF::$codename== "cleodisbe"){
 				$objAffaire = new affaire_cleodisbe($item['id_affaire']);
@@ -1049,6 +1050,7 @@ class facturation extends classes_optima {
 			}
 
 			$objCommande = $objAffaire->getCommande();
+
 
 			try {
 				$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
@@ -1464,6 +1466,7 @@ class facturation extends classes_optima {
 		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_prolongation,"global_","Factures RESTITUTIONS prolongation",$s);
 
+
 		//Envoi d'un pdf contenant toutes les factures contrat
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat 2SI...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures RESTITUTIONS contrat 2SI",$s);
@@ -1626,7 +1629,7 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
-					if(ATF::$codename == "bdomplus"|| ATF::$codename == "go_abonnement") $facture["ref_externe"] = ATF::facture()->getRefExterne();
+					if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement") $facture["ref_externe"] = ATF::facture()->getRefExterne();
 
 					if($facturation["type"] == "liberatoire"){
 						$facture["type_libre"] = "liberatoire";
@@ -1712,4 +1715,4 @@ class facturation_boulanger extends facturation { };
 
 class facturation_go_abonnement extends facturation {
 	public $user_facturation = array(16,116);
- };
+};
