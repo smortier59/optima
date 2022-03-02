@@ -641,11 +641,23 @@ class facturation extends classes_optima {
 
 		$totaux=$this->sa();
 
+		$assurance_sans_tva = false;
+		$type_affaire = ATF::affaire()->select($id_affaire, "id_type_affaire");
+		if ($type_affaire) {
+			if (ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") == "oui") {
+				$assurance_sans_tva = true;
+			}
+		}
+
 		$totaux["loyer"]=$totaux["total_ht"];
 
 		$infos_commande = ATF::affaire()->getCommande($id_affaire)->infos;
 
-		$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		if ($assurance_sans_tva) {
+			$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		} else {
+			$totaux["tva"]=round(($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"])*($infos_commande['tva']-1),2);
+		}
 
 		$totaux["total"]=round($totaux["tva"]+($totaux["total_ht"]+$totaux["total_assurance"]+$totaux["total_frais_de_gestion"]),2);
 
@@ -754,6 +766,19 @@ class facturation extends classes_optima {
 	function periode_facturation($id_affaire,$date=false) {
 		$this->q->reset()->Where("id_affaire",$id_affaire,"AND",1)
 						 ->Where("date_periode_debut",date("Y-m-d"),"AND",1,">=")
+						 ->setDimension("row")
+						 ->addOrder("date_periode_debut","asc");
+
+		if($date){
+			$this->q->Where("id_facture",NULL,"AND",1,"IS NULL");
+		}
+
+		return $this->sa();
+
+	}
+
+	function next_echeance($id_affaire,$date=false) {
+		$this->q->reset()->Where("id_affaire",$id_affaire,"AND",1)
 						 ->setDimension("row")
 						 ->addOrder("date_periode_debut","asc");
 
@@ -1603,7 +1628,7 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
-					if(ATF::$codename == "bdomplus") $facture["ref_externe"] = ATF::facture()->getRefExterne();
+					if(ATF::$codename == "bdomplus"|| ATF::$codename == "go_abonnement") $facture["ref_externe"] = ATF::facture()->getRefExterne();
 
 					if($facturation["type"] == "liberatoire"){
 						$facture["type_libre"] = "liberatoire";
@@ -1687,4 +1712,6 @@ class facturation_bdomplus extends facturation {
 class facturation_bdom extends facturation { };
 class facturation_boulanger extends facturation { };
 
-class facturation_go_abonnement extends facturation { };
+class facturation_go_abonnement extends facturation {
+	public $user_facturation = array(16,116);
+ };

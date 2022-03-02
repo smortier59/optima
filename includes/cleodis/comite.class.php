@@ -523,19 +523,7 @@ class comite extends classes_optima {
 
 
 		//Utilisateurs notifié de validation de comité -> Jerome, Alison, Severine et Jeanne
-		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
-								//->where("login", "abowe", "OR", "filles")
-								->where("login", "mmysoet", "OR", "filles")
-								->where("login", "jloison", "OR", "filles")
-								//->where("login", "smazars", "OR", "filles")
-								->where("login", "lhochart", "OR", "filles");
-
-
-		$filles = ATF::user()->sa();
-		foreach ($filles as $key => $value) {
-        	$notifie_suivi[] = $value["id_user"];
-     	}
-
+		$notifie_suivi = ATF::user()->getDestinataireFromConstante(' __NOTIFIE_CREATE_TACHE_PARTENAIRE__');
 		$notifie_suivi = array_unique($notifie_suivi);
 
 		$suivi_notifie = "";

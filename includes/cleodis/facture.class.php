@@ -57,10 +57,13 @@ class facture_cleodis extends facture {
 		$this->colonnes['panel']['dates_facture'] = array(
 			"date_periode_debut"=>array("readonly"=>true),
 			"date_periode_fin"=>array("readonly"=>true),
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield"),
-			"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
-
+			"prix"  => array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
 		);
+
+		$this->colonnes['panel']["hors_tva"] = array(
+			"prix_sans_tva"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
+		);
+
 
 		$this->colonnes['panel']['dates_facture_libre'] = array(
 			"date_periode_debut_libre"=>array("custom"=>true,"xtype"=>"datefield"),
@@ -99,6 +102,7 @@ class facture_cleodis extends facture {
 		$this->panels['primary'] = array("visible"=>true,'nbCols'=>3);
 		$this->panels['refi'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
 		$this->panels['dates_facture'] = array("visible"=>true,'nbCols'=>3);
+		$this->panels['hors_tva'] = array("visible"=> false, 'nbCols' => 3);
 		$this->panels['midas'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
 		$this->panels['dates_facture_libre'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
 		$this->panels['lignes_repris'] = array('nbCols'=>1);
@@ -202,7 +206,11 @@ class facture_cleodis extends facture {
 				return date("Y-m-d");
 			case "date_previsionnelle":
 				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					if (ATF::$codename == "go_abonnement") {
+						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
+					} else {
+						$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					}
 					if($date_previsionnelle=ATF::affaire()->select($facture['id_affaire'],"date_previsionnelle")){
 						$day=$date_previsionnelle;
 					}else{
@@ -214,26 +222,47 @@ class facture_cleodis extends facture {
 				}
 			case "date_periode_debut":
 				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					if (ATF::$codename == "go_abonnement") {
+						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
+					} else {
+						$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					}
+
 					return $periode["date_periode_debut"];
 				}
 				break;
 			case "date_periode_fin":
 				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					if (ATF::$codename == "go_abonnement") {
+						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
+					} else {
+						$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					}
 					return $periode["date_periode_fin"];
 				}
 				break;
 			case "prix":
 				if ($facture) {
+					log::logger($facture , "mfleurquin");
 
 					$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
 
+					log::logger($type_affaire , "mfleurquin");
+					log::logger(ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") , "mfleurquin");
+
 					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-							$prix=($periode["montant"]+$periode["frais_de_gestion"]);
-						}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-							$prix=$facture["prix"];
+						if (ATF::$codename == "go_abonnement") {
+							if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
+								$prix=($periode["montant"]+$periode["frais_de_gestion"]);
+							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+								$prix=$facture["prix"];
+							}
+						} else {
+							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+								$prix=($periode["montant"]+$periode["frais_de_gestion"]);
+							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+								$prix=$facture["prix"];
+							}
 						}
 					} else {
 						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
@@ -248,28 +277,38 @@ class facture_cleodis extends facture {
 				}
 
 				break;
-				case "prix_sans_tva":
+			case "prix_sans_tva":
+					$prix_sans_tva = 0;
 					if ($facture) {
 
 						$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
 						if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-								$prix_sans_tva=$periode["assurance"];
-							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-								$prix_sans_tva=$facture["prix_sans_tva"];
+							if (ATF::$codename == "go_abonnement") {
+								if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
+									$prix_sans_tva=$periode["assurance"];
+								}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+									$prix_sans_tva=$facture["prix_sans_tva"];
+								}
+							} else {
+								if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+									$prix_sans_tva=$periode["assurance"];
+								}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+									if ($facture["prix_sans_tva"]) {
+										$prix_sans_tva=$facture["prix_sans_tva"];
+									}
+								}
 							}
 						} else {
 							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
 								$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
 							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-								$prix_sans_tva=$facture["prix_sans_tva"];
+								if ($facture["prix_sans_tva"]) {
+									$prix_sans_tva=$facture["prix_sans_tva"];
+								}
 							}
 						}
 					}
-					if($prix_sans_tva){
-						return $prix_sans_tva;
-					}
-					return 0;
+					return $prix_sans_tva;
 
 					break;
 			case "prix_refi":
@@ -282,6 +321,8 @@ class facture_cleodis extends facture {
 				if ($facture["id_affaire"]) {
 					if(ATF::affaire()->select($facture["id_affaire"],"nature")=="vente"){
 						return "cheque";
+					} else {
+						return ATF::commande()->select($facture["id_commande"], "type");
 					}
 				}
 				break;
@@ -481,7 +522,7 @@ class facture_cleodis extends facture {
 				$facture["facture"] = array(
 		            "id_societe" => $affaire["id_societe"],
 		            "type_facture" => "libre",
-		            "mode_paiement" => "prelevement",
+		            "mode_paiement" => $commande["type"],
 		            "id_affaire" => $affaire["id_affaire"],
 		            "type_libre" => "normale",
 		            "date" => date("d-m-Y"),
@@ -576,10 +617,10 @@ class facture_cleodis extends facture {
 		}
 
 		$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
-		$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
+		$dateFinPeriode = $dateFinPeriode->format('d-m-Y');
 
 		if($prix != 0){
-			$mode_paiement = "prelevement";
+			$mode_paiement = $commande["type"];
 			if($affaire["site_associe"] === 'toshiba') $mode_paiement = "cb";
 			if($affaire["site_associe"] === 'btwin') $mode_paiement = "pre-paiement";
 
@@ -628,6 +669,8 @@ class facture_cleodis extends facture {
 
 	        $id_facture = $this->insert($facture);
 
+
+
 	        $this->libreToNormale(array("id_facture"=> $id_facture));
 
 	        //Sur l'echeancier, le montant ne doit pas être Loyer + aussrance + frais de dossier
@@ -638,6 +681,7 @@ class facture_cleodis extends facture {
 	        							"assurance"=>  $loyers[0]["assurance"],
 	        							"frais_de_gestion" => $loyers[0]["frais_de_gestion"]
 	    						));
+
 
 	    }
 
@@ -705,7 +749,14 @@ class facture_cleodis extends facture {
 			$infos["prix"]=$infos["prix_midas"];
 			$infos["commentaire"] = $infos["periode_midas"];
 		}elseif($infos["type_facture"]=="facture"){
-			if($facturation= ATF::facturation()->periode_facturation($commande['id_affaire'])){
+			if (ATF::$codename == "go_abonnement") {
+				$facturation= ATF::facturation()->next_echeance($commande['id_affaire']);
+			} else {
+				$facturation= ATF::facturation()->periode_facturation($commande['id_affaire']);
+			}
+
+
+			if($facturation){
 				if(($infos["date_periode_debut"]) && ($infos["date_periode_fin"])){
 					$date = explode("-", $infos["date_periode_debut"]);
 					$date_periode_debut = $date[2]."-".$date[1]."-".$date[0];
@@ -717,7 +768,14 @@ class facture_cleodis extends facture {
 					if(($infos["date_periode_debut"] >= $facturation["date_periode_debut"]) && ($infos["date_periode_fin"] <= $facturation["date_periode_fin"])){
 						//On est dans une periode de l'echeancier
 						if($facturation["id_facture"]) throw new errorATF("Il existe déjà une facturation pour cette période.",349);
-					}else{ $facturation = ATF::facturation()->periode_facturation($commande['id_affaire'],true); }
+					}else{
+						if (ATF::$codename == "go_abonnement") {
+							$facturation = ATF::facturation()->next_echeance($commande['id_affaire'],true);
+						} else {
+							$facturation = ATF::facturation()->periode_facturation($commande['id_affaire'],true);
+						}
+
+					}
 				}else{
 					$infos["date_periode_debut"] = $facturation["date_periode_debut"];
 					$infos["date_periode_fin"] = $facturation["date_periode_fin"];
@@ -765,7 +823,9 @@ class facture_cleodis extends facture {
 			$infos["tva"]= "1.2";
 		}
 
-		if (ATF::$codename == "bdomplus" || ATF::$codename == "boulanger") $infos["ref_externe"] = $this->getRefExterne();
+		if (ATF::$codename == "bdomplus" || ATF::$codename == "boulanger" || ATF::$codename == "go_abonnement") {
+			$infos["ref_externe"] = $this->getRefExterne();
+		}
 
 
 		ATF::db($this->db)->begin_transaction();
@@ -1130,8 +1190,6 @@ class facture_cleodis extends facture {
      * @param array $infos : contient tous les enregistrements
      */
      public function export_xls_special(&$infos){
-
-
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
@@ -1146,11 +1204,12 @@ class facture_cleodis extends facture {
 		//mise en place des titres
 		$this->ajoutTitre($sheet);
 
-
-
 		//ajout des donnÃ©es
 		if($infos){
-			 $this->ajoutDonnees($sheet,$infos);
+			$this->ajoutDonnees($sheet,$infos);
+			foreach($infos as $facture){
+				ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "oui"));
+			}
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
@@ -1282,7 +1341,6 @@ class facture_cleodis extends facture {
 					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
 				}
 
-
 				$choix = "defaut";
 
 				if($item['facture.type_facture'] == "libre" && in_array($item["facture.type_libre"], ["cout_copie", "transfert"])){
@@ -1335,14 +1393,18 @@ class facture_cleodis extends facture {
 								   	$en_cours = true;
 								}else{ $en_cours = false; }
 
-								//Affaire non refi ou refinancée par CLEODIS
-								if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
-									$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
-								//Affaire en cours et refinancée par BMF
-								}elseif($ResRefinancement && $refinancement == "BMF"){
-									$choix = "affaire_en_cours_refi_bmf";
-								}elseif(($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE') && $en_cours){
-									$choix = "affaire_en_cours_refi_cleofi_sgef";
+								if( ATF::$codename == "cleodisbe") {
+									$choix = "affaire_en_cours_cleodisbe";
+								} else {
+									//Affaire non refi ou refinancée par CLEODIS
+									if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
+										$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
+									//Affaire en cours et refinancée par BMF
+									}elseif($ResRefinancement && $refinancement == "BMF"){
+										$choix = "affaire_en_cours_refi_bmf";
+									}elseif(($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE') && $en_cours){
+										$choix = "affaire_en_cours_refi_cleofi_sgef";
+									}
 								}
 							}
 						}
@@ -1367,6 +1429,7 @@ class facture_cleodis extends facture {
 						$ligne[1]["D"] ="411000";
 						$ligne[2]["D"] ="706220";
 						$ligne[3]["D"] ="706220";
+						$ligne[4]["D"] ="445714";
 					break;
 
 					case 'libre_transfert':
@@ -1420,6 +1483,9 @@ class facture_cleodis extends facture {
 						$ligne[2]["D"] = "706230";
 						$ligne[3]["D"] = "706230";
 						$ligne[4]["D"] = "445713";
+						if (ATF::$codename == "cleodisbe") {
+							$ligne[4]["D"] = "445710";
+						}
 					break;
 
 					case 'avoir_sur_prolongation':
@@ -1464,6 +1530,12 @@ class facture_cleodis extends facture {
 						$ligne[2] = array("D"=> "706230" , "H"=> $h);
 						$ligne[3] = array("D"=> "706230" , "H"=> $h);
 						$ligne[4] = array("D"=> "445713" , "H"=> $h);
+					break;
+
+					case 'affaire_en_cours_cleodisbe':
+						$ligne[2]["D"] = "706200";
+						$ligne[3]["D"] = "706200";
+						$ligne[4]["D"] = "445710";
 					break;
 
 					case 'facture_sans_tva':
@@ -3004,13 +3076,14 @@ class facture_cleodis extends facture {
 
 class facture_cleodisbe extends facture_cleodis {
 
+
 	/** Mise en place du contenu
      * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
      * @param array $sheets : contient les 5 onglets
      * @param array $infos : contient tous les enregistrements
      */
-     public function ajoutDonnees(&$sheets,$infos){
+    /* public function ajoutDonnees(&$sheet,$infos){
 		$row_auto=1;
 		$increment=0;
 		foreach ($infos as $key => $item) {
@@ -3203,27 +3276,41 @@ class facture_cleodisbe extends facture_cleodis {
 
 
 					if($row_data){
+						$indexCol = 0;
 						if($infos["rejet"]){
 							if($row_data["G"] != 0){
 								$row_auto++;
 								foreach($row_data as $col=>$valeur){
-									$sheets['auto']->write($col.$row_auto, $valeur);
+									if (($col === "B" || $col === "M") && $valeur ) {
+										$dateTime = new DateTime($valeur);
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+										$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+									} else {
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+									}
+									$sheet->getColumnDimension($col)->setAutoSize(true);
+									$indexCol++;
 								}
 							}
 						}else{
 							$row_auto++;
 							foreach($row_data as $col=>$valeur){
-								$sheets['auto']->write($col.$row_auto, $valeur);
+								if (($col === "B" || $col === "M") && $valeur ) {
+									$dateTime = new DateTime($valeur);
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+									$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+								} else {
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+								}
+								$sheet->getColumnDimension($col)->setAutoSize(true);
+								$indexCol++;
 							}
 						}
 					}
 				}
 			}
 		}
-	}
-
-
-
+	}*/
 
 };
 class facture_cap extends facture_cleodis { };
@@ -3600,6 +3687,57 @@ class facture_go_abonnement extends facture_cleodis {
 	}
 
 
+	function getRef($id_affaire,$type="facture"){
+		$affaire=ATF::affaire()->select($id_affaire);
+
+		$this->q->reset()
+				->addCondition("id_affaire",$id_affaire)
+				->addCondition("type_facture",$type)
+				->addOrder("ref_reel","DESC")
+				->setDimension("row");
+
+		if($affaire["nature"]=='avenant'){
+			$this->q->addField('ROUND( SUBSTRING(  `ref` , 15 ) )',"ref_reel");
+		}else{
+			$this->q->addField('ROUND( SUBSTRING(  `ref` , 11 ) )',"ref_reel");
+		}
+
+		$facture=$this->sa();
+
+		if(!$facture){
+			$suffix=0;
+		}else{
+			$suffix=$facture["ref_reel"];
+		}
+
+		if($type=="ap"){
+			$sufType="-AP";
+		}elseif($type=="refi"){
+			$sufType="-RE";
+		}elseif($type=="libre"){
+			$sufType="-LI";
+		}elseif($type=="facture"){
+			$sufType="";
+		}
+
+		//Si jamais pour une raison x ou y la ref existe déjà il faut incrémenter jusqu'à trouver une ref dispo (problème lorsque cléodis se trompe de type et que l'on doit modifier le type sans changer la ref...)
+		$find=false;
+		$i=1;
+		while($find==false){
+			$this->q->reset()->addCondition("ref",$affaire["ref"]."-".($suffix+$i).$sufType);
+			if(!$this->sa()){
+				$ref=$affaire["ref"]."-".($suffix+$i).$sufType;
+				$find=true;
+			}else{
+				$i++;
+			}
+		}
+
+		return $ref;
+
+	}
+
+
 	/**
 	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -3705,6 +3843,45 @@ class facture_go_abonnement extends facture_cleodis {
 			}
 		}
 		return true;
+	}
+
+	public function getRefExterne(){
+		$prefix = "F";
+
+		$this->q->reset()
+				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`ref_externe`,2)+1',"max_ref")
+				->addOrder('ref_externe',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+		$nb=$this->sa();
+
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="00000000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="0000000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="000000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="00000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000000){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="000000001";
+		}
+		return $prefix.$suffix;
+
 	}
 
 };

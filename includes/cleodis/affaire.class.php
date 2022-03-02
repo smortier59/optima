@@ -1075,7 +1075,15 @@ class affaire_cleodis extends affaire {
 	* @return float
 	*/
 	public function getCompteTLoyerActualise(&$infos) {
-		$a = new affaire_cleodis($infos["id_affaire"]);
+		if (ATF::$codename == "go_abonnement") {
+			$a = new affaire_go_abonnement($infos["id_affaire"]);
+		}
+		elseif (ATF::$codename == "bdomplus") {
+			$a = new affaire_bdomplus($infos["id_affaire"]);
+		} else {
+			$a = new affaire_cleodis($infos["id_affaire"]);
+		}
+
 		if ($c = $a->getCommande()) {
 			$date_debut = $c->get("date_debut");
 		}
@@ -1189,8 +1197,17 @@ class affaire_cleodis extends affaire {
 		if(ATF::$usr->getID()){
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
-			$societe = ATF::societe()->select(246);
-			$from = $societe["societe"]." <".$societe["email"].">";
+			if (ATF::$codename != "cleodis" && ATF::$codename != "cleodisbe" ) {
+				ATF::constante()->q->reset()->where("constante","__MAIL_SOCIETE__");
+				$mail_societe = ATF::constante()->select_row();
+				ATF::constante()->q->reset()->where("constante","__SOCIETE__");
+				$optima_societe = ATF::constante()->select_row();
+
+				$from = $optima_societe["valeur"]." <". $mail_societe["valeur"] .">";
+			} else {
+				$societe = ATF::societe()->select(246);
+				$from = $societe["societe"]." <".$societe["email"].">";
+			}
 		}
 
 		if(!$email["objet"]){
@@ -1212,7 +1229,10 @@ class affaire_cleodis extends affaire {
 			$path = ATF::$table()->filepath($last_id,$item);
 			$mail->addFile($path,$key.$enregistrement["ref"].".pdf",true);
 		}
+		log::logger($info_mail , "mfleurquin");
 		$mail->send();
+
+
 
 		if($email["emailCopie"]){
 			$info_mail["recipient"] = $email["emailCopie"];
@@ -1762,7 +1782,8 @@ class affaire_cleodis extends affaire {
 				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk'], true);
 				if($commande){
 					$data['data'][$key]["id_commande_crypt"] = ATF::commande()->cryptId($commande['commande.id_commande']);
-					$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+					$data["data"][$key]['contat_signe'] = true;
+					// $data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
 					$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 				}else{
@@ -2542,6 +2563,7 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+
 		$utilisateur  = ATF::$usr->get("contact");
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
@@ -2605,11 +2627,10 @@ class affaire_cleodis extends affaire {
 
 			ATF::societe()->q->reset()
 				->select("id_societe")
-				->addOrder('ref',"ASC")
+				->addOrder('id_societe',"ASC")
 				->setDimension("row")
 				->setLimit(1);
 			$id_societe_codename = ATF::societe()->select_row();
-
 
 			$produits[0] = array(
 			  "devis_ligne__dot__produit"=> $post['libelle'],
@@ -2624,7 +2645,7 @@ class affaire_cleodis extends affaire {
 			  "devis_ligne__dot__commentaire"=>"",
 			  "devis_ligne__dot__neuf"=>"oui",
 			  "devis_ligne__dot__id_produit_fk"=>"",
-			  "devis_ligne__dot__id_fournisseur_fk"=>$id_societe_codename["id_societe"]
+			  "devis_ligne__dot__id_fournisseur_fk"=>$utilisateur["id_societe"]
 			);
 			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
@@ -2635,9 +2656,6 @@ class affaire_cleodis extends affaire {
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
-			if ($apporteur){
-				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
-			}
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
@@ -2780,17 +2798,8 @@ class affaire_cleodis extends affaire {
 			ATF::tache()->insert($tache);
 
             if($post["commentaire"]){
-            	//Creer un suivi pour alisson, Severine, jeanne
-            	ATF::user()->q->reset()->where("login", "tdelattre", "OR", "filles")
-            						   ->where("login", "jvasut", "OR", "filles")
-            						   ->where("login", "egerard", "OR", "filles")
-									   ->where("login", "mmysoet", "OR", "filles");
-            	$filles = ATF::user()->sa();
-            	$notifie = array();
 
-            	foreach ($filles as $key => $value) {
-            		$notifie[] = $value["id_user"];
-            	}
+				$notifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_COMMENTAIRE_AFFAIRE_PARTENAIRE__");
 
             	$suivi = array(
 					 "id_societe"=>$id_societe
@@ -3114,32 +3123,10 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe') return;
+		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe' && ATF::$codename != 'go_abonnement') return;
 
-		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
-								//->where("login", "abowe", "OR", "filles")
-								->where("login", "mmysoet", "OR", "filles")
-								->where("login", "egerard", "OR", "filles")
-								->where("login", "btronquit", "OR", "filles")
-								->where("login", "pcaminel", "OR", "filles")
-								//->where("login", "smazars", "OR", "filles")
-								->where("login", "lhochart", "OR", "filles");
+		$dest = ATF::user()->getDestinataireFromConstante("__DESTINATAIRE_NOTIFIE_TACHE_AFFAIRE_PARTENAIRE__");
 
-
-		$filles = ATF::user()->sa();
-        $dest = array();
-        foreach ($filles as $key => $value) {
-        	$dest[] = $value["id_user"];
-     	}
-
-
-		// $dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
-		// $id_user = 116; //Benjamin Tronquit
-
-		// if(ATF::$codename === "cleodisbe"){
-		// 	$dest = array("18", "21", "104", "124");  //Pierre, Allison, Severine,  Jeanne
-		// 	$id_user = 113;  //Benjamin Tronquit
-		// }
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);

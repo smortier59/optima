@@ -4367,6 +4367,7 @@ class pdf_cleodis extends pdf {
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
+				$commentaire = "";
 
 
 
@@ -4374,20 +4375,25 @@ class pdf_cleodis extends pdf {
 				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
 				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
 
-				ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
+
+				if (ATF::$codename !== "go_abonnement") {
+					ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
 										   ->where('etat','valide','AND')
 										   ->from('demande_refi','id_refinanceur','refinanceur','id_refinanceur')
 										   ->where('refinanceur.code_refi','REFACTURATION');
 
-				if($refi = ATF::demande_refi()->select_row()){
-					if($commentaire) $commentaire .= 'Information de prélèvements : ';
-					$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+					if($refi = ATF::demande_refi()->select_row()){
+						if($commentaire) $commentaire .= 'Information de prélèvements : ';
+						$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+					}
 				}
 
 
-				$data[0][0] = $commentaire;
-				$styles[0][0] = $this->styleDetailsProduit;
-				$this->tableauBigHead($head,$data,$w,5,$styles);
+				if ($commentaire != "") {
+					$data[0][0] = $commentaire;
+					$styles[0][0] = $this->styleDetailsProduit;
+					$this->tableauBigHead($head,$data,$w,5,$styles);
+				}
 			}
 
 
@@ -4398,7 +4404,7 @@ class pdf_cleodis extends pdf {
 
 		$this->SetXY(10,-30);
 		$this->setfont('arial','',7);
-		if(ATF::$codename != "bdomplus"){
+		if(ATF::$codename != "bdomplus" && ATF::$codename != "go_abonnement"){
 			$this->multicell(200,2,"Conformément à l’article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance.\nCette indemnité compensatoire sera complétée d’une indemnité moratoire correspondant au Taux BCE à sa dernière opération de refinancement majorée de 10 points, sans qu’une mise en demeure ne soit nécessaire, et ce sous toute réserve d’actions complémentaires en réparation du préjudice financier subit.");
 		}
 
@@ -5146,6 +5152,7 @@ class pdf_cleodis extends pdf {
 					,""
 					,"details"=>$this->styleDetailsProduit
 				);
+
 			}else{
 				if($this->facture['type_libre'] === "normale"){
 					//Préparation du détail
@@ -5154,10 +5161,10 @@ class pdf_cleodis extends pdf {
 					}else{
 						$data[0]['details'] = "Matériels objets de la location";
 					}
+
+
 					foreach ($this->lignes as $k => $i) {
-						$produit = ATF::produit()->select($i["id_produit"]);
-			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
 
 			        	$detail = "\n".round($i['quantite'])." ";
 			        	if($sous_categorie) $detail .= $sous_categorie." ";
@@ -5166,6 +5173,7 @@ class pdf_cleodis extends pdf {
 
 			          	$data[0]['details'] .= $detail;
 					}
+
 					$styles[0] = array(
 						""
 						,$this->colsProduitAlignLeft
@@ -5243,8 +5251,6 @@ class pdf_cleodis extends pdf {
 					)
 				);
 			}
-
-			log::logger($this->facture , "mfleurquin");
 
 
 			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
@@ -5456,9 +5462,10 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',10);
 		if(ATF::$codename == "bdomplus"){
 			$this->image($this->logo,5,5,45);
-		}else{
+		}else if(ATF::$codename == "go_abonnement") {
+			$this->image(__PDF_PATH__."/".'go_abonnement/byMyCar.jpg', 5, 5, 45);
+		} else {
 			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,5,45);
-
 		}
 
 
@@ -5592,23 +5599,26 @@ class pdf_cleodis extends pdf {
 
 		if($this->client["id_famille"] != 9){
 
-
-
-
 			$this->cell(190,10,"CET ÉCHÉANCIER VAUT FACTURE (MONTANTS EN EUROS)",1,0,'C',true);
 
 			$this->sety(110);
 
 		}
 
-
-
 		$this->setfont('arial','',8);
+		$this->setTopMargin(30);
+		$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
 
+		$tva_sur_assurance = true;
+
+		if ($this->affaire["id_type_affaire"]) {
+			if (ATF::type_affaire()->select($this->affaire["id_type_affaire"], "assurance_sans_tva") == "oui") {
+				$tva_sur_assurance = false;
+			}
+		}
 		$totaux=ATF::facturation()->montant_total($this->affaire['id_affaire'],$this->type);
+
 		if ($this->lignes) {
-			$this->setTopMargin(30);
-			$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
 			foreach ($this->lignes as $k=>$i) {
 				//Si le montant est différent c'est qu'on a changé de loyer, on le signale par une ligne
 				if($montant!=$i["montant"]){
@@ -5616,8 +5626,15 @@ class pdf_cleodis extends pdf {
 
 				if($i["type"]==$this->type) {
 					$loyer_ht=$i["montant"];
-					$tva=($i["montant"]+$i["frais_de_gestion"]+$i["assurance"])*($this->commande['tva']-1);
-					$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+
+					if ($tva_sur_assurance == false) {
+						$tva=($i["montant"]+$i["frais_de_gestion"])*($this->commande['tva']-1);
+						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+
+					} else {
+						$tva=($i["montant"]+$i["frais_de_gestion"]+$i["assurance"])*($this->commande['tva']-1);
+						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+					}
 
 					$data[] = array(
 						date("d/m/Y",strtotime($i["date_periode_debut"]))
@@ -5632,7 +5649,6 @@ class pdf_cleodis extends pdf {
 					$montant=$i["montant"];
 				}
 			}
-
 			$data[] = array("TOTAL"	,number_format($totaux["loyer"],2, ',', ' '),number_format($totaux["total_frais_de_gestion"],2, ',', ' '),number_format($totaux["total_assurance"],2, ',', ' '),number_format($totaux["tva"],2, ',', ' '),number_format($totaux["total"],2, ',', ' '));
 
 			$this->tableauBigHead($head,$data,190,5,false,270);
@@ -14759,42 +14775,6 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
 
-		/*
-		//On récupère les documents du/des produits de cette affaire
-        ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
-        $lignes = ATF::commande_ligne()->sa();
-
-        foreach ($lignes as $key => $value) {
-			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
-			if($id_doc){
-	            $doc = ATF::document_contrat()->select($id_doc);
-	            if($doc["etat"] == "actif" && $doc["type_signature"] == "commune_avec_contrat"){
-
-				    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
-				    if (file_exists($filepath)){
-				    	try {
-						    $pageCount = $this->setSourceFile($filepath);
-
-						    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-						      $tplIdx = $this->importPage($pageNo);
-
-						      // add a page
-						      $this->unsetHeader();
-					    	  $this->unsetFooter();
-						      $this->AddPage();
-						      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-						    }
-						} catch (Exception $e) {
-  							log::logger('filepath CGS = '.$filepath,"qjanon");
-							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
-							log::logger($e->getMessage(),"qjanon");
-							continue;
-						}
-					}
-				}
-			}
-		}*/
-
 	}
 
 
@@ -15698,63 +15678,418 @@ class pdf_go_abonnement extends pdf_cleodis {
 	public $bgcolorTableau = "ba9856";
 	public $txtcolorTableau = "000000";
 
+	public function factureClassiqueSociete($global=false) {
 
-	/*
-	public function contratA4Particulier($id, $signature,$sellsign) {
+		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
+			$this->bmcFacture($global, true);
+		} else {
+			parent::factureClassiqueSociete($global);
+		}
+	}
 
-		$this->initLogo($this->affaire["id_type_affaire"]);
-		$this->image($this->logo,10,10,40);
+	public function factureClassiqueParticulier($global=false) {
+
+		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+
+		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
+			$this->bmcFacture($global, false);
+		} else {
+			parent::factureClassiqueParticulier($global);
+		}
+	}
+
+	public function bmcFacture($global=false, $btob=false) {
+		if(!$global){
+			$this->open();
+		}
+
+		$this->setHeader();
+		$this->addpage();
+		$this->setMargins(15,30);
+		$this->sety(15);
 
 
-		$this->sety(10);
-		$this->multicell(0,5,"LE LOUEUR",0,'C');
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',7);
-		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
-		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
-		$this->setLeftMargin(15);
+		$this->setfont('arial','B',22);
+		if ($this->facture["prix"]>=0) {
+			if($this->facture["type_libre"] === "liberatoire"){
+				$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
+			}else{
+				$this->multicell(0,15,'FACTURE',0,'C');
+			}
+		} else {
+			$this->multicell(0,15,'AVOIR',0,'C');
+		}
+		$this->setfont('arial','',8);
+
+
+		//CADRE Societe
+		$cadre = array(
+			$this->societe['societe']
+			,$this->societe['adresse']
+			,$this->societe['adresse_2']
+			,$this->societe['cp']." ".$this->societe['ville']
+			,"Tel : ".$this->agence['tel']
+			,"N° TVA intra : FR 91 ".$this->societe["siren"]
+			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
+		);
+		$this->cadre(20,35,80,35,$cadre,"Emetteur");
+
+
+		//CADRE Client
+		if($this->client['facturation_adresse']){
+			$cadre = array(
+				 $this->client['societe']
+				,$this->client['facturation_adresse']
+				,$this->client['facturation_adresse_2']
+				,$this->client['facturation_adresse_3']
+				,$this->client['facturation_cp']." ".$this->client['facturation_ville']
+				,"Tel : ".$this->client['tel']
+			);
+		}else{
+			$cadre = array(
+				 $this->client['societe']
+				,$this->client['adresse']
+				,$this->client['adresse_2']
+				,$this->client['adresse_3']
+				,$this->client['cp']." ".$this->client['ville']
+				,"Tel : ".$this->client['tel']
+			);
+		}
+
+		$this->cadre(110,35,80,35,$cadre,"Destinataire");
+
+		$this->multicell(0,5,"A l'attention de ".$this->client['societe'].",");
 		$this->ln(5);
+		$y = $this->gety();
+
+
+		//CADRE Date
+		$cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
+		$this->cadre(10,$y,60,13,$cadre);
+
+		//CADRE Client
+		if($this->client['nom_commercial'] && $this->client['nom_commercial'] != '-'){
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).' '.($this->client['ref']?"(".$this->client['ref'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
+		}else{
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).' '.($this->client['ref']?"(".$this->client['ref'].")":NULL),"align"=>"C"));
+		}
+
+		$this->cadre(75,$y,60,13,$cadre);
+
+		//CADRE Facture
+		if ($this->facture["ref_externe"]) {
+			$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref_externe'],"align"=>"C"));
+		} else {
+			$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["ref"]?"-".$this->client["ref"]:NULL),"align"=>"C"));
+		}
+		$this->cadre(140,$y,60,13,$cadre);
+
+		if ($this->lignes) {
+			$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
+			$w = array(20,60,30,20,25,30);
+			$data = $styles = array();
+
+			$data[0][0] = "1";
+
+			$data[0][1] = "Redevance Abonnement";
+			$data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+			$data[0][1] .= "\nContrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
+
+
+			//Désignation L3
+			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+			//Désignation L4
+			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+			// Montant Facture
+			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+			// On va chercher si la tva s'applique sur l'assurance loyer ou non
+			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
+				$data[0][3] = number_format(abs(round($this->facture["prix"] * ($this->facture['tva']-1),2)),2,'.',' ')." €";
+				$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
+
+				$total = ($this->facture["prix"] * $this->facture['tva']) + $this->facture["prix_sans_tva"];
+				$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
+			}
+
+			$styles[0][1] = array("align"=>"L");
+
+			$this->tableauBigHead($head,$data,$w,5,$styles);
+
+			if ($this->facture['commentaire']) {
+				$com = array(array("Commentaire : ".$this->facture['commentaire']));
+				$sCom = array(array($this->styleDetailsProduit));
+				$this->tableau(false,$com,180,5,$sCom);
+			}
+
+			if($this->facture['type_facture'] === "libre"){
+				if($this->facture['type_libre'] == "contentieux"){
+					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
+					$sInfosTVA = array(array($this->styleDetailsProduit));
+					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
+				}
+			}
+		}
+
+
+
+		$this->ln(10);
+		$y = $this->getY();
+		$this->setfont('arial','U',8);
+		$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
+		$this->setfont('arial','',8);
+		if($this->facture["prix"]>0){
+			if($this->facture['mode_paiement']){
+				if ($this->facture['mode_paiement']=="pre-paiement") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cb") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cheque") {
+					$this->cell(0,5,"A réception de facture",0,1);
+				} elseif ($this->facture['mode_paiement']=="virement") {
+					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
+				} elseif($this->facture['mode_paiement'] !="mandat") {
+					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
+				}
+			}
+		}else{
+			$this->cell(0,5,"Par remboursement ou compensation",0,1);
+		}
+
+		if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
+			if(ATF::$codename !== "cleodisbe"){
+		      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		    }
+		}
+
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
+			$cadre = array();
+			$cadre[] = $this->societe["nom_banque"];
+			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
+			$cadre[] = "IBAN : ".$this->societe["IBAN"];
+			$cadre[] = "BIC : ".$this->societe["BIC"];
+			$this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
+		}
+
+		if ($btob) {
+			$this->setY(255);
+			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
+		}
+
+	}
+
+
+	/** PDF de l'échéancier d'une affaire
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 28-02-2011
+	*/
+	public function echeancierFacturation($id) {
+		$this->open();
+		$this->unsetHeader();
+		$this->addpage();
+
 		$this->setfont('arial','B',10);
-		$this->multicell(0,6,"L'ABONNÉ",0,'C');
+		$this->image($this->logo,5,5,45);
+
+
+		$this->setxy(100,10);
+		$this->cell(0,5,"LE LOUEUR",0,1,'L');
+
+
 		$this->setLeftMargin(65);
 		$this->setfont('arial','B',7);
-		$this->multicell(0,3,"Nom : ".$this->client['societe'],0);
-		$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
-		$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
+		$this->cell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0,1);
+		$this->cell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0,1);
+		if($this->societe['id_pays'] =='FR'){
+			$this->cell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,1);
+		}else{
+			$this->cell(0,3,"Numéro de TVA  ".$this->societe['siret'],0,1);
+		}
 
-		$this->multicell(0,3,"Mail : ".$this->client['particulier_email'],0);
+		$this->setfont('arial','B',10);
+		$this->setxy(100,28);
+		if($this->client["id_famille"] != 9){
+			$this->cell(0,6,"LE LOCATAIRE",0,1,'L');
+		}else{
+			$this->cell(0,6,"L'ABONNE",0,1,'L');
+		}
+
+		$this->setLeftMargin(65);
+
+		if($this->client["id_famille"] != 9){
+			$this->setfont('arial','B',10);
+			$this->cell(30,5,"Raison sociale : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['societe'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(20,5,"Adresse : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['adresse'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(25,5,"Code Postal : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(15,5,$this->client['cp'],0,0);
+			$this->setfont('arial','B',10);
+			$this->cell(15,5,"Ville : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(40,5,$this->client['ville'],0,1);
+			$this->setfont('arial','B',10);
+			if($this->client['id_pays'] =='FR'){
+				$this->cell(15,5,"SIRET : ",0,0);
+			}else{
+				$this->cell(35,5,"NUMERO DE TVA : ",0,0);
+			}
+			$this->setfont('arial','',10);
+			$this->cell(30,5,$this->client['siret'],0,0);
+		}else{
+
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['societe'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(20,5,"Adresse : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['adresse'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(25,5,"Code Postal : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(15,5,$this->client['cp'],0,0);
+			$this->setfont('arial','B',10);
+			$this->cell(15,5,"Ville : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(40,5,$this->client['ville'],0,1);
+		}
+
+
+		$this->setfont('arial','B',10);
+		$this->cell(10,5,"Tél. : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(15,5,$this->client['tel'],0,1);
 
 
 		$this->SetLineWidth(0.35);
 		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,60,220,60);
-		$this->setLeftMargin(15);
+		$this->setLeftMargin(10);
+		$this->sety(62);
+
 		$this->setfont('arial','B',10);
-		$this->setY(62);
+		$this->cell(45,5,"Contrat ".(($this->client["id_famille"]==9)?"d'abonnement":(($this->devis['type_contrat']=="vente"?"de vente":"de location")))." : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(80,5,$this->devis['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,0);
+		$this->setfont('arial','B',10);
 
-		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".$this->commande['ref']);
+		$this->cell(45,5,"Date départ : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(80,5,$this->dateDebut,0,1);
+		$this->setfont('arial','B',10);
+		$this->cell(45,5,"Durée : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(80,5,$this->duree." Mois",0,0);
+		$this->setfont('arial','B',10);
+		$this->cell(45,5,"Date d'expiration : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(80,5,$this->dateExpiration,0,1);
 
-		$this->ln(5);
+		$this->setfont('arial','B',10);
+
+		$this->setfont('arial','B',10);
+		$this->cell(45,5,"Terme : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(80,5,"Terme à échoir",0,1);
+
+		$this->setfont('arial','B',10);
+		$this->cell(45,5,"Mode de paiement : ",0,0);
+		$this->setfont('arial','',10);
+		$this->cell(80,5,ATF::$usr->trans($this->commande['type'],'commande'),0,1);
+
+
 
 		$this->SetLineWidth(0.35);
 		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,73,220,73);
 
-		$this->setxy(15,75);
-		$this->SetDrawColor(0,0,0);
+		$this->line(0,60,220,60);
+		$this->setLeftMargin(10);
+		$this->sety(62);
+
+		$this->sety(95);
+		$this->setdrawcolor(0,0,0);
+		$this->SetFillColor(200,200,200);
 		$this->SetLineWidth(0.2);
 
+		if($this->client["id_famille"] != 9){
 
-		$titre = "ARTICLE 1 : CONTRAT D’ABONNEMENT";
-		$texte = "L'objet du contrat est l'abonnement comprenant la mise en location d'équipements dont le détail figure ci-après ainsi que des services associés.";
+			$this->cell(190,10,"CET ÉCHÉANCIER VAUT FACTURE (MONTANTS EN EUROS)",1,0,'C',true);
 
-		$this->setfont('arial','B',8);
-		$this->cell(0,5,$titre,0,1);
+			$this->sety(110);
+
+		}
+
 		$this->setfont('arial','',8);
-		$this->multicell(0,4,$texte,0,1);
+		$this->setTopMargin(30);
+		$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
 
+		$tva_sur_assurance = true;
+
+		if ($this->affaire["id_type_affaire"]) {
+			if (ATF::type_affaire()->select($this->affaire["id_type_affaire"], "assurance_sans_tva") == "oui") {
+				$tva_sur_assurance = false;
+			}
+		}
+		$totaux=ATF::facturation()->montant_total($this->affaire['id_affaire'],$this->type);
+
+		if ($this->lignes) {
+			foreach ($this->lignes as $k=>$i) {
+				//Si le montant est différent c'est qu'on a changé de loyer, on le signale par une ligne
+				if($montant!=$i["montant"]){
+				}
+
+				if($i["type"]==$this->type) {
+					$loyer_ht=$i["montant"];
+
+					if ($tva_sur_assurance == false) {
+						$tva=($i["montant"]+$i["frais_de_gestion"])*($this->commande['tva']-1);
+						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+
+					} else {
+						$tva=($i["montant"]+$i["frais_de_gestion"]+$i["assurance"])*($this->commande['tva']-1);
+						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+					}
+
+					$data[] = array(
+						date("d/m/Y",strtotime($i["date_periode_debut"]))
+						,number_format($loyer_ht,2,","," ")
+						,number_format($i["frais_de_gestion"],2,","," ")
+						,number_format($i["assurance"],2,","," ")
+						,number_format($tva,2,","," ")
+						,number_format($total,2,","," ")
+					);
+
+					//Conserver le montant pour vérifier si on a changé de loyer
+					$montant=$i["montant"];
+				}
+			}
+			$data[] = array("TOTAL"	,number_format($totaux["loyer"],2, ',', ' '),number_format($totaux["total_frais_de_gestion"],2, ',', ' '),number_format($totaux["total_assurance"],2, ',', ' '),number_format($totaux["tva"],2, ',', ' '),number_format($totaux["total"],2, ',', ' '));
+
+			$this->tableauBigHead($head,$data,190,5,false,270);
+
+		}
+
+		$this->ln(5);
+		$this->setfont('arial','',10);
+		$this->cell(45,5,"(1) Taux de TVA (loyers) :",0,0);
+		$this->cell(10,5,(($this->commande['tva']-1)*100)." %",0,1);
+		if($this->client["id_famille"]!=9){
+			$this->cell(10,5,"(2) Exonération de TVA article 261 C2 du CGI",0,1);
+
+
+			$this->ln(5);
+			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
+
+		}
 
 	}
-	*/
-
  };
