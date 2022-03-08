@@ -8,6 +8,6 @@ if(exec('whoami')!="apache"){
 
 ATF::facturation()->facturationMensuelle();
 
-if($_SERVER["argv"][1] !== "bdomplus") ATF::facturation()->facturationMensuelleRestitution();
+if($_SERVER["argv"][1] !== "bdomplus" && $_SERVER["argv"][1] !== "go_abonnement") ATF::facturation()->facturationMensuelleRestitution();
 
 ?>

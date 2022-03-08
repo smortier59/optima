@@ -201,6 +201,7 @@ class devis_cleodis extends devis {
 		$this->addPrivilege("extjs","update");
 		$this->addPrivilege("uploadFile","update");
 		$this->addPrivilege("export_devis_loyer");
+		$this->addPrivilege("getLoyerForUpdate");
 
 		$this->formExt=true;
 		$this->no_insert = true;
@@ -280,7 +281,15 @@ class devis_cleodis extends devis {
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
-		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
+		$loyers = json_decode($infos["values_".$this->table]["loyer"],true);
+
+		foreach ($loyers as $key => $value) {
+			if ($value["loyer__dot__type"] === 'prolongation') {
+				$infos_loyer_prolongation[] = $value;
+			} else {
+				$infos_loyer[] = $value;
+			}
+		}
 
 		//Gestion AR/Avenant : soit l'un soit l'autre
 		if($infos["panel_AR-checkbox"]){
@@ -377,6 +386,7 @@ class devis_cleodis extends devis {
 
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+
 
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
@@ -573,6 +583,36 @@ class devis_cleodis extends devis {
 			$loyer_vente["id_affaire"]=$infos["id_affaire"];
 			ATF::loyer()->i($loyer_vente);
 		}
+
+		if ($infos_loyer_prolongation) {
+
+			$id_prolongation = ATF::prolongation()->i(array(
+				"id_affaire" => $infos['id_affaire'],
+				"ref" => $infos["ref"],
+				"id_societe" => $infos["id_societe"]
+			));
+
+			foreach($infos_loyer_prolongation as $key=>$item){
+				foreach($item as $k=>$i){
+					$k_unescape=util::extJSUnescapeDot($k);
+					$item[str_replace("loyer.","",$k_unescape)]=$i;
+					unset($item[$k]);
+				}
+
+				$item["id_affaire"]=$infos["id_affaire"];
+				$item["id_prolongation"] = $id_prolongation;
+				unset($item["loyer_total"]);
+				unset($item["type"]);
+				unset($item["avec_option"]);
+				if($item["frequence_loyer"]){
+					ATF::loyer_prolongation()->i($item);
+				}else{
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Il n'y a pas de fréquence pour un loyer de prolongation",876);
+				}
+			}
+		}
+
 
 		if(ATF::$codename !== "bdomplus"){
 			if($preview){
@@ -1807,4 +1847,62 @@ class devis_boulanger extends devis_cleodis { };
 
 class devis_assets extends devis_cleodis { };
 
-class devis_go_abonnement extends devis_cleodis { };
+class devis_go_abonnement extends devis_cleodis {
+
+	public function getLoyerForUpdate($post,$s) {
+
+		$loyers = $prolongations = array();
+
+		ATF::loyer()->q->reset()->where("id_affaire", $post["id_affaire"])->addOrder("id_loyer");
+		$loyers = ATF::loyer()->select_all();
+
+		ATF::loyer_prolongation()->q->reset()->where("id_affaire", $post["id_affaire"])->addOrder("id_loyer_prolongation");
+		$prolongations = ATF::loyer_prolongation()->select_all();
+
+		$res = [];
+		if ($loyers) {
+			foreach ($loyers as $key => $value) {
+				$res[] = [
+					"loyer.loyer" => $value["loyer"],
+					"loyer.id_loyer" => $value["id_loyer"],
+					"loyer.id_affaire" => $value["id_affaire"],
+					"loyer.duree" => $value["duree"],
+					"loyer.type" =>  $value["type"],
+					"loyer.assurance" => $value["assurance"],
+					"loyer.frais_de_gestion" => $value["frais_de_gestion"],
+					"loyer.serenite" => $value["serenite"],
+					"loyer.maintenance" => $value["mainteance"],
+					"loyer.hotline" =>  $value["hotline"],
+					"loyer.supervision" => $value["supervision"],
+					"loyer.support" => $value["support"],
+					"loyer.frequence_loyer" =>  $value["frequence_loyer"],
+					"loyer.avec_option" => $value["avec_option"]
+				];
+			}
+		}
+
+
+		if ($prolongations) {
+			foreach ($prolongations as $key => $value) {
+				$res[] = [
+					"loyer.id_loyer" => $value["id_loyer"],
+					"loyer.id_affaire" => $value["id_affaire"],
+					"loyer.loyer" => $value["loyer"],
+					"loyer.duree" => $value["duree"],
+					"loyer.type" =>  "prolongation",
+					"loyer.assurance" => $value["assurance"],
+					"loyer.frais_de_gestion" => $value["frais_de_gestion"],
+					"loyer.serenite" => $value["serenite"],
+					"loyer.maintenance" => $value["mainteance"],
+					"loyer.hotline" =>  $value["hotline"],
+					"loyer.supervision" => $value["supervision"],
+					"loyer.support" => $value["support"],
+					"loyer.frequence_loyer" =>  $value["frequence_loyer"],
+					"loyer.avec_option" => "non"
+				];
+			}
+		}
+		return $res;
+	}
+
+ };
