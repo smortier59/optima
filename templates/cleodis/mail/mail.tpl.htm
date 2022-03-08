@@ -1,3 +1,4 @@
+
 {if ATF::$codename !="bdomplus"  && ATF::$codename !="boulanger" }
     <?xml version="1.0" encoding="utf-8"?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
@@ -11,7 +12,7 @@
             </style>
         </head>
         <body>
-
+            
 
 
             <table cellspacing="0" cellpadding="0" border="0">
@@ -25,16 +26,17 @@
                             </td>
                         {/if}
                     {/if}
-
+                    
                     <tr>
                         <!--TEXTE DU TEMPLATE-->
                         <td align="left" valign="top" style="width:640px;">
                             <!--SI TEMPLATE SPECIFIQUE EXISTE-->
                             {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
+                                
                                 <br />{include file="mail/{$infos.template}.tpl.htm"}
                             <!--SINON PAR DEFAUT ON MET LE CONTENUE DE 'texte'-->
                             {else}
-                                {$infos["texte"]}
+                                {$infos['texte']}
                             {/if}
                         </td>
                     </tr>
