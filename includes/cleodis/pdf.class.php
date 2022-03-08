@@ -4834,15 +4834,15 @@ class pdf_cleodis extends pdf {
 		  }
 	  }
 
-
-	  if ($this->lignes_visibles) {
-		//Désignation L3
+    //Désignation L3
 		$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
 		//Désignation L4
 		list($annee,$mois,$jour)= explode("-",$this->facture['date']);
 		//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
 		// Montant Facture
 		$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+	  if ($this->lignes_visibles) {
 
 		if($this->facture['type_facture'] !== "libre"){
 		  //Préparation du détail
@@ -5139,14 +5139,15 @@ class pdf_cleodis extends pdf {
 				}
 			}
 
-			if($this->lignes_visibles) {
-				//Désignation L3
+      //Désignation L3
 				$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
 				//Désignation L4
 				list($annee,$mois,$jour)= explode("-",$this->facture['date']);
 				//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
 				// Montant Facture
 				$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+			if($this->lignes_visibles) {
 
 				if($this->facture['type_facture'] !== "libre"){
 					//Préparation du détail
@@ -14492,14 +14493,15 @@ class pdf_bdomplus extends pdf_cleodis {
 				}
 			}
 
-			if ($this->lignes_visibles) {
-				//Désignation L3
+      //Désignation L3
 				$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
 				//Désignation L4
 				list($annee,$mois,$jour)= explode("-",$this->facture['date']);
 				//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
 				// Montant Facture
 				$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+			if ($this->lignes_visibles) {
 
 				if($this->facture['type_facture'] !== "libre"){
 					//Préparation du détail
