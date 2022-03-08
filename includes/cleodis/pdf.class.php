@@ -4325,8 +4325,12 @@ class pdf_cleodis extends pdf {
 		$this->pdf_facture = true;
 
 		$this->facture = ATF::facture()->select($id);
-		ATF::facture_ligne()->q->reset()->where("visible","oui")->where("afficher","oui")->where("id_facture",$this->facture['id_facture']);
+
+		ATF::facture_ligne()->q->reset()->where("id_facture",$this->facture['id_facture']);
 		$this->lignes = ATF::facture_ligne()->sa();
+
+		ATF::facture_ligne()->q->reset()->where("visible","oui")->where("afficher","oui")->where("id_facture",$this->facture['id_facture']);
+		$this->lignes_visibles = ATF::facture_ligne()->sa();
 
 		$this->client = ATF::societe()->select($this->facture['id_societe']);
 		$this->affaire = ATF::affaire()->select($this->facture['id_affaire']);
@@ -4825,67 +4829,72 @@ class pdf_cleodis extends pdf {
 		  }
 		}
 	  }
-	  //Désignation L3
-	  $data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
-	  //Désignation L4
-	  list($annee,$mois,$jour)= explode("-",$this->facture['date']);
-	  //$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
-	  // Montant Facture
-	  $data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-      if($this->facture['type_facture'] !== "libre"){
-        //Préparation du détail
-        if($this->affaire['nature']=="vente"){
-          $data[0]['details'] = "Equipements objets de la vente";
-        }elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-        }else{  $data[0]['details'] = "Matériels objets de la location"; }
-        foreach ($this->lignes as $k => $i) {
-        	$produit = ATF::produit()->select($i["id_produit"]);
-        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
 
-        	$detail = "\n".round($i['quantite'])." ";
-        	if($sous_categorie) $detail .= $sous_categorie." ";
-        	if($fabriquant) $detail .= $fabriquant." ";
-        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+	  if ($this->lignes_visibles) {
+		//Désignation L3
+		$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+		//Désignation L4
+		list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+		//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+		// Montant Facture
+		$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-		    $data[0]['details'] .= $detail;
-        }
-        $styles[0] = array(
-          ""
-          ,$this->colsProduitAlignLeft
-          ,""
-          ,"details"=>$this->styleDetailsProduit
-        );
-      }else{
-        if($this->facture['type_libre'] === "normale"){
-          //Préparation du détail
-          if($this->affaire['nature']=="vente"){
-            $data[0]['details'] = "Equipements objets de la vente";
-          }else{
-            $data[0]['details'] = "Matériels objets de la location";
-          }
-          foreach ($this->lignes as $k => $i) {
+		if($this->facture['type_facture'] !== "libre"){
+		  //Préparation du détail
+		  if($this->affaire['nature']=="vente"){
+			$data[0]['details'] = "Equipements objets de la vente";
+		  }elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
+		  }else{  $data[0]['details'] = "Matériels objets de la location"; }
+		  foreach ($this->lignes_visibles as $k => $i) {
+			  $produit = ATF::produit()->select($i["id_produit"]);
+			  $sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+			  $fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
 
-            	$produit = ATF::produit()->select($i["id_produit"]);
-	        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-	        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+			  $detail = "\n".round($i['quantite'])." ";
+			  if($sous_categorie) $detail .= $sous_categorie." ";
+			  if($fabriquant) $detail .= $fabriquant." ";
+			  $detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
 
-	        	$detail = "\n".round($i['quantite'])." ";
-	        	if($sous_categorie) $detail .= $sous_categorie." ";
-	        	if($fabriquant) $detail .= $fabriquant." ";
-	        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+			  $data[0]['details'] .= $detail;
+		  }
+		  $styles[0] = array(
+			""
+			,$this->colsProduitAlignLeft
+			,""
+			,"details"=>$this->styleDetailsProduit
+		  );
+		}else{
+		  if($this->facture['type_libre'] === "normale"){
+			//Préparation du détail
+			if($this->affaire['nature']=="vente"){
+			  $data[0]['details'] = "Equipements objets de la vente";
+			}else{
+			  $data[0]['details'] = "Matériels objets de la location";
+			}
+			foreach ($this->lignes_visibles as $k => $i) {
 
-	          	$data[0]['details'] .= $detail;
-          }
-          $styles[0] = array(
-            ""
-            ,$this->colsProduitAlignLeft
-            ,""
-            ,"details"=>$this->styleDetailsProduit
-          );
-        }
-      }
+				  $produit = ATF::produit()->select($i["id_produit"]);
+				  $sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+				  $fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+				  $detail = "\n".round($i['quantite'])." ";
+				  if($sous_categorie) $detail .= $sous_categorie." ";
+				  if($fabriquant) $detail .= $fabriquant." ";
+				  $detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+					$data[0]['details'] .= $detail;
+			}
+			$styles[0] = array(
+			  ""
+			  ,$this->colsProduitAlignLeft
+			  ,""
+			  ,"details"=>$this->styleDetailsProduit
+			);
+		  }
+		}
+	  }
+
 
 	  $this->tableauBigHead($head,$data,$w,5,$styles);
 
@@ -5120,68 +5129,72 @@ class pdf_cleodis extends pdf {
 					}
 				}
 			}
-			//Désignation L3
-			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
-			//Désignation L4
-			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
-			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
-			// Montant Facture
-			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-			if($this->facture['type_facture'] !== "libre"){
-				//Préparation du détail
-				if($this->affaire['nature']=="vente"){
-					$data[0]['details'] = "Equipements objets de la vente";
-				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-				}else{	$data[0]['details'] = "Matériels objets de la location"; }
-				foreach ($this->lignes as $k => $i) {
-					$produit = ATF::produit()->select($i["id_produit"]);
-		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+			if($this->lignes_visibles) {
+				//Désignation L3
+				$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+				//Désignation L4
+				list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+				//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+				// Montant Facture
+				$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-		        	$detail = "\n".round($i['quantite'])." ";
-		        	if($sous_categorie) $detail .= $sous_categorie." ";
-		        	if($fabriquant) $detail .= $fabriquant." ";
-		        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
-
-		          	$data[0]['details'] .= $detail;
-				}
-				$styles[0] = array(
-					""
-					,$this->colsProduitAlignLeft
-					,""
-					,"details"=>$this->styleDetailsProduit
-				);
-
-			}else{
-				if($this->facture['type_libre'] === "normale"){
+				if($this->facture['type_facture'] !== "libre"){
 					//Préparation du détail
 					if($this->affaire['nature']=="vente"){
 						$data[0]['details'] = "Equipements objets de la vente";
-					}else{
-						$data[0]['details'] = "Matériels objets de la location";
+					}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
+					}else{	$data[0]['details'] = "Matériels objets de la location"; }
+					foreach ($this->lignes_visibles as $k => $i) {
+						$produit = ATF::produit()->select($i["id_produit"]);
+						$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+						$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+						$detail = "\n".round($i['quantite'])." ";
+						if($sous_categorie) $detail .= $sous_categorie." ";
+						if($fabriquant) $detail .= $fabriquant." ";
+						$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+						$data[0]['details'] .= $detail;
 					}
-
-
-					foreach ($this->lignes as $k => $i) {
-
-
-			        	$detail = "\n".round($i['quantite'])." ";
-			        	if($sous_categorie) $detail .= $sous_categorie." ";
-			        	if($fabriquant) $detail .= $fabriquant." ";
-			        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
-
-			          	$data[0]['details'] .= $detail;
-					}
-
 					$styles[0] = array(
 						""
 						,$this->colsProduitAlignLeft
 						,""
 						,"details"=>$this->styleDetailsProduit
 					);
+
+				}else{
+					if($this->facture['type_libre'] === "normale"){
+						//Préparation du détail
+						if($this->affaire['nature']=="vente"){
+							$data[0]['details'] = "Equipements objets de la vente";
+						}else{
+							$data[0]['details'] = "Matériels objets de la location";
+						}
+
+
+						foreach ($this->lignes_visibles as $k => $i) {
+
+
+							$detail = "\n".round($i['quantite'])." ";
+							if($sous_categorie) $detail .= $sous_categorie." ";
+							if($fabriquant) $detail .= $fabriquant." ";
+							$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+							$data[0]['details'] .= $detail;
+						}
+
+						$styles[0] = array(
+							""
+							,$this->colsProduitAlignLeft
+							,""
+							,"details"=>$this->styleDetailsProduit
+						);
+					}
 				}
 			}
+
 
 			$this->tableauBigHead($head,$data,$w,5,$styles);
 
@@ -14469,57 +14482,33 @@ class pdf_bdomplus extends pdf_cleodis {
 					}
 				}
 			}
-			//Désignation L3
-			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
-			//Désignation L4
-			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
-			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
-			// Montant Facture
-			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-			if($this->facture['type_facture'] !== "libre"){
-				//Préparation du détail
-				if($this->affaire['nature']=="vente"){
-					$data[0]['details'] = "Matériels/services objets de la vente";
-				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-				}else{	$data[0]['details'] = "Matériels/services objets de la location"; }
-				foreach ($this->lignes as $k => $i) {
-					$produit = ATF::produit()->select($i["id_produit"]);
-		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+			if ($this->lignes_visibles) {
+				//Désignation L3
+				$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+				//Désignation L4
+				list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+				//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+				// Montant Facture
+				$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-		        	$detail = "\n".round($i['quantite'])." ";
-		        	if($sous_categorie) $detail .= $sous_categorie." ";
-		        	if($fabriquant) $detail .= $fabriquant." ";
-		        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
-
-		          	$data[0]['details'] .= $detail;
-				}
-				$styles[0] = array(
-					""
-					,$this->colsProduitAlignLeft
-					,""
-					,"details"=>$this->styleDetailsProduit
-				);
-			}else{
-				if($this->facture['type_libre'] === "normale"){
+				if($this->facture['type_facture'] !== "libre"){
 					//Préparation du détail
 					if($this->affaire['nature']=="vente"){
 						$data[0]['details'] = "Matériels/services objets de la vente";
-					}else{
-						$data[0]['details'] = "Matériels/services objets du contrat";
-					}
-					foreach ($this->lignes as $k => $i) {
+					}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
+					}else{	$data[0]['details'] = "Matériels/services objets de la location"; }
+					foreach ($this->lignes_visibles as $k => $i) {
 						$produit = ATF::produit()->select($i["id_produit"]);
-			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+						$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+						$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
 
-			        	$detail = "\n".round($i['quantite'])." ";
-			        	if($sous_categorie) $detail .= $sous_categorie." ";
-			        	if($fabriquant) $detail .= $fabriquant." ";
-			        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+						$detail = "\n".round($i['quantite'])." ";
+						if($sous_categorie) $detail .= $sous_categorie." ";
+						if($fabriquant) $detail .= $fabriquant." ";
+						$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
 
-			          	$data[0]['details'] .= $detail;
+						$data[0]['details'] .= $detail;
 					}
 					$styles[0] = array(
 						""
@@ -14527,8 +14516,36 @@ class pdf_bdomplus extends pdf_cleodis {
 						,""
 						,"details"=>$this->styleDetailsProduit
 					);
+				}else{
+					if($this->facture['type_libre'] === "normale"){
+						//Préparation du détail
+						if($this->affaire['nature']=="vente"){
+							$data[0]['details'] = "Matériels/services objets de la vente";
+						}else{
+							$data[0]['details'] = "Matériels/services objets du contrat";
+						}
+						foreach ($this->lignes_visibles as $k => $i) {
+							$produit = ATF::produit()->select($i["id_produit"]);
+							$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+							$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+							$detail = "\n".round($i['quantite'])." ";
+							if($sous_categorie) $detail .= $sous_categorie." ";
+							if($fabriquant) $detail .= $fabriquant." ";
+							$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+							$data[0]['details'] .= $detail;
+						}
+						$styles[0] = array(
+							""
+							,$this->colsProduitAlignLeft
+							,""
+							,"details"=>$this->styleDetailsProduit
+						);
+					}
 				}
 			}
+
 
 			$this->tableauBigHead($head,$data,$w,5,$styles);
 
