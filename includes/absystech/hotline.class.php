@@ -408,7 +408,20 @@ class hotline extends classes_optima {
 			if($heures < 10) $heures = "0".$heures;
 			$minutes = ($sec-($heures*3600))/60;
 			if($minutes < 10) $minutes = "0".$minutes;
-			return $heures."H".$minutes;
+
+			$durees = "";
+			if($type=="dep"){
+				if($minutes < 10){
+					$durees=  $heures."H".$minutes;
+				}else{
+					$durees =  $heures."H".intval($minutes);
+				}
+			}else{
+				$durees =  $heures."H".$minutes;
+			}
+
+			return $durees;
+
 		}
 	}
 
