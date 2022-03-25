@@ -1505,7 +1505,6 @@ class affaire_cleodis extends affaire {
 	*/
 	public function _affairePortailToshiba($get,$post) {
 
-
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
 
@@ -1827,7 +1826,9 @@ class affaire_cleodis extends affaire {
 			       ->addField("id_bon_de_commande")
 			       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
 			       ->where("affaire.id_affaire", ATF::affaire()->decryptId($data['data'][$key]['id_affaire_fk']), "AND")
+				   ->where("bon_de_commande.id_fournisseur", $apporteur, "AND")
 			       ->setDimension('cell');
+
 			    if($id_bon_de_commande = ATF::bon_de_commande()->sa()){
 			    	$data['data'][$key]["bon_de_commande"] = true;
 			    	$data['data'][$key]["id_bon_de_commande_crypt"] = ATF::bon_de_commande()->cryptId($id_bon_de_commande);
