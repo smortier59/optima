@@ -4347,8 +4347,31 @@ class affaire_go_abonnement extends affaire_cleodis {
 	   	);
 	   	$this->panels['specifique_goa'] = array("visible"=>true, 'nbCols'=>1);
 
-		$this->fieldstructure();
+		$this->onglets = array(
+			'affaire_etat'
+			,'loyer'
+			,"sell_and_sign"
+			,'loyer_kilometrage'
+			,'devis'=>array('opened'=>true)
+			,'comite'=>array('opened'=>true)
+			,'commande'=>array('opened'=>true)
+			,'prolongation'
+			,'loyer_prolongation'
+			,'bon_de_commande'
+			,'demande_refi'
+			,'facture'=>array('opened'=>true)
+			,'facture_fournisseur'
+			,'facture_non_parvenue'
+			,'facturation'
+			,'intervention'
+			,'parc'
+			,'livraison'
+			,'suivi'
+			,'tache'
+			,"pdf_affaire"
+		);
 
+		$this->fieldstructure();
 
 		$this->addPrivilege("updateSpecifiqueGOA");
 
