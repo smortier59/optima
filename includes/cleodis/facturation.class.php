@@ -6,7 +6,7 @@
 */
 class facturation extends classes_optima {
 
-	public $user_facturation = array(16,91);
+	public $user_facturation = array(16);
 
 	function __construct() {
 		$this->table="facturation";
@@ -1650,7 +1650,7 @@ class facturation extends classes_optima {
 						$facture["date_paiement"] = NULL;
 					}
 
-					if(ATF::$codename == "bdomplus") $facture["date_paiement"] = NULL;
+					if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement" || ATF::$codename == "assets") $facture["date_paiement"] = NULL;
 
 					$id_facture=ATF::facture()->i($facture);
 
@@ -1707,11 +1707,13 @@ class facturation extends classes_optima {
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
 
-class facturation_bdomplus extends facturation {
-	public $user_facturation = array(16,116);
+class facturation_assets extends facturation {
+	public $user_facturation = array(16);
 };
-class facturation_bdom extends facturation { };
-class facturation_boulanger extends facturation { };
+
+class facturation_bdomplus extends facturation {
+	public $user_facturation = array(16);
+};
 
 class facturation_go_abonnement extends facturation {
 	public $user_facturation = array(16,116);
