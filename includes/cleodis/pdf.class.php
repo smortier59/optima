@@ -4798,36 +4798,40 @@ class pdf_cleodis extends pdf {
 	  $data = $styles = array();
 	  //Quantite
 	  $data[0][0] = "1";
-	  if($this->facture['type_facture'] !== "libre") {
-		//Désignation L1
-		if($this->affaire['nature']=="vente"){
-		  $data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-		}else{
-		  if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-		  }else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
-		}
-		//Désignation L2
-		if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
-		  $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-		}
-	  }else{
-		if($this->facture['type_libre'] === "normale"){
-		  //Désignation L1
-		  if($this->affaire['nature']=="vente"){
-			$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-		  }else{
-			if($this->facture["redevance"] === "oui"){
-			  if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-			  }else{  $data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+	  if ($this->facture['designation']) {
+		$data[0][1] = $this->facture['designation'];
+	  } else {
+		if($this->facture['type_facture'] !== "libre") {
+			//Désignation L1
+			if($this->affaire['nature']=="vente"){
+			  $data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+			}else{
+			  if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+			  }else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
 			}
-		  }
-		  //Désignation L2
-		  if($this->facture["redevance"] === "oui"){
+			//Désignation L2
 			if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
 			  $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
 			}
+		  }else{
+			if($this->facture['type_libre'] === "normale"){
+			  //Désignation L1
+			  if($this->affaire['nature']=="vente"){
+				$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+			  }else{
+				if($this->facture["redevance"] === "oui"){
+				  if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+				  }else{  $data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+				}
+			  }
+			  //Désignation L2
+			  if($this->facture["redevance"] === "oui"){
+				if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+				  $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+				}
+			  }
+			}
 		  }
-		}
 	  }
 
 	  //Désignation L3
@@ -5099,33 +5103,38 @@ class pdf_cleodis extends pdf {
 			$data = $styles = array();
 			//Quantite
 			$data[0][0] = "1";
-			if($this->facture['type_facture'] !== "libre") {
-				//Désignation L1
-				if($this->affaire['nature']=="vente"){
-					$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-				}else{
-					if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-					}else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
-				}
-				//Désignation L2
-				if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
-					$data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-				}
-			}else{
-				if($this->facture['type_libre'] === "normale"){
+
+			if ($this->facture['designation']) {
+				$data[0][1] = $this->facture['designation'];
+			} else {
+				if($this->facture['type_facture'] !== "libre") {
 					//Désignation L1
 					if($this->affaire['nature']=="vente"){
 						$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
 					}else{
-						if($this->facture["redevance"] === "oui"){
-							if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-							}else{	$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
-						}
+						if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+						}else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
 					}
 					//Désignation L2
-					if($this->facture["redevance"] === "oui"){
-						if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
-							$data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+					if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+						$data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+					}
+				}else{
+					if($this->facture['type_libre'] === "normale"){
+						//Désignation L1
+						if($this->affaire['nature']=="vente"){
+							$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+						}else{
+							if($this->facture["redevance"] === "oui"){
+								if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+								}else{	$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+							}
+						}
+						//Désignation L2
+						if($this->facture["redevance"] === "oui"){
+							if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+								$data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+							}
 						}
 					}
 				}
@@ -5138,6 +5147,8 @@ class pdf_cleodis extends pdf {
       //$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
       // Montant Facture
       $data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+			if($this->lignes_visibles) {
 
 			if($this->lignes_visibles) {
 
@@ -15810,16 +15821,26 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->cadre(140,$y,60,13,$cadre);
 
 		if ($this->lignes) {
-			$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
-			$w = array(20,60,30,20,25,30);
+			if ($this->facture["prix_sans_tva"] == 0) {
+				$head = array("Quantité","Désignation","Montant HT", 'TVA', 'TOTAL TTC');
+				$w = array(20,85,30,20,30);
+			} else {
+				$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
+				$w = array(20,60,30,20,25,30);
+			}
 			$data = $styles = array();
 
 			$data[0][0] = "1";
 
-			$data[0][1] = "Redevance Abonnement";
-			$data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-			$data[0][1] .= "\nContrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
-
+			if ($this->facture['designation']) {
+				$data[0][1] = $this->facture['designation'];
+			} else {
+			    if($this->facture["redevance"] === "oui"){
+				    $data[0][1] = "Redevance Abonnement";
+				    $data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+				    $data[0][1] .= "\nContrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
+                }
+			}
 
 			//Désignation L3
 			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
@@ -15833,10 +15854,13 @@ class pdf_go_abonnement extends pdf_cleodis {
 			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
 			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
 				$data[0][3] = number_format(abs(round($this->facture["prix"] * ($this->facture['tva']-1),2)),2,'.',' ')." €";
-				$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
-
 				$total = ($this->facture["prix"] * $this->facture['tva']) + $this->facture["prix_sans_tva"];
-				$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
+				if ($this->facture["prix_sans_tva"] == 0) {
+					$data[0][4] = number_format(abs(round($total,2)),2,'.',' ')." €";
+				} else {
+					$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
+					$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
+				}
 			}
 
 			$styles[0][1] = array("align"=>"L");
