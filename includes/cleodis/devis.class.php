@@ -291,6 +291,10 @@ class devis_cleodis extends devis {
 			}
 		}
 
+		if (ATF::$codename === "go_abonnement") {
+			$infos_loyer_kilometrage = json_decode($infos["values_".$this->table]["loyer_kilometrage"],true);
+		}
+
 		//Gestion AR/Avenant : soit l'un soit l'autre
 		if($infos["panel_AR-checkbox"]){
 			$infos_AR=$this->getArrayAvenantARVente($infos["AR"],"AR");
@@ -436,6 +440,18 @@ class devis_cleodis extends devis {
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
+
+
+		if (ATF::$codename === "go_abonnement" && $infos_loyer_kilometrage) {
+			foreach ($infos_loyer_kilometrage as $klk => $vlk) {
+				ATF::loyer_kilometrage()->insert(array(
+					"loyer" => $vlk['loyer_kilometrage__dot__loyer'],
+					"kilometrage" => $vlk['loyer_kilometrage__dot__kilometrage'],
+					"id_affaire" => $infos["id_affaire"]
+				));
+			}
+		}
+
 		$infos["ref"]=$affaire["ref"];
 
 		////////////////Opportunité
@@ -716,6 +732,8 @@ class devis_cleodis extends devis {
 					   ->addCondition("id_affaire",$devis["id_affaire"]);
 		$demande_refis=ATF::demande_refi()->sa();
 
+
+
 		ATF::db($this->db)->begin_transaction();
 
 		ATF::affaire()->q->reset()->addCondition("id_fille",$affaire["id_affaire"]);
@@ -837,6 +855,7 @@ class devis_cleodis extends devis {
 			ATF::demande_refi()->i($item);
 		}
 
+
 		if($infos["preview"]){
 			ATF::db($this->db)->rollback_transaction();
 			return $this->cryptId($last_id);
@@ -848,6 +867,7 @@ class devis_cleodis extends devis {
 			}
 			return $last_id;
 		}
+
 
 	}
 
@@ -1848,6 +1868,15 @@ class devis_boulanger extends devis_cleodis { };
 class devis_assets extends devis_cleodis { };
 
 class devis_go_abonnement extends devis_cleodis {
+
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+		$this->colonnes['panel']['loyer_kilometrage_lignes'] = array(
+			"loyer_kilometrage"=>array("custom"=>true)
+		);
+		$this->panels['loyer_kilometrage_lignes'] = array("visible"=>true, 'nbCols'=>1);
+		$this->fieldstructure();
+	}
 
 	public function getLoyerForUpdate($post,$s) {
 
