@@ -714,7 +714,6 @@ class facture_cleodis extends facture {
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
 
-
 		$commande=ATF::commande()->select($infos["id_commande"]);
 		$infos["id_affaire"]=$commande["id_affaire"];
 		$infos["tva"]=$commande["tva"];
@@ -737,9 +736,11 @@ class facture_cleodis extends facture {
 			$infos["id_refinanceur"]=$demande_refi["id_refinanceur"];
 			unset($infos["date_periode_debut"],$infos["date_periode_fin"]);
 		}elseif($infos["type_facture"]=="libre"){
+	
 			$infos["prix"]=$infos["prix_libre"];
 			$infos["date_periode_debut"]=$infos["date_periode_debut_libre"];
 			$infos["date_periode_fin"]=$infos["date_periode_fin_libre"];
+
 
 			if($infos["type_libre"] == "contentieux") $infos["tva"] = 1;
 
@@ -841,6 +842,7 @@ class facture_cleodis extends facture {
 
 		////////////////Facture
 		unset($infos["marge"],$infos["marge_absolue"],$infos["prix_achat"]);
+
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		////////////////Facturation
@@ -933,7 +935,42 @@ class facture_cleodis extends facture {
         }
 	}
 
+	public function _createFactureLibre($get, $post){
+		
 
+		try{
+			if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
+
+			if(!$post['type_libre']) throw new errorATF("TYPE_LIBRE EST OBLIGATOIRE", 500);
+			if(!$post['date']) throw new errorATF("LA DATE EST OBLIGATOIRE", 500);
+			if(!$post['prix_sans_tva']) throw new errorATF("PRIX_SANS_TVA EST OBLIGATOIRE", 500);
+			if(!$post['prix_libre']) throw new errorATF("LE PRIX_LIBRE EST OBLIGATOIRE", 500);
+			if($post['type_facture'] != "libre") throw new errorATF("LE TYPE DE FACTURE DOIT ETRE DE TYPE LIBRE", 500);
+			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 500);
+			if(!$post['date_periode_fin_libre']) throw new errorATF("DATE_PERIODE_FIN_LIBRE EST OBLIGATOIRE", 500);
+			if(!$post['date_periode_debut_libre']) throw new errorATF("DATE_PERIODE_DEBUT_LIBRE EST OBLIGATOIRE", 500);
+
+			unset($post['schema']);
+
+			$affaire = ATF::affaire()->select($post["id_affaire"]);
+			ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
+			$commande = ATF::commande()->select_row();
+			if($commande){
+				$post['id_commande'] = $commande['commande.id_commande'];
+			}
+
+			if($affaire['id_societe']){
+				$post['id_societe'] = $affaire['id_societe'];
+			}
+
+			$return = $this->insert($post,$s,NULL,$var=NULL,NULL,true);
+
+		} catch(errorATF $e){
+			$msg = $e->getMessage();
+			throw new errorATF('Error:'.$msg, 500);
+			return false;
+		}
+	}
 
 
 
