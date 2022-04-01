@@ -939,22 +939,28 @@ class facture_cleodis extends facture {
 		
 
 		try{
-			if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
+			if(!$post) throw new errorATF("DATA_MANQUANTE", 400);
 
-			if(!$post['type_libre']) throw new errorATF("TYPE_LIBRE EST OBLIGATOIRE", 500);
-			if(!$post['date']) throw new errorATF("LA DATE EST OBLIGATOIRE", 500);
-			if(!$post['prix_libre']) throw new errorATF("LE PRIX_LIBRE EST OBLIGATOIRE", 500);
-			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 500);
-			if(!$post['type_facture']) $post['type_facture'] = "libre";
+			if(!$post['type_libre']) throw new errorATF("TYPE_LIBRE EST OBLIGATOIRE", 400);
+			if(!$post['date']) throw new errorATF("LA DATE EST OBLIGATOIRE", 400);
+			if(!$post['prix_libre']) throw new errorATF("LE PRIX_LIBRE EST OBLIGATOIRE", 400);
+			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 400);
 
 			unset($post['schema']);
 
 			$affaire = ATF::affaire()->select($post["id_affaire"]);
+
 			ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
+
 			$commande = ATF::commande()->select_row();
+
+			if(!$commande['commande.id_commande']) throw new errorATF("ID_COMMANDE INTROUVABLE", 404);
+
 			if($commande){
 				$post['id_commande'] = $commande['commande.id_commande'];
 			}
+
+			if(!$affaire['id_societe']) throw new errorATF("ID_SOCIETE INTROUVABLE", 404);
 
 			if($affaire['id_societe']){
 				$post['id_societe'] = $affaire['id_societe'];
