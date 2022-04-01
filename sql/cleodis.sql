@@ -1,7 +1,3 @@
-
-ALTER TABLE `facture` ADD `designation` TEXT NULL DEFAULT NULL AFTER `ref_magasin`;
-ALTER TABLE `loyer` CHANGE `type` `type` ENUM('engagement','liberatoire','prolongation') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'engagement';
-
 CREATE OR REPLACE
 ALGORITHM = UNDEFINED VIEW `abonnement_client` AS
 select
