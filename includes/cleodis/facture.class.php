@@ -27,6 +27,8 @@ class facture_cleodis extends facture {
             ,'facture.date_rejet'=>array("renderer"=>"updateDate","width"=>170)
             ,'facture.date_regularisation'=>array("renderer"=>"updateDate","width"=>170)
             ,'facture.nature'
+			,'facture.date_envoi'=>array("renderer"=>"updateDate","width"=>170)
+			,'facture.envoye'
 		);
 
 		// Panel principal
@@ -948,47 +950,110 @@ class facture_cleodis extends facture {
 		$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
 		$facture = ATF::facture()->select($infos["id_facture"]);
 
-		if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")) {
+		if ($infos["key"] == "date_envoi") {
 
-			if($infos["key"] == "date_regularisation") {
-				$this->updateEnumRejet($infos);
-
-				if ($infos["value"] != "" && $infos["value"] != NULL) {
-					if ($facture["date_paiement"] == NULL) {
-						$infosMaj["date_paiement"] = $infos["value"];
-					}
-				} else {
-					if ($facture["date_paiement"]) {
-						$infosMaj["date_paiement"] = NULL;
-					}
-				}
-			}
-
-			if ($infos["key"] == "date_rejet") {
-				if ($infos["value"] == "" || $infos["value"] == NULL) {
-					if ( $facture["date_regularisation"] ) {
-						$infosMaj["date_regularisation"] = NULL;
-					}
-				}
-			}
-
-			$infosMaj["id_facture"] = $infos["id_facture"];
-
-			if($this->u($infosMaj)) {
-				ATF::$msg->addNotice(
-					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-					,ATF::$usr->trans("notice_success_title")
-				);
-			}
-
-			$factureAfter = ATF::facture()->select($infosMaj["id_facture"]);
-			if ($factureAfter["date_paiement"] && !$factureAfter["date_rejet"]) {
-				ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
+			if ($facture["envoye"] === "oui") {
+				throw new errorATF("Facture déja envoyée", 400);
 			} else {
-				if ($factureAfter["date_regularisation"]) {
+				if ($infos["value"] && date("Ymd", strtotime($infos["value"])) < date("Ymd")) throw new errorATF("Impossible de prévoir un envoi anterieur à la date du jour !!", 400);
+
+				ATF::facture()->u($infosMaj);
+			}
+
+		} else {
+			if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")) {
+
+				if($infos["key"] == "date_regularisation") {
+					$this->updateEnumRejet($infos);
+
+					if ($infos["value"] != "" && $infos["value"] != NULL) {
+						if ($facture["date_paiement"] == NULL) {
+							$infosMaj["date_paiement"] = $infos["value"];
+						}
+					} else {
+						if ($facture["date_paiement"]) {
+							$infosMaj["date_paiement"] = NULL;
+						}
+					}
+				}
+
+				if ($infos["key"] == "date_rejet") {
+					if ($infos["value"] == "" || $infos["value"] == NULL) {
+						if ( $facture["date_regularisation"] ) {
+							$infosMaj["date_regularisation"] = NULL;
+						}
+					}
+				}
+
+				$infosMaj["id_facture"] = $infos["id_facture"];
+
+				if($this->u($infosMaj)) {
+					ATF::$msg->addNotice(
+						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+						,ATF::$usr->trans("notice_success_title")
+					);
+				}
+
+				$factureAfter = ATF::facture()->select($infosMaj["id_facture"]);
+				if ($factureAfter["date_paiement"] && !$factureAfter["date_rejet"]) {
 					ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
 				} else {
-					ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "impayee"));
+					if ($factureAfter["date_regularisation"]) {
+						ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
+					} else {
+						ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "impayee"));
+					}
+				}
+
+				$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+				ATF::commande()->checkEtatContentieux($commande);
+
+				// log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
+				ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
+
+				// log::logger("################################# FIN", "updateDate");
+				return true;
+			} else {
+				switch($infos["key"]) {
+					case "date_paiement" :
+						// SUPPRESSION DE LA DATE DE PAIEMENT
+						if ($infos["value"] == "" || $infos["value"] == NULL) {
+							if ($facture["date_rejet"] == NULL && $facture["rejet"] != "non_rejet") {
+								$infosMaj["date_rejet"] = date("Y-m-d", strtotime("-1 days"));
+							}
+							if($facture["date_regularisation"]) $infosMaj["date_regularisation"] = NULL;
+						} else {
+							if ($facture["date_rejet"] !== NULL && $facture["date_regularisation"] === NULL){
+								$infosMaj["date_regularisation"] = $infos["value"];
+							}
+						}
+					break;
+
+				}
+
+				if($infosMaj[$infos["key"]]) {
+					$infosMaj["etat"]="payee";
+				} else {
+					$infosMaj["etat"]="impayee";
+				}
+
+
+				if($this->u($infosMaj)) {
+					ATF::$msg->addNotice(
+						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+						,ATF::$usr->trans("notice_success_title")
+					);
+				}
+
+				$factureAfter = ATF::facture()->select($infosMaj["id_facture"]);
+				if ($factureAfter["date_paiement"] && !$factureAfter["date_rejet"]) {
+					ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
+				} else {
+					if ($factureAfter["date_regularisation"]) {
+						ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
+					} else {
+						ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "impayee"));
+					}
 				}
 			}
 
@@ -999,58 +1064,8 @@ class facture_cleodis extends facture {
 			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
 
 			// log::logger("################################# FIN", "updateDate");
-			return true;
-		} else {
-			switch($infos["key"]) {
-				case "date_paiement" :
-					// SUPPRESSION DE LA DATE DE PAIEMENT
-					if ($infos["value"] == "" || $infos["value"] == NULL) {
-						if ($facture["date_rejet"] == NULL && $facture["rejet"] != "non_rejet") {
-							$infosMaj["date_rejet"] = date("Y-m-d", strtotime("-1 days"));
-						}
-						if($facture["date_regularisation"]) $infosMaj["date_regularisation"] = NULL;
-					} else {
-						if ($facture["date_rejet"] !== NULL && $facture["date_regularisation"] === NULL){
-							$infosMaj["date_regularisation"] = $infos["value"];
-						}
-					}
-				break;
 
-			}
-
-			if($infosMaj[$infos["key"]]) {
-				$infosMaj["etat"]="payee";
-			} else {
-				$infosMaj["etat"]="impayee";
-			}
-
-
-			if($this->u($infosMaj)) {
-				ATF::$msg->addNotice(
-					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-					,ATF::$usr->trans("notice_success_title")
-				);
-			}
-
-			$factureAfter = ATF::facture()->select($infosMaj["id_facture"]);
-			if ($factureAfter["date_paiement"] && !$factureAfter["date_rejet"]) {
-				ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
-			} else {
-				if ($factureAfter["date_regularisation"]) {
-					ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "payee"));
-				} else {
-					ATF::facture()->u(array("id_facture"=> $infos["id_facture"], "etat" => "impayee"));
-				}
-			}
 		}
-
-		$commande = $this->select($infos["id_facture"] , "facture.id_commande");
-		ATF::commande()->checkEtatContentieux($commande);
-
-		// log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
-		ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
-
-		// log::logger("################################# FIN", "updateDate");
 
 		return true;
 	}
