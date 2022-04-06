@@ -44,6 +44,7 @@ class facture_cleodis extends facture {
      		))
 			,"date"
 			,"date_previsionnelle"
+			,"date_envoi"
 			,"designation"=>array("xtype"=>"textarea")
 			,"commentaire"=>array("xtype"=>"textarea")
 
@@ -93,7 +94,7 @@ class facture_cleodis extends facture {
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
-			 "email"=>array("custom"=>true,'null'=>true)
+			"email"=>array("custom"=>true,'null'=>true)
 			,"emailCopie"=>array("custom"=>true,'null'=>true)
 			,"emailTexte"=>array("custom"=>true,'null'=>true,"xtype"=>"htmleditor")
 		);
@@ -286,7 +287,7 @@ class facture_cleodis extends facture {
 										$prix_sans_tva=$periode["assurance"];
 									}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
 										$prix_sans_tva=$facture["prix_sans_tva"];
-									} 
+									}
 								} else {
 									if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
 										$prix_sans_tva=$periode["assurance"];
@@ -3069,6 +3070,96 @@ class facture_cleodis extends facture {
 			}
 		}
 	}
+
+
+	/**
+	* permet d'envoyer les factures par mail, pour les factures ayant une date_envoi = date en param et envoyé = non
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function sendFactureMail($date) {
+
+		ATF::facture()->q->reset()->where("envoye", "non", "AND")
+								 ->where("date_envoi", $date, "AND");
+
+		$factures_a_envoyer = ATF::facture()->sa();
+
+		foreach ($factures_a_envoyer as $key => $value) {
+			try {
+				$facture_info = ATF::facture()->select($value["id_facture"]);
+				$societe = ATF::societe()->select($facture_info["id_societe"]);
+
+				if($societe["id_contact_facturation"]){
+					$contact= ATF::contact()->select($societe["id_contact_facturation"]);
+				}else{
+					$contact = NULL;
+				}
+				$ref = $facture_info['ref_externe'] ? $facture_info['ref_externe'] : $facture_info['ref'];
+
+				if ($contact) {
+
+
+					$email = array(
+						"email" => NULL,
+						"texte" => "Bonjour ".$contact['nom']." ".$contact['prenom'].", <br />
+						Nous avons le plaisir de vous envoyer votre facture n°".$ref."<br />
+						Merci de votre confiance",
+						"html" => true,
+						"template"=> "facture"
+					);
+
+
+
+					if($contact["email"]) {
+						$email['email']=$contact["email"];
+					}else{
+						$email['email']=$contact["email_perso"];
+					}
+
+					if ($email['email'] != NULL) {
+
+
+						$suivi_message = "Envoi de la facture ".$ref.
+									" au client ".$societe["societe"]." (email: ".$email["email"].") ".
+									" pour l'affaire ".ATF::affaire()->select($facture_info["id_affaire"], "ref");
+
+						ATF::affaire()->mailContact($email,$value["id_facture"],"facture", array("facture"=> "fichier_joint"));
+						ATF::facture()->u(array("id_facture"=> $value["id_facture"], "envoye"=> "oui"));
+
+						// On recupere la facturation associée à cette facture
+						ATF::facturation()->q->reset()->where("id_facture", $value["id_facture"]);
+						if ($facturation = ATF::facturation()->select_row()) {
+							ATF::facturation()->u(array("id_facturation"=> $facturation["id_facturation"], "envoye"=> "oui"));
+						}
+					} else {
+						$suivi_message = "Erreur lors de l'envoi de la facture  ".$ref." au client ".$societe["societe"]."\nRaison: Pas d'email sur le contact de facturation (".$contact['nom']." ".$contact['prenom'].")";
+					}
+				} else {
+					$suivi_message = "Erreur lors de l'envoi de la facture  ".$ref." au client ".$societe["societe"]."\nRaison: Pas de contact de facturation";
+				}
+
+			} catch (errorATF $e) {
+				$suivi_message = "Erreur lors de l'envoi de la facture  ".$ref." au client ".$societe["societe"]."\nRaison: ".$e->getMessage();
+			}
+
+			$suivi = array(
+				"id_societe"=> $facture_info["id_societe"]
+				,"id_affaire"=> $facture_info["id_affaire"]
+				,"type_suivi"=>'Comptabilité'
+				,"texte"=>$suivi_message
+				,'public'=>'oui'
+				,'id_contact'=>NULL
+				,'suivi_societe'=>NULL
+				,'suivi_notifie'=>NULL
+				,'champsComplementaire'=>NULL
+			);
+			$suivi["no_redirect"] = true;
+
+			ATF::suivi()->insert($suivi);
+
+		}
+	}
+
 
 
 

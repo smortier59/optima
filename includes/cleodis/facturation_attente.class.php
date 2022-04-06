@@ -36,14 +36,45 @@ class facturation_attente extends classes_optima {
 			$id_facture = $value["id_facture"];
 			$table = $value["nom_table"];
 			$path = get_object_vars(json_decode($value["path"]));
+			log::logger($path , "mfleurquin");
+
 			$id_facturation = $value["id_facturation"];
 			try {
-				ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
+				$facture_info = ATF::facture()->select($id_facture);
+				$suivi_message = "Envoi de la facture ".$facture_info['ref'].
+								" au client ".ATF::societe()->select($facture_info["id_societe"], "societe")." (email: ".$email["email"].") ".
+								" pour l'affaire ".ATF::affaire()->select($facture_info["id_affaire"], "ref");
+
+				if ($facture_info["envoye"] != 'oui') {
+
+					ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
+					ATF::facture()->u(array("id_facture"=> $id_facture, "envoye"=> "oui", "date_envoi" => date("Y-m-d")));
+				} else {
+					$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "erreur"=> "Facture déja envoyée"));
+				}
+
 				$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "envoye"=> "oui"));
 				ATF::facturation()->u(array("id_facturation"=> $id_facturation, "envoye"=> "oui"));
 			} catch (errorATF $e) {
 				$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "envoye"=> "erreur", "erreur"=>$e->getMessage()));
+				$suivi_message = "Erreur lors de l'envoi de la facture  ".$facture_info['ref']." au client ".ATF::societe()->select($facture_info["id_societe"], "societe")."\nRaison: ".$e->getMessage();
 			}
+
+			$suivi = array(
+				"id_societe"=> $facture_info["id_societe"]
+				,"id_affaire"=> $facture_info["id_affaire"]
+				,"type_suivi"=>'Comptabilité'
+				,"texte"=>$suivi_message
+				,'public'=>'oui'
+				,'id_contact'=>NULL
+				,'suivi_societe'=>NULL
+				,'suivi_notifie'=>NULL
+				,'champsComplementaire'=>NULL
+			);
+			$suivi["no_redirect"] = true;
+
+			ATF::suivi()->insert($suivi);
+
 		}
 	}
 };
