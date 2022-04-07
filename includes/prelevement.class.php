@@ -154,12 +154,14 @@ class prelevement extends classes_optima{
       ATF::db()->commit_transaction();
     }
 
+
     public function _fetchFactureImpayeesNonPrelevement($get){
 
       ATF::facture()->q->reset()
                               ->where('facture.etat','impayee')
                               ->where('facture.id_termes',24,'AND',false,"!=")
-                              ->where('facture.id_termes',25,'AND',false,"!=");
+                              ->where('facture.id_termes',25,'AND',false,"!=")
+                              ->addOrder("facture.ref", "ASC");
 
       $response = ATF::facture()->select_all();
 
@@ -803,6 +805,7 @@ class prelevement extends classes_optima{
         foreach ($post['refs_facture'] as $key=>$r) {
 
             $facture = ATF::facture()->getByRef($r);
+
             if (!$facture) throw new errorATF("Facture non trouvée", 500);
             if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
 
@@ -815,9 +818,8 @@ class prelevement extends classes_optima{
               "remarques"=> $post['remarque']? $post['remarque']: "Rapprochement comptable via Telescope - ".number_format($total,2, ',', ' ')." €",
             );
 
-            $paiement["filestoattach"]["fichier_joint"] = true;
-
-
+            $post['isFile'] == "true" ? $paiement["filestoattach"]["fichier_joint"] = true : false;
+  
             // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
             $id = ATF::facture_paiement()->insert($paiement);
 
