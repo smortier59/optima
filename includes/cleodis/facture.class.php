@@ -948,6 +948,8 @@ class facture_cleodis extends facture {
 			if(!$post['date']) throw new errorATF("LA DATE EST OBLIGATOIRE", 400);
 			if(!$post['prix_libre']) throw new errorATF("LE PRIX_LIBRE EST OBLIGATOIRE", 400);
 			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 400);
+			if(!$post['type_facture']) throw new errorATF("LE TYPE_FACTURE EST OBLIGATOIRE", 400);
+			if($post['type_facture'] !== "libre") throw new errorATF("LE TYPE DE FACTURE DOIT ETRE LIBRE", 400);
 
 			unset($post['schema']);
 
