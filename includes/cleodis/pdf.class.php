@@ -275,9 +275,9 @@ class pdf_cleodis extends pdf {
 							$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 							}
 						} catch (Exception $e) {
-							log::logger('filepath CGS = '.$filepath,"qjanon");
-							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
-							log::logger($e->getMessage(),"qjanon");
+							log::logger('filepath CGS = '.$filepath,"error_pdf");
+							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "error_pdf");
+							log::logger($e->getMessage(),"error_pdf");
 							continue;
 						}
 					}
@@ -385,7 +385,7 @@ class pdf_cleodis extends pdf {
 
 			$this->setLeftMargin(130);
 			$this->setY($y);
-			$this->MultiCell(70,4,"\nSigné à : Lille\nLe : ".date("d/m/Y", strtotime($this->affaire["date"]))."\nPar : ".$this->affaire["signataire"]."\n ",1,'L',0);
+			$this->MultiCell(70,4,"\nSigné à : Lille\nLe : ".date("d/m/Y")."\nPar : ".$this->affaire["signataire"]."\n ",1,'L',0);
 			$this->setLeftMargin(10);
 		}
 
