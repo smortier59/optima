@@ -70,7 +70,10 @@
 								Ext.getCmp('societe['+key+']').setValue(value);
 							} else {
 								Ext.getCmp('societe['+key+']').reset();
-
+							}
+						} else {
+							if (Ext.getCmp('combosociete['+key+']')) {
+								Ext.getCmp('combosociete['+key+']').setValue(value);
 							}
 						}
 					});
