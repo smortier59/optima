@@ -268,7 +268,7 @@ class creditsafe extends classes_optima {
 
 
 		// ETAT
-		switch ($companySummary->companyStatus->CompanyStatus->status) {
+		switch ($companySummary->companyStatus->status) {
 			case '':
 				$return['etat'] = "supprime";
 			break;
@@ -280,6 +280,8 @@ class creditsafe extends classes_optima {
 				$return['etat'] = "actif";
 			break;
 		}
+
+        log::logger($return , "mfleurquin");
         return $return;
 
     }
