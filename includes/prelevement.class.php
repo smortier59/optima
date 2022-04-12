@@ -161,7 +161,7 @@ class prelevement extends classes_optima{
                               ->where('facture.etat','impayee')
                               ->where('facture.id_termes',24,'AND',false,"!=")
                               ->where('facture.id_termes',25,'AND',false,"!=")
-                              ->addOrder("facture.ref", "ASC");
+                              ->addOrder("facture.date", "DESC");
 
       $response = ATF::facture()->select_all();
 
