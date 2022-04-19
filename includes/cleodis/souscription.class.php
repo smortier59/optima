@@ -112,6 +112,15 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = null;
       break;
 
+      case 'volfoni':
+      case 'aubureau':
+      case 'leon':
+      case 'hippopotamus':
+        ATF::societe()->q->reset()->where("siret", "31007041200062");
+        $sphinx = ATF::societe()->select_row();
+        $this->id_partenaire = $sphinx["id_societe"];
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -314,6 +323,10 @@ class souscription_cleodis extends souscription {
           case 'axa':
           case 'worldline':
           case 'h2c':
+          case 'volfoni':
+          case 'aubureau':
+          case 'leon':
+          case 'hippopotamus':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -464,6 +477,8 @@ class souscription_cleodis extends souscription {
       ATF::type_affaire()->q->reset()->where("type_affaire", "H2C Leasing");
       $type_affaire = ATF::type_affaire()->select_row();
     }*/    
+
+    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -831,6 +846,10 @@ class souscription_cleodis extends souscription {
       case 'assets':
       case 'worldline':
       case 'h2c':
+      case 'volfoni':
+      case 'aubureau':
+      case 'leon':
+      case 'hippopotamus':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1115,6 +1134,12 @@ class souscription_cleodis extends souscription {
       break;
       case 'h2c':
         $r = "H2";
+      break;
+      case 'volfoni':
+      case 'aubureau':
+      case 'leon':
+      case 'hippopotamus':
+        $r = "NC";
       break;
       default:
         $r = substr($site_associe, 0, 2);
