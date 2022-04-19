@@ -6,10 +6,10 @@ ALTER TABLE `document_revendeur` CHANGE `site_associe` `site_associe` ENUM('cleo
 
 
 INSERT INTO `client` (`id_client`, `client`, `etat`, `client_id`, `client_secret`)  VALUES
-(NULL, 'volfoni', 'actif', 'vDjFsZtgyNpqq5RpZ4g8ZT7hh3vVGyXT', '9Z8X6bFJLW76NYsfqJzuK9ryxje8t3qz'),
-(NULL, 'aubureau', 'actif', 'y2VTmkMStf76qYTdHuVYJY2fhMRGFNMV', 'bwTPAesdY37UqGU2u8YSuMvKKRBuc2v4'),
-(NULL, 'leon', 'actif', 'WTgXfRTmcJqGTmpcZJhcKd5ewGP7xPe8', 'q6ErSg2PVMHub59bhrvW54QqghRrYdCS'),
-(NULL, 'hippopotamus', 'actif', 'sMn2QXPxxQwEwvK7NCAmnWrR9Qvhd6WE', 'urXtSaNtc6XwP2rP7Cu7JKEkjWX4H2vf');
+(NULL, 'volfoni', 'actif', 'vDjFsZtgyNpqq5RpZ4g8ZT7hh3vVGyXT', '$2a$10$FfDP19p/zWbPqZ1SnsKnKuLKjHWFKbI8wRSKgmrAK.GCy4Vjkxnqu'),
+(NULL, 'aubureau', 'actif', 'y2VTmkMStf76qYTdHuVYJY2fhMRGFNMV', '$2a$10$C1xfYbb6XO2DQN/qDQjfT.WmAbaJEy4pqJXDdWGa97TEJAy2xR4g'),
+(NULL, 'leon', 'actif', 'WTgXfRTmcJqGTmpcZJhcKd5ewGP7xPe8', '$2a$10$63/8MkUFFODedb5IUzdj6uIWHckF3uUwGFpiKtLNNftUVeKyiCxxW'),
+(NULL, 'hippopotamus', 'actif', 'sMn2QXPxxQwEwvK7NCAmnWrR9Qvhd6WE', '$2a$10$oIxKhCOYvn9/.SXqTy.9zeSMPWr29TUpiajE4.FwCBZIJ.2bNgvze');
 
 
 INSERT INTO `site_associe` (`id_site_associe`, `site_associe`, `code`, `steps_tunnel`, `id_client`, `url_front`, `cs_score_minimal`, `age_minimal`, `export_middleware`, `id_societe`, `color_dominant`, `color_footer`, `color_links`, `color_titles`, `id_societe_footer_mail`, `can_update_bic_iban`, `id_type_affaire`) VALUES
