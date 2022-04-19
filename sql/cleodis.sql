@@ -1,3 +1,8 @@
+ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','locevo','dib','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','locevo','dib','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `affaire` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','dib','locevo','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `document_revendeur` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','locevo','dib','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 CREATE OR REPLACE
 ALGORITHM = UNDEFINED VIEW `affaire_client` AS
 select
@@ -49,6 +54,19 @@ where
     and (`commande`.`etat` in ('mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux')
         or `affaire`.`nature` = 'vente')
 
+
+INSERT INTO `client` (`id_client`, `client`, `etat`, `client_id`, `client_secret`)  VALUES
+(NULL, 'volfoni', 'actif', 'vDjFsZtgyNpqq5RpZ4g8ZT7hh3vVGyXT', '9Z8X6bFJLW76NYsfqJzuK9ryxje8t3qz'),
+(NULL, 'aubureau', 'actif', 'y2VTmkMStf76qYTdHuVYJY2fhMRGFNMV', 'bwTPAesdY37UqGU2u8YSuMvKKRBuc2v4'),
+(NULL, 'leon', 'actif', 'WTgXfRTmcJqGTmpcZJhcKd5ewGP7xPe8', 'q6ErSg2PVMHub59bhrvW54QqghRrYdCS'),
+(NULL, 'hippopotamus', 'actif', 'sMn2QXPxxQwEwvK7NCAmnWrR9Qvhd6WE', 'urXtSaNtc6XwP2rP7Cu7JKEkjWX4H2vf');
+
+
+INSERT INTO `site_associe` (`id_site_associe`, `site_associe`, `code`, `steps_tunnel`, `id_client`, `url_front`, `cs_score_minimal`, `age_minimal`, `export_middleware`, `id_societe`, `color_dominant`, `color_footer`, `color_links`, `color_titles`, `id_societe_footer_mail`, `can_update_bic_iban`, `id_type_affaire`) VALUES
+(NULL, 'volfoni', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://volfoni.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
+(NULL, 'aubureau', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://aubureau.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
+(NULL, 'leon', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://leon.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
+(NULL, 'hippopotamus', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://hippopotamus.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21');
 CREATE OR REPLACE
 ALGORITHM = UNDEFINED VIEW `factures_client` AS
 select
