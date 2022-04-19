@@ -63,64 +63,7 @@ INSERT INTO `client` (`id_client`, `client`, `etat`, `client_id`, `client_secret
 
 
 INSERT INTO `site_associe` (`id_site_associe`, `site_associe`, `code`, `steps_tunnel`, `id_client`, `url_front`, `cs_score_minimal`, `age_minimal`, `export_middleware`, `id_societe`, `color_dominant`, `color_footer`, `color_links`, `color_titles`, `id_societe_footer_mail`, `can_update_bic_iban`, `id_type_affaire`) VALUES
-(NULL, 'volfoni', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://volfoni.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
-(NULL, 'aubureau', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://aubureau.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
-(NULL, 'leon', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://leon.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
-(NULL, 'hippopotamus', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '13', 'http://hippopotamus.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21');
-CREATE OR REPLACE
-ALGORITHM = UNDEFINED VIEW `factures_client` AS
-select
-    `facture`.`id_facture` AS `id_facture`,
-    `facture`.`ref` AS `ref`,
-    `facture`.`ref_externe` AS `ref_externe`,
-    `facture`.`id_societe` AS `id_societe`,
-    `facture`.`prix` AS `prix`,
-    `facture`.`etat` AS `etat`,
-    `facture`.`date` AS `date`,
-    `facture`.`date_paiement` AS `date_paiement`,
-    `facture`.`type_facture` AS `type_facture`,
-    `facture`.`date_periode_debut` AS `date_periode_debut`,
-    `facture`.`date_periode_fin` AS `date_periode_fin`,
-    `facture`.`tva` AS `tva`,
-    `facture`.`id_affaire` AS `id_affaire`,
-    `facture`.`mode_paiement` AS `mode_paiement`,
-    `facture`.`nature` AS `nature`,
-    `facture`.`rejet` AS `rejet`,
-    `facture`.`date_rejet` AS `date_rejet`,
-    `facture`.`date_regularisation` AS `date_regularisation`
-from
-    `facture`
-where
-    `facture`.`type_facture` <> 'refi'
-    and `facture`.`id_affaire` in (
-    select
-        `affaire_client`.`id_affaire`
-    from
-        `affaire_client`)
-
-CREATE OR REPLACE
-ALGORITHM = UNDEFINED VIEW `abonnement_client` AS
-select
-    `commande`.`id_societe` AS `id_societe`,
-    `commande`.`id_affaire` AS `id_affaire`,
-    `commande`.`id_commande` AS `id_commande`,
-    `commande`.`ref` AS `num_dossier`,
-    `commande`.`commande` AS `dossier`,
-    `commande`.`etat` AS `statut`,
-    `commande`.`date` AS `date`,
-    `commande`.`date_debut` AS `date_debut`,
-    `commande`.`date_evolution` AS `date_fin`,
-    `commande`.`date_arret` AS `date_arret`,
-    `commande`.`retour_contrat` AS `retour_contrat`,
-    `affaire`.`IBAN` AS `IBAN`,
-    `affaire`.`BIC` AS `BIC`,
-    `affaire`.`RUM` AS `RUM`,
-    `affaire`.`site_associe` AS `site_associe`
-from
-    (`commande`
-join `affaire` on
-    (`commande`.`id_affaire` = `affaire`.`id_affaire`))
-where
-    `affaire`.`etat` not in ('demande_refi', 'facture_refi')
-    and (`commande`.`etat` in ('mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux')
-        or `affaire`.`nature` = 'vente')
+(NULL, 'volfoni', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '43', 'http://volfoni.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
+(NULL, 'aubureau', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '44', 'http://aubureau.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
+(NULL, 'leon', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '45', 'http://leon.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
+(NULL, 'hippopotamus', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '46', 'http://hippopotamus.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21');
