@@ -438,47 +438,6 @@ class souscription_cleodis extends souscription {
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-
-
-
-    if($post['site_associe'] == "boulangerpro"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "Boulanger Pro");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "hexamed"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "Hexamed Leasing");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "locevo"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "LocEvo");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "dib"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "DIB");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "haccp"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "haccp");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "axa"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "Axa");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "worldline"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "Worldline");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-    if($post['site_associe'] == "h2c"){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "H2C Leasing");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-
-    if(in_array($post['site_associe'], ['volfoni','aubureau','leon','hippopotamus']) ){
-      ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
-      $type_affaire = ATF::type_affaire()->select_row();
-    }
-
     if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
 
     // COnstruction des lignes de devis a partir des produits en JSON
