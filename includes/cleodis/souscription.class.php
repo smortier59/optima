@@ -108,7 +108,7 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = $sphinx["id_societe"];
       break;
 
-      case 'bymycar':        
+      case 'bymycar':
         $this->id_partenaire = null;
       break;
 
@@ -186,7 +186,7 @@ class souscription_cleodis extends souscription {
                                       ->where("principal", "oui");
 
           $produit_principal_pack = ATF::pack_produit_ligne()->select_row();
-          
+
           if($produit_principal_pack){
             // Si $v[id_pack_produit_ligne] == Le produit principal
             if($v["id_pack_produit_ligne"] == $produit_principal_pack["id_pack_produit_ligne"]){
@@ -344,11 +344,12 @@ class souscription_cleodis extends souscription {
 
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
+        $affaires["contrats"][] = $id_contrat;
       }
 
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
-        log::logger($e->getMessage() , "mfleurquin");
+        log::logger($e->getMessage() , "souscription_error");
 
         throw $e;
     }
@@ -427,6 +428,20 @@ class souscription_cleodis extends souscription {
       $type_affaireNormal = ATF::type_affaire()->select_row();
       $type_affaire = $type_affaireNormal["id_type_affaire"];
     }      
+
+    $assurance_sans_tva = "non";
+
+    if ($site_associe["id_type_affaire"]){
+      $type_affaire = $site_associe["id_type_affaire"];
+      if ($type_affaire) {
+        $devis["id_type_affaire"] = $type_affaire;
+        $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
+      }
+    } else {
+      ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+      $type_affaireNormal = ATF::type_affaire()->select_row();
+      $type_affaire = $type_affaireNormal["id_type_affaire"];
+    }
 
     // Construction du devis
     $devis = array(
@@ -588,6 +603,25 @@ class souscription_cleodis extends souscription {
       }
     }
 
+    if ($post["prolongations"]) {
+      foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
+        $toInsertLoyer[] = array(
+          "loyer__dot__loyer"=> $vp["loyer"],
+          "loyer__dot__duree"=> $vp["duree"],
+          "loyer__dot__type"=>"prolongation",
+          "loyer__dot__assurance"=>$vp["assurance"],
+          "loyer__dot__frais_de_gestion"=>$vp["frais_de_gestion"],
+          "loyer__dot__frequence_loyer"=> $vp["frequence"],
+          "loyer__dot__serenite"=>"",
+          "loyer__dot__maintenance"=>"",
+          "loyer__dot__hotline"=>"",
+          "loyer__dot__supervision"=>"",
+          "loyer__dot__support"=>"",
+          "loyer__dot__avec_option"=>"non"
+        );
+      }
+    }
+
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
 
@@ -657,7 +691,8 @@ class souscription_cleodis extends souscription {
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
 
     $id_commande = ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
-    return $id_commande;
+
+    return ATF::commande()->decryptId($id_commande);
   }
 
   /**
@@ -882,6 +917,8 @@ class souscription_cleodis extends souscription {
 
       break;
 
+
+
       default:
         throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500);
       break;
@@ -923,6 +960,21 @@ class souscription_cleodis extends souscription {
     }
 
     return $return;
+  }
+
+  /**
+   * Retour le PDF du contrat pour l'API du tuennel Meelo/GOA
+   */
+  public function _getPDFContrat($get) {
+    try {
+      $file = ATF::pdf()->generic('contratA4',$get['id_commande'], true);
+      return base64_encode($file);
+    } catch (errorATF $e) {
+      log::logger($e->getMessage() , "mfleurquin");
+      throw $e;
+    }
+
+
   }
 
   /**
