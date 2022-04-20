@@ -452,7 +452,35 @@ class parc_bdomplus extends parc_cleodis { };
 
 class parc_boulanger extends parc_cleodis { };
 class parc_assets extends parc_cleodis { };
-class parc_go_abonnement extends parc_cleodis { };
+class parc_go_abonnement extends parc_cleodis {
+	function __construct() {
+		parent::__construct();
+		$this->table = "parc";
+		$this->colonnes['fields_column']["parc.immatriculation"] = array("width"=>150,"rowEditor"=>"setImmatriculation");
+
+
+
+		$this->fieldstructure();
+
+		$this->addPrivilege("setImmatriculation");
+	}
+
+	public function setImmatriculation($infos) {
+		$res = $this->update(
+			array(
+				"id_parc"=> $this->decryptId($infos["id_parc"]),
+				"immatriculation" => strtoupper($infos["immatriculation"])
+			)
+		);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
+	}
+
+};
 
 
 class parc_midas extends parc_cleodis {
