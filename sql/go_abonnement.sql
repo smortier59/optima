@@ -1,0 +1,1 @@
+ALTER TABLE `parc` ADD `immatriculation` VARCHAR(25) NULL DEFAULT NULL AFTER `id_bon_de_commande`;
