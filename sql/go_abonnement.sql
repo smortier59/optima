@@ -1,0 +1,1 @@
+ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(255) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;
