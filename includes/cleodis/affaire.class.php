@@ -2564,7 +2564,6 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
-
 		$utilisateur  = ATF::$usr->get("contact");
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
@@ -2781,8 +2780,9 @@ class affaire_cleodis extends affaire {
             $dest = array();
             if(ATF::societe()->select($id_societe , "id_owner")) $dest[] = ATF::societe()->select($id_societe , "id_owner");
             if(ATF::societe()->select($id_societe , "id_assistante")) $dest[] = ATF::societe()->select($id_societe , "id_assistante");
+			if(ATF::societe()->select($utilisateur["id_societe"] , "id_owner")) $dest[] = ATF::societe()->select($utilisateur["id_societe"] , "id_owner");
 
-            //Creation d'une tache au responsable + assistant de la societe
+			//Creation d'une tache au responsable + assistant de la societe
             $tache = array("tache"=>array(
 				"id_societe"=> $id_societe,
 				"id_user"=>ATF::$usr->getID(),
@@ -2792,8 +2792,8 @@ class affaire_cleodis extends affaire {
 				"type_tache"=>"creation_contrat",
 				"horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
 				"no_redirect"=>"true"
-			),
-			"dest"=>$dest
+				),
+				"dest"=>$dest
 			);
 
 			ATF::tache()->insert($tache);
