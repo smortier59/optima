@@ -66,7 +66,7 @@ select
     `partenaire`.`societe` AS `partenaire`,
     `apporteur`.`id_apporteur` AS `id_apporteur`
 from
-    ((((`affaire`
+    (((((`affaire`
 left join `magasin` on
     (`magasin`.`id_magasin` = `affaire`.`id_magasin`))
 left join `societe` `client` on
@@ -75,7 +75,12 @@ left join `societe` `partenaire` on
     (`affaire`.`id_partenaire` = `partenaire`.`id_societe`))
 left join `societe` `apporteur` on
     (`affaire`.`id_apporteur` = `apporteur`.`id_societe`))
-WHERE nature = 'vente';
+left join `commande` on
+    (`commande`.`id_affaire` = `affaire`.`id_affaire`))
+where
+    `affaire`.`etat` not in ('demande_refi', 'facture_refi')
+    and (`commande`.`etat` in ('mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux')
+        or `affaire`.`nature` = 'vente')
 
 CREATE OR REPLACE
 ALGORITHM = UNDEFINED VIEW `factures_client` AS
@@ -101,8 +106,12 @@ select
 from
     `facture`
 where
-    `facture`.`type_facture` <> 'refi' AND `id_affaire` in (SELECT `id_affaire` from `abonnement_client`)
-    OR `id_affaire` in (SELECT `id_affaire` from `affaire_client`);
+    `facture`.`type_facture` <> 'refi'
+    and `facture`.`id_affaire` in (
+    select
+        `affaire_client`.`id_affaire`
+    from
+        `affaire_client`)
 
 
 
