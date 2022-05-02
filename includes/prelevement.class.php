@@ -239,7 +239,8 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -282,7 +283,8 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -323,7 +325,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date',$date_debut_periode,"AND",false,">=");
+            ->where('facture.date',$date_debut_periode,"AND",false,">=")
+            ->addOrder("facture.ref", "DESC");
 
         $result= ATF::facture()->sa();
 
@@ -362,7 +365,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
 
         $result= ATF::facture()->sa();
 
@@ -455,7 +459,8 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -497,7 +502,8 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -553,7 +559,8 @@ class prelevement extends classes_optima{
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
@@ -606,7 +613,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date',$date_debut_periode,"AND",false,">=");
+            ->where('facture.date',$date_debut_periode,"AND",false,">=")
+            ->addOrder("facture.ref", "DESC");
 
         $result= ATF::facture()->sa();
 
@@ -651,7 +659,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
 
         $result= ATF::facture()->sa();
 
@@ -694,7 +703,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date',$date_debut_periode,"AND",false,">=");
+            ->where('facture.date',$date_debut_periode,"AND",false,">=")
+            ->addOrder("facture.ref", "DESC");
            
         $result= ATF::facture()->sa();
 
@@ -748,7 +758,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=")
+            ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
