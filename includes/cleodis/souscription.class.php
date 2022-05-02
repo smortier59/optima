@@ -426,20 +426,6 @@ class souscription_cleodis extends souscription {
       $type_affaire = $type_affaireNormal["id_type_affaire"];
     }
 
-    $assurance_sans_tva = "non";
-
-    if ($site_associe["id_type_affaire"]){
-      $type_affaire = $site_associe["id_type_affaire"];
-      if ($type_affaire) {
-        $devis["id_type_affaire"] = $type_affaire;
-        $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
-      }
-    } else {
-      ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
-      $type_affaireNormal = ATF::type_affaire()->select_row();
-      $type_affaire = $type_affaireNormal["id_type_affaire"];
-    }
-
     // Construction du devis
     $devis = array(
         "id_societe" => $post['id_societe'],
@@ -455,9 +441,6 @@ class souscription_cleodis extends souscription {
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
     );
-
-    // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
