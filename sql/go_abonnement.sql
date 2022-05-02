@@ -1,1 +1,2 @@
 ALTER TABLE `parc` ADD `immatriculation` VARCHAR(25) NULL DEFAULT NULL AFTER `id_bon_de_commande`;
+ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(255) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;

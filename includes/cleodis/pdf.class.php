@@ -2205,29 +2205,49 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
-
-		$this->noPageNo = true;
-		$this->unsetHeader();
-		if(!$signature)	$this->Open();
-		$this->AddPage();
-		$this->setFooter();
 		$this->commandeInit($id,$s,$previsu);
-		$this->A3 = false;
-		$this->A4 = true;
 
 		$this->setfont('arial','B',10);
 
-		if ($this->client['id_famille'] == 9) {
-			  $this->contratA4Particulier($id, $signature,$sellsign);
+		if($this->affaire["id_type_affaire"] && ATF::type_affaire()->select($this->affaire["id_type_affaire"], "contrat_template") !== 'contrat') {
+			log::logger("PDF spécifique" , "mfleurquin");
+			$function = ATF::type_affaire()->select($this->affaire["id_type_affaire"], "contrat_template");
+			if ($this->client['id_famille'] == 9) {
+				$function .= "A4Particulier";
+			} else {
+				$function .= "A4Societe";
+			}
+
+			if (method_exists($this,$function)) {
+				$this->noPageNo = true;
+				$this->unsetHeader();
+				if(!$signature)	$this->Open();
+				$this->AddPage();
+				$this->setFooter();
+				$this->A3 = false;
+				$this->A4 = true;
+				$this->$function($id, $signature,$sellsign);
+			} else {
+				log::logger("Fonction PDF Inconnue ". $function , "PDF_ERROR");
+			}
 		} else {
-		  $this->contratA4Societe($id, $signature,$sellsign);
+			$this->noPageNo = true;
+			$this->unsetHeader();
+			if(!$signature)	$this->Open();
+			$this->AddPage();
+			$this->setFooter();
+
+			$this->A3 = false;
+			$this->A4 = true;
+			if ($this->client['id_famille'] == 9) {
+				$this->contratA4Particulier($id, $signature,$sellsign);
+			} else {
+				$this->contratA4Societe($id, $signature,$sellsign);
+			}
 		}
 	}
 
   	public function contratA4Societe($id, $signature,$sellsign) {
-
-
-
   		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->image($this->logo,10,10,40);
 
