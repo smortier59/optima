@@ -135,6 +135,20 @@ ATF.buildGridEditor({
                 editor: new Ext.form.TextField({
                     value:0
                 })
+            }, {
+                header: 'echeance',
+                width:20,
+                dataIndex: '{$current_class->table}__dot__echeance',
+                editor: new Ext.form.TextField({
+                    value:0
+                })
+            }, {
+                header: 'montant_ht',
+                width:20,
+                dataIndex: '{$current_class->table}__dot__montant_ht',
+                editor: new Ext.form.TextField({
+                    value:0
+                })
             }
 
         ]
