@@ -200,7 +200,7 @@ class souscription_cleodis extends souscription {
 
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
-      
+
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"],  $post["renouvellement"]);
 
@@ -301,7 +301,7 @@ class souscription_cleodis extends souscription {
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
-      
+
 
 
         if ($post['id_panier']) {
@@ -411,23 +411,20 @@ class souscription_cleodis extends souscription {
    * @return [type]          [description]
    */
   private function createDevis ($post, $libelle, $fournisseur) {
-        
+
     ATF::site_associe()->q->reset()->where("site_associe", $post["site_associe"]);
     $site_associe = ATF::site_associe()->select_row();
-    
+
     $assurance_sans_tva = "non";
 
     if ($site_associe["id_type_affaire"]){
       $type_affaire = $site_associe["id_type_affaire"];
-      if ($type_affaire) {
-        $devis["id_type_affaire"] = $type_affaire;
-        $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
-      }
+      $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
     } else {
       ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
       $type_affaireNormal = ATF::type_affaire()->select_row();
       $type_affaire = $type_affaireNormal["id_type_affaire"];
-    }      
+    }
 
     $assurance_sans_tva = "non";
 
@@ -578,12 +575,12 @@ class souscription_cleodis extends souscription {
           $devis["prix"] = ($toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
         } else {
           $devis["prix"] = $toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"];
-        }        
+        }
     }
-    
+
     // Faire sauter les index
     $toInsertProduitDevis = array_values($toInsertProduitDevis);
-    
+
     if ($post["prolongations"]) {
       foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
         $toInsertLoyer[] = array(
