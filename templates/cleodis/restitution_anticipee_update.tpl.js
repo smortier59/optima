@@ -1,6 +1,6 @@
 {$pager="{$current_class->table}LoyerKilometrageUpdate"}
 {$parent_class=$current_class}
-{$current_class=ATF::getClass("loyer_kilometrage")}
+{$current_class=ATF::getClass("restitution_anticipee")}
 {$q=ATF::_s(pager)->getAndPrepare($pager)}
 {$fields=[
 	"{$current_class->table}.loyer"
@@ -18,4 +18,4 @@
 {else}
 	{$q->reset()->addCondition("id_affaire",0)->setView([order=>$fields])->end()}
 {/if}
-{include file="loyer_kilometrage-lignes.tpl.js"}
+{include file="restitution_anticipee-lignes.tpl.js"}

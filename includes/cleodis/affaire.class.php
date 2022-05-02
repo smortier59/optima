@@ -4352,7 +4352,7 @@ class affaire_go_abonnement extends affaire_cleodis {
 			'affaire_etat'
 			,'loyer'
 			,"sell_and_sign"
-			,'loyer_kilometrage'
+			,'restitution_anticipee'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)
