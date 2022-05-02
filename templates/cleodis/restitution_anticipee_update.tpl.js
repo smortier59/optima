@@ -5,6 +5,8 @@
 {$fields=[
 	"{$current_class->table}.loyer"
 	, "{$current_class->table}.kilometrage"
+	, "{$current_class->table}.echeance"
+	, "{$current_class->table}.montant_ht"
 ]}
 
 {if ATF::_r(id_devis)}
