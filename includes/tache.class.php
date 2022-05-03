@@ -173,13 +173,13 @@ class tache extends classes_optima {
 				log::logger(ATF::$usr->getID(),"error");
 				//envoi des mails aux concernés (si il y a au moins le mail du
 				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
-					$infos_mail = array( 
+					$infos_mail = array(
 						"recipient"=>implode(',',$liste_email),
 						"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
 						"objet"=>"Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
 						"template"=>"tache_insert",
 						"donnees"=>$infos,
-						"from"=>ATF::$usr->get('email')
+						"from"=>ATF::user()->select(ATF::$usr->getID(), "email")
 					);
 					if ($partenaire) {
 						$infos_mail["partenaire"] = $partenaire;
