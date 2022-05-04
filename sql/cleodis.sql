@@ -67,3 +67,20 @@ INSERT INTO `site_associe` (`id_site_associe`, `site_associe`, `code`, `steps_tu
 (NULL, 'aubureau', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '44', 'http://aubureau.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
 (NULL, 'leon', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '45', 'http://leon.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21'),
 (NULL, 'hippopotamus', NULL, 'COMPONENT_CONFIRM_CLIENT_ACCOUNT,COMPONENT_B2B_ALLINONE,COMPONENT_SIGNING_DOCUMENTS_IFRAME,COMPONENT_UPLOAD_PJ,COMPONENT_FINISHED_RECAP', '46', 'http://hippopotamus.cleodis.com', '40', '2', 'oui', '6738', '2e92e7', 'fae856', 'fae856', 'fae856', '6738', '0', '21');
+
+ALTER TABLE `site_associe` ADD `siret_partenaire` VARCHAR(25) NULL DEFAULT NULL COMMENT 'Partenaire des affaires utilisé dans le souscription class' AFTER `id_type_affaire`;
+
+UPDATE `site_associe` SET `siret_partenaire`= "30613890003613" WHERE site_associe = 'btwin';
+UPDATE `site_associe` SET `siret_partenaire`= "34738457002017" WHERE site_associe = 'bdomplus';
+UPDATE `site_associe` SET `siret_partenaire`= "51028155300030" WHERE site_associe = 'hexamed';
+UPDATE `site_associe` SET `siret_partenaire`= "45122067700087" WHERE site_associe = 'boulangerpro';
+UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'volfoni';
+UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'aubureau';
+UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'leon';
+UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'hippopotamus';
+UPDATE `site_associe` SET `siret_partenaire`= "43939846200044" WHERE site_associe = 'h2c';
+UPDATE `site_associe` SET `siret_partenaire`= "37890194600574" WHERE site_associe = 'worldline';
+UPDATE `site_associe` SET `siret_partenaire`= "34020062500036" WHERE site_associe = 'axa';
+UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'haccp';
+UPDATE `site_associe` SET `siret_partenaire`= "42268731900059" WHERE site_associe = 'dib';
+UPDATE `site_associe` SET `siret_partenaire`= "45307981600048" WHERE site_associe = 'locevo';

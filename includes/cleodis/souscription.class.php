@@ -38,89 +38,22 @@ class souscription_cleodis extends souscription {
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
-    switch ($post['site_associe']) {
-      case 'boulangerpro':
-        ATF::societe()->q->reset()->where("siret", "45122067700087");
-        $boulpro = ATF::societe()->select_row();
-        $this->id_partenaire = $boulpro["id_societe"];
-      break;
+    if ($post['site_associe']) {
 
-      case 'btwin':
-        $this->id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
-      break;
+      ATF::site_associe()->q->reset()->where('site_associe', $post['site_associe']);
+      $site_associe = ATF::site_associe()->select_row();
 
-      case 'bdomplus':
-        //$this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
-        $this->id_partenaire = 31456;
-      break;
+      $this->id_partenaire = null;
 
-      case 'boulanger-cafe':
-        $this->id_partenaire = 31456; // ID de la société BoulangerS (same in RCT - PROD - DEV)
-      break;
-
-      case 'hexamed':
-        ATF::societe()->q->reset()->where("siret", "51028155300030");
-        $hexamed = ATF::societe()->select_row();
-
-        $this->id_partenaire = $hexamed["id_societe"];
-      break;
-
-      case 'locevo':
-        ATF::societe()->q->reset()->where("siret", "45307981600048");
-        $cleodis = ATF::societe()->select_row();
-
-        $this->id_partenaire = $cleodis["id_societe"];
-      break;
-
-      case 'dib':
-        ATF::societe()->q->reset()->where("siret", "42268731900059");
-        $cleodis = ATF::societe()->select_row();
-
-        $this->id_partenaire = $cleodis["id_societe"];
-      break;
-
-      case 'haccp':
-        ATF::societe()->q->reset()->where("siret", "31007041200062");
-        $cleodis = ATF::societe()->select_row();
-
-        $this->id_partenaire = $cleodis["id_societe"];
-      break;
-
-      case 'axa':
-        ATF::societe()->q->reset()->where("siret", "34020062500036");
-        $cleodis = ATF::societe()->select_row();
-
-        $this->id_partenaire = $cleodis["id_societe"];
-      break;
-      case 'worldline':
-        ATF::societe()->q->reset()->where("siret", "37890194600574");
-        $cleodis = ATF::societe()->select_row();
-
-        $this->id_partenaire = $cleodis["id_societe"];
-      break;
-
-      case 'assets':
-        $this->id_partenaire = NULL;
-      break;
-
-      case 'h2c':
-        ATF::societe()->q->reset()->where("siret", "43939846200044");
-        $sphinx = ATF::societe()->select_row();
-        $this->id_partenaire = $sphinx["id_societe"];
-      break;
-
-      case 'volfoni':
-      case 'aubureau':
-      case 'leon':
-      case 'hippopotamus':
-        ATF::societe()->q->reset()->where("siret", "31007041200062");
-        $sphinx = ATF::societe()->select_row();
-        $this->id_partenaire = $sphinx["id_societe"];
-      break;
-
-      default:
+      if ($site_associe) {
+        if ($site_associe['siret_partenaire']) {
+          ATF::societe()->q->reset()->where("siret", $site_associe['siret_partenaire']);
+          $partenaire = ATF::societe()->select_row();
+          if ($partenaire) $this->id_partenaire = $partenaire["id_societe"];
+        }
+      } else {
         throw new errorATF("Site associe incorrect", 500);
-      break;
+      }
     }
 
     if(!$post["no_iban"]){
@@ -346,10 +279,9 @@ class souscription_cleodis extends souscription {
           default:
           break;
         }
-
-
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
+        $affaires['contrats'][] = $id_contrat;
       }
 
     } catch (errorATF $e) {
@@ -1076,10 +1008,15 @@ class souscription_cleodis extends souscription {
         $r = "H2";
       break;
       case 'volfoni':
+        $r = "VO";
       case 'aubureau':
+        $r = "AB";
+      break;
       case 'leon':
+        $r = "LN";
+      break;
       case 'hippopotamus':
-        $r = "NC";
+        $r = "HI";
       break;
       default:
         $r = substr($site_associe, 0, 2);
