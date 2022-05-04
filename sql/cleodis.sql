@@ -105,4 +105,7 @@ join `affaire` on
 where
     `affaire`.`etat` not in ('demande_refi', 'facture_refi')
     and (`commande`.`etat` in ('mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux')
-        or `affaire`.`nature` = 'vente')
+        or `affaire`.`nature` = 'vente');
+
+
+ALTER TABLE `panier` DROP FOREIGN KEY `panier_ibfk_2`; ALTER TABLE `panier` ADD CONSTRAINT `panier_ibfk_2` FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE SET NULL ON UPDATE CASCADE;
