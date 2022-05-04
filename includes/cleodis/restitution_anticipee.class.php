@@ -8,9 +8,8 @@ class restitution_anticipee extends classes_optima{
 		$this->table = __CLASS__;
 		$this->controlled_by = 'affaire';
 		$this->colonnes["fields_column"] = array(
-			,"restitution_anticipee.echeance"
-			,"restitution_anticipee.montant_ht"
-
+			"restitution_anticipee.echeance",
+			"restitution_anticipee.montant_ht"
 		);
 
 		$this->colonnes['primary'] = array(
