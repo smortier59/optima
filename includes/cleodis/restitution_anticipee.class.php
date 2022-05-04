@@ -8,8 +8,6 @@ class restitution_anticipee extends classes_optima{
 		$this->table = __CLASS__;
 		$this->controlled_by = 'affaire';
 		$this->colonnes["fields_column"] = array(
-			 'restitution_anticipee.loyer'
-            ,"restitution_anticipee.kilometrage"
 			,"restitution_anticipee.echeance"
 			,"restitution_anticipee.montant_ht"
 
@@ -17,8 +15,6 @@ class restitution_anticipee extends classes_optima{
 
 		$this->colonnes['primary'] = array(
 			'id_affaire' => array("disabled"=>true),
-			'loyer',
-			'kilometrage',
 			'echeance',
 			'montant_ht'
 		);
