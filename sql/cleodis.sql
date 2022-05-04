@@ -170,7 +170,10 @@ ALTER TABLE `restitution_anticipee`
   ADD PRIMARY KEY (`id_loyer_kilometrage`),
   ADD KEY `id_affaire` (`id_affaire`);
 
+ALTER TABLE `restitution_anticipee`
+  DROP `loyer`,
+  DROP `kilometrage`;
+
 ALTER TABLE `restitution_anticipee` MODIFY `id_loyer_kilometrage` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 ALTER TABLE `restitution_anticipee` ADD CONSTRAINT `restitution_anticipee_ibfk_1` FOREIGN KEY (`id_affaire`) REFERENCES `affaire` (`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
-ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(75) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(255) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;
