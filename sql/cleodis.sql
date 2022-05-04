@@ -211,3 +211,7 @@ UPDATE `site_associe` SET `siret_partenaire`= "34020062500036" WHERE site_associ
 UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'haccp';
 UPDATE `site_associe` SET `siret_partenaire`= "42268731900059" WHERE site_associe = 'dib';
 UPDATE `site_associe` SET `siret_partenaire`= "45307981600048" WHERE site_associe = 'locevo';
+        or `affaire`.`nature` = 'vente');
+
+
+ALTER TABLE `panier` DROP FOREIGN KEY `panier_ibfk_2`; ALTER TABLE `panier` ADD CONSTRAINT `panier_ibfk_2` FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE SET NULL ON UPDATE CASCADE;

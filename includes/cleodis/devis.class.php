@@ -733,6 +733,9 @@ class devis_cleodis extends devis {
 		$demande_refis=ATF::demande_refi()->sa();
 
 
+		// On va voir si il y a un panier associé à cette affaire
+		ATF::panier()->q->where("id_affaire", $devis['id_affaire']);
+		$panier = ATF::panier()->select_row();
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -815,6 +818,9 @@ class devis_cleodis extends devis {
 		    closedir($handle);
 		}
 
+		if ($panier) ATF::panier()->u(array("id_panier"=> $panier["panier.id_panier"], "id_affaire" => null));
+
+
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
 
 		$infos["devis"]["id_partenaire"]  = $data_affaire["id_partenaire"];
@@ -855,6 +861,7 @@ class devis_cleodis extends devis {
 			ATF::demande_refi()->i($item);
 		}
 
+		if ($panier) ATF::panier()->u(array("id_panier"=> $panier["panier.id_panier"], "id_affaire" => $id_affaire));
 
 		if($infos["preview"]){
 			ATF::db($this->db)->rollback_transaction();
