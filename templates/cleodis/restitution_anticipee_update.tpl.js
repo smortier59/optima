@@ -3,8 +3,6 @@
 {$current_class=ATF::getClass("restitution_anticipee")}
 {$q=ATF::_s(pager)->getAndPrepare($pager)}
 {$fields=[
-	"{$current_class->table}.loyer"
-	, "{$current_class->table}.kilometrage"
 	, "{$current_class->table}.echeance"
 	, "{$current_class->table}.montant_ht"
 ]}

@@ -123,19 +123,6 @@ ATF.buildGridEditor({
         },*/
         columns: [
             {
-                header: 'loyer',
-                dataIndex: '{$current_class->table}__dot__loyer',
-                editor: new Ext.form.TextField({
-                    value:0
-                })
-            }, {
-                header: 'kilometrage',
-                width:20,
-                dataIndex: '{$current_class->table}__dot__kilometrage',
-                editor: new Ext.form.TextField({
-                    value:0
-                })
-            }, {
                 header: 'echeance',
                 width:20,
                 dataIndex: '{$current_class->table}__dot__echeance',
