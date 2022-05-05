@@ -58,7 +58,7 @@ class suivi extends classes_optima {
 
 		$this->addPrivilege("rpcGetRecentForMobile");
 		$this->addPrivilege("suiviSpeedInsertForWebmail","insert");
-		$this->field_nom = "texte";
+
 
 		$this->files["fichier_joint"] = array("multiUpload"=>true);
 		$this->onglets = array('tache');
@@ -76,7 +76,7 @@ class suivi extends classes_optima {
 	* @return int id_suivi
     */
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
-	
+
 		if($infos["suivi"]["id_affaire"]){
 			$liste["id_affaire"] = ATF::affaire()->decryptId($infos["suivi"]["id_affaire"]);
 		}
@@ -128,7 +128,7 @@ class suivi extends classes_optima {
 		}catch(errorATF $e){
 			throw new errorATF("ERREUR DE SUIVI",988);
 		}
-		
+
 		if(!$link){	$link = ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table]));	}
 
 		//pour chaque personnes concernées (notifiés, intervenant_societe, intervenant_client)
