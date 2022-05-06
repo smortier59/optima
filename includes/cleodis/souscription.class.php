@@ -372,10 +372,6 @@ class souscription_cleodis extends souscription {
         "BIC"=> $post["bic"]
     );
 
-    // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-
-    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire;
-
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
