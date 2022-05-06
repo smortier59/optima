@@ -346,7 +346,10 @@ class souscription_cleodis extends souscription {
 
     if ($site_associe["id_type_affaire"]){
       $type_affaire = $site_associe["id_type_affaire"];
-      $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
+      if ($type_affaire) {
+        $devis["id_type_affaire"] = $type_affaire;
+        $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
+      }
     } else {
       ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
       $type_affaireNormal = ATF::type_affaire()->select_row();
