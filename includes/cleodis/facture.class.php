@@ -3093,27 +3093,32 @@ class facture_cleodis extends facture {
 	*
 	*/
 	public function sendFactureMail($date) {
-
+		log::logger("-----------------------------" , "sendFactureMail");
+		log::logger("Arrivée dans le sendFactureMail pour la date du ".$date , "sendFactureMail");
 		ATF::facture()->q->reset()->where("envoye", "non", "AND")
 								 ->where("date_envoi", $date, "AND");
-
 		$factures_a_envoyer = ATF::facture()->sa();
+
+		log::logger("On a ".count($factures_a_envoyer)." a envoyé pour cette date" , "sendFactureMail");
 
 		foreach ($factures_a_envoyer as $key => $value) {
 			try {
 				$facture_info = ATF::facture()->select($value["id_facture"]);
 				$societe = ATF::societe()->select($facture_info["id_societe"]);
 
+				log::logger("-- Facture ".$facture_info['ref'] , "sendFactureMail");
+
 				if($societe["id_contact_facturation"]){
+					log::logger("---- On a un contact de facturation pour cette societe " , "sendFactureMail");
 					$contact= ATF::contact()->select($societe["id_contact_facturation"]);
 				}else{
+					log::logger("---- On a pas de contact de facturation pour cette societe " , "sendFactureMail");
 					$contact = NULL;
 				}
 				$ref = $facture_info['ref_externe'] ? $facture_info['ref_externe'] : $facture_info['ref'];
 
 				if ($contact) {
-
-
+					log::logger("---- On prepare le mail " , "sendFactureMail");
 					$email = array(
 						"email" => NULL,
 						"texte" => "Bonjour ".$contact['nom']." ".$contact['prenom'].", <br />
@@ -3124,7 +3129,6 @@ class facture_cleodis extends facture {
 					);
 
 
-
 					if($contact["email"]) {
 						$email['email']=$contact["email"];
 					}else{
@@ -3132,7 +3136,7 @@ class facture_cleodis extends facture {
 					}
 
 					if ($email['email'] != NULL) {
-
+						log::logger("---- On envoi le mail à ".$contact['email'] , "sendFactureMail");
 
 						$suivi_message = "Envoi de la facture ".$ref.
 									" au client ".$societe["societe"]." (email: ".$email["email"].") ".
@@ -3147,6 +3151,7 @@ class facture_cleodis extends facture {
 							ATF::facturation()->u(array("id_facturation"=> $facturation["id_facturation"], "envoye"=> "oui"));
 						}
 					} else {
+						log::logger("---- Le contact de facturation n'a pas de mail ou mail perso" , "sendFactureMail");
 						$suivi_message = "Erreur lors de l'envoi de la facture  ".$ref." au client ".$societe["societe"]."\nRaison: Pas d'email sur le contact de facturation (".$contact['nom']." ".$contact['prenom'].")";
 					}
 				} else {
@@ -3173,6 +3178,8 @@ class facture_cleodis extends facture {
 			ATF::suivi()->insert($suivi);
 
 		}
+		log::logger("Fin du batch ".$date , "sendFactureMail");
+		log::logger("-----------------------------" , "sendFactureMail");
 	}
 
 
