@@ -276,7 +276,7 @@ class souscription_cleodis extends souscription {
 
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
-        log::logger($e->getMessage() , "mfleurquin");
+        log::logger($e->getMessage() , "souscription_error");
 
         throw $e;
     }
@@ -346,7 +346,10 @@ class souscription_cleodis extends souscription {
 
     if ($site_associe["id_type_affaire"]){
       $type_affaire = $site_associe["id_type_affaire"];
-      $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
+      if ($type_affaire) {
+        $devis["id_type_affaire"] = $type_affaire;
+        $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
+      }
     } else {
       ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
       $type_affaireNormal = ATF::type_affaire()->select_row();
@@ -370,7 +373,8 @@ class souscription_cleodis extends souscription {
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
+
+    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire;
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -582,7 +586,8 @@ class souscription_cleodis extends souscription {
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
 
     $id_commande = ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
-    return $id_commande;
+
+    return ATF::commande()->decryptId($id_commande);
   }
 
   /**
@@ -807,6 +812,8 @@ class souscription_cleodis extends souscription {
 
       break;
 
+
+
       default:
         throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500);
       break;
@@ -848,6 +855,21 @@ class souscription_cleodis extends souscription {
     }
 
     return $return;
+  }
+
+  /**
+   * Retour le PDF du contrat pour l'API du tuennel Meelo/GOA
+   */
+  public function _getPDFContrat($get) {
+    try {
+      $file = ATF::pdf()->generic('contratA4',$get['id_commande'], true);
+      return base64_encode($file);
+    } catch (errorATF $e) {
+      log::logger($e->getMessage() , "mfleurquin");
+      throw $e;
+    }
+
+
   }
 
   /**
