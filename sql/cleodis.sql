@@ -5,6 +5,8 @@ ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','locat
 ALTER TABLE `affaire` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','dib','locevo','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `document_revendeur` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','locevo','dib','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+
 CREATE OR REPLACE
 ALGORITHM = UNDEFINED VIEW `affaire_client` AS
 select
@@ -86,3 +88,5 @@ UPDATE `site_associe` SET `siret_partenaire`= "34020062500036" WHERE site_associ
 UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'haccp';
 UPDATE `site_associe` SET `siret_partenaire`= "42268731900059" WHERE site_associe = 'dib';
 UPDATE `site_associe` SET `siret_partenaire`= "45307981600048" WHERE site_associe = 'locevo';
+
+

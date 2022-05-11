@@ -16228,13 +16228,11 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 	}
 
-	public function contrat_goa_freeA4Particulier($id, $signature, $sellAndSign) {
-		$this->contrat_goa_free($id, "particulier");
-	}
+	public function contrat_goa_freeA4Particulier($id, $signature, $sellAndSign) { $this->contrat_goa_free($id, "particulier"); }
+	public function contrat_goa_freeA4Professionnel($id, $signature, $sellAndSign) { $this->contrat_goa_free($id, "pro"); }
 
-	public function contrat_goa_freeA4Professionnel($id, $signature, $sellAndSign) {
-		$this->contrat_goa_free($id, "pro");
-	}
+	public function contrat_goa_locationA4Particulier($id, $signature, $sellAndSign) { $this->contrat_goa_location($id, "particulier"); }
+	public function contrat_goa_locationA4Professionnel($id, $signature, $sellAndSign) { $this->contrat_goa_location($id, "pro"); }
 
 	public function headerContrat($title, $type_client) {
 		$this->setfont('arial','B',10);
@@ -16452,6 +16450,183 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->mandatSepa();
 	}
 
+	public function contrat_goa_location($id, $type_client) {
+		$num_article = 1;
+		$this->colsProduit = array("border"=>"TB","size"=>9,"flag"=>"colsProduit");
+		$this->colsProduitFirst = array("border"=>"TLB","size"=>9,"flag"=>"colsProduitFirst");
+		$this->colsProduitLast = array("border"=>"TBR","size"=>9,"flag"=>"colsProduitLast");
+		$this->colsProduitAvecDetail = array("border"=>"T","size"=>9,"flag"=>"colsProduitAvecDetail");
+		$this->colsProduitAvecDetailFirst = array("border"=>"TL","size"=>9,"flag"=>"colsProduitAvecDetailFirst");
+		$this->colsProduitAvecDetailLast = array("border"=>"TR","size"=>9,"flag"=>"colsProduitAvecDetailLast");
+		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
+
+		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat de location n° : ".$this->commande['ref'], $type_client);
+
+		$this->articleContrat("ARTICLE ".$num_article." : CONTRAT DE LOCATION");
+		$num_article++;
+		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$this->commande["ref"].".",0,1);
+		$this->ln(3);
+
+		$head = array("VEHICULE(S) ET SERVICES ASSOCIES","Taux de TVA sur les loyers",);
+		$w = array(150,35);
+		$styles = [];
+        if ($this->lignes) {
+            $this->tableauBigHead($head, [], $w, 5, $styles);
+            $this->tableauProduit();
+        }
+		$this->ln(3);
+
+
+		$this->articleContrat("ARTICLE ".$num_article." : DUREE DU CONTRAT DE LOCATION");
+		$num_article++;
+		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$this->commande["ref"].".",0,1);
+		$this->ln(3);
+
+		$head = array("Nombre de loyers","Périodicité","Loyer hors assurance HT", "Loyer hors assurance TVA", "Assurance", 'TOTAL TTC');
+		$w = array(30,31,31,31,31,31);
+		$styles = [];
+
+		$data = [];
+
+		foreach($this->loyer as $k => $v) {
+			if ($v['type'] === "engagement") {
+				$ligne[0] = $v["duree"];
+				$ligne[1] = strtoupper($v["frequence_loyer"]);
+				$ligne[2] = number_format($v["loyer"], 2, ',', '')." €";
+				$ligne[3] = number_format(($v["loyer"]* $this->commande["tva"]) - $v['loyer'], 2, ',', '')." €";
+				$ligne[4] = number_format($v["assurance"], 2, ',', '')." €";
+				$ligne[5] = number_format((($v["loyer"]* $this->commande["tva"]) + $v["assurance"]), 2, ',', '')." €";
+
+				$data[] = $ligne;
+			}
+		}
+		$this->tableauBigHead($head,$data,$w,10,$styles);
+
+
+		$this->articleContrat("ARTICLE ".$num_article." : PRIX DU CONTRAT DE LOCATION");
+		$num_article++;
+		$this->multicell(0,4,"Le loyer mensuel du Client au titre de la location du véhicule est fixé comme suit :",0,1);
+		$this->ln(3);
+
+		$this->multicell(0,4,"Le loyer est payable terme à échoir par prélèvement automatique. Toute période mensuelle de location commencée est due.",0,1);
+		$this->multicell(0,4,"Le premier loyer sera prélevé dans les jours suivants la date de livraison effective du véhicule.",0,1);
+		$this->multicell(0,4,"Le jour des prélèvements suivants (en cas de reconduction du Contrat de Location) est déterminé en fonction de la date de livraison effective du véhicule :",0,1);
+		$this->multicell(0,4,"       -	Si la livraison a lieu entre le 1er et le 10 du mois, les prélèvements auront lieu à partir du 1er du mois",0,1);
+		$this->multicell(0,4,"       -	Si la livraison a lieu entre le 11 et le 20 du mois, les prélèvements auront lieu à partir du 11 du mois",0,1);
+		$this->multicell(0,4,"       -	Si la livraison a lieu entre le 21 et le dernier jour du mois, les prélèvements auront lieu à partir du 21 du mois",0,1);
+		$this->ln(3);
+
+
+		$this->articleContrat("ARTICLE ".$num_article." : KILOMETRAGE");
+		$num_article++;
+		$this->multicell(0,4,"Le kilométrage de référence sera indiqué lors de la livraison effective du véhicule.",0,1);
+
+
+		$this->multicell(0,4,"Kilométrage maximum : ".$this->affaire["kilometrage_max"]." km par mois.",0,1);
+		$this->multicell(0,4,"En cas de dépassement du forfait kilométrique, chaque tranche commencée de 250 km sera facturée ".$this->affaire["montant_kilometrage_max_depasse"]." € les 250 kilomètres",0,1);
+		$this->ln(3);
+
+
+		$this->articleContrat("ARTICLE ".$num_article." : CONDUCTEUR(S) AUTORISE(S)");
+		$num_article++;
+		$this->multicell(0,4,"Les conducteurs âgés de plus de 21 ans et ayant plus de deux ans révolus de permis de conduire peuvent utiliser le véhicule, conformément aux termes et conditions du Contrat de Location, et sous la seule responsabilité du Client.",0,1);
+		$this->ln(3);
+
+		$this->articleContrat("ARTICLE ".$num_article." : MISE A DISPOSITION");
+		$num_article++;
+		$this->multicell(0,4,"Le Client a souhaité souscrire cette offre de location et a librement choisi les équipements objets de la location.\n\nLe Client reconnait louer les équipements en parfait état de fonctionnement.",0,1);
+		$this->ln(3);
+
+		$this->articleContrat("ARTICLE ".$num_article." : GRILLE TARIFAIRE DE FRAIS");
+		$num_article++;
+		$this->multicell(0,4,"Les frais suivants sont susceptibles d’être facturés par GoAb au Client, en fonction des options choisies ou en cas de manquement à ses obligations, telle que stipulées au Contrat d’Abonnement et dans les Conditions Générales de Location. La grille tarifaire de frais est susceptible d’évoluer à tout moment, à la seule discrétion de GoAb. En cas de modification de la présente grille tarifaire, GoAb notifiera le Client et lui communiquera la grille modifiée ; laquelle entrera en vigueur suivant un délai de préavis de trente (30) jours suivant sa notification au Client.",0,1);
+		$this->ln(3);
+
+		$head = array("Frais","Fixes ou variables","Montant / Méthode de calcul");
+		$w = array(35,35,105);
+		$styles = [];
+		$lignes_frais = [
+			["Frais de livraison du véhicule (domicile du Client ou tout autre lieu convenu)", "Variables", "Le tarif de livraison dépend de la grille disponible auprès du Partenaire de GoAb.\n\nLe tarif sera indiqué au Client avant la livraison." ]
+			,["Frais de ravitaillement en carburant*", "Variables", "Le Client paiera à GoAb les coûts relatifs aux éventuels manques de carburant en regard du niveau de carburant contenu dans le Véhicule au moment du retour du Véhicule à GoAb.\nAu montant du différentiel, s’ajoutera, 30 € TTC au titre des frais de gestion."]
+			,["Frais de remplacement de la Clé, documents administratifs ou accessoires *","Variables","Le Client sera facturé pour le coût de remplacement de toute clé, de tout document ou accessoire manquant." ]
+			,["Frais fumeur","Fixes","Si le Conducteur ou n’importe quelle autre personne fume(nt) à l’intérieur du Véhicule pendant la durée du Contrat de Location, le Client sera redevable d’une pénalité de 500 € TTC de frais de nettoyage approfondi." ]
+			,["Frais de « remise en état* »","Variables","Au moment du retour du Véhicule à GoAb, le Client est responsable de tous les frais engagés pour remettre le Véhicule dans l’état dans lequel il était à la Date de Début du Contrat de Location.\nCes frais sont établis après la restitution du véhicule et devront être payés par le Client." ]
+			,["Réparations*", "Variables", "Le Client sera responsable des réparations (qui doivent être effectuées par un centre de réparation agréé par GoAb) et de tous les frais :\n
+				i.	après la découverte de dommages à la suite d’une réinspection du Véhicule lors de son retour par le Client à GoAb ;
+				ii.	si le Véhicule a besoin d’un service de voiturier (nettoyage) plus approfondi que le service de nettoyage standard de GoAb lors de la remise du Véhicule à GoAb ; et/ou
+				iii.	si le Véhicule a été endommagé à l’intérieur ou à l’extérieur
+				(que le Client soit responsable ou non des dégâts) à tout moment lorsque ces dommages sont découverts ou signalés.
+				Ces frais sont établis après la restitution du véhicule et devront être payés par le Client." ]
+			,["Frais de kilométrage excédentaire*","Variables" , "Le Client accepte de respecter le kilométrage mensuel choisi et s’engage à payer le supplément si le kilométrage mensuel est dépassé\nFrais de kilométrage excédentaire : indiqués dans l’Article 4 des Conditions Particulières de Location." ]
+			,["Frais de restitution de véhicule", "Fixes","Gratuit" ]
+			,["Frais administratifs (changement d’adresse, changement d’informations de paiement ...)", "Fixes", "10 € HT" ]
+			,["Frais administratifs (résiliation anticipée aux torts du Client)", "Fixes", "100 € HT" ]
+			,["Frais de gestion d’amendes", "Fixes", "En cas de réception par GoAb d'un procès-verbal ou d'une demande d'information par l'Officier du Ministère Public, les frais de traitement administratif s’élèvent à 20 € HT ou 50 € HT s’il y en a plus de trois dans le mois." ]
+			,["Frais d’envoi de recommandé", "Fixes", "Tout envoi de lettre en recommandé (Désignation par exemple) sera facturé 10 € HT." ]
+			,["Frais de recouvrement", "Variables", "A détailler." ]
+		];
+
+		foreach($lignes_frais as $k=>$l){
+			$styles[] = [
+				[], [], ["align" => "L"]
+			];
+		}
+        $this->tableauBigHead($head, $lignes_frais, $w, 5, $styles);
+
+
+
+		$this->articleContrat("ARTICLE ".$num_article." : ASSURANCE ET FRANCHISES");
+		$num_article++;
+		$this->multicell(0,4,"Pour précision des termes de la police d’assurance, la franchise d’assurance est de ".$this->affaire["franchise"]." € TTC.",0,1);
+		$this->ln(3);
+
+		$this->articleContrat("ARTICLE ".$num_article." : ABSENCE DE DROIT DE RETRACTATION");
+		$num_article++;
+		$this->multicell(0,4,"CONFORMEMENT AUX DISPOSITIONS DE L’ARTICLE L. 221-28 DU CODE DE LA CONSOMMATION, LE CLIENT RECONNAIT EXPRESSEMENT QUE, DANS LE CADRE DE LA CONCLUSION DU CONTRAT DE LOCATION CONCLU A DISTANCE, IL NE BENEFICIE D’AUCUN DROIT DE RETRACTATION.",0,1);
+		$this->ln(3);
+
+		$this->articleContrat("ARTICLE ".$num_article." : VALIDITE");
+		$num_article++;
+		$this->multicell(0,4,"La conclusion du Contrat de Location est conditionnée à l’acceptation du Comité des Agréments de GoAb, en considération notamment des informations et documents communiqués par le Client. L’acceptation ou le refus sera notifié au Client dans un délai maximum de 7 jours suivant la signature des présentes.",0,1);
+		$this->ln(3);
+
+		$this->setY(219);
+		$this->line(0,$this->gety(),238,$this->gety());
+		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"Fait en deux exemplaires",0,'C');
+
+
+		$this->SetDrawColor(0,0,0);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',9);
+		$this->setFillColor(255,255,0);
+
+		$cadre = array(
+			"Fait à : "
+			,"Le : "
+			,"Nom : "
+			,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
+		);
+
+		$y = $this->gety()+2;
+		$t = "Le Client";
+
+		$this->cadre(20,$y,80,48,$cadre,$t);
+
+		$cadre = array(
+			"Fait à : "
+			,"Le : "
+			,"Nom : "
+			,"Qualité : "
+			,"Signature et cachet commercial : "
+		);
+		$this->cadre(110,$y,80,48,$cadre,"Go Abonnement");
+
+		$this->mandatSepa();
+
+	}
+
 	public function articleContrat($titre) {
 		$this->ln(5);
 		$this->setfont('arial','B',8);
@@ -16498,7 +16673,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 	}
 
 	public function details_produit($ligne) {
-		if (strtoupper($ligne["categorie"]) === "VEHICULE") {
+		if (strtoupper($ligne["categorie"]) === "VEHICULE" && $this->affaire["num_chassis"]) {
 			$commentaire = "Immatriculation : " . $this->affaire["num_chassis"] . ", N° de châssis: ".$ligne['serial'];
 		}
 
@@ -16506,12 +16681,14 @@ class pdf_go_abonnement extends pdf_cleodis {
 			$commentaire = 'Commentaire: '. $commentaire. ' '.$ligne['commentaire_produit'];
 		}
 
+		$tva = ATF::tva()->select(ATF::produit()->select($ligne['id_produit'], 'id_tva'));
+
 		return [
 			$ligne['quantite'],
 			strtoupper($ligne["categorie"]),
 			$ligne['produit'],
 			$commentaire,
-			"20%"
+			$tva["text"]
 		];
 	}
 

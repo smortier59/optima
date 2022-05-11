@@ -372,6 +372,12 @@ class souscription_cleodis extends souscription {
         "BIC"=> $post["bic"]
     );
 
+    if (ATF::$codename === "go_abonnement") {
+      $devis['kilometrage_max'] = $post['kilometrage_max'];
+      $devis['montant_kilometrage_max_depasse'] = $post['montant_kilometrage_max_depasse'];
+      $devis['franchise'] = $post['franchise'];
+    }
+
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);

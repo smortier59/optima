@@ -273,6 +273,13 @@ class affaire_cleodis extends affaire {
 		$affaire["id_commercial"] = ATF::societe()->select($infos["id_societe"], "id_owner");
 
 
+		if (ATF::$codename === "go_abonnement") {
+			$affaire['kilometrage_max'] = $infos['kilometrage_max'];
+			$affaire['montant_kilometrage_max_depasse'] = $infos['montant_kilometrage_max_depasse'];
+			$affaire['franchise'] = $infos['franchise'];
+		}
+
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
