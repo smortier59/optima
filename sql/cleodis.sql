@@ -1,3 +1,5 @@
+ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(75) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(255) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;
+ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(75) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;ALTER TABLE `type_affaire` ADD `contrat_template` VARCHAR(255) NOT NULL DEFAULT 'contrat' AFTER `devis_template`;
 ALTER TABLE `facture` ADD `date_envoi` DATE NULL DEFAULT NULL AFTER `envoye_mail`;
 ALTER TABLE `facture` ADD `envoye` ENUM('oui','non','erreur') NULL DEFAULT 'non' AFTER `date_envoi`;
 ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','locevo','dib','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
@@ -5,6 +7,8 @@ ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','locat
 ALTER TABLE `affaire` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','dib','locevo','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `document_revendeur` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','locevo','dib','haccp','axa','worldline','h2c','volfoni','aubureau','leon','hippopotamus','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+
 CREATE OR REPLACE
 ALGORITHM = UNDEFINED VIEW `abonnement_client` AS
 select
@@ -211,7 +215,6 @@ UPDATE `site_associe` SET `siret_partenaire`= "34020062500036" WHERE site_associ
 UPDATE `site_associe` SET `siret_partenaire`= "31007041200062" WHERE site_associe = 'haccp';
 UPDATE `site_associe` SET `siret_partenaire`= "42268731900059" WHERE site_associe = 'dib';
 UPDATE `site_associe` SET `siret_partenaire`= "45307981600048" WHERE site_associe = 'locevo';
-        or `affaire`.`nature` = 'vente');
 
 
 ALTER TABLE `panier` DROP FOREIGN KEY `panier_ibfk_2`; ALTER TABLE `panier` ADD CONSTRAINT `panier_ibfk_2` FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE SET NULL ON UPDATE CASCADE;
