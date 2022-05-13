@@ -26,6 +26,13 @@ class societe_cleodis extends societe {
       ,"societe.nom_commercial"
       ,"societe.code_client"
       ,'logo'=> array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70,"renderer"=>"uploadFile")
+      ,'deblocage'=>array(
+				"custom"=>true,
+				"nosort"=>true,
+				"align"=>"center",
+				"renderer"=>"deblocage",
+				"width"=>100
+			)
     );
 
     // Panel prinicpal
@@ -239,6 +246,8 @@ class societe_cleodis extends societe {
     $this->addPrivilege("autocompleteFournisseurFormationDevis");
     $this->addPrivilege("importProspect","insert");
     $this->addPrivilege("autocompleteSociete");
+    $this->addPrivilege("deblocageSociete");
+
 
     $this->autocomplete = array(
       "field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
@@ -790,6 +799,26 @@ class societe_cleodis extends societe {
 
     return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
   }
+
+  public function deblocageSociete($infos){
+   
+    $societe = ATF::societe()->select($this->decryptId($infos['id_societe']));
+
+    ATF::contact()->q->reset()->where('email',$societe['email']);
+
+    $contacts = ATF::contact()->select_all();
+
+    foreach($contacts as $item){
+      ATF::societe()->u(array("id_societe"=> $item['id_societe'], "date_blocage"=> NULL));
+    }
+
+
+		ATF::$msg->addNotice('Societe '.$this->decryptId($infos['id_societe']).' debloqué !');
+
+		return true;
+	}
+
+
 
 
   /**
