@@ -139,4 +139,11 @@ class pdf_societe extends classes_optima {
 		}
 		return $return;
 	}
+
+	public function _documents($infos){
+		$fj = ATF::pdf_societe()->filepath($infos['id_societe'],"fichier_joint");
+
+		return $fj;
+
+	}
 };
