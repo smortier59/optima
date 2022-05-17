@@ -804,8 +804,15 @@ class societe_cleodis extends societe {
    
     $societe = ATF::societe()->select($this->decryptId($infos['id_societe']));
 
-    ATF::contact()->q->reset()->where('email',$societe['email']);
-
+    if($infos['email']){
+      ATF::contact()->q->reset()->where('email',$societe['email']);
+      
+    }else if($infos['particulier_email']){
+      ATF::contact()->q->reset()->where('particulier_email',$societe['particulier_email']);
+    }else{
+      ATF::contact()->q->reset()->where('id_societe',$societe['id_societe']);
+    }
+    
     $contacts = ATF::contact()->select_all();
 
     foreach($contacts as $item){
