@@ -159,14 +159,23 @@ class pdf_societe extends classes_optima {
 
 				foreach($pdf_societes["data"] as $item){
 			
+					// zippage des fichiers pdf
 					if(file_exists($this->filepath($item['id_pdf_societe'],"fichier_joint"))){
-						log::logger("id_pdf_societe","dsarr");
-						log::logger($item['id_pdf_societe'],"dsarr");
-						$name=$item['id_pdf_societe'].".fichier_joint.zip";
+						$name=$item['id_pdf_societe'].".pdf";
 						try{
 							$zip->addFile($this->filepath($item['id_pdf_societe'],"fichier_joint"),$name);
 							}catch(errorATF $e){
-							log::logger($e->getMessage(),'dsarr');
+								throw $e;
+						}
+					}
+
+					//zippage des autres fichiers
+					if(file_exists($this->filepath($item['id_pdf_societe'],"fichier_joint2"))){
+						$name=$item['id_pdf_societe'].".zip";
+						try{
+							$zip->addFile($this->filepath($item['id_pdf_societe'],"fichier_joint2"),$name);
+							}catch(errorATF $e){
+								throw $e;
 						}
 					}
 				}
