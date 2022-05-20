@@ -149,10 +149,6 @@ class pdf_societe extends classes_optima {
 		$response = "";
 
 		$zipname = 'liasse_documentaire' . date("Ymd-Hi") . '.zip';
-		$zip = new ZipArchive;
-		$zip->open($zipname, ZipArchive::CREATE);
-
-		$zipname = 'liasse_documentaire' . date("Ymd-Hi") . '.zip';
 		$zip = new ZipArchive();
 		if($zip->open(__TEMP_PATH__  .$zipname, ZipArchive::CREATE) === true){
 			if($pdf_societes){
