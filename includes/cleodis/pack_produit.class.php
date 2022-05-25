@@ -1123,12 +1123,26 @@ class pack_produit extends classes_optima {
 			    	return str_replace("produit.","",$el);
 			    }, $entetes);
 			    $produitDedoublonne = [];
+				$result = [];
+
+				// assemblage de produits par site_associé
 			    foreach ($data as $p) {
-			    	//if($site_associe == $p["produit.site_associe"]){
-			    		$produitDedoublonne[$p['produit.id_produit']] = $p;
-			    	//}
+					if($p["produit.site_associe"] == $site_associe){
+						$result[$p["produit.site_associe"]] = $p;
+					}
 			    }
+
+				foreach($data as $p){
+
+					if($result[$site_associe]['produit.site_associe'] == $p['produit.site_associe']){
+						$produitDedoublonne[] = $p;
+
+					}
+
+				}
+
 				$data = $produitDedoublonne;
+
 			break;
 
 			case 'Packs':
@@ -1144,6 +1158,7 @@ class pack_produit extends classes_optima {
 			    		$packs[] = $value;
 			    	}
 			    }
+
 			    $data = $packs;
 			break;
 
@@ -1160,6 +1175,8 @@ class pack_produit extends classes_optima {
 			    		$lignes[] = $value;
 			    	}
 			    }
+
+
 			    $data = $lignes;
 			break;
 		}
