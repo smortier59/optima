@@ -254,6 +254,48 @@ class slimpay {
 
     }
 
+    public function updateFactureRejetPayment() {
+        ATF::slimpay_transaction()->q->reset()->where("executionStatus", "rejected");
+        $rejectedPayments = ATF::slimpay_transaction()->select_all();
+        foreach ($rejectedPayments as $key => $value) {
+            $customKey;
+            switch (json_decode($value['retour'])->code) {
+                case 'MS02':
+                    $customKey = 'contestation_debiteur';
+                    break;
+                case 'AM04':
+                case '411':
+                    $customKey = 'provision_insuffisante';
+                    break;
+                case '641':
+                case 'C11':
+                    $customKey = 'opposition_compte';
+                    break;
+                case '903':
+                    $customKey = 'decision_judiciaire';
+                    break;
+                case 'AC04':
+                    $customKey = 'compte_cloture';
+                    break;
+                case '134':
+                    $customKey = 'coor_banc_inexploitable';
+                    break;
+                case '2011':
+                    $customKey = 'pas_dordre_de_payer';
+                    break;
+                default:
+                    $customKey = 'non_preleve';
+                    break;
+            }
+            ATF::facture()->updateEnumRejet(
+                array(
+                    "id_facture" => $value['id_facture'],
+                    "key" => "rejet",
+                    "value" => $customKey
+                )
+            );
+        }
+    }
 }
 ?>
 
