@@ -86,12 +86,14 @@ class souscription_cleodis extends souscription {
           'id_societe' => $societe["id_societe"],
           'id_contact_signataire' => $post['id_contact']
         );
+
         ATF::societe()->u($toUpdate);
       }
 
       //On check les durées sur chaque pack pour regrouper/affaire
       $lignes = json_decode($post["produits"], true);
       $post["produits"] = $affaires = $lignes_par_duree = array();
+      $affaires["refs_externe"] = [];
 
       foreach ($lignes as $key => $value) {
         $duree = ATF::pack_produit()->getDureePack($value["id_pack_produit"]);
@@ -142,7 +144,6 @@ class souscription_cleodis extends souscription {
 
         ATF::affaire()->q->reset()->addField('affaire.ref','ref')->where('affaire.id_affaire', $id_affaire);
         $ref_affaire = ATF::affaire()->select_cell();
-
 
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
@@ -209,6 +210,16 @@ class souscription_cleodis extends souscription {
         // ajout du vendeur pour bdomplus
         if ($post['site_associe'] == 'bdomplus' && $nameVendeur) {
           $affToUpdate['vendeur'] = $nameVendeur;
+        }
+
+        if ($post["ref_externe"]) {
+          if (count($affaires["ids"]) > 1) {
+            $affToUpdate["ref_externe"] = $post["ref_externe"]."-".(count($affaires["ids"])-1);
+            $affaires["refs_externe"][] = $post["ref_externe"]."-".(count($affaires["ids"])-1);
+          } else {
+            $affToUpdate["ref_externe"] = $post["ref_externe"];
+            $affaires["refs_externe"][] = $post["ref_externe"];
+          }
         }
 
 
@@ -281,6 +292,7 @@ class souscription_cleodis extends souscription {
         throw $e;
     }
     ATF::db($this->db)->commit_transaction();
+
 
     return $affaires;
   }
