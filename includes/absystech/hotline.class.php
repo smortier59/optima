@@ -406,9 +406,13 @@ class hotline extends classes_optima {
 			$sec = $this->getTime($id_hotline,$type);
 			$heures = intval($sec/3600);
 			if($heures < 10) $heures = "0".$heures;
-			$minutes = ($sec-($heures*3600))/60;
+
+			$minutes = intval(($sec-($heures*3600))/60);
+
 			if($minutes < 10) $minutes = "0".$minutes;
+
 			return $heures."H".$minutes;
+
 		}
 	}
 
