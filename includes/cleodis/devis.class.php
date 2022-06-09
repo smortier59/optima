@@ -292,7 +292,7 @@ class devis_cleodis extends devis {
 		}
 
 		if (ATF::$codename === "go_abonnement") {
-			$infos_loyer_kilometrage = json_decode($infos["values_".$this->table]["loyer_kilometrage"],true);
+			$infos_restitution_anticipee = json_decode($infos["values_".$this->table]["restitution_anticipee"],true);
 		}
 
 		//Gestion AR/Avenant : soit l'un soit l'autre
@@ -442,11 +442,11 @@ class devis_cleodis extends devis {
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 
 
-		if (ATF::$codename === "go_abonnement" && $infos_loyer_kilometrage) {
-			foreach ($infos_loyer_kilometrage as $klk => $vlk) {
-				ATF::loyer_kilometrage()->insert(array(
-					"loyer" => $vlk['loyer_kilometrage__dot__loyer'],
-					"kilometrage" => $vlk['loyer_kilometrage__dot__kilometrage'],
+		if (ATF::$codename === "go_abonnement" && $infos_restitution_anticipee) {
+			foreach ($infos_restitution_anticipee as $klk => $vlk) {
+				ATF::restitution_anticipee()->insert(array(
+					"loyer" => $vlk['restitution_anticipee__dot__loyer'],
+					"kilometrage" => $vlk['restitution_anticipee__dot__kilometrage'],
 					"id_affaire" => $infos["id_affaire"]
 				));
 			}
@@ -1871,10 +1871,10 @@ class devis_go_abonnement extends devis_cleodis {
 
 	function __construct($table_or_id=NULL) {
 		parent::__construct($table_or_id);
-		$this->colonnes['panel']['loyer_kilometrage_lignes'] = array(
-			"loyer_kilometrage"=>array("custom"=>true)
+		$this->colonnes['panel']['restitution_anticipee_lignes'] = array(
+			"restitution_anticipee"=>array("custom"=>true)
 		);
-		$this->panels['loyer_kilometrage_lignes'] = array("visible"=>true, 'nbCols'=>1);
+		$this->panels['restitution_anticipee_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->fieldstructure();
 	}
 
