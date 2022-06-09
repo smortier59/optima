@@ -801,22 +801,21 @@ class societe_cleodis extends societe {
   }
 
   public function deblocageSociete($infos){
-   
+
     $societe = ATF::societe()->select($this->decryptId($infos['id_societe']));
 
-    if($infos['email']){
-      ATF::contact()->q->reset()->where('email',$societe['email']);
-      
-    }else if($infos['particulier_email']){
-      ATF::contact()->q->reset()->where('particulier_email',$societe['particulier_email']);
-    }else{
-      ATF::contact()->q->reset()->where('id_societe',$societe['id_societe']);
-    }
+    //deblocage de la société en question
+    ATF::societe()->u(array("id_societe"=> $this->decryptId($infos['id_societe']), "date_blocage"=> NULL));
+
+    ATF::contact()->q->reset()->where('id_societe',$societe['id_societe']);
     
     $contacts = ATF::contact()->select_all();
 
-    foreach($contacts as $item){
-      ATF::societe()->u(array("id_societe"=> $item['id_societe'], "date_blocage"=> NULL));
+    //deblocage de tous les societes du contact
+    if($contacts) {
+      foreach($contacts as $item){
+        ATF::societe()->u(array("id_societe"=> $item['id_societe'], "date_blocage"=> NULL));
+      }
     }
 
 
