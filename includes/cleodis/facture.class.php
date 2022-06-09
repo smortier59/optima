@@ -3224,7 +3224,95 @@ class facture_cleodis extends facture {
 		log::logger("-----------------------------" , "sendFactureMail");
 	}
 
+	/**
+	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function statusDebitEnCours(){
 
+		$this->q->reset()->where("facture.date", date("Y-m-d", strtotime("-1 year")), "AND", null, ">=");
+		if($factures = $this->select_all()){
+			foreach ($factures as $kfacture => $vfacture) {
+
+				//On récupère la derniere transaction
+				ATF::slimpay_transaction()->q->reset()->where("id_facture", $vfacture["facture.id_facture"])->addOrder("id_slimpay_transaction", "DESC");
+				$transaction = ATF::slimpay_transaction()->select_all();
+				if($transaction){
+
+					//On récupère la derniere transaction connue (en BDD) pour cette facture
+					$state = ATF::slimpay()->getStatutDebit($transaction[0]["ref_slimpay"]);					
+
+					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
+					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
+						ATF::slimpay_transaction()->u(array("id_slimpay_transaction"=> $transaction[0]["id_slimpay_transaction"],
+															"executionStatus"=>$state["executionStatus"],
+															"retour"=>json_encode($state)
+													  ));
+
+						//Si le statut de la transaction est rejected, il faut allez rechercher la Transaction rejouée
+						if($state["executionStatus"] == "rejected") {
+							//un suivi sans destinataire "Facture xxxx impayée"
+							$suivis = array("suivi"=> array(
+													"id_societe" => $this->select($vfacture["facture.id_facture"] , "id_societe"),
+													"type" => "note",
+													"date" => date("Y-m-d H:i:s"),
+													"texte" => "Facture ".$this->select($vfacture["facture.id_facture"] , "ref")." impayée",
+													"id_affaire" => $this->select($vfacture["facture.id_facture"] , "id_affaire"),
+													"type_suivi" => "Contrat",
+													"no_redirect" => true,
+													"suivi_notifie"=>array(116)
+											  	)
+											);
+
+							ATF::suivi()->insert($suivis);
+
+							switch ($state["rejectedReason"]) {
+								case 'MS02':
+									$customKey = 'contestation_debiteur';
+									break;
+								case 'AM04':
+								case '411':
+									$customKey = 'provision_insuffisante';
+									break;
+								case '641':
+								case 'C11':
+									$customKey = 'opposition_compte';
+									break;
+								case '903':
+									$customKey = 'decision_judiciaire';
+									break;
+								case 'AC04':
+									$customKey = 'compte_cloture';
+									break;
+								case '134':
+									$customKey = 'coor_banc_inexploitable';
+									break;
+								case '2011':
+									$customKey = 'pas_dordre_de_payer';
+									break;
+								default:
+									$customKey = 'non_preleve';
+									break;
+							}
+							ATF::facture()->updateEnumRejet(
+								array(
+									"id_facture" => $vfacture["facture.id_facture"],
+									"key" => "rejet",
+									"value" => $customKey
+								)
+							);
+
+							// ATF::facture()->u(array('id_facture'=> $vfacture["facture.id_facture"], "etat"=>"impayee"));
+
+						}
+					}
+				}
+
+			}
+		}
+
+
+	}
 
 
 };
@@ -3527,8 +3615,6 @@ class facture_bdomplus extends facture_cleodis {
 
 							ATF::suivi()->insert($suivis);
 
-							ATF::facture()->u(array('id_facture'=> $vfacture["facture.id_facture"], "etat"=>"impayee"));
-
 						}
 					}
 
@@ -3820,15 +3906,36 @@ class facture_go_abonnement extends facture_cleodis {
 	*
 	*/
 	public function aPrelever($infos){
-		$q = "SELECT facture.*
-		 	  FROM facture
-			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
-			  AND etat = 'impayee'
-			  AND date_paiement IS NULL
-			  ORDER BY facture.date_periode_debut, `facture`.`id_societe`, `facture`.`id_affaire`";
+
+		// & les factures donc le dernier prelevement est Rejected
+		//Recuperer les factures qui n'ont pas de prelevement SLIMPAY
+
+
+		$q = "select f.*
+		from facture f 
+		where etat='impayee'
+		and (
+				(
+					f.date_paiement is null 
+					 and f.id_facture not in (select id_facture from slimpay_transaction st)
+				 )
+			or (
+				f.id_facture in (
+					select st2.id_facture
+					from slimpay_transaction st2
+					where st2.id_slimpay_transaction in (
+						select max(st3.id_slimpay_transaction)
+						from slimpay_transaction st3 
+						where st3.id_facture =st2.id_facture 
+						and st3.executionStatus='rejected'
+					)    
+				)
+			)
+		)";		 
 
 		$return = ATF::db()->sql2array($q);
 
+		
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
