@@ -16305,7 +16305,11 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->colsProduitAvecDetailLast = array("border"=>"TR","size"=>9,"flag"=>"colsProduitAvecDetailLast");
 		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
 
-		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat d'abonnement n° : ".$this->commande['ref'], $type_client);
+		$ref = $this->commande['ref'];
+		if ($this->affaire['ref_externe']) $ref = $this->affaire['ref_externe'];
+
+
+		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat d'abonnement n° : ".$ref, $type_client);
 
 		$this->multicell(0,3,"Les présentes conditions particulières au contrat d’abonnement automobile GOA FREE (ci-après les « Conditions Particulières d’Abonnement ») sont conclues entre la société Go Abonnement et le Client, tel que désigné ci-avant.");
 		$this->multicell(0,3,"\nLes Conditions Particulières d’Abonnement et les Conditions Générales d’Abonnement forment ensemble le Contrat d’Abonnement GOA FREE.\n");
@@ -16460,11 +16464,15 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->colsProduitAvecDetailLast = array("border"=>"TR","size"=>9,"flag"=>"colsProduitAvecDetailLast");
 		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
 
-		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat de location n° : ".$this->commande['ref'], $type_client);
+		$ref = $this->commande['ref'];
+		if ($this->affaire['ref_externe']) $ref = $this->affaire['ref_externe'];
+
+
+		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat de location n° : ".$ref, $type_client);
 
 		$this->articleContrat("ARTICLE ".$num_article." : CONTRAT DE LOCATION");
 		$num_article++;
-		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$this->commande["ref"].".",0,1);
+		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$ref.".",0,1);
 		$this->ln(3);
 
 		$head = array("VEHICULE(S) ET SERVICES ASSOCIES","Taux de TVA sur les loyers",);
@@ -16479,7 +16487,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 		$this->articleContrat("ARTICLE ".$num_article." : DUREE DU CONTRAT DE LOCATION");
 		$num_article++;
-		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$this->commande["ref"].".",0,1);
+		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$ref.".",0,1);
 		$this->ln(3);
 
 		$head = array("Nombre de loyers","Périodicité","Loyer hors assurance HT", "Loyer hors assurance TVA", "Assurance", 'TOTAL TTC');
