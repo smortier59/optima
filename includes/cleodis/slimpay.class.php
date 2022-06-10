@@ -254,6 +254,81 @@ class slimpay {
 
     }
 
+    public function foo()
+    {
+        $csvPath = "/home/www/optima/core/includes/cleodis/BMN-20211204-030113-630.csv";
+        function read($csv){
+            $file = fopen($csv, 'r');
+            echo 'ooooooooooooooooooooooooooooo';
+            echo $file;
+            echo 'ooooooooooooooooooooooooooooo';
+            while (!feof($file) ) {
+                $line[] = fgetcsv($file, 1024);
+            }
+            fclose($file);
+            return $line;
+        }
+        
+        // Définir le chemin d'accès au fichier CSV
+        $csv = $csvPath;
+        
+        $csv = read($csv);
+        echo '<pre>';
+        print_r($csv);
+        echo '</pre>';
+
+        // if (($handle = fopen($csvPath, "r")) !== FALSE):
+        //     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE):
+        //         $num = count($data);
+        //        echo "<br /><br /><p> $num champs à la ligne $row:</p>";
+        //         $row++;
+        //         for ($c=0; $c < $num; $c++):
+        //            echo $data[$c] . " | ";
+        //         endfor;
+        //     endwhile;
+        //     fclose($handle);
+        // endif;
+
+        // ! ////////////////////////////////////////////////////////////////////////
+        
+        // $csvFile = file($csvPath);
+        // $data = [];
+        // foreach ($csvFile as $line) {
+        //     $data[] = str_getcsv($line);
+        //     print_r("==============\n");
+        //     print_r(str_getcsv($line));
+        //     print_r("==============\n");
+        // }
+
+        // $lol = implode("", $data[1]);
+        // $mdr = explode(";", $lol);
+        // print_r($mdr);
+
+        // var_dump($data);
+        // print_r($data[1]);
+
+        // ! ////////////////////////////////////////////////////////////////////////
+        // if (($open = fopen("./BMN-20211204-030113-630.csv", "r")) !== FALSE) 
+        // {
+        //   echo "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+        
+        //   while (($data = fgetcsv($open, 1000, ",")) !== FALSE) 
+        //   {        
+        //     $array[] = $data; 
+        //   }
+        
+        //   fclose($open);
+        // }
+        // echo "<pre>";
+        // var_dump($array);
+        // echo "</pre>";
+
+        // print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
+        // $file = fopen($csvPath, "r");
+        // print_r(fgetcsv($file, 1000, ","));
+        // fclose($file);
+    }
+
 }
 ?>
 
