@@ -4,7 +4,7 @@ define("__BYPASS__",true);
 include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
-print("hello \n");
-ATF::slimpay()->foo();
+$BmnPath = realpath("../../../bmn");
 
+ATF::slimpay()->updateAllBankMobilityEntites($BmnPath);
 ?>

@@ -254,14 +254,22 @@ class slimpay {
 
     }
 
-    public function foo()
+    public function updateAllBankMobilityEntites($path)
     {
-        $csvPath = "/home/www/optima/core/includes/cleodis/BMN-20211204-030113-630.csv";
+        $dir = new DirectoryIterator($path);
+
+        foreach ($dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $path .= "/{$fileinfo->getFilename()}";
+                $this->readBmnCsv($path);
+            }
+        }
+    }
+
+    private function readBmnCsv($csvPath)
+    {
         function read($csv){
             $file = fopen($csv, 'r');
-            echo 'ooooooooooooooooooooooooooooo';
-            echo $file;
-            echo 'ooooooooooooooooooooooooooooo';
             while (!feof($file) ) {
                 $line[] = fgetcsv($file, 1024);
             }
@@ -273,62 +281,42 @@ class slimpay {
         $csv = $csvPath;
         
         $csv = read($csv);
-        echo '<pre>';
-        print_r($csv);
-        echo '</pre>';
-
-        // if (($handle = fopen($csvPath, "r")) !== FALSE):
-        //     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE):
-        //         $num = count($data);
-        //        echo "<br /><br /><p> $num champs à la ligne $row:</p>";
-        //         $row++;
-        //         for ($c=0; $c < $num; $c++):
-        //            echo $data[$c] . " | ";
-        //         endfor;
-        //     endwhile;
-        //     fclose($handle);
-        // endif;
-
-        // ! ////////////////////////////////////////////////////////////////////////
+        array_shift($csv);
+        array_splice($csv, -2);
         
-        // $csvFile = file($csvPath);
-        // $data = [];
-        // foreach ($csvFile as $line) {
-        //     $data[] = str_getcsv($line);
-        //     print_r("==============\n");
-        //     print_r(str_getcsv($line));
-        //     print_r("==============\n");
-        // }
-
-        // $lol = implode("", $data[1]);
-        // $mdr = explode(";", $lol);
-        // print_r($mdr);
-
-        // var_dump($data);
-        // print_r($data[1]);
-
-        // ! ////////////////////////////////////////////////////////////////////////
-        // if (($open = fopen("./BMN-20211204-030113-630.csv", "r")) !== FALSE) 
-        // {
-        //   echo "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+        // Keys des champs du CSV correspondant aux :
+        // - RUM
+        // - IBAN et BIC (ancien et nouveau)
+        $allowed = [2, 10, 11, 13, 14];
         
-        //   while (($data = fgetcsv($open, 1000, ",")) !== FALSE) 
-        //   {        
-        //     $array[] = $data; 
-        //   }
-        
-        //   fclose($open);
-        // }
-        // echo "<pre>";
-        // var_dump($array);
-        // echo "</pre>";
+        $filteredArray = [];
+        foreach ($csv as $key => $value) {
+            $valueAsString = implode("", $value);
+            $tmpFieldsAsArray = explode(";", $valueAsString);
 
-        // print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
-        // $file = fopen($csvPath, "r");
-        // print_r(fgetcsv($file, 1000, ","));
-        // fclose($file);
+            array_push($filteredArray, array_values(array_filter($tmpFieldsAsArray, 
+            function($k) use ($allowed) {
+                return in_array($k, $allowed);
+            },
+            ARRAY_FILTER_USE_KEY)));
+        }
+
+        $this->updateAffaireAndSocieteIbanAndBic($filteredArray);
     }
 
+    private function updateAffaireAndSocieteIbanAndBic($filteredArray) {
+        foreach ($filteredArray as $key => $value) {
+            ATF::societe()->q->reset()->where("RUM", $value[0]);
+            $societe = ATF::societe()->select_row();
+			ATF::societe()->u(array("id_societe" => $societe["id_societe"], "IBAN"=> $value[4], "BIC"=> $value[3]));
+            
+            ATF::affaire()->q->reset()->where("RUM", $value[0]);
+            $affaires = ATF::affaire()->sa();
+            foreach ($affaires as $key => $affaire) {
+                ATF::affaire()->u(array("id_affaire" => $affaire["id_affaire"], "IBAN"=> $value[4], "BIC"=> $value[3]));
+            }
+        }
+    }
 }
 ?>
 
