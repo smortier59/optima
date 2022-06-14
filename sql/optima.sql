@@ -1,1 +1,0 @@
-ALTER TABLE `produit` ADD `loyer_sans_tva` FLOAT(6,3) NULL DEFAULT NULL AFTER `loyer`;
