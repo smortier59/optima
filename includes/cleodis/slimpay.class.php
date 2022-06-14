@@ -305,16 +305,20 @@ class slimpay {
     }
 
     private function updateAffaireAndSocieteIbanAndBic($filteredArray) {
-        foreach ($filteredArray as $key => $value) {
-            ATF::societe()->q->reset()->where("RUM", $value[0]);
-            $societe = ATF::societe()->select_row();
-			ATF::societe()->u(array("id_societe" => $societe["id_societe"], "IBAN"=> $value[4], "BIC"=> $value[3]));
-            
-            ATF::affaire()->q->reset()->where("RUM", $value[0]);
-            $affaires = ATF::affaire()->sa();
-            foreach ($affaires as $key => $affaire) {
-                ATF::affaire()->u(array("id_affaire" => $affaire["id_affaire"], "IBAN"=> $value[4], "BIC"=> $value[3]));
+        try {
+            foreach ($filteredArray as $key => $value) {
+                ATF::societe()->q->reset()->where("RUM", $value[0]);
+                $societe = ATF::societe()->select_row();
+		    	ATF::societe()->u(array("id_societe" => $societe["id_societe"], "IBAN"=> $value[4], "BIC"=> $value[3]));
+
+                ATF::affaire()->q->reset()->where("RUM", $value[0]);
+                $affaires = ATF::affaire()->sa();
+                foreach ($affaires as $key => $affaire) {
+                    ATF::affaire()->u(array("id_affaire" => $affaire["id_affaire"], "IBAN"=> $value[4], "BIC"=> $value[3]));
+                }
             }
+        } catch (errorATF $e) {
+            echo $e->getMessage();
         }
     }
 }
