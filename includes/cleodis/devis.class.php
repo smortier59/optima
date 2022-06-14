@@ -391,43 +391,51 @@ class devis_cleodis extends devis {
 
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+		$societe = ATF::societe()->select($infos['id_societe']);
 
 
-		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
+		if ($infos['rum']) {
+			$RUM = $infos["rum"];
 
-		if(!$RUM){
-			if(    ATF::societe()->select($infos['id_societe'], 'RUM')
-				&& ATF::societe()->select($infos['id_societe'], 'IBAN') == $affaire["BIC"]
-				&& ATF::societe()->select($infos['id_societe'], 'BIC') == $affaire["IBAN"]){
-				$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
-			}else{
-				//Si il n'y a pas de RUM, on en ajoute un pour cette société
-			    $RUM = ATF::societe()->create_rum();
+			if (!$societe["RUM"]) {
+				ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+			}
+			unset($infos["rum"]);
+		} else {
+			$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
-			    $societe = ATF::societe()->select($infos['id_societe']);
-
-				if($societe['code_client']){
-
-					if(strlen($societe['code_client']) === 6){
-						$RUM .= $societe['code_client'];
-					}elseif(strlen($societe['code_client']) > 6){
-						$RUM .= substr($societe['code_client'], -6);
-					}else{
-						for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
-							$RUM .= '0';
-						}
-						$RUM .= $societe['code_client'];
-					}
+			if(!$RUM){
+				if(    ATF::societe()->select($infos['id_societe'], 'RUM')
+					&& ATF::societe()->select($infos['id_societe'], 'IBAN') == $affaire["BIC"]
+					&& ATF::societe()->select($infos['id_societe'], 'BIC') == $affaire["IBAN"]){
+					$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
 				}else{
-					$RUM .= '000000';
+					//Si il n'y a pas de RUM, on en ajoute un pour cette société
+					$RUM = ATF::societe()->create_rum();
+
+					if($societe['code_client']){
+						if(strlen($societe['code_client']) === 6){
+							$RUM .= $societe['code_client'];
+						}elseif(strlen($societe['code_client']) > 6){
+							$RUM .= substr($societe['code_client'], -6);
+						}else{
+							for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
+								$RUM .= '0';
+							}
+							$RUM .= $societe['code_client'];
+						}
+					}else{
+						$RUM .= '000000';
+					}
+
+
+					ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+					if($affaire["IBAN"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "IBAN"=>$affaire["IBAN"]));
+					if($affaire["BIC"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "BIC"=>$affaire["BIC"]));
 				}
-
-
-			    ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
-			    if($affaire["IBAN"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "IBAN"=>$affaire["IBAN"]));
-			    if($affaire["BIC"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "BIC"=>$affaire["BIC"]));
 			}
 		}
+
 		$affaire["RUM"] = $RUM;
 
 		if ($infos['id_commercial']) {
@@ -447,8 +455,8 @@ class devis_cleodis extends devis {
 		if (ATF::$codename === "go_abonnement" && $infos_restitution_anticipee) {
 			foreach ($infos_restitution_anticipee as $klk => $vlk) {
 				ATF::restitution_anticipee()->insert(array(
-					"loyer" => $vlk['restitution_anticipee__dot__loyer'],
-					"kilometrage" => $vlk['restitution_anticipee__dot__kilometrage'],
+					"montant_ht" => $vlk['restitution_anticipee__dot__montant_ht'],
+					"echeance" => $vlk['restitution_anticipee__dot__echeance'],
 					"id_affaire" => $infos["id_affaire"]
 				));
 			}
