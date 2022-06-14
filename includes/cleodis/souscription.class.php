@@ -372,6 +372,8 @@ class souscription_cleodis extends souscription {
         "BIC"=> $post["bic"]
     );
 
+    if ($post["rum"])  $devis["rum"] = $post["rum"];
+
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);

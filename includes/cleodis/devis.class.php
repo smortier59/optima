@@ -390,9 +390,16 @@ class devis_cleodis extends devis {
 
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+		$societe = ATF::societe()->select($infos['id_societe']);
+
 
 		if ($infos['rum']) {
+			$RUM = $infos["rum"];
 
+			if (!$societe["RUM"]) {
+				ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+			}
+			unset($infos["rum"]);
 		} else {
 			$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
@@ -405,10 +412,7 @@ class devis_cleodis extends devis {
 					//Si il n'y a pas de RUM, on en ajoute un pour cette société
 					$RUM = ATF::societe()->create_rum();
 
-					$societe = ATF::societe()->select($infos['id_societe']);
-
 					if($societe['code_client']){
-
 						if(strlen($societe['code_client']) === 6){
 							$RUM .= $societe['code_client'];
 						}elseif(strlen($societe['code_client']) > 6){
