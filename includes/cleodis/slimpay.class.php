@@ -269,8 +269,7 @@ class slimpay {
 
         foreach ($dir as $fileinfo) {
             if (!$fileinfo->isDot()) {
-                $path .= "/{$fileinfo->getFilename()}";
-                $this->readBmnCsv($path);
+                $this->readBmnCsv($fileinfo->getPathname());
             }
         }
     }
@@ -285,19 +284,10 @@ class slimpay {
      */
     private function readBmnCsv($csvPath)
     {
-        function read($csv){
-            $file = fopen($csv, 'r');
-            while (!feof($file) ) {
-                $line[] = fgetcsv($file, 1024);
-            }
-            fclose($file);
-            return $line;
-        }
-        
         // Définir le chemin d'accès au fichier CSV
         $csv = $csvPath;
         
-        $csv = read($csv);
+        $csv = $this->openCsv($csvPath);
         array_shift($csv);
         array_splice($csv, -2);
         
@@ -310,7 +300,7 @@ class slimpay {
         foreach ($csv as $key => $value) {
             $valueAsString = implode("", $value);
             $tmpFieldsAsArray = explode(";", $valueAsString);
-
+            
             array_push($filteredArray, array_values(array_filter($tmpFieldsAsArray, 
             function($k) use ($allowed) {
                 return in_array($k, $allowed);
@@ -320,6 +310,24 @@ class slimpay {
 
         $this->updateAffaireAndSocieteIbanAndBic($filteredArray);
     }
+
+    /**
+     * @param $csv qui correspond au chemin vers le dossier de stockage des BMN
+     * à la racine du projet
+     * 
+     * Ouvre le fichier csv et retourne un tableau contenant chaque ligne du csv
+     * 
+     * @author Francisco Fernandez <ffernandez@absystech.fr>
+     */
+    private function openCsv($csv){
+        $file = fopen($csv, 'r');
+        while (!feof($file) ) {
+            $line[] = fgetcsv($file, 1024);
+        }
+        fclose($file);
+        return $line;
+    }
+    
 
     /**
      * @param $filteredArray à la liste d'objets contenant les IBAN, BIC et RUM
@@ -335,11 +343,24 @@ class slimpay {
                 ATF::societe()->q->reset()->where("RUM", $value[0]);
                 $societe = ATF::societe()->select_row();
 		    	ATF::societe()->u(array("id_societe" => $societe["id_societe"], "IBAN"=> $value[4], "BIC"=> $value[3]));
-
+                
                 ATF::affaire()->q->reset()->where("RUM", $value[0]);
                 $affaires = ATF::affaire()->sa();
                 foreach ($affaires as $key => $affaire) {
                     ATF::affaire()->u(array("id_affaire" => $affaire["id_affaire"], "IBAN"=> $value[4], "BIC"=> $value[3]));
+                    
+                    $notifies = ATF::user()->getDestinataireFromConstante("__SUIVI_SLIMPAY_UPDATE_BMN__");
+
+                    $suivi = array(
+                        "id_user"=>ATF::$usr->get('id_user')
+                        ,"id_societe"=>$affaire['id_societe']
+                        ,"id_affaire"=>$affaire['id_affaire']
+                        ,"type_suivi"=>'Contrat'
+                        ,"texte"=>"Affaire n°".ATF::affaire()->select($affaire['id_affaire'],'ref')." - Modification des coordonnées bancaires. Voici les anciennes : BIC : '".$value[1]."', IBAN : '".$value[2]."'. Et voici les nouvelles : BIC : '".$value[3]."', IBAN : '".$value[4]."'."
+                        ,'public'=>'oui'
+                        ,'suivi_notifie'=>$notifies
+                    );
+                    ATF::suivi()->insert($suivi);
                 }
             }
         } catch (errorATF $e) {
