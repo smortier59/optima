@@ -254,6 +254,15 @@ class slimpay {
 
     }
 
+    /**
+     * @param $path qui correspond au chemin vers le dossier de stockage des BMN
+     * à la racine du projet
+     * 
+     * Méthode appelée par le batch `batch_mobilite_bancaire_slimpay.php` pour lire
+     * les csv et enregistrer les infos traitées directement en base
+     * 
+     * @author Francisco Fernandez <ffernandez@absystech.fr>
+     */
     public function updateAllBankMobilityEntites($path)
     {
         $dir = new DirectoryIterator($path);
@@ -266,6 +275,14 @@ class slimpay {
         }
     }
 
+    /**
+     * @param $csvPath qui correspond au chemin vers le dossier de stockage des BMN
+     * à la racine du projet
+     * 
+     * Effectue le traitement permettant de lire les fichiers csv contenus dans le dossier
+     * 
+     * @author Francisco Fernandez <ffernandez@absystech.fr>
+     */
     private function readBmnCsv($csvPath)
     {
         function read($csv){
@@ -304,6 +321,14 @@ class slimpay {
         $this->updateAffaireAndSocieteIbanAndBic($filteredArray);
     }
 
+    /**
+     * @param $filteredArray à la liste d'objets contenant les IBAN, BIC et RUM
+     * contenu dans un fichier BMN
+     * 
+     * Effectue le traitement permettant d'update les tables `affaire` et `societe`
+     * 
+     * @author Francisco Fernandez <ffernandez@absystech.fr>
+     */
     private function updateAffaireAndSocieteIbanAndBic($filteredArray) {
         try {
             foreach ($filteredArray as $key => $value) {
