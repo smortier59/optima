@@ -266,10 +266,11 @@ class slimpay {
     public function updateAllBankMobilityEntites($path)
     {
         $dir = new DirectoryIterator($path);
+        $notifies = ATF::user()->getDestinataireFromConstante("__SUIVI_SLIMPAY_UPDATE_BMN__");
 
         foreach ($dir as $fileinfo) {
             if (!$fileinfo->isDot()) {
-                $this->readBmnCsv($fileinfo->getPathname());
+                $this->readBmnCsv($fileinfo->getPathname(), $notifies);
             }
         }
     }
@@ -282,7 +283,7 @@ class slimpay {
      * 
      * @author Francisco Fernandez <ffernandez@absystech.fr>
      */
-    private function readBmnCsv($csvPath)
+    private function readBmnCsv($csvPath, $notifies)
     {
         // Définir le chemin d'accès au fichier CSV
         $csv = $csvPath;
@@ -308,7 +309,7 @@ class slimpay {
             ARRAY_FILTER_USE_KEY)));
         }
 
-        $this->updateAffaireAndSocieteIbanAndBic($filteredArray);
+        $this->updateAffaireAndSocieteIbanAndBic($filteredArray, $notifies);
     }
 
     /**
@@ -334,10 +335,11 @@ class slimpay {
      * contenu dans un fichier BMN
      * 
      * Effectue le traitement permettant d'update les tables `affaire` et `societe`
+     * Insert également un suivi pour chaque affaire et envoie un email en conséquence
      * 
      * @author Francisco Fernandez <ffernandez@absystech.fr>
      */
-    private function updateAffaireAndSocieteIbanAndBic($filteredArray) {
+    private function updateAffaireAndSocieteIbanAndBic($filteredArray, $notifies) {
         try {
             foreach ($filteredArray as $key => $value) {
                 ATF::societe()->q->reset()->where("RUM", $value[0]);
@@ -349,14 +351,19 @@ class slimpay {
                 foreach ($affaires as $key => $affaire) {
                     ATF::affaire()->u(array("id_affaire" => $affaire["id_affaire"], "IBAN"=> $value[4], "BIC"=> $value[3]));
                     
-                    $notifies = ATF::user()->getDestinataireFromConstante("__SUIVI_SLIMPAY_UPDATE_BMN__");
-
                     $suivi = array(
                         "id_user"=>ATF::$usr->get('id_user')
                         ,"id_societe"=>$affaire['id_societe']
                         ,"id_affaire"=>$affaire['id_affaire']
                         ,"type_suivi"=>'Contrat'
-                        ,"texte"=>"Affaire n°".ATF::affaire()->select($affaire['id_affaire'],'ref')." - Modification des coordonnées bancaires. Voici les anciennes : BIC : '".$value[1]."', IBAN : '".$value[2]."'. Et voici les nouvelles : BIC : '".$value[3]."', IBAN : '".$value[4]."'."
+                        ,"texte"=>"Affaire n°".ATF::affaire()->select($affaire['id_affaire'],'ref')." \n
+                        Modification des coordonnées bancaires. \n
+                        - Anciennes coordonnées : 
+                        BIC : '".$value[1]."'
+                        IBAN : '".$value[2]."'\n
+                        - Nouvelles coordonnées :
+                        BIC : '".$value[3]."'
+                        IBAN : '".$value[4]."'."
                         ,'public'=>'oui'
                         ,'suivi_notifie'=>$notifies
                     );
