@@ -457,12 +457,20 @@ class parc_go_abonnement extends parc_cleodis {
 		parent::__construct();
 		$this->table = "parc";
 		$this->colonnes['fields_column']["parc.immatriculation"] = array("width"=>150,"rowEditor"=>"setImmatriculation");
+		$this->colonnes['fields_column']["parc.kilometrage"] = array("width"=>150,"rowEditor"=>"setkilometrage");
+		$this->colonnes['fields_column']["parc.date_premiere_mise_en_circulation"] = array("width"=>150,"rowEditor"=>"setdate_premiere_mise_en_circulation");
+		$this->colonnes['fields_column']["parc.puissance"] = array("width"=>150,"rowEditor"=>"setPuissance");
+		$this->colonnes['fields_column']["parc.type_energie"] = array("width"=>150,"rowEditor"=>"setType_energie");
 
 
 
 		$this->fieldstructure();
 
 		$this->addPrivilege("setImmatriculation");
+		$this->addPrivilege("setkilometrage");
+		$this->addPrivilege("setdate_premiere_mise_en_circulation");
+		$this->addPrivilege("setPuissance");
+		$this->addPrivilege("setType_energie");
 	}
 
 	public function setImmatriculation($infos) {
@@ -479,6 +487,71 @@ class parc_go_abonnement extends parc_cleodis {
 			);
 		}
 	}
+
+
+	public function setkilometrage($infos) {
+		$res = $this->update(
+			array(
+				"id_parc"=> $this->decryptId($infos["id_parc"]),
+				"kilometrage" => $infos["kilometrage"]
+			)
+		);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
+	}
+
+
+	public function setdate_premiere_mise_en_circulation($infos) {
+		$res = $this->update(
+			array(
+				"id_parc"=> $this->decryptId($infos["id_parc"]),
+				"date_premiere_mise_en_circulation" => $infos["date_premiere_mise_en_circulation"]
+			)
+		);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
+	}
+
+
+	public function setPuissance($infos) {
+		$res = $this->update(
+			array(
+				"id_parc"=> $this->decryptId($infos["id_parc"]),
+				"puissance" => $infos["puissance"]
+			)
+		);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
+	}
+
+	public function setType_energie($infos) {
+		$res = $this->update(
+			array(
+				"id_parc"=> $this->decryptId($infos["id_parc"]),
+				"type_energie" => $infos["type_energie"]
+			)
+		);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
+	}
+
+
 
 };
 
