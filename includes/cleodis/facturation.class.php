@@ -1600,7 +1600,15 @@ class facturation extends classes_optima {
 					}
 
 					//Insertion des factures
-					$facture_date_previsionnelle=date('Y-m-d',strtotime($facturation["date_periode_debut"]."+".$day." day"));
+					$jourPrelevement = date("d", strtotime($facturation["date_periode_debut"]));
+					if ($affaire["date_previsionnelle"]) {
+						if (intval($affaire["date_previsionnelle"]) < 10) {
+							$jourPrelevement = "0".$affaire["date_previsionnelle"];
+						} else {
+							$jourPrelevement = $affaire["date_previsionnelle"];
+						}
+					}
+					$facture_date_previsionnelle=date('Y-m-',strtotime($facturation["date_periode_debut"]."+".$day." day")).$jourPrelevement;
 
 					$prix = $facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
 					$prix_sans_tva = 0;
