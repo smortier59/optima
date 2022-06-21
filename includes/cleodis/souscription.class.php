@@ -398,7 +398,13 @@ class souscription_cleodis extends souscription {
 
         ATF::produit()->q->reset()
           ->addField("loyer")
-          ->addField("loyer_sans_tva")
+          ->addField('assurance')
+          ->addField('frais_de_gestion')
+          ->addField('serenite')
+          ->addField('maintenance')
+          ->addField('hotline')
+          ->addField('supervision')
+          ->addField('support')
           ->addField("duree")
           ->addField("ean")
           ->addField("id_sous_categorie")
@@ -481,13 +487,22 @@ class souscription_cleodis extends souscription {
         }
 
         $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["assurance"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] += $produitLoyer["frais_de_gestion"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__serenite"] += $produitLoyer["serenite"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__maintenance"] += $produitLoyer["maintenance"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__hotline"] += $produitLoyer["hotline"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__supervision"] += $produitLoyer["supervision"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__support"] += $produitLoyer["support"] * $produit['quantite'];
+
         $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
 
+        $loyer = $toInsertLoyer[0]["loyer__dot__loyer"] +  $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] + $toInsertLoyer[0]["loyer__dot__serenite"] +  $toInsertLoyer[0]["loyer__dot__maintenance"] + $toInsertLoyer[0]["loyer__dot__hotline"] + $toInsertLoyer[0]["loyer__dot__supervision"] +  $toInsertLoyer[0]["loyer__dot__support"];
+
         if ($assurance_sans_tva == "oui") {
-          $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["loyer_sans_tva"] * $produit['quantite'];
-          $devis["prix"] = ($toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
+          $devis["prix"] = ($loyer * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
         } else {
-          $devis["prix"] = $toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"];
+          $devis["prix"] = $loyer * $toInsertLoyer[0]["loyer__dot__duree"];
         }
     }
 
