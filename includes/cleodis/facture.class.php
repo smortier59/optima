@@ -392,6 +392,7 @@ class facture_cleodis extends facture {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function delete($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL) {
+		
 		if (is_numeric($infos) || is_string($infos)) {
 			$id=$this->decryptId($infos);
 			$facture=$this->select($id);
@@ -1142,11 +1143,37 @@ class facture_cleodis extends facture {
 	* @return boolean
 	*/
 	public function can_delete($id){
-		if($this->select($id,"etat")=="impayee"){
-			return true;
+
+		if(ATF::$codename == "go_abonnement" ){
+			if($this->can_delete_go_abonnement($id)){
+				return true;
+			}else{
+				throw new errorATF("Impossible de supprimer cette ".ATF::$usr->trans($this->table)." car la valeur exporte est egale à OUI.");
+			}
+
 		}else{
-			throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
+			if($this->select($id,"etat")=="impayee"){
+			return true;
+		 }else{
+		 	throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
+		 }
 		}
+
+		
+	}
+
+	public function can_delete_go_abonnement($id){
+		$active = false;
+
+		if($this->select($id,"exporte") == "oui"){
+			$active = false;
+	
+		}else{
+			$active = true;
+		}
+
+		return $active;
+
 	}
 
 	/**
