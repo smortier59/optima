@@ -1148,7 +1148,7 @@ class facture_cleodis extends facture {
 			if($this->can_delete_go_abonnement($id)){
 				return true;
 			}else{
-				throw new errorATF("Impossible de supprimer cette ".ATF::$usr->trans($this->table)." car la valeur exporte est egale à OUI.");
+				throw new errorATF("Impossible de supprimer cette ".ATF::$usr->trans($this->table)." car elle est impayée et la valeur exporte est egale à OUI.");
 			}
 
 		}else{
@@ -1165,7 +1165,7 @@ class facture_cleodis extends facture {
 	public function can_delete_go_abonnement($id){
 		$active = false;
 
-		if($this->select($id,"exporte") == "oui"){
+		if($this->select($id,"exporte") == "oui" && $this->select($id,"etat") =="impayee"){
 			$active = false;
 	
 		}else{
