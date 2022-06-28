@@ -102,7 +102,7 @@ class pdf_cleodis extends pdf {
 
 		$footerTexte = $this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'];
 		if (ATF::$codename == "go_abonnement") {
-			$footerTexte .= " - Email : ".$this->societe['email'];
+			$footerTexte .= " \n Email : ".$this->societe['email'];
 		}
 
 		if ($this->A3) {
