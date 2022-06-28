@@ -458,9 +458,10 @@ class parc_go_abonnement extends parc_cleodis {
 		$this->table = "parc";
 		$this->colonnes['fields_column']["parc.immatriculation"] = array("width"=>150,"rowEditor"=>"setImmatriculation");
 		$this->colonnes['fields_column']["parc.kilometrage"] = array("width"=>150,"rowEditor"=>"setkilometrage");
-		$this->colonnes['fields_column']["parc.date_premiere_mise_en_circulation"] = array("width"=>150,"rowEditor"=>"setdate_premiere_mise_en_circulation");
+		$this->colonnes['fields_column']["parc.date_premiere_mise_en_circulation"] = array("renderer"=>"updateDate");
 		$this->colonnes['fields_column']["parc.puissance"] = array("width"=>150,"rowEditor"=>"setPuissance");
-		$this->colonnes['fields_column']["parc.type_energie"] = array("width"=>150,"rowEditor"=>"setType_energie");
+		$this->colonnes['fields_column']["parc.type_energie"] = array("renderer"=>"setType_energie","width"=>200);
+		
 
 
 
@@ -540,7 +541,7 @@ class parc_go_abonnement extends parc_cleodis {
 		$res = $this->update(
 			array(
 				"id_parc"=> $this->decryptId($infos["id_parc"]),
-				"type_energie" => $infos["type_energie"]
+				"type_energie" => $infos["value"]
 			)
 		);
 		if($res){
