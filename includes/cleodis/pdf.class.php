@@ -99,6 +99,12 @@ class pdf_cleodis extends pdf {
 		$style2 = array("decoration"=>"BI","size"=>10,"color"=>"000000");
 
 		$savelMargin=$this->lMargin;
+
+		$footerTexte = $this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'];
+		if (ATF::$codename == "go_abonnement") {
+			$footerTexte .= " - Email : ".$this->societe['email'];
+		}
+
 		if ($this->A3) {
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
@@ -106,7 +112,7 @@ class pdf_cleodis extends pdf {
 
 				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 
-				$this->multicell(200,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+				$this->multicell(200,3,$footerTexte,0,'C');
 
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
@@ -122,9 +128,7 @@ class pdf_cleodis extends pdf {
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 			}
 
-
-
-			$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+			$this->multicell(0,3,$footerTexte,0,'C');
 
 			$this->SetX(10);
 			if (!$this->noPageNo) {
@@ -212,21 +216,21 @@ class pdf_cleodis extends pdf {
 	}
 
 
-  public function noticeAssurance() {
-	$this->Open();
-	$this->unsetHeader();
-	$this->unsetFooter();
+	public function noticeAssurance() {
+		$this->Open();
+		$this->unsetHeader();
+		$this->unsetFooter();
 
-	$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
+		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
 
-	for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-	  $tplIdx = $this->importPage($pageNo);
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+		$tplIdx = $this->importPage($pageNo);
 
-	  // add a page
-	  $this->AddPage();
-	  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		// add a page
+		$this->AddPage();
+		$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		}
 	}
-  }
 
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
@@ -15754,13 +15758,16 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 
+		$telSociete = $this->agence['tel'];
+		if (!$telSociete) $telSociete = $this->societe['tel'];
+
 		//CADRE Societe
 		$cadre = array(
 			$this->societe['societe']
 			,$this->societe['adresse']
 			,$this->societe['adresse_2']
 			,$this->societe['cp']." ".$this->societe['ville']
-			,"Tel : ".$this->agence['tel']
+			,"Tel : ".$telSociete
 			,"N° TVA intra : FR 91 ".$this->societe["siren"]
 			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 		);
