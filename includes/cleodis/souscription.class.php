@@ -851,7 +851,8 @@ class souscription_cleodis extends souscription {
       "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref"),
       "rum"=> ATF::affaire()->select($id_affaire, "RUM"),
       "bic"=> $bic,
-      "iban"=> $iban
+      "iban"=> $iban,
+      "id_type_affaire" => ATF::affaire()->select($id_affaire, "id_type_affaire")
     );
 
     if($passage_slimpay)  $return["passage_slimpay"] = $passage_slimpay;
