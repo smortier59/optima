@@ -1155,9 +1155,7 @@ class facture_cleodis extends facture {
 			}
 		}else{
 		 	throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
-		 }
 		}
-
 	}
 
 	/**
