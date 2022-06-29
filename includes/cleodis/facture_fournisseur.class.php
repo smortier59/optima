@@ -26,7 +26,7 @@ class facture_fournisseur extends classes_optima {
 			"ref"
 			,"id_affaire"=>array("disabled"=>true)
 			,"id_bon_de_commande"=>array("disabled"=>true)
-			,"id_fournisseur"=>array("disabled"=>true)
+			,"id_fournisseur"
 			,"type"
 			,"periodicite"
 		);

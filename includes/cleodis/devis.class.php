@@ -292,7 +292,7 @@ class devis_cleodis extends devis {
 		}
 
 		if (ATF::$codename === "go_abonnement") {
-			$infos_loyer_kilometrage = json_decode($infos["values_".$this->table]["loyer_kilometrage"],true);
+			$infos_restitution_anticipee = json_decode($infos["values_".$this->table]["restitution_anticipee"],true);
 		}
 
 		//Gestion AR/Avenant : soit l'un soit l'autre
@@ -391,42 +391,46 @@ class devis_cleodis extends devis {
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
 
+		if ($infos['rum']) {
 
-		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
+		} else {
+			$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
-		if(!$RUM){
-			if(    ATF::societe()->select($infos['id_societe'], 'RUM')
-				&& ATF::societe()->select($infos['id_societe'], 'IBAN') == $affaire["BIC"]
-				&& ATF::societe()->select($infos['id_societe'], 'BIC') == $affaire["IBAN"]){
-				$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
-			}else{
-				//Si il n'y a pas de RUM, on en ajoute un pour cette société
-			    $RUM = ATF::societe()->create_rum();
-
-			    $societe = ATF::societe()->select($infos['id_societe']);
-
-				if($societe['code_client']){
-
-					if(strlen($societe['code_client']) === 6){
-						$RUM .= $societe['code_client'];
-					}elseif(strlen($societe['code_client']) > 6){
-						$RUM .= substr($societe['code_client'], -6);
-					}else{
-						for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
-							$RUM .= '0';
-						}
-						$RUM .= $societe['code_client'];
-					}
+			if(!$RUM){
+				if(    ATF::societe()->select($infos['id_societe'], 'RUM')
+					&& ATF::societe()->select($infos['id_societe'], 'IBAN') == $affaire["BIC"]
+					&& ATF::societe()->select($infos['id_societe'], 'BIC') == $affaire["IBAN"]){
+					$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
 				}else{
-					$RUM .= '000000';
+					//Si il n'y a pas de RUM, on en ajoute un pour cette société
+					$RUM = ATF::societe()->create_rum();
+
+					$societe = ATF::societe()->select($infos['id_societe']);
+
+					if($societe['code_client']){
+
+						if(strlen($societe['code_client']) === 6){
+							$RUM .= $societe['code_client'];
+						}elseif(strlen($societe['code_client']) > 6){
+							$RUM .= substr($societe['code_client'], -6);
+						}else{
+							for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
+								$RUM .= '0';
+							}
+							$RUM .= $societe['code_client'];
+						}
+					}else{
+						$RUM .= '000000';
+					}
+
+
+					ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+					if($affaire["IBAN"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "IBAN"=>$affaire["IBAN"]));
+					if($affaire["BIC"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "BIC"=>$affaire["BIC"]));
 				}
-
-
-			    ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
-			    if($affaire["IBAN"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "IBAN"=>$affaire["IBAN"]));
-			    if($affaire["BIC"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "BIC"=>$affaire["BIC"]));
 			}
 		}
+
 		$affaire["RUM"] = $RUM;
 
 		if ($infos['id_commercial']) {
@@ -442,11 +446,11 @@ class devis_cleodis extends devis {
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 
 
-		if (ATF::$codename === "go_abonnement" && $infos_loyer_kilometrage) {
-			foreach ($infos_loyer_kilometrage as $klk => $vlk) {
-				ATF::loyer_kilometrage()->insert(array(
-					"loyer" => $vlk['loyer_kilometrage__dot__loyer'],
-					"kilometrage" => $vlk['loyer_kilometrage__dot__kilometrage'],
+		if (ATF::$codename === "go_abonnement" && $infos_restitution_anticipee) {
+			foreach ($infos_restitution_anticipee as $klk => $vlk) {
+				ATF::restitution_anticipee()->insert(array(
+					"montant_ht" => $vlk['restitution_anticipee__dot__montant_ht'],
+					"echeance" => $vlk['restitution_anticipee__dot__echeance'],
 					"id_affaire" => $infos["id_affaire"]
 				));
 			}
@@ -733,6 +737,9 @@ class devis_cleodis extends devis {
 		$demande_refis=ATF::demande_refi()->sa();
 
 
+		// On va voir si il y a un panier associé à cette affaire
+		ATF::panier()->q->where("id_affaire", $devis['id_affaire']);
+		$panier = ATF::panier()->select_row();
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -815,6 +822,9 @@ class devis_cleodis extends devis {
 		    closedir($handle);
 		}
 
+		if ($panier) ATF::panier()->u(array("id_panier"=> $panier["panier.id_panier"], "id_affaire" => null));
+
+
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
 
 		$infos["devis"]["id_partenaire"]  = $data_affaire["id_partenaire"];
@@ -855,6 +865,7 @@ class devis_cleodis extends devis {
 			ATF::demande_refi()->i($item);
 		}
 
+		if ($panier) ATF::panier()->u(array("id_panier"=> $panier["panier.id_panier"], "id_affaire" => $id_affaire));
 
 		if($infos["preview"]){
 			ATF::db($this->db)->rollback_transaction();
@@ -1871,10 +1882,10 @@ class devis_go_abonnement extends devis_cleodis {
 
 	function __construct($table_or_id=NULL) {
 		parent::__construct($table_or_id);
-		$this->colonnes['panel']['loyer_kilometrage_lignes'] = array(
-			"loyer_kilometrage"=>array("custom"=>true)
+		$this->colonnes['panel']['restitution_anticipee_lignes'] = array(
+			"restitution_anticipee"=>array("custom"=>true)
 		);
-		$this->panels['loyer_kilometrage_lignes'] = array("visible"=>true, 'nbCols'=>1);
+		$this->panels['restitution_anticipee_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->fieldstructure();
 	}
 

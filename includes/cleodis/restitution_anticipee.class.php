@@ -1,22 +1,21 @@
 <?php
 
 
-class loyer_kilometrage extends classes_optima{
+class restitution_anticipee extends classes_optima{
 
     public function __construct() {
 		parent::__construct();
 		$this->table = __CLASS__;
 		$this->controlled_by = 'affaire';
 		$this->colonnes["fields_column"] = array(
-			 'loyer_kilometrage.loyer'
-            ,"loyer_kilometrage.kilometrage"
-
+			"restitution_anticipee.echeance",
+			"restitution_anticipee.montant_ht"
 		);
 
 		$this->colonnes['primary'] = array(
 			'id_affaire' => array("disabled"=>true),
-			'loyer',
-			'kilometrage'
+			'echeance',
+			'montant_ht'
 		);
 
 		$this->fieldstructure();
