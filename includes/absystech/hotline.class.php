@@ -4511,5 +4511,363 @@ class hotline extends classes_optima {
 
 	}
 
+	/**
+	* Création d'une nouvelle fonction qui gére le  syteme de recherche de tickets hotline
+	* @author DS <dsarr@absystech.fr>
+	* @params titre du ticket hotline , un array de tags , boolean
+	*/
+
+	public function _searchTicketHotLine($post){
+		
+		$result = [];
+		$return = [];
+
+		if($post['entite'] && !$post['contact'] && !$post['utilisateur_en_charge']  && !$post['resume']){
+
+			ATF::societe()->q->reset()
+			->addCondition("societe",trim($post['entite'])."%","AND",false,"LIKE");
+
+			$societes =  ATF::societe()->select_all();
+
+			if($societes){
+				foreach($societes as $item){
+					ATF::hotline()->q->reset()
+					->where('hotline.id_societe',$item['id_societe'])
+					->addOrder("hotline.id_societe", "DESC");
+					$result = ATF::hotline()->select_all();
+				}
+	
+				foreach($result as $key=>$value){
+				
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+	
+	
+					
+				}
+			}
+		}elseif(!$post['entite'] && $post['contact'] && !$post['utilisateur_en_charge']  && !$post['resume']){
+
+			ATF::contact()->q->reset()
+			->addCondition("prenom",trim($post['contact'])."%","AND",false,"LIKE");
+
+			$contacts =  ATF::contact()->select_all();
+
+			if($contacts){
+				foreach($contacts as $item){
+					ATF::hotline()->q->reset()
+					->where('hotline.id_contact',$item['id_contact'])
+					->addOrder("hotline.id_societe", "DESC");
+					$result = ATF::hotline()->select_all();
+					foreach($result as $item){
+						array_push($return,$item);
+					}
+				}
+
+				$result = $return ;
+
+				foreach($result as $key=>$value){
+			
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+	
+				}
+			}
+
+		}elseif(!$post['entite'] && !$post['contact'] && $post['utilisateur_en_charge']  && !$post['resume']){
+
+			ATF::user()->q->reset()
+			->addCondition("prenom",trim($post['utilisateur_en_charge'])."%","AND",false,"LIKE");
+
+			$users =  ATF::user()->select_all();
+
+			if($users){
+				foreach($users as $item){
+					ATF::hotline()->q->reset()
+					->where('hotline.id_user',$item['id_user'])
+					->addOrder("hotline.id_societe", "DESC");
+					$result = ATF::hotline()->select_all();
+					foreach($result as $item){
+						array_push($return,$item);
+					}
+				}
+
+				$result = $return ;
+
+				foreach($result as $key=>$value){
+			
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+	
+				}
+			}
+
+		}elseif(!$post['entite'] && !$post['contact'] && !$post['utilisateur_en_charge']  && $post['resume']){
+
+			ATF::hotline()->q->reset()
+			->addCondition("hotline.hotline",trim($post['resume'])."%","AND",false,"LIKE")
+			->addOrder("hotline.id_societe", "DESC");
+
+			$result = ATF::hotline()->select_all();
+
+			if($result){
+				foreach($result as $key=>$value){
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+				}
+			}
+
+
+		}elseif($post['entite'] && $post['contact'] && !$post['utilisateur_en_charge']  && !$post['resume']){
+
+			ATF::contact()->q->reset()->addCondition("prenom",trim($post['contact'])."%","AND",false,"LIKE");
+
+			ATF::societe()->q->reset()->addCondition("societe",trim($post['entite'])."%","AND",false,"LIKE");
+
+			$contacts = ATF::contact()->select_all();
+			$societes =  ATF::societe()->select_all();
+
+			if($contacts && $societes){
+				foreach($contacts as $contact){
+
+					foreach($societes as $societe){
+	
+						ATF::hotline()->q->reset()
+						->where('hotline.id_societe',$societe['id_societe'])
+						->where('hotline.id_contact',$contact['id_contact'])
+						->addOrder("hotline.id_societe", "DESC");
+						$result = ATF::hotline()->select_all();
+	
+						foreach($result as $item){
+							array_push($return,$item);
+						}
+					}
+				}
+
+				$result = $return;
+
+				foreach($result as $key=>$value){
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+				}
+			}
+
+		}elseif($post['entite'] && $post['contact'] && $post['utilisateur_en_charge']  && !$post['resume']){
+
+			ATF::contact()->q->reset()->addCondition("prenom",trim($post['contact'])."%","AND",false,"LIKE");
+
+			ATF::societe()->q->reset()->addCondition("societe",trim($post['entite'])."%","AND",false,"LIKE");
+
+			ATF::user()->q->reset()->addCondition("prenom",trim($post['utilisateur_en_charge'])."%","AND",false,"LIKE");
+
+			$contacts = ATF::contact()->select_all();
+			$societes =  ATF::societe()->select_all();
+			$users =  ATF::user()->select_all();
+
+			if($contacts && $societes && $users){
+				foreach($contacts as $contact){
+
+					foreach($societes as $societe){
+	
+						foreach($users as $user){
+							ATF::hotline()->q->reset()
+							->where('hotline.id_societe',$societe['id_societe'])
+							->where('hotline.id_contact',$contact['id_contact'])
+							->where('hotline.id_user',$user['id_user'])
+							->addOrder("hotline.id_societe", "DESC");
+							$result = ATF::hotline()->select_all();
+	
+							foreach($result as $item){
+								array_push($return,$item);
+							}
+						}
+					}
+				}
+				$result = $return;
+
+				foreach($result as $key=>$value){
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+				}
+
+			}
+
+		}elseif($post['entite'] && $post['contact'] && $post['utilisateur_en_charge']  && $post['resume']){
+
+			ATF::contact()->q->reset()->addCondition("prenom",trim($post['contact'])."%","AND",false,"LIKE");
+
+			ATF::societe()->q->reset()->addCondition("societe",trim($post['entite'])."%","AND",false,"LIKE");
+
+			ATF::user()->q->reset()->addCondition("prenom",trim($post['utilisateur_en_charge'])."%","AND",false,"LIKE");
+
+			$contacts = ATF::contact()->select_all();
+			$societes =  ATF::societe()->select_all();
+			$users =  ATF::user()->select_all();
+
+			if($contacts && $societes && $users){
+				foreach($contacts as $contact){
+
+					foreach($societes as $societe){
+	
+						foreach($users as $user){
+						
+							ATF::hotline()->q->reset()
+							->where('hotline.id_societe',$societe['id_societe'])
+							->where('hotline.id_contact',$contact['id_contact'])
+							->where('hotline.id_user',$user['id_user'])
+							->addCondition("hotline",trim($post['resume'])."%","AND",false,"LIKE")
+							->addOrder("hotline.id_societe", "DESC");
+							$result = ATF::hotline()->select_all();
+	
+							foreach($result as $item){
+								array_push($return,$item);
+							}
+	
+						}
+	
+						
+					}
+				}
+
+				$result = $return;
+
+				foreach($result as $key=>$value){
+					$result[$key]['id_affaire_fk'] = $value['id_affaire'];
+					$result[$key]['id_contact_fk'] = $value['id_contact'];
+					$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
+					$result[$key]['id_hotline_fk'] = $value['id_hotline'];
+					$result[$key]['id_user_fk'] = $value['id_user'];
+					$result[$key]['id_societe_fk'] = $value['id_societe'];
+	
+					$nom = ATF::user()->select($result[$key]['id_user_fk'],"nom");
+					$prenom = ATF::user()->select($result[$key]['id_user_fk'],"prenom");
+					$gep_projet = ATF::gep_projet()->select($result[$key]['id_gep_projet_fk'],"gep_projet");
+					$id_hotline = ATF::hotline()->select($result[$key]['id_hotline_fk'],"hotline");
+					$societe =  ATF::societe()->select($result[$key]['id_societe_fk'],"societe");
+					$nom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"nom");
+					$prenom_contact =  ATF::contact()->select($result[$key]['id_contact_fk'],"prenom");
+	
+					$result[$key]['id_user'] = $prenom.' '.$nom;
+					$result[$key]['id_gep_projet'] = $gep_projet;
+					$result[$key]['id_hotline'] = $id_hotline;
+					$result[$key]['id_societe'] = $societe;
+					$result[$key]['id_contact'] = $nom_contact." ".$prenom_contact;
+				}
+			}
+
+		}
+
+
+		return $result;
+	}
+
 };
 ?>
