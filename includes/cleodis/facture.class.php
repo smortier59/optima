@@ -3260,6 +3260,10 @@ class facture_bdomplus extends facture_cleodis {
 		return $result;
 	}
 
+	public function _aPrelever($infos) {
+		$this->aPrelever($infos);
+	}
+
 	/**
 	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
