@@ -286,7 +286,7 @@ class facture_cleodis extends facture {
 										$prix_sans_tva=$periode["assurance"];
 									}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
 										$prix_sans_tva=$facture["prix_sans_tva"];
-									} 
+									}
 								} else {
 									if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
 										$prix_sans_tva=$periode["assurance"];
@@ -3070,6 +3070,10 @@ class facture_cleodis extends facture {
 		}
 	}
 
+	public function _aPrelever($infos) {
+		$this->aPrelever($infos);
+	}
+
 
 
 };
@@ -3258,10 +3262,6 @@ class facture_bdomplus extends facture_cleodis {
 		);
 
 		return $result;
-	}
-
-	public function _aPrelever($infos) {
-		$this->aPrelever($infos);
 	}
 
 	/**
