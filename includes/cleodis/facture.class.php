@@ -3071,7 +3071,7 @@ class facture_cleodis extends facture {
 	}
 
 	public function _aPrelever($infos) {
-		$this->aPrelever($infos);
+		return $this->aPrelever($infos);
 	}
 
 
