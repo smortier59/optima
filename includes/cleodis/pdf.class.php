@@ -1952,7 +1952,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',15);
 		$this->multicell(70,5,"Contrat de ".$location,0,'R');
 		$this->setxy(345,20);
-		$this->cell(0,5,"n°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,1,'L');
+		$this->cell(0,5,"n°".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,1,'L');
 
 		$this->setfont('arial','',8);
 		$cadreLocataire = array(
@@ -2273,15 +2273,15 @@ class pdf_cleodis extends pdf {
 		  $this->ln(5);
 		}else{
 		  if($this->devis["type_contrat"] == "presta"){
-			$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de PRESTATION n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+			$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de PRESTATION n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 		  }else{
-			$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de ".($this->affaire['nature']=="vente"?"vente":"location")." n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+			$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de ".($this->affaire['nature']=="vente"?"vente":"location")." n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
 		  }
 		  if($this->lignes && $this->affaire["nature"]=="AR"){
 			foreach($this->AR as $k=>$i){
 			  $affaire=ATF::affaire()->select($i['id_affaire']);
-			  $ref_ar .=" ".$affaire["ref"]." (".$affaire["affaire"]."), ";
+			  $ref_ar .=" ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref'])." (".$affaire["affaire"]."), ";
 			}
 			$this->ln(2);
 			$this->setfont('arial','BI',7.5);
@@ -2346,11 +2346,11 @@ class pdf_cleodis extends pdf {
 			} else {
 			  $affaire_provenance=ATF::affaire()->select($k);
 			  if($this->affaire["nature"]=="avenant"){
-				$title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				$title = $eq." RETIRE(S) DE L'AFFAIRE ".($affaire_provenance['ref_externe'] ? $affaire_provenance['ref_externe'] : $affaire_provenance['ref'])." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
 			  }elseif($this->affaire["nature"]=="AR"){
-				$title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				$title = $eq." PROVENANT(S) DE L'AFFAIRE ".($affaire_provenance['ref_externe'] ? $affaire_provenance['ref_externe'] : $affaire_provenance['ref'])." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
 			  }elseif($this->affaire["nature"]=="vente"){
-				$title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				$title = $eq." VENDU(S) DE L'AFFAIRE ".($affaire_provenance['ref_externe'] ? $affaire_provenance['ref_externe'] : $affaire_provenance['ref'])." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
 			  }
 			}
 			unset($data,$st);
@@ -2658,7 +2658,7 @@ class pdf_cleodis extends pdf {
 		$this->setY(62);
 
 
-		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
 
 		$this->ln(5);
@@ -3040,14 +3040,14 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"",0,'C');
 		$this->setleftMargin(15);
 		$this->setfont('arial','B',8);
-		$this->multicell(0,5,"PROCES-VERBAL D'ENLÈVEMENT DU CONTRAT D'ABONNEMENT N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
+		$this->multicell(0,5,"PROCES-VERBAL D'ENLÈVEMENT DU CONTRAT D'ABONNEMENT N°".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
 		$this->setleftMargin(15);
 
 		$this->ln(5);
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"IL EST EXPOSE ET CONVENU CE QUI SUIT :");
 		$this->setfont('arial','',8);
-		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du ".date("d/m/Y", strtotime($this->commande["date"])).", le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
+		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du ".date("d/m/Y", strtotime($this->commande["date"])).", le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
 
 		$this->setfont('arial','',8);
 		//$this->ln(5);
@@ -3234,14 +3234,14 @@ class pdf_cleodis extends pdf {
 		//}
 
 		$this->setfont('arial','B',8);
-		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON AVEC CESSION DU MATERIEL ET DU CONTRAT DE LOCATION N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
+		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON AVEC CESSION DU MATERIEL ET DU CONTRAT DE LOCATION N°".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
 		$this->setleftMargin(15);
 
 		$this->ln(5);
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"IL EST EXPOSE ET CONVENU CE QUI SUIT :");
 		$this->setfont('arial','',8);
-		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du _____________________, le Loueur a loué au Locataire ci-dessus désigné les équipements suivants :");
+		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du _____________________, le Loueur a loué au Locataire ci-dessus désigné les équipements suivants :");
 
 		$this->setfont('arial','',8);
 		//$this->ln(5);
@@ -3586,7 +3586,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',18);
 		$this->multicell(0,5,"ANNEXE DE DESCRIPTION DES EQUIPEMENTS",0,'C');
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
+		$this->multicell(0,5,"Contrat N° ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
 		$this->ln(5);
 		foreach ($tableau as $k=>$i) {
 			$this->setFillColor(239,239,239);
@@ -15834,7 +15834,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 			    if($this->facture["redevance"] === "oui"){
 				    $data[0][1] = "Redevance Abonnement";
 				    $data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-				    $data[0][1] .= "\nContrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
+				    $data[0][1] .= "\nContrat n°".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref'])."-".$this->client["ref"].' - '.$this->affaire["affaire"];
                 }
 			}
 
@@ -16023,7 +16023,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->setfont('arial','B',10);
 		$this->cell(45,5,"Contrat ".(($this->client["id_famille"]==9)?"d'abonnement":(($this->devis['type_contrat']=="vente"?"de vente":"de location")))." : ",0,0);
 		$this->setfont('arial','',10);
-		$this->cell(80,5,$this->devis['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,0);
+		$this->cell(80,5,($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,0);
 		$this->setfont('arial','B',10);
 
 		$this->cell(45,5,"Date départ : ",0,0);
