@@ -31,6 +31,7 @@ class devis_cleodis extends devis {
 			,"id_affaire"
 			,"devis"
 			,"etat"
+			,"ref_externe"=>array("custom"=>true)
 			,"id_filiale"=>array("autocomplete"=>array(
 				"function"=>"autocompleteAvecFiliale"
 				,"mapping"=>array(
@@ -444,7 +445,8 @@ class devis_cleodis extends devis {
 			$affaire["id_commercial"] = ATF::societe()->select($infos['id_societe'], "id_owner");
 		}
 		$affaire["id_apporteur"]= $infos["id_apporteur"];
-		unset($infos["id_commercial"], $infos["id_apporteur"]);
+		$affaire["ref_externe"]= $infos["ref_externe"];
+		unset($infos["id_commercial"], $infos["id_apporteur"], $infos["ref_externe"]);
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
@@ -1158,6 +1160,9 @@ class devis_cleodis extends devis {
 
 				case "id_commercial":
 					return $affaire["id_commercial"];
+
+				case "ref_externe":
+					return $affaire["ref_externe"];
 			}
 		}else{
 			switch ($field) {
@@ -1208,6 +1213,9 @@ class devis_cleodis extends devis {
 
 				case "id_commercial":
 					return ATF::societe()->select(ATF::_r('id_societe'), "id_owner");
+
+				case "ref_externe":
+					return $affaire["ref_externe"];
 
 			}
 		}

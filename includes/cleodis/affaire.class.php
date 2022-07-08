@@ -13,6 +13,7 @@ class affaire_cleodis extends affaire {
 
 		$this->colonnes['fields_column'] = array(
 			'affaire.ref'
+			,'affaire.ref_externe'
 			,'affaire.date'
 			,'affaire.affaire'
 			,'affaire.id_societe'
@@ -41,6 +42,7 @@ class affaire_cleodis extends affaire {
 
 		$this->colonnes['primary'] = array(
 			"ref"=>array("disabled"=>true)
+			,"ref_externe"=>array("disabled"=>true)
 			,"affaire"
 			,"etat"
 			,"date"
