@@ -6,17 +6,17 @@ ATF.renderer.typeFacture=function(table,field) {
 		var type = record.data[table+'__dot__type_facture'];
 		/* Prolongation Expand */
 		html = '<img class="smallIcon '+type+'" title="'+ATF.usr.trans(type,table)+'"  alt="'+ATF.usr.trans(type,table)+'" src="'+ATF.blank_png+'" />';
-		
+
 		if(type == "libre"){
 			return '<div class="center" id="'+idDiv+'">'+html+'<br /><a href="javascript:;" onclick="ATF.ajax(\'facture,libreToNormale.ajax\',\'id_facture='+record.data[table+'__dot__id_facture']+'\');">
-																     <img class="smallIcon '+type+'" title="'+ATF.usr.trans(type,table)+'"  alt="'+ATF.usr.trans(type,table)+'" src="'+ATF.blank_png+'" /> 
+																     <img class="smallIcon '+type+'" title="'+ATF.usr.trans(type,table)+'"  alt="'+ATF.usr.trans(type,table)+'" src="'+ATF.blank_png+'" />
 																     =>
 																     <img class="smallIcon facture" title="'+ATF.usr.trans("facture",table)+'"  alt="'+ATF.usr.trans("facture",table)+'" src="'+ATF.blank_png+'" />
 																    </a></div>';
 		}else{
 			return '<div class="center" id="'+idDiv+'">'+html+'</div>';
 		}
-		
+
 	}
 };
 
@@ -43,9 +43,9 @@ trad["coor_banc_inexploitable"] = "Coordonnées bancaires inexploitables";
 trad["pas_dordre_de_payer"] = "Pas d'ordre de payer";
 
 
-/* 
+/*
 	Renderer pour la relance
-	@author Quentin JANON <qjanon@absystech.fr> 
+	@author Quentin JANON <qjanon@absystech.fr>
 */
 ATF.renderer.relanceFacture=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
@@ -80,16 +80,16 @@ ATF.renderer.relanceFacture=function(table,field) {
 							url : 'facture,getAllForRelance.ajax,id_facture='+id,
 							root : 'result',
 			                storeId: 'autreFactureStore',
-			                idProperty: 'id',					                
+			                idProperty: 'id',
 			                autoLoad: true,
-			                fields: [ 
+			                fields: [
 								{ name:'value', mapping: 'id' },
 								{ name:'text', mapping: 'reference' }
 							]
-							
+
 						});
-						
-						
+
+
 						var itemForFactureSelection = {
 							xtype: 'multiselect'
 							,width: 'auto'
@@ -102,7 +102,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 							,store: storeRelance
 							,valueField: 'value'
 							,displayField: 'text'
-							,hidden:dis															
+							,hidden:dis
 						};
 						var extraItem = null;
 						var dlRelance = null;
@@ -137,13 +137,13 @@ ATF.renderer.relanceFacture=function(table,field) {
 							}
 							extraItem = {
 								xtype: 'textfield'
-								,name: 'autreFacture' 
+								,name: 'autreFacture'
 								,id: 'autreFacture'
 								,value: id_autreFacture
-								,hidden:true							
+								,hidden:true
 							};
 						}
-						
+
 						if (id_relance_seconde) {
 							var html = "";
 							html += '<a href="relance-select-relance2-'+id_relance_seconde+'.dl" target="_blank">';
@@ -160,7 +160,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 							fileToPrevisu = "relance3";
 							dis = true;
 						}
-						
+
 						var form = null;
 						if (id_relance_med) {
 							var html = "";
@@ -175,7 +175,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 								}
 								,html:html
 							});
-							
+
 						} else {
 							var form = new Ext.FormPanel({
 								frame:true,
@@ -192,7 +192,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 										itemForFactureSelection
 									,{
 										xtype: 'textarea'
-										,name: 'texte' 
+										,name: 'texte'
 										,id: 'texte'
 										,fieldLabel:'{ATF::$usr->trans("texte","relance")|addslashes}'
 										,style: {
@@ -203,13 +203,13 @@ ATF.renderer.relanceFacture=function(table,field) {
 									},
 									{
 										xtype: 'textfield'
-										,name: 'id_facture' 
+										,name: 'id_facture'
 										,id: 'id_facture'
 										,value: id
 										,hidden:true
 									}
 								],
-							
+
 								buttons: [{
 									text: 'Ok',
 									handler: function(a,b,c,d){
@@ -230,7 +230,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 												store.reload();
 											}
 											,timeout:3600
-										});								
+										});
 									}
 								},{
 									text: '{ATF::$usr->trans(preview)|escape:javascript}',
@@ -252,7 +252,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 												}else if(action.result.cadre_refreshed){
 													ATF.ajax_refresh(action.result,true);
 												}else {
-													ATF.extRefresh(action); 
+													ATF.extRefresh(action);
 												}
 											}
 											,failure:function(form, action) {
@@ -268,7 +268,7 @@ ATF.renderer.relanceFacture=function(table,field) {
 												}
 											}
 											,timeout:3600
-										});									
+										});
 									}
 								},{
 									text: 'Annuler',
@@ -278,13 +278,13 @@ ATF.renderer.relanceFacture=function(table,field) {
 									}
 								}]
 							});
-							
+
 							if (extraItem) {
 								Ext.getCmp('myForm'+id).add(extraItem);
 							}
 						}
 					}
-					
+
 					if (!Ext.getCmp('mywindow'+id)) {
 						var height = 0;
 						var width = 0;
@@ -306,35 +306,35 @@ ATF.renderer.relanceFacture=function(table,field) {
 							width = 800;
 						}
 					}
-					Ext.getCmp('mywindow'+id).setHeight(height);		
-					Ext.getCmp('mywindow'+id).setWidth(width);		
-					Ext.getCmp('mywindow'+id).show();		
+					Ext.getCmp('mywindow'+id).setHeight(height);
+					Ext.getCmp('mywindow'+id).setWidth(width);
+					Ext.getCmp('mywindow'+id).show();
 				}
 			}
 		};
-		
+
 		(function(){
 			var params = {
 				renderTo: idDiv,
 				items:[btnRelance]
-				
+
 			};
 			var p = new Ext.Container(params);
 		}).defer(25);
 
-		
+
 		return '<div class="left" id="'+idDiv+'"></div>';
 	}
 };
 
 
-/* 
+/*
 	Renderer pour la modification d'un texte.
-	@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
+	@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 */
 ATF.renderer.updateEnumFactureRejetCledodis=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
-		if(record.json){ 
+		if(record.json){
 			var idDivUD = Ext.id();
 			var id = record.data[table+'__dot__id_'+table];
 			(function(){
@@ -359,7 +359,7 @@ ATF.renderer.updateEnumFactureRejetCledodis=function(table,field) {
 								'displayText'
 							],
 							data: [
-								['non_rejet','Acceptée'] , 								
+								['non_rejet','Acceptée'] ,
 								['non_preleve','Pas prélevée'],
 								['non_preleve_mandat','Pas prélevée cause mandat'],
 								['contestation_debiteur','Contestation débiteur'],
@@ -370,7 +370,7 @@ ATF.renderer.updateEnumFactureRejetCledodis=function(table,field) {
 								['solde','Solde'],
 								['coor_banc_inexploitable','Coordonnées bancaires inexploitables'],
 								['pas_dordre_de_payer','Pas d\'ordre de payer'],
-								
+
 
 							]
 						})
@@ -392,10 +392,11 @@ ATF.renderer.updateEnumFactureRejetCledodis=function(table,field) {
 				};
 				var p = new Ext.FormPanel(params);
 			}).defer(25);
-					
+
 			return '<div  id="'+idDivUD+'"></span>';
 		}
 	}
 };
+
 
 {/strip}
