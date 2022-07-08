@@ -15775,8 +15775,15 @@ class pdf_go_abonnement extends pdf_cleodis {
 				,$this->client['facturation_adresse_2']
 				,$this->client['facturation_adresse_3']
 				,$this->client['facturation_cp']." ".$this->client['facturation_ville']
-				,"Tel : ".$this->client['tel']
 			);
+			if ($this->client["id_famille"] == 9) {
+				$cadre[] = "Tel : ".$this->client['particulier_portable'];
+				$cadre[] = "Email : ".$this->client['particulier_email'];
+			} else {
+				$cadre[] = "Tel : ".$this->client['tel'];
+				$cadre[] = "Email : ".$this->client['email'];
+			}
+
 		}else{
 			$cadre = array(
 				 $this->client['societe']
@@ -15784,8 +15791,14 @@ class pdf_go_abonnement extends pdf_cleodis {
 				,$this->client['adresse_2']
 				,$this->client['adresse_3']
 				,$this->client['cp']." ".$this->client['ville']
-				,"Tel : ".$this->client['tel']
 			);
+			if ($this->client["id_famille"] == 9) {
+				$cadre[] = "Tel : ".$this->client['particulier_portable'];
+				$cadre[] = "Email : ".$this->client['particulier_email'];
+			} else {
+				$cadre[] = "Tel : ".$this->client['tel'];
+				$cadre[] = "Email : ".$this->client['email'];
+			}
 		}
 
 		$this->cadre(110,35,80,35,$cadre,"Destinataire");
