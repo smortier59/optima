@@ -1629,6 +1629,9 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
+					if(ATF::$codename == "go_abonnement"){
+						$facture['date'] = date("Y-m-d");
+					}
 					if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement") $facture["ref_externe"] = ATF::facture()->getRefExterne();
 
 					if($facturation["type"] == "liberatoire"){
