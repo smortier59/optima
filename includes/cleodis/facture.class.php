@@ -715,7 +715,6 @@ class facture_cleodis extends facture {
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
 
-
 		$commande=ATF::commande()->select($infos["id_commande"]);
 		$infos["id_affaire"]=$commande["id_affaire"];
 		$infos["tva"]=$commande["tva"];
@@ -738,9 +737,11 @@ class facture_cleodis extends facture {
 			$infos["id_refinanceur"]=$demande_refi["id_refinanceur"];
 			unset($infos["date_periode_debut"],$infos["date_periode_fin"]);
 		}elseif($infos["type_facture"]=="libre"){
+	
 			$infos["prix"]=$infos["prix_libre"];
 			$infos["date_periode_debut"]=$infos["date_periode_debut_libre"];
 			$infos["date_periode_fin"]=$infos["date_periode_fin_libre"];
+
 
 			if($infos["type_libre"] == "contentieux") $infos["tva"] = 1;
 
@@ -842,6 +843,7 @@ class facture_cleodis extends facture {
 
 		////////////////Facture
 		unset($infos["marge"],$infos["marge_absolue"],$infos["prix_achat"]);
+
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		////////////////Facturation
@@ -934,7 +936,47 @@ class facture_cleodis extends facture {
         }
 	}
 
+	public function _createFactureLibre($get, $post){
+		
 
+		try{
+			if(!$post) throw new errorATF("DATA_MANQUANTE", 400);
+
+			if(!$post['type_libre']) throw new errorATF("TYPE_LIBRE EST OBLIGATOIRE", 400);
+			if(!$post['date']) throw new errorATF("LA DATE EST OBLIGATOIRE", 400);
+			if(!$post['prix_libre']) throw new errorATF("LE PRIX_LIBRE EST OBLIGATOIRE", 400);
+			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 400);
+			if(!$post['type_facture']) throw new errorATF("LE TYPE_FACTURE EST OBLIGATOIRE", 400);
+			if($post['type_facture'] !== "libre") throw new errorATF("LE TYPE DE FACTURE DOIT ETRE LIBRE", 400);
+
+			unset($post['schema']);
+
+			$affaire = ATF::affaire()->select($post["id_affaire"]);
+
+			ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
+
+			$commande = ATF::commande()->select_row();
+
+			if(!$commande['commande.id_commande']) throw new errorATF("ID_COMMANDE INTROUVABLE", 404);
+
+			if($commande){
+				$post['id_commande'] = $commande['commande.id_commande'];
+			}
+
+			if(!$affaire['id_societe']) throw new errorATF("ID_SOCIETE INTROUVABLE", 404);
+
+			if($affaire['id_societe']){
+				$post['id_societe'] = $affaire['id_societe'];
+			}
+
+			$return = $this->insert($post,$s,NULL,$var=NULL,NULL,true);
+
+		} catch(errorATF $e){
+			$msg = $e->getMessage();
+			throw new errorATF('Error:'.$msg, 500);
+			return false;
+		}
+	}
 
 
 
