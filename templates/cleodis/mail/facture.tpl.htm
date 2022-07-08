@@ -13,12 +13,16 @@
 										<td height="165" style="height:165px;" valign="middle" width="600">
 											<p style=" width:90%;color:#000;font-size:20px;line-height:1.15;">
 											  {$infos["texte"]}
+
+												<br/>
+												<br/>
+
+												{if ATF::$codename == "bdomplus"}<br/>Les équipes  B’dom+ et Boulanger {/if}
+												{if ATF::$codename == "boulanger"}<br/>Les équipes Boulanger {/if}
+												{if ATF::$codename == "go_abonnement"}<br/>Les équipes Go Abonement {/if}
+												{if ATF::$codename == "cleodis"}<br/>Les équipes Cléodis {/if}
+												{if ATF::$codename == "assets"}<br/>Les équipes Assets {/if}
 											</p>
-											<br/>
-											<br/>
-											
-											{if ATF::$codename == "bdomplus"}<br/>Les équipes  B’dom+ et Boulanger {/if}
-											{if ATF::$codename == "boulanger"}<br/>Les équipes Boulanger {/if}
 
 										</td>
 									</tr>
@@ -32,5 +36,4 @@
 		</tr>
 	</tbody>
 </table>
-   
-   
+
