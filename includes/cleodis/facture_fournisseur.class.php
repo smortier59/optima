@@ -26,7 +26,7 @@ class facture_fournisseur extends classes_optima {
 			"ref"
 			,"id_affaire"=>array("disabled"=>true)
 			,"id_bon_de_commande"=>array("disabled"=>true)
-			,"id_fournisseur"=>array("disabled"=>true)
+			,"id_fournisseur"
 			,"type"
 			,"periodicite"
 		);
@@ -803,7 +803,7 @@ class facture_fournisseur extends classes_optima {
 
         $force = false;
         $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
-        if(!$infos["force"]){ $this->q->where("facture_fournisseur.deja_exporte_cegid","non"); $force=true; }
+        $this->q->where("facture_fournisseur.deja_exporte_cegid","non");
         $infos = $this->sa();
 
 		$this->export_xls_cegid_v2($infos,$force);

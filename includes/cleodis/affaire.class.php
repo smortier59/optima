@@ -13,6 +13,7 @@ class affaire_cleodis extends affaire {
 
 		$this->colonnes['fields_column'] = array(
 			'affaire.ref'
+			,'affaire.ref_externe'
 			,'affaire.date'
 			,'affaire.affaire'
 			,'affaire.id_societe'
@@ -41,6 +42,7 @@ class affaire_cleodis extends affaire {
 
 		$this->colonnes['primary'] = array(
 			"ref"=>array("disabled"=>true)
+			,"ref_externe"=>array("disabled"=>true)
 			,"affaire"
 			,"etat"
 			,"date"
@@ -4352,7 +4354,7 @@ class affaire_go_abonnement extends affaire_cleodis {
 			'affaire_etat'
 			,'loyer'
 			,"sell_and_sign"
-			,'loyer_kilometrage'
+			,'restitution_anticipee'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)

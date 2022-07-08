@@ -1629,6 +1629,9 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
+					if(ATF::$codename == "go_abonnement"){
+						$facture['date'] = date("Y-m-d");
+					}
 					if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement") $facture["ref_externe"] = ATF::facture()->getRefExterne();
 
 					if($facturation["type"] == "liberatoire"){
@@ -1638,12 +1641,12 @@ class facturation extends classes_optima {
 
 
 					if($facture["mode_paiement"] == "prelevement"){
-						if(ATF::$codename != "bdomplus"){
-							$facture["etat"] = "payee";
-							$facture["date_paiement"] = $facture["date"];
-						}else{
+						if(ATF::$codename == "bdomplus" || ATF::$codename == "go_abonnement" || ATF::$codename == "assets"){
 							$facture["etat"] = "impayee";
 							$facture["date_paiement"] = NULL;
+						}else{
+							$facture["etat"] = "payee";
+							$facture["date_paiement"] = $facture["date"];
 						}
 					}else{
 						$facture["etat"] = "impayee";
@@ -1716,5 +1719,5 @@ class facturation_bdomplus extends facturation {
 };
 
 class facturation_go_abonnement extends facturation {
-	public $user_facturation = array(16,116);
+	public $user_facturation = array(16,171,172);
 };

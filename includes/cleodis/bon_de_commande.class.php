@@ -466,7 +466,9 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			return false;
 		}
 
-		$prefix=$code_four."-".ATF::affaire()->select($id_affaire,"ref")."-";
+		$affaire = ATF::affaire()->select($id_affaire);
+
+		$prefix=$code_four."-".($affaire["ref_externe"] ? $affaire["ref_externe"] : $affaire["ref"])."-";
 
 		$this->q->reset()
 			->addField("ROUND(SUBSTRING(`ref`,".(strlen($prefix)+1)."))","ref_reel")
