@@ -286,7 +286,7 @@ class facture_cleodis extends facture {
 										$prix_sans_tva=$periode["assurance"];
 									}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
 										$prix_sans_tva=$facture["prix_sans_tva"];
-									} 
+									}
 								} else {
 									if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
 										$prix_sans_tva=$periode["assurance"];
@@ -392,6 +392,7 @@ class facture_cleodis extends facture {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function delete($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL) {
+
 		if (is_numeric($infos) || is_string($infos)) {
 			$id=$this->decryptId($infos);
 			$facture=$this->select($id);
@@ -1143,9 +1144,17 @@ class facture_cleodis extends facture {
 	*/
 	public function can_delete($id){
 		if($this->select($id,"etat")=="impayee"){
-			return true;
+
+			if(ATF::$codename == "go_abonnement" ){
+                if ($this->select($id, "exporte") == "oui") {
+					throw new errorATF("Impossible de supprimer cette ".ATF::$usr->trans($this->table)." car cette facture est déja exportée.");
+                }
+				return true;
+			} else {
+				return true;
+			}
 		}else{
-			throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
+		 	throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
 		}
 	}
 
