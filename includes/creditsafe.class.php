@@ -287,6 +287,21 @@ class creditsafe extends classes_optima {
 
     }
 
+    public function _getSolde() {
+        try {
+            $res = $this->getSolde();
+
+            return [
+                "restant" => $res["restant"],
+                "utilise" => $res["utilise"],
+                "date" => $res["date"] ,
+                "heure" => $res["heure"]
+            ];
+        } catch (errorATF $e) {
+            throw $e;
+        }
+
+    }
 
     /**
      * Recupere les infos de soldes de Credit Safe
@@ -390,6 +405,8 @@ class creditsafe extends classes_optima {
                 $return["serie"] = "CreditSafe Connect France";
                 $return["restant"] = $data->data[0]->paid - $data->data[0]->used;
                 $return["utilise"] = $data->data[0]->used;
+                $return["date"] = date("Y-m-d", strtotime($data->date_interogation));
+                $return["heure"] = date("H:i", strtotime($data->date_interogation));
                 return $return;
             }
 
