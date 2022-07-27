@@ -639,7 +639,6 @@ class pack_produit extends classes_optima {
 		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
 		$data = $this->select_data($s,"saExport");
 
-
 		$packs = [];
 		$lignes = [];
 		$produits = [];
@@ -906,11 +905,10 @@ class pack_produit extends classes_optima {
 			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
 		}*/
 
-
 		$packs = [];
 		$lignes = [];
 		$produits = [];
-		foreach ($data as $pack) {
+		foreach ($data as $pack_query) {
 
 			// On récupère les packs avec les bonnes colonnes
 	        ATF::pack_produit()->q->reset()
@@ -934,9 +932,10 @@ class pack_produit extends classes_optima {
 				->addField("pack_produit.val_plancher")
 				->addField("pack_produit.val_plafond")
 				->addField("pack_produit.max_qte")
-				->where('id_pack_produit', $pack['id_pack_produit'])
+				->where('id_pack_produit', $pack_query['id_pack_produit'])
 				->addOrder('id_pack_produit', 'DESC');
-	        $packs[] = ATF::pack_produit()->select_row();
+			$pack = ATF::pack_produit()->select_row();
+			$packs[] = $pack;
 
 			// On récupère les packs avec les bonnes colonnes
 	        ATF::pack_produit_ligne()->q->reset()
@@ -975,6 +974,7 @@ class pack_produit extends classes_optima {
 				->where('id_pack_produit',$pack['pack_produit.id_pack_produit'])
 				->setStrict();
 	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
+				$l["pack_produit_ligne.site_associe"] = $pack["pack_produit.site_associe"];
 	        	array_push($lignes, $l);
 	        }
 		}
@@ -1019,7 +1019,6 @@ class pack_produit extends classes_optima {
 				->addField("produit.commentaire")
 				->addField("produit.type_offre")
 				->addField("produit.description")
-				->addField("produit.site_associe")
 				->addField("produit.loyer")
 				->addField("produit.duree")
 				->addField("produit.loyer1")
@@ -1054,6 +1053,7 @@ class pack_produit extends classes_optima {
 				->setStrict();
 
 	        foreach (ATF::produit()->select_all() as $p) {
+				$p["produit.site_associe"] = $l["pack_produit_ligne.site_associe"];
 	        	array_push($produits, $p);
 	        }
 		}
@@ -1064,13 +1064,12 @@ class pack_produit extends classes_optima {
 			$site_associe[$value["pack_produit.site_associe"]][$value["pack_produit.id_pack_produit"]] = true ;
 		}
 
-
-
 		$zipname = 'middleware' . date("Ymd-Hi") . '.zip';
 		$zip = new ZipArchive;
 		$zip->open($zipname, ZipArchive::CREATE);
 
 		foreach ($site_associe as $key => $value) {
+
 			$file = $this->csv_middleware("Packs", $packs, $key, $site_associe);
 			$zip->addFile($file);
 			$this->csv_middleware_to_ftp($file);
@@ -1110,50 +1109,39 @@ class pack_produit extends classes_optima {
 	 * @param  Array  $pack_par_site_associe Données des packs, par site associé
 	 * @return String File                   Nom du fichier
 	 */
-	public function csv_middleware($titre, $data, $site_associe, $pack_par_site_associe){
+	public function csv_middleware($titre, $donnees, $site_associe, $pack_par_site_associe){
 
 
 		$fn = $titre . "-" . $site_associe . ".csv";
         $fp = fopen($fn, 'w');
+		$data = [];
 
 		switch ($titre) {
 			case 'Produits':
-				$entetes = array_keys($data[0]);
+				$entetes = array_keys($donnees[0]);
 				$entetes = array_map(function ($el) {
 			    	return str_replace("produit.","",$el);
 			    }, $entetes);
 			    $produitDedoublonne = [];
-				$result = [];
 
-				// assemblage de produits par site_associé
-			    foreach ($data as $p) {
-					if($p["produit.site_associe"] == $site_associe){
-						$result[$p["produit.site_associe"]] = $p;
+				foreach($donnees as $p){
+					if($site_associe === $p['produit.site_associe']){
+						$produitDedoublonne[$p['produit.id_produit']] = $p;
 					}
-			    }
-
-				foreach($data as $p){
-
-					if($result[$site_associe]['produit.site_associe'] == $p['produit.site_associe']){
-						$produitDedoublonne[] = $p;
-
-					}
-
 				}
-
 				$data = $produitDedoublonne;
 
 			break;
 
 			case 'Packs':
-				$entetes = array_keys($data[0]);
+				$entetes = array_keys($donnees[0]);
 			    $entetes = array_map(function ($el) {
 			    	return str_replace("pack_produit.","",$el);
 			    }, $entetes);
 
 			    $packs = [];
 
-			    foreach ($data as $key => $value) {
+			    foreach ($donnees as $key => $value) {
 			    	if($pack_par_site_associe[$site_associe][$value["pack_produit.id_pack_produit"]]){
 			    		$packs[] = $value;
 			    	}
@@ -1164,13 +1152,13 @@ class pack_produit extends classes_optima {
 
 
 			case 'Lignes':
-				$entetes = array_keys($data[0]);
+				$entetes = array_keys($donnees[0]);
 			    $entetes = array_map(function ($el) {
 			    	return str_replace("pack_produit_ligne.","",$el);
 			    }, $entetes);
 
 			    $lignes = [];
-			    foreach ($data as $key => $value) {
+			    foreach ($donnees as $key => $value) {
 			    	if($pack_par_site_associe[$site_associe][$value["pack_produit_ligne.id_pack_produit"]]){
 			    		$lignes[] = $value;
 			    	}

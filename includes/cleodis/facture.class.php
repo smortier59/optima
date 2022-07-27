@@ -3132,6 +3132,10 @@ class facture_cleodis extends facture {
 		}
 	}
 
+	public function _aPrelever($infos) {
+		return $this->aPrelever($infos);
+	}
+
 
 	/**
 	* permet d'envoyer les factures par mail, pour les factures ayant une date_envoi = date en param et envoyé = non

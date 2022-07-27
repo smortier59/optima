@@ -161,6 +161,8 @@ class prelevement extends classes_optima{
                               ->where('facture.etat','impayee')
                               ->where('facture.id_termes',24,'AND',false,"!=")
                               ->where('facture.id_termes',25,'AND',false,"!=")
+                              ->where('facture.type_facture','facture_periodique')
+                              ->where('facture.type_facture','facture')
                               ->addOrder("facture.ref", "DESC");
 
       $response = ATF::facture()->select_all();
@@ -180,6 +182,7 @@ class prelevement extends classes_optima{
 
       }
 
+
       return $response;
     }
 
@@ -189,6 +192,8 @@ class prelevement extends classes_optima{
                               ->where('facture.etat','impayee')
                               ->where('facture.id_termes',24,'AND',false,"!=")
                               ->where('facture.id_termes',25,'AND',false,"!=")
+                              ->where('facture.type_facture','facture_periodique')
+                              ->where('facture.type_facture','facture')
                               ->addOrder("facture.ref", "DESC");
 
       $result = ATF::facture()->select_all();
@@ -238,6 +243,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
@@ -282,6 +289,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
@@ -325,6 +334,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->addOrder("facture.ref", "DESC");
 
@@ -365,6 +376,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
 
@@ -402,6 +415,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->addOrder("facture.ref", "DESC");
 
         $response = ATF::facture()->select_all();
@@ -458,6 +473,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
@@ -501,6 +518,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
@@ -558,6 +577,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
@@ -613,6 +634,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->addOrder("facture.ref", "DESC");
 
@@ -659,6 +682,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
 
@@ -703,6 +728,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_debut_periode,"AND",false,">=")
             ->addOrder("facture.ref", "DESC");
            
@@ -758,6 +785,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->where('facture.date',$date_fin_periode,"AND",false,"<=")
             ->addOrder("facture.ref", "DESC");
         $result= ATF::facture()->sa();
@@ -813,6 +842,8 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.type_facture','facture_periodique')
+            ->where('facture.type_facture','facture')
             ->addOrder("facture.id_societe", "DESC");
 
       }elseif($get['tri'] == "id_societe" && $get['trid']=="asc"){
@@ -820,6 +851,8 @@ class prelevement extends classes_optima{
         ->where('facture.etat','impayee')
         ->where('facture.id_termes',24,'AND',false,"!=")
         ->where('facture.id_termes',25,'AND',false,"!=")
+        ->where('facture.type_facture','facture_periodique')
+        ->where('facture.type_facture','facture')
         ->addOrder("facture.id_societe", "ASC");
       }
 
