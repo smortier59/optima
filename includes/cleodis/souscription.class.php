@@ -385,6 +385,8 @@ class souscription_cleodis extends souscription {
         "BIC"=> $post["bic"]
     );
 
+    if ($post["rum"])  $devis["rum"] = $post["rum"];
+
     if (ATF::$codename === "go_abonnement") {
       $devis['kilometrage_max'] = $post['kilometrage_max'];
       $devis['montant_kilometrage_max_depasse'] = $post['montant_kilometrage_max_depasse'];
