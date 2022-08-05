@@ -1139,7 +1139,7 @@ class societe_cleodis extends societe {
       //Remplacer les lettres par des chiffres au moyen d'une table de conversion (A=10, B=11, C=12 etc.)
       for($i=0;$i<strlen($iban); $i++){
         if(!is_numeric($iban[$i])){
-          $char .= $table_conversion[$iban[$i]];
+          $char .= $table_conversion[strtoupper($iban[$i])];
         }else{
           $char .= $iban[$i];
         }

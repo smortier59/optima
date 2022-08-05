@@ -275,6 +275,13 @@ class affaire_cleodis extends affaire {
 		$affaire["id_commercial"] = ATF::societe()->select($infos["id_societe"], "id_owner");
 
 
+		if (ATF::$codename === "go_abonnement") {
+			$affaire['kilometrage_max'] = $infos['kilometrage_max'];
+			$affaire['montant_kilometrage_max_depasse'] = $infos['montant_kilometrage_max_depasse'];
+			$affaire['franchise'] = $infos['franchise'];
+		}
+
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -4373,13 +4380,16 @@ class affaire_go_abonnement extends affaire_cleodis {
 			,'tache'
 			,"pdf_affaire"
 		);
+		$this->colonnes['panel']['specifique_goa'] = array(
+			"specifique_goa"=>array("custom"=>true)
+	   	);
+	   	$this->panels['specifique_goa'] = array("visible"=>true, 'nbCols'=>1);
 
 		$this->fieldstructure();
 
 		$this->addPrivilege("updateSpecifiqueGOA");
 
 	}
-
 	/**
 	* Retourne la ref d'une affaire
 	* @param int $id_parent

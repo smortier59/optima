@@ -387,6 +387,12 @@ class souscription_cleodis extends souscription {
 
     if ($post["rum"])  $devis["rum"] = $post["rum"];
 
+    if (ATF::$codename === "go_abonnement") {
+      $devis['kilometrage_max'] = $post['kilometrage_max'];
+      $devis['montant_kilometrage_max_depasse'] = $post['montant_kilometrage_max_depasse'];
+      $devis['franchise'] = $post['franchise'];
+    }
+
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
@@ -413,7 +419,13 @@ class souscription_cleodis extends souscription {
 
         ATF::produit()->q->reset()
           ->addField("loyer")
-          ->addField("loyer_sans_tva")
+          ->addField('assurance')
+          ->addField('frais_de_gestion')
+          ->addField('serenite')
+          ->addField('maintenance')
+          ->addField('hotline')
+          ->addField('supervision')
+          ->addField('support')
           ->addField("duree")
           ->addField("ean")
           ->addField("id_sous_categorie")
@@ -496,18 +508,46 @@ class souscription_cleodis extends souscription {
         }
 
         $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["assurance"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] += $produitLoyer["frais_de_gestion"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__serenite"] += $produitLoyer["serenite"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__maintenance"] += $produitLoyer["maintenance"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__hotline"] += $produitLoyer["hotline"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__supervision"] += $produitLoyer["supervision"] * $produit['quantite'];
+        $toInsertLoyer[0]["loyer__dot__support"] += $produitLoyer["support"] * $produit['quantite'];
+
         $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
 
+        $loyer = $toInsertLoyer[0]["loyer__dot__loyer"] +  $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] + $toInsertLoyer[0]["loyer__dot__serenite"] +  $toInsertLoyer[0]["loyer__dot__maintenance"] + $toInsertLoyer[0]["loyer__dot__hotline"] + $toInsertLoyer[0]["loyer__dot__supervision"] +  $toInsertLoyer[0]["loyer__dot__support"];
+
         if ($assurance_sans_tva == "oui") {
-          $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["loyer_sans_tva"] * $produit['quantite'];
-          $devis["prix"] = ($toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
+          $devis["prix"] = ($loyer * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
         } else {
-          $devis["prix"] = $toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"];
+          $devis["prix"] = $loyer * $toInsertLoyer[0]["loyer__dot__duree"];
         }
     }
 
     // Faire sauter les index
     $toInsertProduitDevis = array_values($toInsertProduitDevis);
+
+    if ($post["prolongations"]) {
+      foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
+        $toInsertLoyer[] = array(
+          "loyer__dot__loyer"=> $vp["loyer"],
+          "loyer__dot__duree"=> $vp["duree"],
+          "loyer__dot__type"=>"prolongation",
+          "loyer__dot__assurance"=>$vp["assurance"],
+          "loyer__dot__frais_de_gestion"=>$vp["frais_de_gestion"],
+          "loyer__dot__frequence_loyer"=> $vp["frequence"],
+          "loyer__dot__serenite"=>"",
+          "loyer__dot__maintenance"=>"",
+          "loyer__dot__hotline"=>"",
+          "loyer__dot__supervision"=>"",
+          "loyer__dot__support"=>"",
+          "loyer__dot__avec_option"=>"non"
+        );
+      }
+    }
 
     if ($post["prolongations"]) {
       foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
@@ -852,7 +892,8 @@ class souscription_cleodis extends souscription {
       "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref"),
       "rum"=> ATF::affaire()->select($id_affaire, "RUM"),
       "bic"=> $bic,
-      "iban"=> $iban
+      "iban"=> $iban,
+      "id_type_affaire" => ATF::affaire()->select($id_affaire, "id_type_affaire")
     );
 
     if($passage_slimpay)  $return["passage_slimpay"] = $passage_slimpay;
@@ -890,45 +931,7 @@ class souscription_cleodis extends souscription {
   * @param array $infos Simple dimension des champs à insérer
   */
   public function checkIBAN($iban){
-    $table_conversion = array("A"=>10,"B"=>11,"C"=>12,"D"=>13,"E"=>14,"F"=>15,"G"=>16,"H"=>17,"I"=>18,"J"=>19,"K"=>20,"L"=>21,"M"=>22,"N"=>23,"O"=>24,"P"=>25,"Q"=>26,"R"=>27,"S"=>28,"T"=>29,"U"=>30,"V"=>31,"W"=>32,"X"=>33,"Y"=>34,"Z"=>35);
-
-
-    /*
-    * Enlever les caractères indésirables (espaces, tirets)
-    * Supprimer les 4 premiers caractères et les replacer à la fin du compte
-    * Remplacer les lettres par des chiffres au moyen d'une table de conversion (A=10, B=11, C=12 etc.)
-    * Diviser le nombre ainsi obtenu par 97.
-    * Si le reste n'est pas égal à 1 l'IBAN est incorrect : Modulo de 97 égal à 1
-    */
-    if($iban){
-      //Enlever les caractères indésirables (espaces, tirets)
-      $iban = str_replace("-", "", $iban);
-      $iban = str_replace(" ", "", $iban);
-
-
-      //Supprimer les 4 premiers caractères et les replacer à la fin du compte
-      $first = substr($iban, 0, 4);
-      $iban = substr($iban, 4);
-
-      $iban = $iban.$first;
-
-      $char = "";
-
-      //Remplacer les lettres par des chiffres au moyen d'une table de conversion (A=10, B=11, C=12 etc.)
-      for($i=0;$i<strlen($iban); $i++){
-        if(!is_numeric($iban[$i])){
-          $char .= $table_conversion[$iban[$i]];
-        }else{
-          $char .= $iban[$i];
-        }
-      }
-
-      //Diviser le nombre ainsi obtenu par 97
-      if(bcmod($char , 97) != 1) throw new errorATF("IBAN incorrect", 500);
-
-    }else{
-      throw new errorATF("IBAN vide", 500);
-    }
+    ATF::societe()->checkIBAN($iban);
   }
 
 
