@@ -3226,6 +3226,11 @@ class affaire_cleodis extends affaire {
 						 ->setLimit($post['limit'])
 						 ->addOrder('id_affaire', 'DESC');
 
+						 if ($post['id_societe']) {
+							ATF::affaire()->q->where('affaire.id_societe', $post['id_societe']);
+						 }
+
+
 		return ATF::affaire()->sa();
 
 	}
