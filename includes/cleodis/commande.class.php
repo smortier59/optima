@@ -1856,15 +1856,20 @@ class commande_cleodis extends commande {
 		ATF::db($this->db)->commit_transaction();
 
 
-		if($commandeMAJ){
-			$infos_mail["from"] = "NO REPLY <no-reply@cleodis.com>";
-		    $infos_mail["recipient"] = "jerome.loison@cleodis.com,benjamin.tronquit@cleodis.com";
-		    $infos_mail["html"] = true;
-		    $infos_mail["template"] = "mail_recap_update_statut_contrat";
-			$infos_mail["objet"] = "[".ATF::$codename."] - Recapitulatif des contrat ayant changé de statut";
-			$infos_mail["commande"] = $commandeMAJ;
-			$mail = new mail($infos_mail);
-			$send = $mail->send();
+		if($commandeMAJ) {
+			ATF::constante()->q->reset()->where("constante","__MAIL_STATUT_CONTRAT_CHANGE__");
+			$destinataires = ATF::constante()->select_row();
+
+			if ($destinataires) {
+				$infos_mail["from"] = "NO REPLY <no-reply@cleodis.com>";
+				$infos_mail["recipient"] = $destinataires["valeur"];
+				$infos_mail["html"] = true;
+				$infos_mail["template"] = "mail_recap_update_statut_contrat";
+				$infos_mail["objet"] = "[".ATF::$codename."] - Recapitulatif des contrats ayant changé de statut";
+				$infos_mail["commande"] = $commandeMAJ;
+				$mail = new mail($infos_mail);
+				$send = $mail->send();
+			}
 		}
 
 	}
