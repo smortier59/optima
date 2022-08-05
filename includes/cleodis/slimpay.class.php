@@ -198,16 +198,26 @@ class slimpay {
 
         // The Relations Namespace
         $relNs = self::getRelationNamespace();
-
+        
         // Follow get-direct-debits
         $rel = new Hal\CustomRel($relNs . 'get-direct-debits');
         $follow = new Http\Follow($rel, 'GET', [
             'id' => $id_slimpay
         ]);
         $res = $hapiClient->sendFollow($follow);
-
         // The Resource's state
         $state = $res->getState();
+
+        if ($state["executionStatus"] === "rejected") {
+            $rel = new Hal\CustomRel($relNs . 'get-direct-debit-issues');
+            $follow = new Http\Follow($rel, 'GET');
+            $res = $hapiClient->sendFollow($follow, $res);
+
+            // The Resource's state
+            $debitIssue = $res->getState();
+
+            $state["rejectedReason"] = $res->getAllEmbeddedResources()["directDebitIssues"][0]->getState()["returnReasonCode"];
+        }              
         return $state;
     }
 
