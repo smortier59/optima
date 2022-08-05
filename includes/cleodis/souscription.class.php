@@ -387,6 +387,12 @@ class souscription_cleodis extends souscription {
 
     if ($post["rum"])  $devis["rum"] = $post["rum"];
 
+    if (ATF::$codename === "go_abonnement") {
+      $devis['kilometrage_max'] = $post['kilometrage_max'];
+      $devis['montant_kilometrage_max_depasse'] = $post['montant_kilometrage_max_depasse'];
+      $devis['franchise'] = $post['franchise'];
+    }
+
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
@@ -523,6 +529,25 @@ class souscription_cleodis extends souscription {
 
     // Faire sauter les index
     $toInsertProduitDevis = array_values($toInsertProduitDevis);
+
+    if ($post["prolongations"]) {
+      foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
+        $toInsertLoyer[] = array(
+          "loyer__dot__loyer"=> $vp["loyer"],
+          "loyer__dot__duree"=> $vp["duree"],
+          "loyer__dot__type"=>"prolongation",
+          "loyer__dot__assurance"=>$vp["assurance"],
+          "loyer__dot__frais_de_gestion"=>$vp["frais_de_gestion"],
+          "loyer__dot__frequence_loyer"=> $vp["frequence"],
+          "loyer__dot__serenite"=>"",
+          "loyer__dot__maintenance"=>"",
+          "loyer__dot__hotline"=>"",
+          "loyer__dot__supervision"=>"",
+          "loyer__dot__support"=>"",
+          "loyer__dot__avec_option"=>"non"
+        );
+      }
+    }
 
     if ($post["prolongations"]) {
       foreach(json_decode($post['prolongations'], true) as $kp => $vp) {

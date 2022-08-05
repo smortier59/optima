@@ -58,6 +58,9 @@ ADD `maintenance` FLOAT(6,3) NULL AFTER `serenite`,
 ADD `hotline` FLOAT(6,3) NULL AFTER `maintenance`,
 ADD `supervision` FLOAT(6,3) NULL AFTER `hotline`,
 ADD `support` FLOAT(6,3) NULL AFTER `supervision`;
+INSERT INTO constante
+(constante, valeur)
+VALUES('__SUIVI_SLIMPAY_UPDATE_BMN__', '');
 
 
 
