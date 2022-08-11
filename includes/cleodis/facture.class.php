@@ -3260,6 +3260,10 @@ class facture_cleodis extends facture {
 
 						//Si le statut de la transaction est rejected, il faut allez rechercher la Transaction rejouée
 						if($state["executionStatus"] == "rejected") {
+
+							ATF::constante()->q->reset()->where("constante","__NOTIFIE_PRELEVEMENT_IMPAYEE__");
+							$notifie_impaye = ATF::constante()->select_row();
+
 							//un suivi sans destinataire "Facture xxxx impayée"
 							$suivis = array("suivi"=> array(
 													"id_societe" => $this->select($vfacture["facture.id_facture"] , "id_societe"),
@@ -3269,7 +3273,7 @@ class facture_cleodis extends facture {
 													"id_affaire" => $this->select($vfacture["facture.id_facture"] , "id_affaire"),
 													"type_suivi" => "Contrat",
 													"no_redirect" => true,
-													"suivi_notifie"=>array(116)
+													"suivi_notifie"=>array($notifie_impaye["valeur"])
 											  	)
 											);
 
