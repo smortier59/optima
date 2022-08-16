@@ -1133,7 +1133,7 @@ class facture_cleodis extends facture {
 				$this->updateDate(array(
 					"id_facture" => $this->decryptId($infos["id_".$this->table]),
 					"key" => "date_rejet",
-					"value" => date("Y-m-d", strtotime("-1 days"))
+					"value" => $infos["date_rejet"] ? date("Y-m-d", strtotime($infos["date_rejet"])) : date("Y-m-d", strtotime("-1 days"))
 				));
 			} else {
 				if ($facture["date_rejet"]) {
@@ -3250,6 +3250,8 @@ class facture_cleodis extends facture {
 
 					//On récupère la derniere transaction connue (en BDD) pour cette facture
 					$state = ATF::slimpay()->getStatutDebit($transaction[0]["ref_slimpay"]);
+					 // $state = json_decode($transaction[0]["retour"], true); // Pour du DEV
+
 
 					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
 					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
@@ -3311,7 +3313,8 @@ class facture_cleodis extends facture {
 								array(
 									"id_facture" => $vfacture["facture.id_facture"],
 									"key" => "rejet",
-									"value" => $customKey
+									"value" => $customKey,
+									"date_rejet" =>  $state["executionDate"]
 								)
 							);
 						}
