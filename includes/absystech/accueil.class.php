@@ -64,4 +64,5 @@ class accueil_wapp6 extends accueil_absystech { }
 class accueil_atoutcoms extends accueil_absystech { }
 
 class accueil_nco extends accueil_absystech { }
+class accueil_i2m extends accueil_absystech { }
 ?>

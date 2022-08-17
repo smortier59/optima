@@ -2464,6 +2464,6 @@ class facture_att extends facture_absystech {
 class facture_wapp6 extends facture_absystech { };
 class facture_atoutcoms extends facture_absystech { };
 class facture_demo extends facture_absystech { };
-
 class facture_nco extends facture_absystech { };
+class facture_i2m extends facture_absystech { };
 ?>

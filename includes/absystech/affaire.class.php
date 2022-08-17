@@ -1022,7 +1022,7 @@ class affaire_wapp6 extends affaire_absystech { };
 class affaire_atoutcoms extends affaire_absystech { };
 class affaire_demo extends affaire_absystech { };
 class affaire_nco extends affaire_absystech { };
-
+class affaire_i2m extends affaire_absystech { };
 /**
 * @codeCoverageIgnore
 */

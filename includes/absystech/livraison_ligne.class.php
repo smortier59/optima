@@ -42,6 +42,6 @@ class livraison_ligne_att extends livraison_ligne_absystech { };
 class livraison_ligne_wapp6 extends livraison_ligne_absystech { };
 class livraison_ligne_atoutcoms extends livraison_ligne_absystech { };
 class livraison_ligne_demo extends livraison_ligne_absystech { };
-
 class livraison_ligne_nco extends livraison_ligne_absystech { };
+class livraison_ligne_i2m extends livraison_ligne_absystech { };
 ?>

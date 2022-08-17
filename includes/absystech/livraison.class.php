@@ -366,6 +366,6 @@ class livraison_att extends livraison_absystech { };
 class livraison_wapp6 extends livraison_absystech { };
 class livraison_atoutcoms extends livraison_absystech { };
 class livraison_demo extends livraison_absystech { };
-
 class livraison_nco extends livraison_absystech { };
+class livraison_i2m extends livraison_absystech { };
 ?>

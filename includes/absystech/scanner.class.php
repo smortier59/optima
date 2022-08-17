@@ -29,4 +29,5 @@ class scanner_absystech extends scanner {
 class scanner_att extends scanner_absystech { };
 class scanner_atoutcoms extends scanner_absystech { };
 class scanner_nco extends scanner_absystech { };
+class scanner_i2m extends scanner_absystech { };
 ?>
