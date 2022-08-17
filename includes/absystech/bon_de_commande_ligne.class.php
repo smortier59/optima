@@ -98,5 +98,5 @@ class bon_de_commande_ligne_wapp6 extends bon_de_commande_ligne_absystech { };
 class bon_de_commande_ligne_atoutcoms extends bon_de_commande_ligne_absystech { };
 class bon_de_commande_ligne_demo extends bon_de_commande_ligne_absystech { };
 class bon_de_commande_ligne_nco extends bon_de_commande_ligne_absystech { };
-
+class bon_de_commande_ligne_i2m extends bon_de_commande_ligne_absystech { };
 ?>

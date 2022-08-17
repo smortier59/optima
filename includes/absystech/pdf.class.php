@@ -2599,6 +2599,6 @@ class pdf_atoutcoms extends pdf_absystech {
 
 
 }
-
 class pdf_nco extends pdf_absystech { }
+class pdf_i2m extends pdf_absystech { }
 ?>
