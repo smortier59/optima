@@ -1465,7 +1465,7 @@ class societe_i2m extends societe_absystech {
 	* @return string $prefix
 	*/
 	public function create_ref_prefix(){
-		return "I2";
+		return "I";
 	}
 }
 ?>
