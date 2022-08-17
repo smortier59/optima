@@ -37,19 +37,32 @@ class produit_cleodis extends produit {
 		$this->table = "produit";
 		$this->colonnes['fields_column'] = array('produit.produit','produit.type','produit.ref','produit.id_fournisseur','produit.prix_achat'=>array("width"=>80,"rowEditor"=>"setInfos"),'produit.etat','produit.id_document_contrat');
 		$this->colonnes['primary']=array('ref','produit','etat','commentaire','id_document_contrat');
+
+		$this->colonnes['panel']['tunnelApi']=array( 'loyer'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'duree'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'assurance'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'frais_de_gestion'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'serenite'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'maintenance'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'hotline'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'supervision'=>array("width"=>80,"rowEditor"=>"setInfos"),
+													 'support'=>array("width"=>80,"rowEditor"=>"setInfos"),
+
+													 'description', 'avis_expert', 'type_offre',
+													 'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)
+													);
+
 		$this->colonnes['panel']['caracteristiques']=array('prix_achat','id_fabriquant','type','id_sous_categorie','id_fournisseur','obsolete');
 		$this->colonnes['panel']['uc']=array('id_produit_besoins','id_produit_type','id_processeur','id_produit_puissance','id_produit_ram','id_produit_dd','id_produit_lecteur','id_produit_lan','id_produit_OS','id_produit_garantie_uc');
 		$this->colonnes['panel']['ecran']=array('id_produit_typeecran','id_produit_viewable','id_produit_garantie_ecran');
 		$this->colonnes['panel']['imprimante']=array('id_produit_technique','id_produit_format','id_produit_garantie_imprimante','id_produit_env');
 		$this->colonnes['panel']['telephone']=array('id_produit_tel_produit','id_produit_tel_type');
-		$this->colonnes['panel']['site_web']=array( 'loyer'=>array("width"=>80,"rowEditor"=>"setInfos"),
-													'duree'=>array("width"=>80,"rowEditor"=>"setInfos"),
-													'loyer1'=>array("width"=>80,"rowEditor"=>"setInfos"),
+
+
+		$this->colonnes['panel']['site_web']=array( 'loyer1'=>array("width"=>80,"rowEditor"=>"setInfos"),
 													'duree1'=>array("width"=>80,"rowEditor"=>"setInfos"),
 													'loyer2'=>array("width"=>80,"rowEditor"=>"setInfos"),
 													'duree2'=>array("width"=>80,"rowEditor"=>"setInfos"),
-													'description', 'avis_expert', 'type_offre',
-													'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80),
 													'services');
 
 		$this->fk_ligne =  'ref,prix_achat,id_fournisseur,id_produit,code,produit,type';
@@ -92,7 +105,7 @@ class produit_cleodis extends produit {
 		$this->colonnes['bloquees']['cloner'] =
 		$this->colonnes['bloquees']['update'] =  array('code','id_produit_dotpitch');
 
-
+		$this->panels['tunnelApi'] = array('nbCols'=>4,'visible'=>true);
 		$this->panels['caracteristiques'] = array('nbCols'=>2,'visible'=>true);
 		$this->panels['site_web'] = array('nbCols'=>2,'visible'=>true);
 

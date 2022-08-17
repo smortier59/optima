@@ -14,7 +14,7 @@
 				height:20
             },
             items: [
-                {foreach from=[num_chassis] item=d}
+                {foreach from=[num_chassis,kilometrage_max,montant_kilometrage_max_depasse,franchise] item=d}
                     {if !$d@first},{/if}
                     {
                         fieldLabel: '{ATF::$usr->trans($d,affaire)}',
