@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `agence` (
 --
 
 INSERT INTO `agence` (`id_agence`, `agence`, `adresse`, `adresse_2`, `adresse_3`, `cp`, `ville`, `id_pays`, `tel`, `fax`) VALUES
-(1, 'Lille', '139 rue des Arts', NULL, NULL, '59100', 'ROUBAIX', 'FR', '0320509902', '0320745005');
+(1, 'Oignies', 'Rue Alain Bashung', NULL, NULL, '62590', 'Oignes', 'FR', '0320509902', '0320745005');
 
 -- --------------------------------------------------------
 
