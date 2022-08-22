@@ -1188,6 +1188,6 @@ class stock_att extends stock_absystech { };
 class stock_wapp6 extends stock_absystech { };
 class stock_atoutcoms extends stock_absystech { };
 class stock_demo extends stock_absystech { };
-
 class stock_nco extends stock_absystech { };
+class stock_i2m extends stock_absystech { };
 ?>

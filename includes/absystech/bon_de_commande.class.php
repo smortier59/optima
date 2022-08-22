@@ -470,6 +470,6 @@ class bon_de_commande_atoutcoms extends bon_de_commande_absystech { };
 class bon_de_commande_demo extends bon_de_commande_absystech { };
 
 class bon_de_commande_nco extends bon_de_commande_absystech { };
-
+class bon_de_commande_i2m extends bon_de_commande_absystech { };
 
 ?>

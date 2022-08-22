@@ -155,6 +155,6 @@ class stats_att extends stats_absystech {
 class stats_demo extends stats_absystech { }
 class stats_wapp6 extends stats_absystech { }
 class stats_atoutcoms extends stats_absystech { }
-
 class stats_nco extends stats_absystech { }
+class stats_i2m extends stats_absystech { }
 ?>

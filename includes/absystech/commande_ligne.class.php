@@ -348,4 +348,5 @@ class commande_ligne_wapp6 extends commande_ligne_absystech { };
 class commande_ligne_atoutcoms extends commande_ligne_absystech { };
 class commande_ligne_demo extends commande_ligne_absystech { };
 class commande_ligne_nco extends commande_ligne_absystech { };
+class commande_ligne_i2m extends commande_ligne_absystech { };
 ?>

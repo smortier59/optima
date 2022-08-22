@@ -379,11 +379,9 @@ class pointage_absystech extends pointage {
 
 };
 
-class pointage_att extends pointage_absystech {
-};
+class pointage_att extends pointage_absystech { };
 class pointage_demo extends pointage_absystech { };
 class pointage_atoutcoms extends pointage_absystech { };
-
 class pointage_nco extends pointage_absystech { };
-
+class pointage_i2m extends pointage_absystech { };
 ?>
