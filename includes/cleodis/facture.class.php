@@ -3285,6 +3285,7 @@ class facture_cleodis extends facture {
 
 							switch ($state["rejectedReason"]) {
 								case 'MS02':
+								case 'MD07':
 									$customKey = 'contestation_debiteur';
 									break;
 								case 'AM04':
@@ -3301,10 +3302,16 @@ class facture_cleodis extends facture {
 								case 'AC04':
 									$customKey = 'compte_cloture';
 									break;
-								case '134':
+								case 'AC01':
+								case 'RC01':
+								case 'MD01':
+								case 'MD02':
+								case 'CNOR':
+								case 'DNOR':
 									$customKey = 'coor_banc_inexploitable';
 									break;
 								case '2011':
+								case 'AG01':
 									$customKey = 'pas_dordre_de_payer';
 									break;
 								default:
