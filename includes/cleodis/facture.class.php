@@ -139,6 +139,8 @@ class facture_cleodis extends facture {
 		$this->addPrivilege("download_facture_controle_statut");
 
 		$this->addPrivilege("aPrelever");
+		$this->addPrivilege("aPreleverEchec");
+
 		$this->addPrivilege("massPrelevementSlimpay");
 
 
@@ -3336,28 +3338,41 @@ class facture_cleodis extends facture {
 		$q = "select f.*
 		from facture f
 		where etat='impayee'
+		and f.date_paiement is null
+		and f.id_facture not in (select id_facture from slimpay_transaction st)";
+
+		$return = ATF::db()->sql2array($q);
+		return $this->retourAffichageAPrelever($return);
+	}
+
+	/**
+	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function aPreleverEchec($infos){
+		//Recuperer les factures qui n'ont pas de prelevement SLIMPAY  & les factures donc le dernier prelevement est Rejected
+		$q = "select f.*
+		from facture f
+		where etat='impayee'
 		and (
-				(
-					f.date_paiement is null
-					 and f.id_facture not in (select id_facture from slimpay_transaction st)
-				 )
-			or (
-				f.id_facture in (
-					select st2.id_facture
-					from slimpay_transaction st2
-					where st2.id_slimpay_transaction in (
-						select max(st3.id_slimpay_transaction)
-						from slimpay_transaction st3
-						where st3.id_facture =st2.id_facture
-						and st3.executionStatus='rejected'
-					)
+			f.id_facture in (
+				select st2.id_facture
+				from slimpay_transaction st2
+				where st2.id_slimpay_transaction in (
+					select max(st3.id_slimpay_transaction)
+					from slimpay_transaction st3
+					where st3.id_facture =st2.id_facture
+					and st3.executionStatus='rejected'
 				)
 			)
 		)";
 
 		$return = ATF::db()->sql2array($q);
+		return $this->retourAffichageAPrelever($return);
 
+	}
 
+	public function retourAffichageAPrelever($return) {
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
