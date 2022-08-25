@@ -281,22 +281,27 @@ class creditsafe extends classes_optima {
 				$return['etat'] = "actif";
 			break;
 		}
-
-        log::logger($return , "mfleurquin");
         return $return;
 
     }
 
     public function _getSolde() {
         try {
-            $res = $this->getSolde();
+            $res = $this->getSolde(false);
 
-            return [
-                "restant" => $res["restant"],
-                "utilise" => $res["utilise"],
-                "date" => $res["date"] ,
-                "heure" => $res["heure"]
-            ];
+            $return = [];
+            foreach($res as $key => $value) {
+                $return[] = [
+                    "title" => $value["serie"],
+                    "restant" => $value["restant"],
+                    "utilise" => $value["utilise"],
+                    "date" => $value["date"] ,
+                    "heure" => $value["heure"]
+                ];
+            }
+
+
+            return $return;
         } catch (errorATF $e) {
             throw $e;
         }
@@ -401,12 +406,16 @@ class creditsafe extends classes_optima {
                 file_put_contents($folder_stat.$fileData, json_encode($data, JSON_PRETTY_PRINT));
             } else {
                 $data = json_decode(file_get_contents($folder_stat.$fileData));
-                $return["title"] = "Solde Crédit Safe <br /> au ".date("d/m/Y à H:i", strtotime($data->date_interogation));
-                $return["serie"] = "CreditSafe Connect France";
-                $return["restant"] = $data->data[0]->paid - $data->data[0]->used;
-                $return["utilise"] = $data->data[0]->used;
-                $return["date"] = date("Y-m-d", strtotime($data->date_interogation));
-                $return["heure"] = date("H:i", strtotime($data->date_interogation));
+
+                foreach ($data->data as $key => $dataCountry) {
+                    $return[$key]["title"] = "Solde Crédit Safe ".$dataCountry->countryName." <br /> au ".date("d/m/Y à H:i", strtotime($data->date_interogation));
+                    $return[$key]["serie"] = $dataCountry->countryName;
+                    $return[$key]["restant"] = $dataCountry->paid - $dataCountry->used;
+                    $return[$key]["utilise"] = $dataCountry->used;
+                    $return[$key]["date"] = date("Y-m-d", strtotime($data->date_interogation));
+                    $return[$key]["heure"] = date("H:i", strtotime($data->date_interogation));
+                }
+
                 return $return;
             }
 
