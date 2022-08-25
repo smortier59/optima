@@ -391,9 +391,16 @@ class devis_cleodis extends devis {
 
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+		$societe = ATF::societe()->select($infos['id_societe']);
+
 
 		if ($infos['rum']) {
+			$RUM = $infos["rum"];
 
+			if (!$societe["RUM"]) {
+				ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+			}
+			unset($infos["rum"]);
 		} else {
 			$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
@@ -406,10 +413,7 @@ class devis_cleodis extends devis {
 					//Si il n'y a pas de RUM, on en ajoute un pour cette société
 					$RUM = ATF::societe()->create_rum();
 
-					$societe = ATF::societe()->select($infos['id_societe']);
-
 					if($societe['code_client']){
-
 						if(strlen($societe['code_client']) === 6){
 							$RUM .= $societe['code_client'];
 						}elseif(strlen($societe['code_client']) > 6){
@@ -466,6 +470,11 @@ class devis_cleodis extends devis {
 
 		$id_type_affaire = $infos["id_type_affaire"];
 
+		if (ATF::$codename === "go_abonnement") {
+			unset($infos['kilometrage_max']);
+			unset($infos['montant_kilometrage_max_depasse']);
+			unset($infos['franchise']);
+		}
 
 		////////////////Devis
 		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);

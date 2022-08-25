@@ -141,4 +141,60 @@ class pdf_societe extends classes_optima {
 		}
 		return $return;
 	}
+
+	public function _documents($infos){
+
+		ATF::pdf_societe()->q->reset()->where('pdf_societe.id_societe',$infos["id_societe"]);
+
+		$pdf_societes = ATF::pdf_societe()->select_all();
+
+		$response = "";
+
+		$zipname = 'liasse_documentaire' . date("Ymd-Hi") . '.zip';
+		$zip = new ZipArchive();
+		if($zip->open(__TEMP_PATH__  .$zipname, ZipArchive::CREATE) === true){
+			if($pdf_societes){
+
+				foreach($pdf_societes["data"] as $item){
+			
+					// zippage des fichiers pdf
+					if(file_exists($this->filepath($item['id_pdf_societe'],"fichier_joint"))){
+						$name=$item['id_pdf_societe'].".pdf";
+						try{
+							$zip->addFile($this->filepath($item['id_pdf_societe'],"fichier_joint"),$name);
+							}catch(errorATF $e){
+								throw $e;
+						}
+					}
+
+					//zippage des autres fichiers
+					if(file_exists($this->filepath($item['id_pdf_societe'],"fichier_joint2"))){
+						$name=$item['id_pdf_societe'].".zip";
+						try{
+							$zip->addFile($this->filepath($item['id_pdf_societe'],"fichier_joint2"),$name);
+							}catch(errorATF $e){
+								throw $e;
+						}
+					}
+				}
+			}
+
+		}
+
+		$zip->close();
+
+		$response = $this->getBase64(__TEMP_PATH__  .$zipname);
+
+		unlink(__TEMP_PATH__  .$zipname);
+
+		return $response;
+
+		
+	}
+
+
+	public function getBase64($path){
+		$data = file_get_contents($path);
+	  	return base64_encode($data);
+	}
 };
