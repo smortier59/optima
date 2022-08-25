@@ -4,307 +4,453 @@
  */
 
 {
-	text: '{ATF::$usr->trans(prelevement_slimpay,facture)|escape:javascript}',
-	disabled: false,
-	handler: function(btn, ev) {
+	text: '{ATF::$usr->trans(Prelevement)}',
+	cls: 'x-btn-text-icon details',
+	menu: new Ext.menu.Menu({ items:[
+		{
+			text: '{ATF::$usr->trans(prelevement_slimpay,facture)|escape:javascript}',
+			disabled: false,
+			handler: function(btn, ev) {
 
-		ATF.basicInfo = new Ext.FormPanel({
-			frame: true,
-			width: 900,
-			items: [{
-				html: "<strong>Choisissez les factures à prélever : </strong>"
-			}],
-			listeners: {
-				render: function (el) {
-					ATF.loadMask.show();
-					ATF.ajax(
-						"facture,aPrelever.ajax"
-						,""
-						,{
-							onComplete: function (r) {
-								var cb = {
-							  		xtype: 'textfield',
-							        name: 'libelle',
-							        fieldLabel: 'Libellé',
-							        allowBlank: true,
-							        value: r.result.libelle
-							  	};
-							  	el.add(cb);
+				ATF.basicInfo = new Ext.FormPanel({
+					frame: true,
+					width: 900,
+					items: [{
+						html: "<strong>Choisissez les factures à prélever : </strong>"
+					}],
+					listeners: {
+						render: function (el) {
+							ATF.loadMask.show();
+							ATF.ajax(
+								"facture,aPrelever.ajax"
+								,""
+								,{
+									onComplete: function (r) {
+										var cb = {
+											xtype: 'textfield',
+											name: 'libelle',
+											fieldLabel: 'Libellé',
+											allowBlank: true,
+											value: r.result.libelle
+										};
+										el.add(cb);
 
-							  	var cb = {
-							  		xtype: 'datefield',
-							        anchor: '50%',
-							        fieldLabel: 'Date de Prélèvement',
-							        name: 'date',
-							        format: 'Y-m-d',
-							        minValue: new Date(),
-							        value: r.result.date_prelevement
-							  	};
-							  	el.add(cb);
+										var cb = {
+											xtype: 'datefield',
+											anchor: '50%',
+											fieldLabel: 'Date de Prélèvement',
+											name: 'date',
+											format: 'Y-m-d',
+											minValue: new Date(),
+											value: r.result.date_prelevement
+										};
+										el.add(cb);
 
-								var cb = {
-							  		xtype: "checkbox"
-							  		,boxLabel: "Tout selectionner"
-							  		,value: "all"
-							  		,name: ""
-							  		,listeners: {
-							  			check: function(){
-							  				var checkboxes = Ext.query('input[type=checkbox]');
+										var cb = {
+											xtype: "checkbox"
+											,boxLabel: "Tout selectionner"
+											,value: "all"
+											,name: ""
+											,listeners: {
+												check: function(){
+													var checkboxes = Ext.query('input[type=checkbox]');
 
-						  					Ext.each(checkboxes, function(obj_item){
-												obj_item.checked = checkboxes[0].checked;
-											});
+													Ext.each(checkboxes, function(obj_item){
+														obj_item.checked = checkboxes[0].checked;
+													});
 
 
-							  			}
-							  		}
-							  	};
-							  	el.add(cb);
+												}
+											}
+										};
+										el.add(cb);
 
-								Ext.iterate(r.result.lignes, function(key, value) {
+										Ext.iterate(r.result.lignes, function(key, value) {
 
-									if (key.date_periode_debut) {
-										var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" € ("+key.date_periode_debut+" au "+key.date_periode_fin+")";
-									} else {
-										var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" €";
+											if (key.date_periode_debut) {
+												var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" € ("+key.date_periode_debut+" au "+key.date_periode_fin+")";
+											} else {
+												var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" €";
+											}
+
+											var cb = {
+												xtype: "checkbox"
+												,boxLabel: label
+												,value: key.id_facture
+												,name: "factures["+key.id_facture+"]"
+											};
+											el.add(cb);
+										});
+
+
+
+										el.doLayout();
+										ATF.loadMask.hide();
 									}
-
-									var cb = {
-								  		xtype: "checkbox"
-								  		,boxLabel: label
-								  		,value: key.id_facture
-								  		,name: "factures["+key.id_facture+"]"
-								  	};
-								  	el.add(cb);
-								});
-
-
-
-								el.doLayout();
-								ATF.loadMask.hide();
-							}
-						}
-					);
-				}
-			},
-			buttons:[{
-				text : "{ATF::$usr->trans(valider_prelevement,hotline)|escape:javascript}",
-				handler : function(){
-					ATF.basicInfo.getForm().submit({
-						submitEmptyText:false,
-						method  : 'post',
-						waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
-						waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
-						url     : 'extjs.ajax',
-						params: {
-							'extAction':'facture'
-							,'extMethod':'massPrelevementSlimpay'
-						}
-						,success:function(form, action) {
-							ATF.unsetFormIsActive();
-							ATF.currentWindow.close();
-							ATF.extRefresh(action);
-							store.reload();
-						}
-						,failure:function(form, action) {
-							var title='Problème';
-							if (action.failureType === Ext.form.Action.CONNECT_FAILURE){
-								Ext.Msg.alert(title, 'Server reported:'+action.response.status+' '+action.response.statusText);
-							} else if (action.failureType === Ext.form.Action.SERVER_INVALID){
-								Ext.Msg.alert(title, action.result.errormsg);
-							} else if (action.failureType === Ext.form.Action.CLIENT_INVALID){
-								Ext.Msg.alert(title, "Un champs est mal renseigné");
-							} else if (action.failureType === Ext.form.Action.LOAD_FAILURE){
-								Ext.Msg.alert(title, "Un champs est mal renseigné");
-							}
-						}
-						,timeout:3600
-					});
-				}
-			}]
-		});
-		ATF.unsetFormIsActive();
-
-		ATF.currentWindow = new Ext.Window({
-			title: 'Prélèvement automatique via SLIMPAY',
-			id:'mywindow',
-			width: 900,
-			buttonAlign:'center',
-			autoScroll:false,
-			closable:true,
-			items: ATF.basicInfo
-		}).show();
-
-	}
-},
-{
-	text: '{ATF::$usr->trans(import_facture_libre,facture)|escape:javascript}',
-	disabled: false,
-	handler: function(btn, ev) {
-		ATF.panelImport = new Ext.FormPanel({
-			frame: true,
-			width: 500,
-			fileUpload: true,
-			id: 'formImportFactureLibre',
-			items: [
-				{
-					xtype: "fileuploadfield",
-					fieldLabel: "Fichier d'import",
-					name: "file",
-					id: "file"
-				},{
-					xtype: 'panel',
-					id:'resultDiv'
-				}
-			],
-
-			buttons:[{
-				text : "Importer",
-				handler : function(){
-					Ext.getCmp('formImportFactureLibre').getForm().submit({
-						submitEmptyText:false,
-						method  : 'post',
-						waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
-						waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
-						url     : 'extjs.ajax',
-						params: {
-							'extAction':'facture'
-							,'extMethod':'import_facture_libre'
-						},
-						waitTitle:'Veuillez patienter',
-						waitMsg: 'Chargement ...',
-						timeout: 3600
-						, success:function(form, action) {
-							var r = Ext.util.JSON.decode(action.response.responseText);
-
-							var html = "";
-							if (r.warnings) {
-								html += "Certaines erreurs non bloquantes ont été détecté, le détail ci dessous : <br><br><ul>";
-								for (var d in r.warnings) {
-									html += "<li><b>Ligne(s) "+r.warnings[d]+"</b> : "+d+"</li>";
 								}
-								html += "</ul><br><br>";
-							}
-							html += "<b>L'export s'est bien déroulé, "+r.factureInserted+" factures insérées.</b>";
-							$('#resultDiv').html(html);
-
+							);
 						}
-						, failure:function(form, action) {
-							var r = Ext.util.JSON.decode(action.response.responseText);
-							var html = "Certaines erreurs ont rendu impossible l'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br><ul>";
-							for (var d in r.errors) {
-								html += "<li><b>Ligne(s) "+r.errors[d]+"</b> : "+d+"</li>";
-							}
-							html += "</ul><br><br>";
-
-							$('#resultDiv').html(html);
+					},
+					buttons:[{
+						text : "{ATF::$usr->trans(valider_prelevement,hotline)|escape:javascript}",
+						handler : function(){
+							ATF.basicInfo.getForm().submit({
+								submitEmptyText:false,
+								method  : 'post',
+								waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
+								waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
+								url     : 'extjs.ajax',
+								params: {
+									'extAction':'facture'
+									,'extMethod':'massPrelevementSlimpay'
+								}
+								,success:function(form, action) {
+									ATF.unsetFormIsActive();
+									ATF.currentWindow.close();
+									ATF.extRefresh(action);
+									store.reload();
+								}
+								,failure:function(form, action) {
+									var title='Problème';
+									if (action.failureType === Ext.form.Action.CONNECT_FAILURE){
+										Ext.Msg.alert(title, 'Server reported:'+action.response.status+' '+action.response.statusText);
+									} else if (action.failureType === Ext.form.Action.SERVER_INVALID){
+										Ext.Msg.alert(title, action.result.errormsg);
+									} else if (action.failureType === Ext.form.Action.CLIENT_INVALID){
+										Ext.Msg.alert(title, "Un champs est mal renseigné");
+									} else if (action.failureType === Ext.form.Action.LOAD_FAILURE){
+										Ext.Msg.alert(title, "Un champs est mal renseigné");
+									}
+								}
+								,timeout:3600
+							});
 						}
-					});
-				}
-			}]
-		});
+					}]
+				});
+				ATF.unsetFormIsActive();
 
-		ATF.unsetFormIsActive();
+				ATF.currentWindow = new Ext.Window({
+					title: 'Prélèvement automatique via SLIMPAY',
+					id:'mywindow',
+					width: 900,
+					buttonAlign:'center',
+					autoScroll:false,
+					closable:true,
+					items: ATF.basicInfo
+				}).show();
 
-		ATF.ImportWindow = new Ext.Window({
-			title: 'Import de facture libre',
-			id:'mymodalimport',
-			width: 510,
-			buttonAlign:'center',
-			autoScroll:false,
-			closable:true,
-			items: ATF.panelImport
-		}).show();
+			}
+		},
+		{
+			text: 'Rejouer un prèlevement échoué',
+			disabled: false,
+			handler: function(btn, ev) {
 
-	}
+				ATF.basicInfo = new Ext.FormPanel({
+					frame: true,
+					width: 900,
+					items: [{
+						html: "<strong>Choisissez les factures à prélever : </strong>"
+					}],
+					listeners: {
+						render: function (el) {
+							ATF.loadMask.show();
+							ATF.ajax(
+								"facture,aPreleverEchec.ajax"
+								,""
+								,{
+									onComplete: function (r) {
+										var cb = {
+											xtype: 'textfield',
+											name: 'libelle',
+											fieldLabel: 'Libellé',
+											allowBlank: true,
+											value: r.result.libelle
+										};
+										el.add(cb);
+
+										var cb = {
+											xtype: 'datefield',
+											anchor: '50%',
+											fieldLabel: 'Date de Prélèvement',
+											name: 'date',
+											format: 'Y-m-d',
+											minValue: new Date(),
+											value: r.result.date_prelevement
+										};
+										el.add(cb);
+
+										var cb = {
+											xtype: "checkbox"
+											,boxLabel: "Tout selectionner"
+											,value: "all"
+											,name: ""
+											,listeners: {
+												check: function(){
+													var checkboxes = Ext.query('input[type=checkbox]');
+
+													Ext.each(checkboxes, function(obj_item){
+														obj_item.checked = checkboxes[0].checked;
+													});
+
+
+												}
+											}
+										};
+										el.add(cb);
+
+										Ext.iterate(r.result.lignes, function(key, value) {
+
+											if (key.date_periode_debut) {
+												var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" € ("+key.date_periode_debut+" au "+key.date_periode_fin+")";
+											} else {
+												var label = "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" €";
+											}
+
+											var cb = {
+												xtype: "checkbox"
+												,boxLabel: label
+												,value: key.id_facture
+												,name: "factures["+key.id_facture+"]"
+											};
+											el.add(cb);
+										});
+
+
+
+										el.doLayout();
+										ATF.loadMask.hide();
+									}
+								}
+							);
+						}
+					},
+					buttons:[{
+						text : "{ATF::$usr->trans(valider_prelevement,hotline)|escape:javascript}",
+						handler : function(){
+							ATF.basicInfo.getForm().submit({
+								submitEmptyText:false,
+								method  : 'post',
+								waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
+								waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
+								url     : 'extjs.ajax',
+								params: {
+									'extAction':'facture'
+									,'extMethod':'massPrelevementSlimpay'
+								}
+								,success:function(form, action) {
+									ATF.unsetFormIsActive();
+									ATF.currentWindow.close();
+									ATF.extRefresh(action);
+									store.reload();
+								}
+								,failure:function(form, action) {
+									var title='Problème';
+									if (action.failureType === Ext.form.Action.CONNECT_FAILURE){
+										Ext.Msg.alert(title, 'Server reported:'+action.response.status+' '+action.response.statusText);
+									} else if (action.failureType === Ext.form.Action.SERVER_INVALID){
+										Ext.Msg.alert(title, action.result.errormsg);
+									} else if (action.failureType === Ext.form.Action.CLIENT_INVALID){
+										Ext.Msg.alert(title, "Un champs est mal renseigné");
+									} else if (action.failureType === Ext.form.Action.LOAD_FAILURE){
+										Ext.Msg.alert(title, "Un champs est mal renseigné");
+									}
+								}
+								,timeout:3600
+							});
+						}
+					}]
+				});
+				ATF.unsetFormIsActive();
+
+				ATF.currentWindow = new Ext.Window({
+					title: 'Prélèvement automatique via SLIMPAY',
+					id:'mywindow',
+					width: 900,
+					buttonAlign:'center',
+					autoScroll:false,
+					closable:true,
+					items: ATF.basicInfo
+				}).show();
+
+			}
+		}
+	]})
 },
 {
-	text: '<img src="{ATF::$staticserver}images/icones/todoList.png" width="24"> Contrôle des statuts de facture',
-	disabled: false,
-	handler: function(btn, ev) {
-		ATF.panelControleStatut = new Ext.FormPanel({
-			frame: true,
-			width: 500,
-			fileUpload: true,
-			id: 'formImportFactureControleStatut',
-			items: [
-				{
-					xtype: "fileuploadfield",
-					fieldLabel: "Fichier de statut",
-					name: "fileStatut",
-					id: "fileStatut"
-				},{
-					xtype: 'panel',
-					id:'resultDiv'
-				}
-			],
-
-			buttons:[{
-				text : "Importer",
-				id: "importControleStatutValidBtn",
-				handler : function(){
-					$('#resultDiv').html("");
-					Ext.getCmp('formImportFactureControleStatut').getForm().submit({
-						submitEmptyText:false,
-						method  : 'post',
-						waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
-						waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
-						url     : 'extjs.ajax',
-						params: {
-							'extAction':'facture'
-							,'extMethod':'import_facture_controle_statut'
-						},
-						waitTitle:'Veuillez patienter',
-						waitMsg: 'Chargement ...',
-						timeout: 3600,
-						success:function(form, action) {
-							var html = '<div class="alert alert-success">C\'est tout bon !<br><br>';
-							html += '<ul style="text-align: left !important;">';
-							// var r = Ext.util.JSON.decode(action.response.responseText);
-
-							if (action.result && action.result.rapport) {
-								html += action.result.rapport;
-							}
-							if (action.result && action.result.fname) {
-								html += "<br>Cliquez ici pour télécharger le rapport XLS : ";
-								html += '<a href="facture,download_facture_controle_statut.ajax,fname=' + action.result.fname + '" target="_blank"><img src="{ATF::$staticserver}images/icones/xls.png" width="16"></a>';
-								html += "<br>";
-							} else {
-								html += "<br>Rapport XLS non disponible<br>";
-							}
-							html += "</div>";
-							$('#resultDiv').html(html);
-							ATF.loadMask.hide();
-						},
-						failure:function(form, action) {
-							var html = '<div class="alert alert-warning">Certaines erreurs ont rendu impossible l\'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br>';
-							html += '<ul style="text-align: left !important;">';
-							if (action.result && action.result.errors) {
-								html += "<li>" + action.result.errors + "</li>";
-							} else {
-								html += "<li>Erreur non identifiée</li>";
-							}
-							html += "</ul></div>";
-
-							$('#resultDiv').html(html);
-							ATF.loadMask.hide();
+	text: '{ATF::$usr->trans(Actions)}',
+	cls: 'x-btn-text-icon details',
+	menu: new Ext.menu.Menu({ items:[
+		{
+			text: '{ATF::$usr->trans(import_facture_libre,facture)|escape:javascript}',
+			disabled: false,
+			handler: function(btn, ev) {
+				ATF.panelImport = new Ext.FormPanel({
+					frame: true,
+					width: 500,
+					fileUpload: true,
+					id: 'formImportFactureLibre',
+					items: [
+						{
+							xtype: "fileuploadfield",
+							fieldLabel: "Fichier d'import",
+							name: "file",
+							id: "file"
+						},{
+							xtype: 'panel',
+							id:'resultDiv'
 						}
-					});
-				}
-			}]
-		});
+					],
 
-		ATF.unsetFormIsActive();
+					buttons:[{
+						text : "Importer",
+						handler : function(){
+							Ext.getCmp('formImportFactureLibre').getForm().submit({
+								submitEmptyText:false,
+								method  : 'post',
+								waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
+								waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
+								url     : 'extjs.ajax',
+								params: {
+									'extAction':'facture'
+									,'extMethod':'import_facture_libre'
+								},
+								waitTitle:'Veuillez patienter',
+								waitMsg: 'Chargement ...',
+								timeout: 3600
+								, success:function(form, action) {
+									var r = Ext.util.JSON.decode(action.response.responseText);
 
-		ATF.ImportWindow = new Ext.Window({
-			title: 'Contrôle des statuts de facture',
-			id:'mymodalControleStatut',
-			width: 510,
-			buttonAlign:'center',
-			autoScroll:false,
-			closable:true,
-			items: ATF.panelControleStatut
-		}).show();
+									var html = "";
+									if (r.warnings) {
+										html += "Certaines erreurs non bloquantes ont été détecté, le détail ci dessous : <br><br><ul>";
+										for (var d in r.warnings) {
+											html += "<li><b>Ligne(s) "+r.warnings[d]+"</b> : "+d+"</li>";
+										}
+										html += "</ul><br><br>";
+									}
+									html += "<b>L'export s'est bien déroulé, "+r.factureInserted+" factures insérées.</b>";
+									$('#resultDiv').html(html);
 
-	}
+								}
+								, failure:function(form, action) {
+									var r = Ext.util.JSON.decode(action.response.responseText);
+									var html = "Certaines erreurs ont rendu impossible l'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br><ul>";
+									for (var d in r.errors) {
+										html += "<li><b>Ligne(s) "+r.errors[d]+"</b> : "+d+"</li>";
+									}
+									html += "</ul><br><br>";
+
+									$('#resultDiv').html(html);
+								}
+							});
+						}
+					}]
+				});
+
+				ATF.unsetFormIsActive();
+
+				ATF.ImportWindow = new Ext.Window({
+					title: 'Import de facture libre',
+					id:'mymodalimport',
+					width: 510,
+					buttonAlign:'center',
+					autoScroll:false,
+					closable:true,
+					items: ATF.panelImport
+				}).show();
+
+			}
+		},
+		{
+			text: 'Contrôle des statuts de facture',
+			disabled: false,
+			handler: function(btn, ev) {
+				ATF.panelControleStatut = new Ext.FormPanel({
+					frame: true,
+					width: 500,
+					fileUpload: true,
+					id: 'formImportFactureControleStatut',
+					items: [
+						{
+							xtype: "fileuploadfield",
+							fieldLabel: "Fichier de statut",
+							name: "fileStatut",
+							id: "fileStatut"
+						},{
+							xtype: 'panel',
+							id:'resultDiv'
+						}
+					],
+
+					buttons:[{
+						text : "Importer",
+						id: "importControleStatutValidBtn",
+						handler : function(){
+							$('#resultDiv').html("");
+							Ext.getCmp('formImportFactureControleStatut').getForm().submit({
+								submitEmptyText:false,
+								method  : 'post',
+								waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
+								waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
+								url     : 'extjs.ajax',
+								params: {
+									'extAction':'facture'
+									,'extMethod':'import_facture_controle_statut'
+								},
+								waitTitle:'Veuillez patienter',
+								waitMsg: 'Chargement ...',
+								timeout: 3600,
+								success:function(form, action) {
+									var html = '<div class="alert alert-success">C\'est tout bon !<br><br>';
+									html += '<ul style="text-align: left !important;">';
+									// var r = Ext.util.JSON.decode(action.response.responseText);
+
+									if (action.result && action.result.rapport) {
+										html += action.result.rapport;
+									}
+									if (action.result && action.result.fname) {
+										html += "<br>Cliquez ici pour télécharger le rapport XLS : ";
+										html += '<a href="facture,download_facture_controle_statut.ajax,fname=' + action.result.fname + '" target="_blank"><img src="{ATF::$staticserver}images/icones/xls.png" width="16"></a>';
+										html += "<br>";
+									} else {
+										html += "<br>Rapport XLS non disponible<br>";
+									}
+									html += "</div>";
+									$('#resultDiv').html(html);
+									ATF.loadMask.hide();
+								},
+								failure:function(form, action) {
+									var html = '<div class="alert alert-warning">Certaines erreurs ont rendu impossible l\'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br>';
+									html += '<ul style="text-align: left !important;">';
+									if (action.result && action.result.errors) {
+										html += "<li>" + action.result.errors + "</li>";
+									} else {
+										html += "<li>Erreur non identifiée</li>";
+									}
+									html += "</ul></div>";
+
+									$('#resultDiv').html(html);
+									ATF.loadMask.hide();
+								}
+							});
+						}
+					}]
+				});
+
+				ATF.unsetFormIsActive();
+
+				ATF.ImportWindow = new Ext.Window({
+					title: 'Contrôle des statuts de facture',
+					id:'mymodalControleStatut',
+					width: 510,
+					buttonAlign:'center',
+					autoScroll:false,
+					closable:true,
+					items: ATF.panelControleStatut
+				}).show();
+
+			}
+		}
+	]})
 }
