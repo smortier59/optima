@@ -3244,6 +3244,182 @@ class facture_cleodis extends facture {
 		$this->q->reset()->where("facture.date", date("Y-m-d", strtotime("-1 year")), "AND", null, ">=");
 		if($factures = $this->select_all()){
 			foreach ($factures as $kfacture => $vfacture) {
+
+				//On récupère la derniere transaction
+				ATF::slimpay_transaction()->q->reset()->where("id_facture", $vfacture["facture.id_facture"])->addOrder("id_slimpay_transaction", "DESC");
+				$transaction = ATF::slimpay_transaction()->select_all();
+				if($transaction){
+
+					//On récupère la derniere transaction connue (en BDD) pour cette facture
+					$state = ATF::slimpay()->getStatutDebit($transaction[0]["ref_slimpay"]);
+					 // $state = json_decode($transaction[0]["retour"], true); // Pour du DEV
+
+
+					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
+					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
+						ATF::slimpay_transaction()->u(array("id_slimpay_transaction"=> $transaction[0]["id_slimpay_transaction"],
+															"executionStatus"=>$state["executionStatus"],
+															"retour"=>json_encode($state)
+													  ));
+
+						//Si le statut de la transaction est rejected, il faut allez rechercher la Transaction rejouée
+						if($state["executionStatus"] == "rejected") {
+
+							ATF::constante()->q->reset()->where("constante","__NOTIFIE_PRELEVEMENT_IMPAYEE__");
+							$notifie_impaye = ATF::constante()->select_row();
+
+							//un suivi sans destinataire "Facture xxxx impayée"
+							$suivis = array("suivi"=> array(
+													"id_societe" => $this->select($vfacture["facture.id_facture"] , "id_societe"),
+													"type" => "note",
+													"date" => date("Y-m-d H:i:s"),
+													"texte" => "Facture ".$this->select($vfacture["facture.id_facture"] , "ref")." impayée",
+													"id_affaire" => $this->select($vfacture["facture.id_facture"] , "id_affaire"),
+													"type_suivi" => "Contrat",
+													"no_redirect" => true,
+													"suivi_notifie"=>array($notifie_impaye["valeur"])
+											  	)
+											);
+
+							ATF::suivi()->insert($suivis);
+
+							switch ($state["rejectedReason"]) {
+								case 'MS02':
+								case 'MD07':
+									$customKey = 'contestation_debiteur';
+									break;
+								case 'AM04':
+								case '411':
+									$customKey = 'provision_insuffisante';
+									break;
+								case '641':
+								case 'C11':
+									$customKey = 'opposition_compte';
+									break;
+								case '903':
+									$customKey = 'decision_judiciaire';
+									break;
+								case 'AC04':
+									$customKey = 'compte_cloture';
+									break;
+								case 'AC01':
+								case 'RC01':
+								case 'MD01':
+								case 'MD02':
+								case 'CNOR':
+								case 'DNOR':
+									$customKey = 'coor_banc_inexploitable';
+									break;
+								case '2011':
+								case 'AG01':
+									$customKey = 'pas_dordre_de_payer';
+									break;
+								default:
+									$customKey = 'non_preleve';
+									break;
+							}
+							ATF::facture()->updateEnumRejet(
+								array(
+									"id_facture" => $vfacture["facture.id_facture"],
+									"key" => "rejet",
+									"value" => $customKey,
+									"date_rejet" =>  $state["executionDate"]
+								)
+							);
+						}
+					}
+				}
+
+			}
+		}
+
+
+	}
+
+	/**
+	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function aPrelever($infos){
+		//Recuperer les factures qui n'ont pas de prelevement SLIMPAY  & les factures donc le dernier prelevement est Rejected
+		$q = "select f.*
+		from facture f
+		where etat='impayee'
+		and f.date_paiement is null
+		and f.id_facture not in (select id_facture from slimpay_transaction st)";
+
+		$return = ATF::db()->sql2array($q);
+		return $this->retourAffichageAPrelever($return);
+	}
+
+	/**
+	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function aPreleverEchec($infos){
+		//Recuperer les factures qui n'ont pas de prelevement SLIMPAY  & les factures donc le dernier prelevement est Rejected
+		$q = "select f.*
+		from facture f
+		where etat='impayee'
+		and (
+			f.id_facture in (
+				select st2.id_facture
+				from slimpay_transaction st2
+				where st2.id_slimpay_transaction in (
+					select max(st3.id_slimpay_transaction)
+					from slimpay_transaction st3
+					where st3.id_facture =st2.id_facture
+					and st3.executionStatus='rejected'
+				)
+			)
+		)";
+
+		$return = ATF::db()->sql2array($q);
+		return $this->retourAffichageAPrelever($return);
+
+	}
+
+	public function retourAffichageAPrelever($return) {
+		foreach ($return as $key => $value) {
+			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
+			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
+			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
+			$return[$key]["prix_ttc"] =  number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
+
+			$id_type_affaire = ATF::affaire()->select($value["id_affaire"], "id_type_affaire");
+			if ($id_type_affaire) {
+				if (ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") == "oui" && $value["prix_sans_tva"] != 0) {
+					$return[$key]["prix_ttc"] = number_format((($value["prix"] * $value["tva"]) + $value["prix_sans_tva"] ) , 2 , ".", "");
+				}
+			}
+		}
+
+		switch(ATF::$codename){
+			case "bdomplus":
+				$libelle = "Abonnement BDOM+ ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+			break;
+
+			case "go_abonnement":
+				$libelle = "Abonnement GO Abonnement ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+			break;
+
+			case "assets":
+				$libelle = "Abonnement Assets ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+			break;
+
+			default:
+				$libelle = "Location Cléodis ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+		}
+
+		$result = array(
+						"libelle"=> $libelle,
+						"date_prelevement"=> date("Y-m-01", strtotime("+1 month")),
+						"lignes" => $return
+					   );
+
+		return $result;
+	}
 	/**
 	 * Retourne les dernieres affaires
 	 * Utilisé par l'espace client / conseiller / adv afin d'afficher le module sur la homepage
@@ -3265,28 +3441,22 @@ class facture_cleodis extends facture {
 						 ->addField('facture.ref_externe', 'ref_externe')
 						 ->addField('facture.tva', 'tva')
 
-				//On récupère la derniere transaction
-				ATF::slimpay_transaction()->q->reset()->where("id_facture", $vfacture["facture.id_facture"])->addOrder("id_slimpay_transaction", "DESC");
-				$transaction = ATF::slimpay_transaction()->select_all();
-				if($transaction){
+						->addField('client.societe', "societe")
+						->addField('client.ref', "ref_societe")
 
-						 ->addField('client.societe', "societe")
-						 ->addField('client.ref', "ref_societe")
+						->from("facture","id_affaire","affaire","id_affaire","affaire")
+						->from("affaire","id_type_affaire","type_affaire","id_type_affaire","type_affaire")
+						->from("facture","id_societe","societe","id_societe","client")
 
-						 ->from("facture","id_affaire","affaire","id_affaire","affaire")
-						 ->from("affaire","id_type_affaire","type_affaire","id_type_affaire","type_affaire")
-						 ->from("facture","id_societe","societe","id_societe","client")
+						->setLimit($post['limit'])
+						->addOrder('facture.date', 'DESC');
 
-						 ->setLimit($post['limit'])
-						 ->addOrder('facture.date', 'DESC');
-
-						 if ($post['id_societe']) {
-							ATF::facture()->q->where('affaire.id_societe', $post['id_societe']);
-						 }
+		if ($post['id_societe']) {
+			ATF::facture()->q->where('affaire.id_societe', $post['id_societe']);
+		}
 		return ATF::facture()->sa();
 
 	}
-
 
 
 
