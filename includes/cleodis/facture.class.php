@@ -3479,8 +3479,137 @@ class facture_cleodis extends facture {
 
 	}
 
+	/**
+	* Regrouper les factures du meme mandat SLIMPAY et meme date de prelevement et envoyer le prélèvement SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos["libelle] String
+	* @param array $infos["factures] JSON Stringify [{id_facture:..., date_prelevement: ...},{id_facture:..., date_prelevement: ...}]
+	*/
+	public function _massPrelevementSlimpay($infos) {
+		$factures = json_decode($infos["factures"]);
+
+		$data = [];
+
+		foreach ($factures as $key => $value) {
+
+			$f = ATF::facture()->select($value->id_facture);
+			$mandat_slimpay = $this->getMandatSlimpay($f["id_affaire"]);
+
+			$data[$mandat_slimpay][$value->date_prelevement]["libelle"] .= $f["ref"]." ";
 
 
+			$prix = $f["prix"] * $f["tva"];
+			$id_type_affaire = ATF::affaire()->select($f["id_affaire"], "id_type_affaire");
+			if ($id_type_affaire) {
+				if (ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") == "oui" && $f["prix_sans_tva"] != 0) {
+					$prix = ($f["prix"] * $f["tva"]) + $f["prix_sans_tva"];
+				}
+			}
+
+			if($data[$mandat_slimpay][$value->date_prelevement]["paymentReference"]){
+				$data[$mandat_slimpay][$value->date_prelevement]["prix"] = number_format($data[$mandat_slimpay][$value->date_prelevement]["prix"] + $prix, 2 , ".", "");
+				$data[$mandat_slimpay][$value->date_prelevement]["id_facture"][] = $value->id_facture;
+
+				$id_affaire = $this->getAffaireMere($f["id_affaire"]);
+				$d = str_replace(ATF::affaire()->select($id_affaire, "ref"), "", $f["ref"]);
+
+				$data[$mandat_slimpay][$value->date_prelevement]["paymentReference"] .= "/".$d;
+			}else{
+				$data[$mandat_slimpay][$value->date_prelevement]["prix"] = number_format($prix,2 , ".", "");
+				$data[$mandat_slimpay][$value->date_prelevement]["id_facture"][] = $value->id_facture;
+				$data[$mandat_slimpay][$value->date_prelevement]["paymentReference"] = $f["ref"];
+			}
+		}
+
+		foreach ($data as $mandat => $dates) {
+			foreach ($dates as $date => $value) {
+				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				$this->createPrelEtSlimpayTransaction($value["id_facture"], $mandat,$value["prix"],$infos["libelle"], $date,$value["paymentReference"]);
+			}
+
+		}
+	}
+
+	/**
+	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function massPrelevementSlimpay($infos){
+
+		$data = array();
+
+		if($infos["factures"]){
+			foreach ($infos["factures"] as $key => $value) {
+				$f = ATF::facture()->select($key);
+				$mandat_slimpay = $this->getMandatSlimpay($f["id_affaire"]);
+
+				$data[$mandat_slimpay]["libelle"] .= $f["ref"]." ";
+
+				$prix = $f["prix"] * $f["tva"];
+				$id_type_affaire = ATF::affaire()->select($f["id_affaire"], "id_type_affaire");
+				if ($id_type_affaire) {
+					if (ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") == "oui" && $f["prix_sans_tva"] != 0) {
+						$prix = ($f["prix"] * $f["tva"]) + $f["prix_sans_tva"];
+					}
+				}
+
+				if($data[$mandat_slimpay]["paymentReference"]){
+					$data[$mandat_slimpay]["prix"] = number_format($data[$mandat_slimpay]["prix"] + $prix, 2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+
+					$id_affaire = $this->getAffaireMere($f["id_affaire"]);
+					$d = str_replace(ATF::affaire()->select($id_affaire, "ref"), "", $f["ref"]);
+
+					$data[$mandat_slimpay]["paymentReference"] .= "/".$d;
+				}else{
+					$data[$mandat_slimpay]["prix"] = number_format($prix,2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+					$data[$mandat_slimpay]["paymentReference"] = $f["ref"];
+				}
+			}
+
+			foreach ($data as $key => $value) {
+				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				$this->createPrelEtSlimpayTransaction($value["id_facture"], $key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+			}
+		}
+		return true;
+	}
+
+	public function createPrelEtSlimpayTransaction($factures, $ref_mandate, $montant, $libelle, $date_prelevement, $paymentReference) {
+
+		$status = ATF::slimpay()->createDebit($ref_mandate, $montant, $libelle, $date_prelevement, $paymentReference);
+
+		foreach ($factures as $kfacture => $vfacture) {
+
+			ATF::slimpay_transaction()->i(
+				array(
+					"id_facture"=> $vfacture,
+					"ref_slimpay" => $status["id"],
+					"executionStatus"=>$status["executionStatus"],
+					"date_execution"=>$status["executionDate"],
+					"retour"=> json_encode($status)
+				)
+			);
+			$infos_facture = $this->select($vfacture);
+
+			$suivis = array("suivi"=>
+					array(
+					"id_societe" => $infos_facture["id_societe"],
+					"id_affaire" => $infos_facture["id_affaire"],
+					"type" => "note",
+					"date" => date("Y-m-d H:i:s"),
+					"texte" => "Prélèvement envoyé à Slimpay pour la facture ".$infos_facture["ref"]." ; prélévement prévu le ".date("d/m/Y", strtotime($date_prelevement))." libellé envoyé :".$libelle,
+					"type_suivi" => "Comptabilité",
+					"no_redirect" => true,
+				)
+			);
+			ATF::suivi()->insert($suivis);
+
+			$this->updateDate(array("id_facture" => $vfacture,"key"=> "date_paiement", "value" =>$date_prelevement));
+		}
+	}
 
 };
 
