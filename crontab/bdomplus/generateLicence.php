@@ -5,7 +5,7 @@ $number = $_SERVER["argv"][2];
 
 $_SERVER["argv"][1] = "bdomplus";
 
-include(dirname(__FILE__)."/../../../global.inc.php");
+include(dirname(__FILE__)."/../../global.inc.php");
 ATF::define("tracabilite",false);
 
 echo "Type de licence => ".$typeLicence."\n";
