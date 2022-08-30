@@ -3479,48 +3479,6 @@ class facture_cleodis extends facture {
 
 	}
 
-	public function retourAffichageAPrelever($return) {
-		foreach ($return as $key => $value) {
-			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
-			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
-			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
-			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
-			$return[$key]["prix_ttc"] =  number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
-
-			$id_type_affaire = ATF::affaire()->select($value["id_affaire"], "id_type_affaire");
-			if ($id_type_affaire) {
-				if (ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") == "oui" && $value["prix_sans_tva"] != 0) {
-					$return[$key]["prix_ttc"] = number_format((($value["prix"] * $value["tva"]) + $value["prix_sans_tva"] ) , 2 , ".", "");
-				}
-			}
-		}
-
-		switch(ATF::$codename){
-			case "bdomplus":
-				$libelle = "Abonnement BDOM+ ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
-			break;
-
-			case "go_abonnement":
-				$libelle = "Abonnement GO Abonnement ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
-			break;
-
-			case "assets":
-				$libelle = "Abonnement Assets ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
-			break;
-
-			default:
-				$libelle = "Location Cléodis ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
-		}
-
-		$result = array(
-						"libelle"=> $libelle,
-						"date_prelevement"=> date("Y-m-01", strtotime("+1 month")),
-						"lignes" => $return
-					   );
-
-		return $result;
-	}
-
 	/**
 	* Regrouper les factures du meme mandat SLIMPAY et meme date de prelevement et envoyer le prélèvement SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
