@@ -1296,6 +1296,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
   public function controle_affaire($affaire, $order=null){
 
+
     if($affaire){
       ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
       $commande = ATF::commande()->select_row();
@@ -1303,10 +1304,13 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
       $loyer = ATF::loyer()->select_row();
 
+
+
       if(!$affaire["affaire.id_magasin"] && ($order && $order["state"])){
         switch ($order["state"]) {
           case "closed.completed" :
             ATF::affaire_etat()->i(array("id_affaire"=> $affaire["affaire.id_affaire_fk"], "etat"=> "finalisation_souscription"));
+            log::logger("Demarrage de l'affaire Mensuelle WEB ".$affaire["affaire.ref"], $this->log_file.date("Ymd"));
             $this->demarrageContrat($affaire,$commande);
           break;
 
