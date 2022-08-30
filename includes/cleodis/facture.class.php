@@ -3462,24 +3462,19 @@ class facture_cleodis extends facture {
 						 ->addField('facture.ref_externe', 'ref_externe')
 						 ->addField('facture.tva', 'tva')
 
-				//On récupère la derniere transaction
-				ATF::slimpay_transaction()->q->reset()->where("id_facture", $vfacture["facture.id_facture"])->addOrder("id_slimpay_transaction", "DESC");
-				$transaction = ATF::slimpay_transaction()->select_all();
-				if($transaction){
+						->addField('client.societe', "societe")
+						->addField('client.ref', "ref_societe")
 
-						 ->addField('client.societe', "societe")
-						 ->addField('client.ref', "ref_societe")
+						->from("facture","id_affaire","affaire","id_affaire","affaire")
+						->from("affaire","id_type_affaire","type_affaire","id_type_affaire","type_affaire")
+						->from("facture","id_societe","societe","id_societe","client")
 
-						 ->from("facture","id_affaire","affaire","id_affaire","affaire")
-						 ->from("affaire","id_type_affaire","type_affaire","id_type_affaire","type_affaire")
-						 ->from("facture","id_societe","societe","id_societe","client")
+						->setLimit($post['limit'])
+						->addOrder('facture.date', 'DESC');
 
-						 ->setLimit($post['limit'])
-						 ->addOrder('facture.date', 'DESC');
-
-						 if ($post['id_societe']) {
-							ATF::facture()->q->where('affaire.id_societe', $post['id_societe']);
-						 }
+		if ($post['id_societe']) {
+			ATF::facture()->q->where('affaire.id_societe', $post['id_societe']);
+		}
 		return ATF::facture()->sa();
 
 	}
