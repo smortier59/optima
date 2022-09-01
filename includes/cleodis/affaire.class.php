@@ -4432,6 +4432,34 @@ class affaire_go_abonnement extends affaire_cleodis {
 		$this->addPrivilege("updateSpecifiqueGOA");
 
 	}
+
+
+	/**
+	* Retourne la ref d'un avenant
+	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+	* @param int $id_parent
+	* @return string ref
+	*/
+	function getRefAvenant($id_parent){
+		//Récup du dernier avenant de cette affaire
+		$ref=substr($this->select($id_parent,"ref"),0,9);
+
+		$this->q->reset()
+		   ->addField('MAX(`ref`)','max')
+		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
+		   ->setStrict()
+		   ->setDimension("row");
+
+		$ref_avenant=$this->sa();
+		$nb_avenant=1;
+		//S'il y a déjà un avenant alors on incrémente
+		if($ref_avenant["max"]){
+			$nb_avenant=substr($ref_avenant["max"],-1) +1;
+		}
+
+		return $ref."AVT".$nb_avenant;
+	}
+
 	/**
 	* Retourne la ref d'une affaire
 	* @param int $id_parent
