@@ -60,20 +60,23 @@ class facturation_attente extends classes_optima {
 				$suivi_message = "Erreur lors de l'envoi de la facture  ".$facture_info['ref']." au client ".ATF::societe()->select($facture_info["id_societe"], "societe")."\nRaison: ".$e->getMessage();
 			}
 
-			$suivi = array(
-				"id_societe"=> $facture_info["id_societe"]
-				,"id_affaire"=> $facture_info["id_affaire"]
-				,"type_suivi"=>'Comptabilité'
-				,"texte"=>$suivi_message
-				,'public'=>'oui'
-				,'id_contact'=>NULL
-				,'suivi_societe'=>NULL
-				,'suivi_notifie'=>NULL
-				,'champsComplementaire'=>NULL
-			);
-			$suivi["no_redirect"] = true;
+			if ($facture_info) {
+				$suivi = array(
+					"id_societe"=> $facture_info["id_societe"]
+					,"id_affaire"=> $facture_info["id_affaire"]
+					,"type_suivi"=>'Comptabilité'
+					,"texte"=>$suivi_message
+					,'public'=>'oui'
+					,'id_contact'=>NULL
+					,'suivi_societe'=>NULL
+					,'suivi_notifie'=>NULL
+					,'champsComplementaire'=>NULL
+				);
+				$suivi["no_redirect"] = true;
 
-			ATF::suivi()->insert($suivi);
+				ATF::suivi()->insert($suivi);
+			}
+
 
 		}
 	}
