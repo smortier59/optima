@@ -236,7 +236,7 @@ class creditsafe extends classes_optima {
 
 		$return['capital'] =  $data->report->shareCapitalStructure->nominalShareCapital->value;
 
-        if (is_int($creditScore->currentCreditRating->providerValue->value)) $return['cs_score'] = $creditScore->currentCreditRating->providerValue->value;
+        $return['cs_score'] = intval($creditScore->currentCreditRating->providerValue->value);
 
 		$return['cs_avis_credit'] = $creditScore->currentCreditRating->creditLimit->value;
 
