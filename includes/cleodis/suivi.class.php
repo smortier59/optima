@@ -140,7 +140,17 @@ class suivi_cleodis extends suivi {
 		unset($infos["suivi"]["champsComplementaire"]);
 
 		if($infos["suivi"]["type_suivi"] == "Contentieux" && ATF::$codename == "cleodis"){
-			ATF::user()->q->reset()->where("login", "gsmit");
+
+			ATF::constante()->q->reset()->where("constante", "__USER_NOTIFIE_SUIVI_CONTENTIEUX__");
+			$user_notifie_suivi_contentieux = ATF::constante()->select_row();
+			$login_suivi_contentieux = $user_notifie_suivi_contentieux["valeur"];
+
+			$login_suivi_contentieux = explode(',', $login_suivi_contentieux);
+			ATF::user()->q->reset();
+
+			foreach ($login_suivi_contentieux as $key => $value) {
+				ATF::user()->q->where("login", $value, "OR");
+			}
 			$notifie_contentieux = ATF::user()->select_all();
 
 
