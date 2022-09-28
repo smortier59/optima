@@ -1273,6 +1273,9 @@ class souscription_bdomplus extends souscription_cleodis {
         ->where("affaire.ref_sign", $ref);
       $affaire = ATF::affaire()->select_row();
 
+
+
+
       $suivi = array(
         "id_societe" => $affaire["affaire.id_societe_fk"],
         "id_affaire" => $affaire["affaire.id_affaire_fk"],
@@ -1314,6 +1317,7 @@ class souscription_bdomplus extends souscription_cleodis {
       if(!$affaire["affaire.id_magasin"] && ($order && $order["state"])){
         switch ($order["state"]) {
           case "closed.completed" :
+            ATF::affaire_etat()->i(array("id_affaire"=> $affaire["affaire.id_affaire_fk"], "etat"=> "paiement_ok"));
             ATF::affaire_etat()->i(array("id_affaire"=> $affaire["affaire.id_affaire_fk"], "etat"=> "finalisation_souscription"));
             log::logger("Demarrage de l'affaire Mensuelle WEB ".$affaire["affaire.ref"], $this->log_file.date("Ymd"));
             $this->demarrageContrat($affaire,$commande);
@@ -1329,6 +1333,7 @@ class souscription_bdomplus extends souscription_cleodis {
           case "open.not_running.suspended.awaiting_input" :
           case "open.not_running.suspended.awaiting_validation" :
           case "open.not_running.not_started" :
+            ATF::affaire_etat()->i(array("id_affaire"=> $affaire["affaire.id_affaire_fk"], "etat"=> "paiement_error"));
             $this->annuleContrat($affaire,$commande, json_encode( $order ));
           break;
         }
