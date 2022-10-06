@@ -1223,12 +1223,10 @@ class bon_de_commande_cleodis extends bon_de_commande {
      * @param array $data : contient l'id des BDC à envoyer par mail
 	 */
 	public function _sendBDCBymail($data) {
-
 		if (!$data['ids']) {
 			throw new errorATF("MISSING_IDS",400);
 		} else {
-			$data['ids'] = str_replace('[', '', $data['ids']);
-			$data['ids'] = str_replace(']', '', $data['ids']);
+			$data['ids'] = substr($data['ids'], 0, -1);
 			$data['ids'] = explode(',', $data['ids']);
 		}
 		$res = ['send' => [], 'error' => []];
