@@ -3420,6 +3420,43 @@ class facture_cleodis extends facture {
 
 		return $result;
 	}
+	/**
+	 * Retourne les dernieres affaires
+	 * Utilisé par l'espace client / conseiller / adv afin d'afficher le module sur la homepage
+	 *	@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 *
+	 * @return Array
+	 */
+	public function _getLastFactures($get, $post) {
+		ATF::facture()->q->reset()
+						 ->addField('affaire.affaire', 'dossier')
+						 ->addField('facture.date', 'date')
+						 ->addField('type_affaire.type_affaire', 'type_affaire')
+						 ->addField('type_affaire.assurance_sans_tva', 'assurance_sans_tva')
+						 ->addField('facture.prix', 'prix')
+						 ->addField('facture.prix_sans_tva', 'prix_sans_tva')
+						 ->addField('facture.etat', 'etat')
+						 ->addField('facture.designation', 'designation')
+						 ->addField('facture.ref', 'ref')
+						 ->addField('facture.ref_externe', 'ref_externe')
+						 ->addField('facture.tva', 'tva')
+
+						->addField('client.societe', "societe")
+						->addField('client.ref', "ref_societe")
+
+						->from("facture","id_affaire","affaire","id_affaire","affaire")
+						->from("affaire","id_type_affaire","type_affaire","id_type_affaire","type_affaire")
+						->from("facture","id_societe","societe","id_societe","client")
+
+						->setLimit($post['limit'])
+						->addOrder('facture.date', 'DESC');
+
+		if ($post['id_societe']) {
+			ATF::facture()->q->where('affaire.id_societe', $post['id_societe']);
+		}
+		return ATF::facture()->sa();
+
+	}
 
 	/**
 	* Regrouper les factures du meme mandat SLIMPAY et meme date de prelevement et envoyer le prélèvement SLIMPAY
@@ -3553,6 +3590,8 @@ class facture_cleodis extends facture {
 			$this->updateDate(array("id_facture" => $vfacture,"key"=> "date_paiement", "value" =>$date_prelevement));
 		}
 	}
+
+
 
 };
 
