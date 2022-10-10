@@ -1846,6 +1846,44 @@ class devis_cleodis extends devis {
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
+
+	/**
+	 * Retourne les derniers devis
+	 * Utilisé par l'espace client / conseiller / adv afin d'afficher le module sur la homepage
+	 *	@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 *
+	 * @return Array
+	 */
+	public function _getLastDevis($get, $post) {
+		ATF::devis()->q->reset()
+						 ->addField('devis.id_devis', 'id_devis')
+						 ->addField('affaire.ref', 'ref_affaire')
+						 ->addField('affaire.ref_externe', 'ref_externe_affaire')
+						 ->addField('affaire.affaire', 'libelle')
+						 ->addField('affaire.id_commercial', 'id_commercial')
+						 ->addField('devis.date', 'date_creation')
+						 ->addField('devis.id_societe', 'id_societe')
+
+						 ->addField("CONCAT(commercial.prenom,' ',commercial.nom)", 'commercial')
+						 ->addField("CONCAT(signataire.prenom,' ',signataire.nom)", 'signataire')
+						 ->addField("CONCAT(contact_facturation.prenom,' ',contact_facturation.nom)", 'contact_facturation')
+
+						 ->addField('client.societe', "societe")
+						 ->addField('client.ref', "ref_societe")
+
+
+						 ->from("devis","id_affaire","affaire","id_affaire")
+						 ->from("affaire","id_commercial","user","id_user","commercial")
+						 ->from("affaire","id_societe","societe","id_societe","client")
+						 ->from("client","id_contact_facturation", "contact","id_contact", "contact_facturation")
+						 ->from("client","id_contact_signataire", "contact","id_contact", "signataire")
+
+						 ->setLimit($post['limit'])
+						 ->addOrder('id_devis', 'DESC');
+
+		return ATF::devis()->sa();
+
+	}
 };
 
 class devis_midas extends devis_cleodis {
