@@ -26,9 +26,9 @@ Le temps passé sur cette requête est à votre charge.
 {else}
 Le temps passé sur cette requête est à notre charge.
 {/if}
-
-Vous pouvez consulter l'avancement de votre requête : {$infos.portail_hotline_url}
-
+{#}
+    Vous pouvez consulter l'avancement de votre requête : {$infos.portail_hotline_url}
+#}
 Cordialement,
 
 L'équipe Absystech
