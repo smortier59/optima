@@ -1526,10 +1526,10 @@ class hotline extends classes_optima {
 	* @return string l'url
 	*/
 	public function createPortailHotlineURL($login,$passwd,$id_hotline,$id_contact,$event="select"){
-		$url=__HOTLINE_URL__."login.php?login=".base64_encode($login)."&password=".base64_encode($passwd)."&contact=".base64_encode($id_contact)."&url=";
-		$url.=base64_encode(__HOTLINE_URL__."hotline.php?table=hotline&event=".$event."&id_hotline=".$id_hotline);
-		$url.= "&schema=".base64_encode(ATF::$codename);
-		return $url;
+		// $url=__HOTLINE_URL__."login.php?login=".base64_encode($login)."&password=".base64_encode($passwd)."&contact=".base64_encode($id_contact)."&url=";
+		// $url.=base64_encode(__HOTLINE_URL__."hotline.php?table=hotline&event=".$event."&id_hotline=".$id_hotline);
+		// $url.= "&schema=".base64_encode(ATF::$codename);
+		return __HOTLINE_URL__;
 	}
 
 	/**
@@ -4518,8 +4518,8 @@ class hotline extends classes_optima {
 	*/
 
 	public function _searchTicketHotLine($post){
-		
-		try { 
+
+		try {
 			$result = [];
 			$return = [];
 
@@ -4546,11 +4546,11 @@ class hotline extends classes_optima {
 					}
 
 					$result = $return;
-		
+
 					if($result){
 						$result = $this->formatData($result);
 					}
-					
+
 				}
 			}elseif(!$post['entite'] && $post['contact'] && !$post['utilisateur_en_charge']  && !$post['resume']){
 
@@ -4570,7 +4570,7 @@ class hotline extends classes_optima {
 								array_push($return,$item);
 							}
 						}
-						
+
 					}
 
 					$result = $return ;
@@ -4578,7 +4578,7 @@ class hotline extends classes_optima {
 					if($result){
 						$result = $this->formatData($result);
 					}
-					
+
 				}
 
 			}elseif(!$post['entite'] && !$post['contact'] && $post['utilisateur_en_charge']  && !$post['resume']){
@@ -4600,7 +4600,7 @@ class hotline extends classes_optima {
 								array_push($return,$item);
 							}
 						}
-					
+
 					}
 
 					$result = $return ;
@@ -4637,7 +4637,7 @@ class hotline extends classes_optima {
 					foreach($contacts as $contact){
 
 						foreach($societes as $societe){
-		
+
 							ATF::hotline()->q->reset()
 							->where('hotline.id_societe',$societe['id_societe'])
 							->where('hotline.id_contact',$contact['id_contact'])
@@ -4649,7 +4649,7 @@ class hotline extends classes_optima {
 									array_push($return,$item);
 								}
 							}
-		
+
 						}
 					}
 
@@ -4659,7 +4659,7 @@ class hotline extends classes_optima {
 						$result = $this->formatData($result);
 					}
 
-					
+
 				}
 
 			}elseif($post['entite'] && $post['contact'] && $post['utilisateur_en_charge']  && !$post['resume']){
@@ -4678,7 +4678,7 @@ class hotline extends classes_optima {
 					foreach($contacts as $contact){
 
 						foreach($societes as $societe){
-		
+
 							foreach($users as $user){
 								ATF::hotline()->q->reset()
 								->where('hotline.id_societe',$societe['id_societe'])
@@ -4691,8 +4691,8 @@ class hotline extends classes_optima {
 										array_push($return,$item);
 									}
 								}
-		
-								
+
+
 							}
 						}
 					}
@@ -4721,9 +4721,9 @@ class hotline extends classes_optima {
 					foreach($contacts as $contact){
 
 						foreach($societes as $societe){
-		
+
 							foreach($users as $user){
-							
+
 								ATF::hotline()->q->reset()
 								->where('hotline.id_societe',$societe['id_societe'])
 								->where('hotline.id_contact',$contact['id_contact'])
@@ -4738,7 +4738,7 @@ class hotline extends classes_optima {
 									}
 								}
 							}
-		
+
 						}
 					}
 
@@ -4760,7 +4760,7 @@ class hotline extends classes_optima {
 
 	public function formatData($result){
 		foreach($result as $key=>$value){
-				
+
 			$result[$key]['id_affaire_fk'] = $value['id_affaire'];
 			$result[$key]['id_contact_fk'] = $value['id_contact'];
 			$result[$key]['id_gep_projet_fk'] = $value['id_gep_projet'];
