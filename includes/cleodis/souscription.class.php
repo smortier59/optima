@@ -1262,7 +1262,7 @@ class souscription_cleodis extends souscription {
 }
 class souscription_bdomplus extends souscription_cleodis {
 
-  public $id_user = 116;
+  public $id_user = 16;
   public $codename = "bdomplus";
 
   public $nb_day = 10; // Nombre de jour pour le decalage des check affaire magasin mensuel
@@ -1978,7 +1978,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
 };
 class souscription_boulanger extends souscription_cleodis {
-  public $id_user = 116;
+  public $id_user = 16;
   public $codename = "boulanger";
 
 
