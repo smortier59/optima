@@ -70,6 +70,56 @@ class user_absystech extends user {
 
 	}
 
+	/**
+	* Permet de récupérer la liste des utilisateurs
+	* @package Telescope
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function _GET($get,$post) {
+
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_user";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit'] && !$get['no-limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$this->q->reset()->addJointure('user','id_profil', 'profil','id_profil')
+						 ->select('user.id_user', 'id_user')
+						 ->select('user.login', 'login')
+						 ->select('user.email', 'email')
+						 ->select('user.etat', 'etat')
+						 ->select('user.id_profil', 'id_profil')
+						 ->select('profil.profil', 'id_profil');
+
+
+		if ($get['id']) {
+			$this->q->where("user.id_user",$get['id'])->setLimit(1);
+		} else {
+			if ($get['filters']['etat']) $this->q->where("user.etat",$get['filters']['etat'],"OR","sta");
+
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
+
+			$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+			if ($get['id']) {
+				$return = $data['data'][0];
+			} else {
+				header("ts-total-row: ".$data['count']);
+				if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+				if ($get['page']) header("ts-active-page: ".$get['page']);
+				if ($get['no-limit']) header("ts-no-limit: 1");
+				$return = $data['data'];
+			}
+			return $return;
+		}
+	}
+
 };
 class user_att extends user_absystech {
 	public function __construct() {
