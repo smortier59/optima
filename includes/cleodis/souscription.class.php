@@ -37,6 +37,7 @@ class souscription_cleodis extends souscription {
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
+    if (!isset($post['nature'])) $post['nature'] = 'location';
     if (!in_array($post['nature'], ['location', 'vente']) ) throw new errorATF("Nature incorrect", 500);
 
     if ($post['site_associe']) {
