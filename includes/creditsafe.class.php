@@ -222,7 +222,7 @@ class creditsafe extends classes_optima {
         $return['ville_rcs'] = $companyIdentification->basicInformation->commercialCourt;
 
 
-        $dateparsee = explode('T',$basicInfo->companyRegistrationDate);
+        $dateparsee = explode('T',$basicInfo->operationsStartDate);
 		$return['date_creation'] = date("Y-m-d",strtotime($dateparsee[0]));
 
 		// $return['tel'] = str_replace("/","",(string)$company->BasicInformation->ContactTelephoneNumber);
