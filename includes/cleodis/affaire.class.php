@@ -2727,12 +2727,12 @@ class affaire_cleodis extends affaire {
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
 
-			if(($societe["cs_score"] > 50 && $creation < $past2Years)){
+			if( ($societe["cs_score"] > 50 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
 				$comite["etat"] = "accepte";
 				$comite["decisionComite"] = "Accepté automatiquement";
 			}else{
 				$comite["etat"] = "refuse";
-				$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
+				$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans)";
 			}
 
 			$comite["reponse"] = date("Y-m-d");
