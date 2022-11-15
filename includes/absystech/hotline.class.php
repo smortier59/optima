@@ -3667,7 +3667,7 @@ class hotline extends classes_optima {
 	* Accepte automatiquement la facturation
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
-	public function acceptationAutomatique($delai = 7) {
+	public function acceptationAutomatique($delai = 6) {
 		ATF::hotline()->q->reset()->where("etat", "done","AND",false,"!=")
 								  ->where("etat", "payee","AND",false,"!=")
 								  ->where("etat", "annulee","AND",false,"!=")
