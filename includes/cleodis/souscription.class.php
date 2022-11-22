@@ -37,6 +37,7 @@ class souscription_cleodis extends souscription {
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
+    if (!isset($post['nature'])|| $post['nature'] == null) $post['nature'] = 'location';
     if (!in_array($post['nature'], ['location', 'vente']) ) throw new errorATF("Nature incorrect", 500);
 
     if ($post['site_associe']) {
@@ -1274,7 +1275,7 @@ class souscription_cleodis extends souscription {
 }
 class souscription_bdomplus extends souscription_cleodis {
 
-  public $id_user = 116;
+  public $id_user = 16;
   public $codename = "bdomplus";
 
   public $nb_day = 10; // Nombre de jour pour le decalage des check affaire magasin mensuel
@@ -1990,7 +1991,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
 };
 class souscription_boulanger extends souscription_cleodis {
-  public $id_user = 116;
+  public $id_user = 16;
   public $codename = "boulanger";
 
 
