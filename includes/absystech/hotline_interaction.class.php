@@ -302,8 +302,8 @@ class hotline_interaction extends classes_optima {
 		$temps = $duree_presta + $duree_dep;
 		$temps = gmdate("H:i:s", $temps*60);
 
-		
-		
+
+
 		/*---------------Gestion de l'ordre de mission----------------------*/
 		if($infos["id_ordre_de_mission"]) ATF::ordre_de_mission()->update(array("id_ordre_de_mission"=>$infos["id_ordre_de_mission"],"etat"=>"termine"));
 
@@ -2157,7 +2157,7 @@ class hotline_interaction extends classes_optima {
 				$duree_presta -= $duree_pause;
 
 			}
-			
+
 			// Check de la durée de prestation, si négatif alors on a inverser les horaires
 			if($duree_presta < 0){
 				ATF::db($this->db)->rollback_transaction();
@@ -2193,10 +2193,10 @@ class hotline_interaction extends classes_optima {
 			// 2ème contrainte : Requête en état wait/fixing uniquement (les requêtes terminées ou non prises en charge ne peuvent pas avoir de changement d'état)
 			// 3ème contrainte : Les requêtes en état wait passent en état fixing lors d'une interaction
 			// 4ème contrainte : Seulement si la facturation est validée ou qu'il n'y a pas de facturation
-			if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){				
+			if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){
 				if($infos["etat_wait"]=="oui" || ($hotline["facturation_ticket"]=="oui" && !$hotline["ok_facturation"]) || ($hotline["facturation_ticket"]=="oui" && $hotline["ok_facturation"]=="non")){
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
-				}		
+				}
 				/*---------------Gestion de la mise en attente de MEP one shot----------------------*/
 				if ($infos['mep_mail']=="oui") {
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"wait_mep"=>"oui","etat"=>"fixing","disabledInternalInteraction"=>true));
@@ -2355,7 +2355,7 @@ class hotline_interaction extends classes_optima {
 					array_push($team,ATF::user()->select($inter["id_user"],"email"));
 				}
 			}
-			
+
 
 			//Ajout des actifs selectionné
 			$lesactifs = is_array($infos["actifNotify"])?$infos["actifNotify"]:explode(",",$infos["actifNotify"]);
@@ -2503,12 +2503,14 @@ class hotline_interaction extends classes_optima {
 		if (!$get['tps'] || $get['tps']=="00:00:00") return 0;
 
 		if ($get['field']=="credit_dep") {
-			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
+			$val = ATF::hotline()->estAuForfait($get);
+			if ($val != 0 && $val != NULL) {
+				return round($val,2);
+			}
 		}
 		$tmp = explode(":", $get['tps']);
 
 		$creditMin = $tmp[1]/60;
-
 		return round($creditMin + $tmp[0],2);
 	}
 
