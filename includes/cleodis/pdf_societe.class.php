@@ -12,7 +12,7 @@ class pdf_societe extends classes_optima {
 		parent::__construct($table_or_id);
 		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array(
-			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
+			'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			,'fichier_joint2'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			,'nom_document'
 			,'pdf_societe.id_societe'
