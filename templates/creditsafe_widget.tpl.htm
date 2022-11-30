@@ -25,7 +25,7 @@
                         "#02FF0F"
                     ],
                     title: {
-                        text: "{$data["title"]}"
+                        text: "{$data[0]["title"]}"
                         ,style :{
                             fontSize: '12px'
                         }
@@ -46,10 +46,10 @@
                     },
                     series: [{
                         type: 'pie',
-                        name: "{$data["serie"]}",
+                        name: "{$data[0]["serie"]}",
                         data: [
-                            ['Utilisé',  {$data["utilise"]} ],
-                            ['Restant',  {$data["restant"]} ]
+                            ['Utilisé',  {$data[0]["utilise"]} ],
+                            ['Restant',  {$data[0]["restant"]} ]
                         ]
                     }]
                 });
