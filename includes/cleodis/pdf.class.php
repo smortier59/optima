@@ -4557,20 +4557,23 @@ class pdf_cleodis extends pdf {
 				unset($data,$styles);
 				foreach ($i as $k_ => $i_) {
 					$produit = ATF::produit()->select($i_['id_produit']);
-					$data[] = array(
-						round($i_['quantite'])
-						,ATF::sous_categorie()->nom($produit['id_sous_categorie'])
-						,ATF::fabriquant()->nom($produit['id_fabriquant'])
-						,$i_['produit']
-						,"details"=>$i_['serial']?"Serial : ".$i_['serial']:""
-					);
-					$styles[] = array(
-						$this->colsProduit
-						,$this->colsProduit
-						,$this->colsProduit
-						,$this->colsProduit
-						,"details"=>$this->styleDetailsProduit
-					);
+					if ($i_["visible"] === "oui" && $i_["afficher"] === "oui") {
+						$data[] = array(
+							round($i_['quantite'])
+							,ATF::sous_categorie()->nom($produit['id_sous_categorie'])
+							,ATF::fabriquant()->nom($produit['id_fabriquant'])
+							,$i_['produit']
+							,"details"=>$i_['serial']?"Serial : ".$i_['serial']:""
+						);
+						$styles[] = array(
+							$this->colsProduit
+							,$this->colsProduit
+							,$this->colsProduit
+							,$this->colsProduit
+							,"details"=>$this->styleDetailsProduit
+						);
+					}
+
 					$total+=$i_['quantite']*$i_['prix_achat'];
 				}
 
