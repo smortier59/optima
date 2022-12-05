@@ -728,23 +728,19 @@ class devis_cleodis extends devis {
 
 
 		//Sauvegarder suivis et taches pour pouvoir les assignier à la nouvelle affaire
-		ATF::suivi()->q->reset()
-					   ->addCondition("id_affaire",$devis["id_affaire"]);
+		ATF::suivi()->q->reset()->addCondition("id_affaire",$devis["id_affaire"]);
 		$suivis=ATF::suivi()->sa();
 
-		ATF::tache()->q->reset()
-					   ->addCondition("id_affaire",$devis["id_affaire"]);
+		ATF::tache()->q->reset()->addCondition("id_affaire",$devis["id_affaire"]);
 		$taches=ATF::tache()->sa();
 
-		ATF::parc()->q->reset()
-					   ->addCondition("id_affaire",$devis["id_affaire"]);
+		ATF::parc()->q->reset()->addCondition("id_affaire",$devis["id_affaire"]);
 		$parcs=ATF::parc()->sa();
 
 		ATF::comite()->q->reset()->addCondition("id_affaire",$devis["id_affaire"]);
 		$comites=ATF::comite()->sa();
 
-		ATF::demande_refi()->q->reset()
-					   ->addCondition("id_affaire",$devis["id_affaire"]);
+		ATF::demande_refi()->q->reset()->addCondition("id_affaire",$devis["id_affaire"]);
 		$demande_refis=ATF::demande_refi()->sa();
 
 
@@ -829,9 +825,16 @@ class devis_cleodis extends devis {
 		$datapath = dirname(ATF::affaire()->filepath($devis["id_affaire"],"temp"));
 		$id_temp = md5(mt_rand(0,time()));
 		if ($handle = opendir($datapath)) {
-		    while (false !== ($fileName = readdir($handle))) if (strpos($fileName,$devis["id_affaire"].".")===0) rename($datapath."/".$fileName, $datapath."/".str_replace($devis["id_affaire"].".",$id_temp.".",$fileName));
+			while (false !== ($fileName = readdir($handle))) {
+				if (strpos($fileName, $devis["id_affaire"].".")===0) {
+					log::logger("On deplace ".($datapath."/".$fileName)." vers ".$datapath."/".str_replace($devis["id_affaire"].".", $id_temp.".", $fileName), "mv_file_update_devis");
+					rename($datapath."/".$fileName, $datapath."/".str_replace($devis["id_affaire"].".", $id_temp.".", $fileName));
+				}
+			}
 		    closedir($handle);
 		}
+
+		log::logger("On a fini de deplacer dans temp", "mv_file_update_devis");
 
 		if ($panier) ATF::panier()->u(array("id_panier"=> $panier["panier.id_panier"], "id_affaire" => null));
 
@@ -845,7 +848,12 @@ class devis_cleodis extends devis {
 
 		// Déplacer toutes les pièces jointes anciennes vers le nouveau
 		if ($handle = opendir($datapath)) {
-		    while (false !== ($fileName = readdir($handle))) if (strpos($fileName,$id_temp.".")===0) rename($datapath."/".$fileName, $datapath."/".str_replace($id_temp.".",$id_affaire.".",$fileName));
+		    while (false !== ($fileName = readdir($handle))){
+				if (strpos($fileName, $id_temp.".")===0) {
+					log::logger("On deplace ".($datapath."/".$fileName)." vers ".$datapath."/".str_replace($id_temp.".", $id_affaire.".", $fileName), "mv_file_update_devis");
+					rename($datapath."/".$fileName, $datapath."/".str_replace($id_temp.".", $id_affaire.".", $fileName));
+				}
+			}
 		    closedir($handle);
 		}
 
