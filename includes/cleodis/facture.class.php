@@ -214,6 +214,16 @@ class facture_cleodis extends facture {
 			case "date":
 				return date("Y-m-d");
 			case "date_previsionnelle":
+				$affaire = ATF::affaire()->select($facture["id_affaire"]);
+				$jourPrelevement = "01";
+                if ($affaire["date_previsionnelle"]) {
+					if (intval($affaire["date_previsionnelle"]) < 10) {
+						$jourPrelevement = "0".$affaire["date_previsionnelle"];
+					} else {
+						$jourPrelevement = $affaire["date_previsionnelle"];
+					}
+                }
+
 				if ($facture) {
 					if (ATF::$codename == "go_abonnement") {
 						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
@@ -225,9 +235,9 @@ class facture_cleodis extends facture {
 					}else{
 						$day=0;
 					}
-					return date('Y-m-d',strtotime($periode["date_periode_debut"]."+".$day." day"));
+					return date('Y-m-',strtotime($periode["date_periode_debut"]."+".$day." day")).$jourPrelevement;
 				}else{
-					return date("Y-m-d");
+					return date("Y-m-").$jourPrelevement;
 				}
 			case "date_periode_debut":
 				if ($facture) {
@@ -593,11 +603,22 @@ class facture_cleodis extends facture {
 								->addOrder("id_loyer", "ASC");
 		$loyers = ATF::loyer()->select_all();
 
-		if(strtotime(date("Y-m-d")) < strtotime($infos["date_debut_contrat"])){
-			$date_previsionnelle = $infos["date_debut_contrat"];
+
+		$jourPrelevement = date("d", strtotime($infos["date_debut_contrat"]));
+        if ($affaire["date_previsionnelle"]) {
+            if (intval($affaire["date_previsionnelle"]) < 10) {
+				$jourPrelevement = "0".$affaire["date_previsionnelle"];
+			} else {
+				$jourPrelevement = $affaire["date_previsionnelle"];
+			}
+        }
+
+
+		if(strtotime(date("Y-m-d")) < strtotime($affaire["date_debut_contrat"])){
+			$date_previsionnelle = date("Y-m-", strtotime($infos["date_debut_contrat"])).$jourPrelevement;
 		}
 		else{
-			$date_previsionnelle = date("Y-m-d");
+			$date_previsionnelle = date("Y-m-").$jourPrelevement;
 		}
 
 		$dateTimeDebContrat = new DateTime(date("Y-m-d", strtotime($infos["date_debut_contrat"])));
@@ -3383,6 +3404,7 @@ class facture_cleodis extends facture {
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["jour_previsionnel"] = ATF::affaire()->select($value["id_affaire"], "date_previsionnelle");
 			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
 			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
 			$return[$key]["prix_ttc"] =  number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
