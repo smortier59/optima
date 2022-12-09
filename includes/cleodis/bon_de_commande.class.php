@@ -514,30 +514,6 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		return array_merge_recursive((array)($conditions),parent::autocompleteConditions($class,$infos,$condition_field,$condition_value));
 	}
 
-//	private function getArrayCommandeLigne($infos){
-//		$infos_explode = explode(",",$infos);
-//		foreach($infos_explode as $key => $item){
-//			if(strpos($item,"parc_")===0){
-//				$parc=str_replace("parc_","",$item);
-//				$return["parc"][]=$parc;
-//			}elseif(strpos($item,"affaire_")===0){
-//				$affaire=str_replace("affaire_","",$item);
-//				$return["affaire"][]=$affaire;
-//			}
-//		}
-//
-//		//Si aucune affaire sélectionné
-//		if(!$affaire){
-//			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
-//		//Si c'est un avenant il ne peut y avoir qu'une affaire parente
-//		}elseif(count($return["affaire"])>1 && $type=="avenant"){
-//			throw new errorATF(ATF::$usr->trans("une_affaire_par_avenant"),878);
-//		}else{
-//			return $return;
-//		}
-//	}
-//
-
 	/**
 	* Surcharge de l'insert afin d'insérer les lignes du bon de commande et d'nvoyer un mail
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -586,33 +562,17 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		if($societe=="CLEODIS" || $societe=="CLEOFI") $infos["prix"]=$infos["prix_cleodis"];
 		unset($infos["prix_cleodis"]);
 		$infos["ref"] = $this->getRef($infos["id_affaire"],$infos["id_fournisseur"]);
-		//$infos["date"] = date("Y-m-d");
-
-//		ATF::facture()->q->reset()
-//						 ->addCondition($infos["id_affaire"],"id_affaire")
-//						 ->setCountOnly();
-//
-//		//s'il y a une facture pour cette affaire alors etat=>fnp sinon etat=>envoyee
-//		if(ATF::facture()->sa()>0){
-//			$infos['etat'] = 'fnp';
-//		}else{
 		$infos['etat'] = 'envoyee';
-//		}
 
 		//Vérification du bon de commande
 		$this->check_field($infos);
 
 		ATF::db($this->db)->begin_transaction();
 
-//*****************************Transaction********************************
+		//*****************************Transaction********************************
 		if(!$infos["date_livraison_prevue"] && ATF::$codename == "cleodis"){
 			$nbj_livraison = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_nbj_livraison");
 			$infos["date_livraison_estime"] = date("Y-m-d", strtotime("+".$nbj_livraison." days", strtotime($infos["date"])));
-
-			/*if($infos["date_livraison_estime"]){
-				$nbj_installation = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_nbj_installation");
-				$infos["date_installation_prevue"] = date("Y-m-d", strtotime("+".$nbj_installation." days", strtotime($infos["date_livraison_estime"])));
-			}*/
 
 			$fournisseur_delai_rav = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_delai_rav");
 			$infos["date_limite_rav"] = date("Y-m-d", strtotime($fournisseur_delai_rav." days", strtotime(ATF::affaire()->select($infos["id_affaire"], "date_ouverture"))));
@@ -655,7 +615,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		// Ajout de la facture non parvenue globale du bon de commande
 		ATF::facture_non_parvenue()->i($fnp);
 
-//*****************************************************************************
+		//*****************************************************************************
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -783,7 +743,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 			//Commande
 			if($bon_de_commande){
-//*****************************Transaction********************************
+			//*****************************Transaction********************************
 				ATF::db($this->db)->begin_transaction();
 
 				ATF::facture_non_parvenue()->q->reset()->addCondition("id_bon_de_commande",$bon_de_commande["id_bon_de_commande"]);
@@ -815,7 +775,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 
 				ATF::db($this->db)->commit_transaction();
-	//*****************************************************************************
+			//*****************************************************************************
 
 				ATF::affaire()->redirection("select",$bon_de_commande["id_affaire"]);
 
@@ -1256,6 +1216,91 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		fpassthru($fh);
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $data : contient l'id des BDC à envoyer par mail
+	 */
+	public function _sendBDCBymail($data) {
+		if (!$data['ids']) {
+			throw new errorATF("MISSING_IDS",400);
+		} else {
+			$data['ids'] = substr($data['ids'], 0, -1);
+			$data['ids'] = explode(',', $data['ids']);
+		}
+		$res = ['send' => [], 'error' => []];
+		foreach ($data['ids'] as $key => $id_bdc) {
+			try {
+				$bdc = ATF::bon_de_commande()->select($id_bdc);
+				if ($bdc) {
+					if (!$bdc["envoye_par_mail"]) {
+						$fournisseur = ATF::societe()->select($bdc['id_fournisseur']);
+						$client = ATF::societe()->select($bdc["id_societe"]);
+						$contact = ATF::contact()->select($client['id_contact_facturation']);
+
+						$info_mail["objet"] = "Bon de commande ".$client["code_client"].' '.$client["societe"];
+						$info_mail["from"] = "noreply@cleodis.com";
+						$info_mail["recipient"] = $fournisseur["email"];
+						$info_mail["html"] = true;
+						$info_mail["template"] = "bon_de_commande";
+
+						$texte = 'Bonjour,<br />Veuillez trouver la commande pour '.$client["code_client"].' '.$client["societe"].' en pièce jointe.';
+						$texte .= '<br /> - '.($client['nom_commercial'] ? $client['nom_commercial'] : $client['societe']);
+						$texte .= '<br /> - '.($client['ref_externe'] ? $client['ref_externe'] : $client['ref']);
+						$texte .= '<br /> - Marques utilisées : '.$bdc["bon_de_commande"];
+						$texte .= '<br /> - '.$contact['nom'].' '.$contact['prenom'].($contact['gsm']?' '.$contact['gsm']:'').($contact['tel']?' '.$contact['tel']:''). ' - '.$contact['email'];
+						$texte .= '<br /> - SIRET : '.$client["siret"];
+						$texte .= '<br /><br />Merci à vous, Cordialement.';
+
+						$info_mail["texte"] = $texte;
+						ATF::$usr->set('id_user',$bdc["id_user"]);
+
+
+						$mail = new mail($info_mail);
+
+						$path = ATF::bon_de_commande()->filepath($bdc["id_bon_de_commande"],"fichier_joint");
+						$mail->addFile($path,$bdc["ref"].".pdf",true);
+
+						if ($fournisseur["email"]) {
+							if ($mail->send()) {
+								$res['send'][] = $bdc["id_bon_de_commande"];
+								ATF::bon_de_commande()->u(array("id_bon_de_commande" => $bdc["id_bon_de_commande"], "envoye_par_mail" => date("Y-m-d")));
+							} else {
+								$res['error'][] = [
+									'id' => $id_bdc,
+									'error' => "Email non envoyé"
+								];
+							}
+						} else {
+							$res['error'][] = [
+								'id' => $id_bdc,
+								'error' => "Pas de mail pour le fournisseur ".$fournisseur['societe']
+							];
+						}
+
+					} else {
+						$res['error'][] = [
+							'id' => $bdc["id_bon_de_commande"],
+							'error' => "Email déja envoyé"
+						];
+					}
+				} else {
+					$res['error'][] = [
+						'id' => $id_bdc,
+						'error' => "ID NON TROUVE"
+					];
+				}
+
+
+			} catch (errorATF $e) {
+				$res['error'][] = [
+					'id' => $bdc["id_bon_de_commande"],
+					'error' => $e->getMessage()
+				];
+			}
+		}
+		return $res;
 	}
 
 };
