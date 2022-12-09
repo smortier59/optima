@@ -25,22 +25,22 @@ class boulangerpro extends classes_optima {
 
         // ATF::produit()->q->where('ref',842769, "OR", "ref_produit", "LIKE"); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
         // // Produits demandés par Benjamin sur skype le 9/5/19 à 17h18
-        // ATF::produit()->q->where('ref',1016843, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1119534, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',"BPLivrMeSGEODI100a125EUR60mois", "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',"Frais60", "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1119576, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1114199, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1021609, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1047180, "OR", "ref_produit", "LIKE"); 
+        // ATF::produit()->q->where('ref',1016843, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',1119534, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',"BPLivrMeSGEODI100a125EUR60mois", "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',"Frais60", "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',1119576, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',1114199, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',1021609, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',1047180, "OR", "ref_produit", "LIKE");
 
         // // Produits demandés par Vincent /Benjamin, mail du mardi 21/05/19 à 15h50
-        // ATF::produit()->q->where('ref',280814, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',146031, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',151577, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1022585, "OR", "ref_produit", "LIKE"); 
+        // ATF::produit()->q->where('ref',280814, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',146031, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',151577, "OR", "ref_produit", "LIKE");
+        // ATF::produit()->q->where('ref',1022585, "OR", "ref_produit", "LIKE");
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -50,8 +50,8 @@ class boulangerpro extends classes_optima {
 
         foreach ($catalogueBoulProActif as $k=>$produit) {
           log::logger("-- Produit ref ".$produit['ref']." - ".$produit['produit'],$this->logFile);
-          
-          $prix_livraison = 0;          
+
+          $prix_livraison = 0;
           $r = self::APIBoulPROlivraison($produit['ref']);
 
           log::logger("---- Appel boulpro API livraison",$this->logFile);
@@ -110,7 +110,7 @@ class boulangerpro extends classes_optima {
             $produit["loyer"] = $loyer;
 
             self::manageProduitPrixChanges($produit, $p, $packDesactive, $produitDesactive, $this->logFile);
-          
+
           }
 
 
@@ -134,7 +134,7 @@ class boulangerpro extends classes_optima {
                 );
                 log::logger("Pack associé n°".$ligne_de_pack_a_desactiver['id_pack_produit']." désactivé cause Garantie",$this->logFile);
               }
-              
+
             } else {
               $ref_garantie = $s["reference"];
               log::logger("Produit ".$produit['produit']." (".$produit['ref'].") : Mise à jour de la ref garantie : ".$ref_garantie,$this->logFile);
@@ -195,7 +195,7 @@ class boulangerpro extends classes_optima {
               'id' => $id_pack,
               'raison' => "Désactivation cause problème calcul loyer"
             );
-          }          
+          }
         }
 
 
@@ -216,7 +216,7 @@ class boulangerpro extends classes_optima {
       $sendmail = false;
       $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.net>";
       $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
-      $infos_mail["recipient"] = "boulangerpro@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
+      $infos_mail["recipient"] = "boulangerpro@absystech.fr,jerome.loison@cleodis.com";
       // $infos_mail["recipient"] = "qjanon@absystech.fr";
 
       $infos_mail['body'] = '';
@@ -339,7 +339,7 @@ class boulangerpro extends classes_optima {
       $produitDesactive[] = array(
         'id' => $produit['id_produit'],
         'raison' => "Désactivation cause livraison"
-      );     
+      );
     }
 
     if ($fabriquant) {
@@ -349,7 +349,7 @@ class boulangerpro extends classes_optima {
 
       if (!count($packsDuProduit)) {
         log::logger("AUCUN Packs liés où le produit est principal : On ne fait rien",$this->logFile);
-      } else {      
+      } else {
         log::logger("Packs liés où le produit est principal : ".$packsDuProduit,$this->logFile);
         foreach (explode(",", $packsDuProduit) as $id_pack) {
           $produits = ATF::pack_produit()->getProduitFromPack($id_pack, 'actif');
@@ -373,12 +373,12 @@ class boulangerpro extends classes_optima {
               $packDesactive[] = array(
                 'id' => $id_pack,
                 'raison' => "Désactivation cause Livraison"
-              );            
+              );
             }
 
           }
 
-        }            
+        }
       }
 
       log::logger("Mise à jour du produit avec les nouvelles infos de fabriquant",$this->logFile);
@@ -421,7 +421,7 @@ class boulangerpro extends classes_optima {
 
     $response = $this->api->get('price/'.$ref);
 
-    $r = $response->getContent();    
+    $r = $response->getContent();
 
     if ($logFile) {
       log::logger("---- REPONSE PRICE",$this->logFile);
@@ -441,7 +441,7 @@ class boulangerpro extends classes_optima {
 
     $response = $this->api->get('services/'.$ref);
 
-    $r = $response->getContent();    
+    $r = $response->getContent();
 
     if ($logFile) {
       log::logger("API Get services/".$ref,$this->logFile);
