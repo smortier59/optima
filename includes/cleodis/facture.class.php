@@ -977,28 +977,54 @@ class facture_cleodis extends facture {
 			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 400);
 			if(!$post['type_facture']) throw new errorATF("LE TYPE_FACTURE EST OBLIGATOIRE", 400);
 			if($post['type_facture'] !== "libre") throw new errorATF("LE TYPE DE FACTURE DOIT ETRE LIBRE", 400);
-
 			unset($post['schema']);
+			$facture = $post;
+
 
 			$affaire = ATF::affaire()->select($post["id_affaire"]);
+			if(!$affaire['id_societe']) {
+				throw new errorATF("ID_SOCIETE INTROUVABLE", 404);
+			} else {
+				$facture['id_societe'] = $affaire['id_societe'];
+			}
+
 
 			ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
-
 			$commande = ATF::commande()->select_row();
-
-			if(!$commande['commande.id_commande']) throw new errorATF("ID_COMMANDE INTROUVABLE", 404);
-
-			if($commande){
-				$post['id_commande'] = $commande['commande.id_commande'];
+			if (!$commande['commande.id_commande']) {
+				throw new errorATF("ID_COMMANDE INTROUVABLE", 404);
+			} else {
+				$facture['id_commande'] = $commande['commande.id_commande'];
 			}
 
-			if(!$affaire['id_societe']) throw new errorATF("ID_SOCIETE INTROUVABLE", 404);
+			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $facture['id_commande']);
+			$lignes = ATF::commande_ligne()->select_all();
+			foreach ($lignes as $key => $value) {
+				$ligne = array();
+				$ligne["facture_ligne__dot__produit"] = $value["produit"];
+				$ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+				$ligne["facture_ligne__dot__ref"] = $value["ref"];
+				$ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+				$ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+				$ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+				$ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+				$ligne["facture_ligne__dot__serial"] = $value["serial"];
+				$ligne["facture_ligne__dot__afficher"] = $value["visible_pdf"];
+				$ligne["facture_ligne__dot__visible"] = $value["visible"];
+				$ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
-			if($affaire['id_societe']){
-				$post['id_societe'] = $affaire['id_societe'];
+				$produits[] = $ligne;
 			}
+			$produits = json_encode($produits);
 
-			$return = $this->insert($post,$s,NULL,$var=NULL,NULL,true);
+			$data = [
+				"facture" => $facture,
+				"values_facture" => [
+					"produits" => $produits
+				]
+				];
+
+			$return = $this->insert($data,$s,NULL,$var=NULL,NULL,true);
 
 		} catch(errorATF $e){
 			$msg = $e->getMessage();
