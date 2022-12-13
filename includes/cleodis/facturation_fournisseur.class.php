@@ -27,7 +27,7 @@ class facturation_fournisseur extends classes_optima {
 
 class facturation_fournisseur_boulanger extends facturation_fournisseur {
 
-	public $user_facturation = array(16,116);
+	public $user_facturation = array(16);
 
 	function __construct() {
 		$this->table="facturation_fournisseur";

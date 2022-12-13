@@ -214,6 +214,16 @@ class facture_cleodis extends facture {
 			case "date":
 				return date("Y-m-d");
 			case "date_previsionnelle":
+				$affaire = ATF::affaire()->select($facture["id_affaire"]);
+				$jourPrelevement = "01";
+                if ($affaire["date_previsionnelle"]) {
+					if (intval($affaire["date_previsionnelle"]) < 10) {
+						$jourPrelevement = "0".$affaire["date_previsionnelle"];
+					} else {
+						$jourPrelevement = $affaire["date_previsionnelle"];
+					}
+                }
+
 				if ($facture) {
 					if (ATF::$codename == "go_abonnement") {
 						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
@@ -225,9 +235,9 @@ class facture_cleodis extends facture {
 					}else{
 						$day=0;
 					}
-					return date('Y-m-d',strtotime($periode["date_periode_debut"]."+".$day." day"));
+					return date('Y-m-',strtotime($periode["date_periode_debut"]."+".$day." day")).$jourPrelevement;
 				}else{
-					return date("Y-m-d");
+					return date("Y-m-").$jourPrelevement;
 				}
 			case "date_periode_debut":
 				if ($facture) {
@@ -593,11 +603,22 @@ class facture_cleodis extends facture {
 								->addOrder("id_loyer", "ASC");
 		$loyers = ATF::loyer()->select_all();
 
-		if(strtotime(date("Y-m-d")) < strtotime($infos["date_debut_contrat"])){
-			$date_previsionnelle = $infos["date_debut_contrat"];
+
+		$jourPrelevement = date("d", strtotime($infos["date_debut_contrat"]));
+        if ($affaire["date_previsionnelle"]) {
+            if (intval($affaire["date_previsionnelle"]) < 10) {
+				$jourPrelevement = "0".$affaire["date_previsionnelle"];
+			} else {
+				$jourPrelevement = $affaire["date_previsionnelle"];
+			}
+        }
+
+
+		if(strtotime(date("Y-m-d")) < strtotime($affaire["date_debut_contrat"])){
+			$date_previsionnelle = date("Y-m-", strtotime($infos["date_debut_contrat"])).$jourPrelevement;
 		}
 		else{
-			$date_previsionnelle = date("Y-m-d");
+			$date_previsionnelle = date("Y-m-").$jourPrelevement;
 		}
 
 		$dateTimeDebContrat = new DateTime(date("Y-m-d", strtotime($infos["date_debut_contrat"])));
@@ -956,28 +977,54 @@ class facture_cleodis extends facture {
 			if(!$post['id_affaire']) throw new errorATF("ID_FACTURE EST OBLIGATOIRE", 400);
 			if(!$post['type_facture']) throw new errorATF("LE TYPE_FACTURE EST OBLIGATOIRE", 400);
 			if($post['type_facture'] !== "libre") throw new errorATF("LE TYPE DE FACTURE DOIT ETRE LIBRE", 400);
-
 			unset($post['schema']);
+			$facture = $post;
+
 
 			$affaire = ATF::affaire()->select($post["id_affaire"]);
+			if(!$affaire['id_societe']) {
+				throw new errorATF("ID_SOCIETE INTROUVABLE", 404);
+			} else {
+				$facture['id_societe'] = $affaire['id_societe'];
+			}
+
 
 			ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
-
 			$commande = ATF::commande()->select_row();
-
-			if(!$commande['commande.id_commande']) throw new errorATF("ID_COMMANDE INTROUVABLE", 404);
-
-			if($commande){
-				$post['id_commande'] = $commande['commande.id_commande'];
+			if (!$commande['commande.id_commande']) {
+				throw new errorATF("ID_COMMANDE INTROUVABLE", 404);
+			} else {
+				$facture['id_commande'] = $commande['commande.id_commande'];
 			}
 
-			if(!$affaire['id_societe']) throw new errorATF("ID_SOCIETE INTROUVABLE", 404);
+			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $facture['id_commande']);
+			$lignes = ATF::commande_ligne()->select_all();
+			foreach ($lignes as $key => $value) {
+				$ligne = array();
+				$ligne["facture_ligne__dot__produit"] = $value["produit"];
+				$ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+				$ligne["facture_ligne__dot__ref"] = $value["ref"];
+				$ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+				$ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+				$ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+				$ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+				$ligne["facture_ligne__dot__serial"] = $value["serial"];
+				$ligne["facture_ligne__dot__afficher"] = $value["visible_pdf"];
+				$ligne["facture_ligne__dot__visible"] = $value["visible"];
+				$ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
-			if($affaire['id_societe']){
-				$post['id_societe'] = $affaire['id_societe'];
+				$produits[] = $ligne;
 			}
+			$produits = json_encode($produits);
 
-			$return = $this->insert($post,$s,NULL,$var=NULL,NULL,true);
+			$data = [
+				"facture" => $facture,
+				"values_facture" => [
+					"produits" => $produits
+				]
+				];
+
+			$return = $this->insert($data,$s,NULL,$var=NULL,NULL,true);
 
 		} catch(errorATF $e){
 			$msg = $e->getMessage();
@@ -3383,6 +3430,7 @@ class facture_cleodis extends facture {
 		foreach ($return as $key => $value) {
 			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
 			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["jour_previsionnel"] = ATF::affaire()->select($value["id_affaire"], "date_previsionnelle");
 			$return[$key]["date_periode_debut"] = $return[$key]["date_periode_debut"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_debut"])) : "";
 			$return[$key]["date_periode_fin"] = $return[$key]["date_periode_fin"] ? date("d/m/Y" , strtotime($return[$key]["date_periode_fin"])): "";
 			$return[$key]["prix_ttc"] =  number_format(($value["prix"] * $value["tva"]), 2 , ".", "");

@@ -2588,6 +2588,7 @@ class affaire_cleodis extends affaire {
 						"nom"=>$post["nom_gerant"],
 						"prenom"=>$post["prenom_gerant"],
 						"tel"=>$post["phone_gerant"],
+						"gsm"=>$post["phone_gerant"],
 						"email"=>$post["email_gerant"],
 						"fonction"=> $post["fonction_gerant"],
 						"id_societe"=> $id_societe,
