@@ -822,24 +822,26 @@ class devis_cleodis extends devis {
 		//$affaire["commentaire_facture"]  = $data_affaire["commentaire_facture"];
 
 		// Déplacer toutes les pièces jointes anciennes vers le nouveau
-		$datapath = dirname(ATF::affaire()->filepath($devis["id_affaire"],"temp"));
-		$id_temp = md5(mt_rand(0,time()));
-		if ($handle = opendir($datapath)) {
-			while (false !== ($fileName = readdir($handle))) {
-				if (strpos($fileName, $devis["id_affaire"].".")===0) {
-					log::logger("On deplace ".($datapath."/".$fileName)." vers ".$datapath."/".str_replace($devis["id_affaire"].".", $id_temp.".", $fileName), "mv_file_update_devis");
-					rename($datapath."/".$fileName, $datapath."/".str_replace($devis["id_affaire"].".", $id_temp.".", $fileName));
+		if(! $infos["preview"]) {
+			$datapath = dirname(ATF::affaire()->filepath($devis["id_affaire"],"temp"));
+			$id_temp = md5(mt_rand(0,time()));
+			if ($handle = opendir($datapath)) {
+				while (false !== ($fileName = readdir($handle))) {
+					if (strpos($fileName, $devis["id_affaire"].".")===0) {
+						log::logger("On deplace ".($datapath."/".$fileName)." vers ".$datapath."/".str_replace($devis["id_affaire"].".", $id_temp.".", $fileName), "mv_file_update_devis");
+						rename($datapath."/".$fileName, $datapath."/".str_replace($devis["id_affaire"].".", $id_temp.".", $fileName));
+					}
 				}
+				closedir($handle);
 			}
-		    closedir($handle);
 		}
 
 		log::logger("On a fini de deplacer dans temp", "mv_file_update_devis");
 
 		if ($panier) ATF::panier()->u(array("id_panier"=> $panier["panier.id_panier"], "id_affaire" => null));
 
-
-		ATF::affaire()->d($devis["id_affaire"],$s,$files);
+		$refresh = NULL;
+		ATF::affaire()->d($devis["id_affaire"],$s,$files, $refresh, true);
 
 		$infos["devis"]["id_partenaire"]  = $data_affaire["id_partenaire"];
 		$last_id = $this->insert($infos,$s,$files);
@@ -847,14 +849,16 @@ class devis_cleodis extends devis {
 		$id_affaire = $this->select($last_id,"id_affaire");
 
 		// Déplacer toutes les pièces jointes anciennes vers le nouveau
-		if ($handle = opendir($datapath)) {
-		    while (false !== ($fileName = readdir($handle))){
-				if (strpos($fileName, $id_temp.".")===0) {
-					log::logger("On deplace ".($datapath."/".$fileName)." vers ".$datapath."/".str_replace($id_temp.".", $id_affaire.".", $fileName), "mv_file_update_devis");
-					rename($datapath."/".$fileName, $datapath."/".str_replace($id_temp.".", $id_affaire.".", $fileName));
+		if (! $infos["preview"]) {
+			if ($handle = opendir($datapath)) {
+				while (false !== ($fileName = readdir($handle))) {
+					if (strpos($fileName, $id_temp.".")===0) {
+						log::logger("On deplace ".($datapath."/".$fileName)." vers ".$datapath."/".str_replace($id_temp.".", $id_affaire.".", $fileName), "mv_file_update_devis");
+						rename($datapath."/".$fileName, $datapath."/".str_replace($id_temp.".", $id_affaire.".", $fileName));
+					}
 				}
+				closedir($handle);
 			}
-		    closedir($handle);
 		}
 
 		if($id_affaire){
@@ -890,7 +894,7 @@ class devis_cleodis extends devis {
 			ATF::db($this->db)->rollback_transaction();
 			return $this->cryptId($last_id);
 		}else{
-
+			ATF::affaire()->delete_files($devis["id_affaire"]);
 			ATF::db($this->db)->commit_transaction();
 			if(is_array($cadre_refreshed)){
 				ATF::affaire()->redirection("select",$id_affaire);
