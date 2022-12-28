@@ -1,0 +1,2 @@
+ALTER TABLE `societe` ADD `id_contact_signataire` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `id_contact_facturation`, ADD INDEX (`id_contact_signataire`);
+ALTER TABLE `societe` ADD FOREIGN KEY (`id_contact_signataire`) REFERENCES `contact`(`id_contact`) ON DELETE SET NULL ON UPDATE CASCADE;
