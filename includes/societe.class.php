@@ -1220,8 +1220,8 @@ class societe extends classes_optima {
 	 */
 	public function _setDomaine($get,$post) {
 		$return = true;
-  	$input = file_get_contents('php://input');
-  	if (!empty($input)) parse_str($input,$post);
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
 
 		if (!$post['idSociete']) throw new errorATF("ID_SOCIETE_MISSING",3256);
 		if (!$post['domaine']) throw new errorATF("DOMAINE_MISSING",3257);
@@ -1318,8 +1318,8 @@ class societe extends classes_optima {
 	}
 
 	public function _set($get, $post) {
-  	$input = file_get_contents('php://input');
-  	if (!empty($input)) parse_str($input,$post);
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
 
 		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
 		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
@@ -1399,6 +1399,14 @@ class societe extends classes_optima {
     }else{
       throw new errorATF("IBAN vide", 500);
     }
+  }
+
+  public function getUrlSign($id_affaire){
+    $url = __SIGN_URL__."#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
+    return $url/*."&sref=".urlencode($url)*/;
+  }
+  public function _getUrlSign($get,$post){
+    return $this->getUrlSign($get['id_affaire']);
   }
 
 }
