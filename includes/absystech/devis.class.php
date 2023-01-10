@@ -39,6 +39,7 @@ class devis_absystech extends devis {
 			 ,'devis.prix'=>array("aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money","width"=>100)
 			 ,'devis.prix_achat'=>array("aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money","width"=>100)
 			 ,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"align"=>"center","type"=>"file","width"=>50)
+			 ,'fichier_joint_signe'=>array("custom"=>true,"nosort"=>true,"align"=>"center","type"=>"file","width"=>50)
 			 ,'actions'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"actionsDevis","width"=>80)
 		 );
 
@@ -175,6 +176,7 @@ class devis_absystech extends devis {
 		$this->files = array(
 			"fichier_joint"=>array("type"=>"pdf","preview"=>true,"quickMail"=>true)
 			,"documentAnnexes"=>array("custom"=>true,'type'=>"zip","quickMail"=>true,"multiUpload"=>true)
+			,"fichier_joint_signe"=>array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true)
 		);
 		$this->addPrivilege("unlock","update");
 		$this->addPrivilege("sendMailDevis","update");
@@ -1729,6 +1731,94 @@ class devis_absystech extends devis {
 
   }
 
+  public function devis_already_sign($id_affaire) {
+	ATF::devis()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_devis", "desc");
+	$d = ATF::devis()->sa();
+
+	if ($d[0]["date_signature"]) {
+		return true;
+	}
+	return false;
+  }
+
+  public function _dataSellAndSign($get, $post) {
+	ATF::devis()->u(array("id_devis" => $post["dataSellAndSign"]["id_devis"],
+						  "id_contrat_sell_and_sign" => $post["dataSellAndSign"]["contract_id"] ));
+
+	return true;
+  }
+
+
+  public function updateDevisGetDevisSigneOodrive() {
+	ATF::devis()->q->reset()->whereIsNotNull("id_contrat_sell_and_sign")
+							->whereIsNull("date_signature");
+	$devis = ATF::devis()->sa();
+
+
+	foreach ($devis as $key => $value) {
+		ATF::db()->begin_transaction();
+		$id_contract = $value["id_contrat_sell_and_sign"];
+
+		$url = "/calinda/hub/selling/model/contract/read?action=getContract&contract_id=".$id_contract;
+
+		$ch = $this->curlinit($url);
+
+        $response = curl_exec($ch);
+        $response = json_decode($response);
+        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_status === 200) {
+			log::logger($response->status , "oodrive");
+			if ($response->status === "ARCHIVED") {
+
+				ATF::devis()->u(array("id_devis" => $value["id_devis"], "date_signature" => gmdate("Y-m-d", $response->date/1000)));
+
+				$url = "/calinda/hub/selling/do?m=getSignedContract&contract_id=".$id_contract;
+				$ch2 = $this->curlinit($url);
+
+				$r2 = curl_exec($ch2);
+				$http_status = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
+				curl_close($ch2);
+				if ($http_status === 200) {
+					$this->store(ATF::_s(), $value["id_devis"], "fichier_joint_signe", $r2);
+					ATF::db()->commit_transaction();
+
+				}else{
+					log::logger("Erreur recuperation contrat signé" , "oodrive");
+					log::logger($response , "oodrive");
+					ATF::db()->rollback_transaction();
+				}
+			}
+        }else{
+            log::logger("Erreur recuperation infos contrat " , "oodrive");
+            log::logger($response , "oodrive");
+			ATF::db()->rollback_transaction();
+        }
+	}
+  }
+
+  public function curlInit($url) {
+
+	$__OODRIVE_HOST__ = ATF::constante()->getConstante("__OODRIVE_HOST__");
+	$__OODRIVE_JTOKEN__ = ATF::constante()->getConstante("__OODRIVE_JTOKEN__");
+
+	$oodrive_host = ATF::constante()->select($__OODRIVE_HOST__, "valeur");
+	$jtoken = ATF::constante()->select($__OODRIVE_JTOKEN__, "valeur");
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $oodrive_host.$url);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, '');
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_ENCODING, '');
+	curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'j_token: '. $jtoken) );
+
+	return $ch;
+  }
 };
 
 class devis_att extends devis_absystech { };
