@@ -3947,14 +3947,11 @@ class hotline extends classes_optima {
 
 		if ($get['filters']['free'] == "on") {
 			$this->q->reset("where");
-			$this->q->whereIsNull("hotline.id_user");
-			/*$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
+
+			$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
 					->where("hotline.etat", "payee", 'AND', 'etat', "!=")
 					->where("hotline.etat", "annulee", 'AND', 'etat', "!=")
-					->where("hotline.etat", "wait", 'AND', 'etat', "!=")
-					->where("hotline.etat", "fixing", 'AND', 'etat', "!=")
-
-					->whereIsNull("hotline.id_user",'AND','etat'); */
+					->whereIsNull("hotline.id_user",'AND','etat');
 
 			if ($get['filters']['dev'] == "on") {
 				$this->q->where("hotline.pole_concerne","dev","OR","pole");
@@ -3975,7 +3972,7 @@ class hotline extends classes_optima {
 				$data['count'] = $nonTraites['count'];
 			}else{
 				$data["data"] = array_merge($data["data"], $nonTraites["data"]);
-				$data['count'] += $nonTraites['count'];
+				$data['count'] += $c['count'];
 			}
 
 
@@ -4498,9 +4495,9 @@ class hotline extends classes_optima {
 			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=")
-			->where("hotline.etat", "wait", 'AND', 'non_etat', "!=")
+			/*->where("hotline.etat", "wait", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "fixing", 'AND', 'non_etat', "!=")
-			->where("hotline.etat", "mine", 'AND', 'non_etat', "!=");
+			->where("hotline.etat", "mine", 'AND', 'non_etat', "!=")*/;
 			//->where("etat" , "free");
 		$poles=ATF::user()->select($get['id_user'],"pole");
 		$pole = explode(',',$poles);
