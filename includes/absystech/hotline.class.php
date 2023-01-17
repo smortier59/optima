@@ -3947,13 +3947,14 @@ class hotline extends classes_optima {
 
 		if ($get['filters']['free'] == "on") {
 			$this->q->reset("where");
-			$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
+			$this->q->whereIsNull("hotline.id_user");
+			/*$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
 					->where("hotline.etat", "payee", 'AND', 'etat', "!=")
 					->where("hotline.etat", "annulee", 'AND', 'etat', "!=")
 					->where("hotline.etat", "wait", 'AND', 'etat', "!=")
 					->where("hotline.etat", "fixing", 'AND', 'etat', "!=")
 
-					->whereIsNull("hotline.id_user",'AND','etat');
+					->whereIsNull("hotline.id_user",'AND','etat'); */
 
 			if ($get['filters']['dev'] == "on") {
 				$this->q->where("hotline.pole_concerne","dev","OR","pole");
