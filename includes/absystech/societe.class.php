@@ -57,6 +57,8 @@ class societe_absystech extends societe {
 
 		$this->colonnes['primary']["credits"] = array("custom"=>true);
 
+		$this->colonnes['panel']['coordonnees_supplementaires_fs'][] = "id_contact_signataire";
+
 		$this->colonnes["rapprocher"] = array(
 			 'id_societe'=>array("disabled"=>true),
 			 'montant'=>array("formatNumeric"=>true,"xtype"=>"textfield"),
@@ -86,6 +88,7 @@ class societe_absystech extends societe {
 
 		$this->foreign_key['id_apporteur_affaire'] = "societe";
 		$this->foreign_key["id_commercial"] = "user";
+		$this->foreign_key["id_contact_signataire"] = "contact";
 
 		$this->fieldstructure();
 
@@ -1421,6 +1424,94 @@ class societe_absystech extends societe {
 
 		return base64_encode($res);
 	}
+
+	/**
+  * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param array $infos Simple dimension des champs à insérer
+  */
+  public function _signAndGetPDF($post,$get){
+    $tel  = $post["tel"];
+    // $bic  = $post["bic"];
+    // $iban = $post["iban"];
+    if (strlen($post["id"])!=32) {
+      throw new Exception('Identifiant non valide.', 500);
+    }
+    $id_affaire = ATF::affaire()->decryptId($post["id"]);
+
+    $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
+    if (!$id_societe) {
+      throw new Exception('Aucune information pour cet identifiant.', 500);
+    }
+    // ATF::societe()->u(array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban));
+
+    //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
+    if(ATF::societe()->select($id_societe, "tel") === NULL) {
+      ATF::societe()->u(array("id_societe"=>$id_societe, 'tel'=>$tel));
+    }
+
+    $societe = ATF::societe()->select($id_societe);
+
+    // $this->checkIBAN($iban);
+
+	ATF::devis()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_devis", "desc");
+	$devis_list = ATF::devis()->sa();
+
+    $contact = ATF::contact()->select($societe["id_contact_signataire"]);
+    $pdf_mandat = ATF::pdf()->generic('devis',$devis_list[0]["id_devis"],true);
+
+    $return = array(
+      "id_affaire"=>$this->decryptId($id_affaire),
+      "civility"=>$contact["civilite"],
+      "id_contact"=> $societe["id_contact_signataire"],
+      "fonction"=> $contact["fonction"],
+      "firstname"=>$contact["prenom"],
+      "lastname"=>$contact["nom"],
+      "address_1"=>$societe["adresse"],
+      "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
+      "postal_code"=>$societe["cp"],
+      "city"=>$societe["ville"],
+      "email"=>$contact["email"],
+      "company_name"=>$societe["societe"],
+      "ref"=>ATF::$codename.$societe["code_client"],
+      "country"=>$societe["id_pays"],
+      "cell_phone"=>$tel,
+      "pdf_mandat"=> base64_encode($pdf_mandat), // base64
+	  "nom_pdf" => "devis ".$devis_list[0]["ref"],
+	  "id_devis" => $devis_list[0]["id_devis"]
+    );
+    return $return;
+  }
+
+  /**
+  * Appel Sell & Sign, retourne les infos du client à partir de l'id_affaire
+    * @author Yann GAUTHERON <ygautheron@absystech.fr>
+  * @param array $post["id_affaire"]
+  */
+  public function _signGetInfosOnly($post){
+	log::logger($post, "mfleurquin");
+    if (strlen($post["id"])!=32) {
+      throw new Exception('Identifiant non valide.', 500);
+    }
+    $id_societe = ATF::affaire()->select($post["id"],"id_societe");
+    if (!$id_societe) {
+      throw new Exception('Aucune information pour cet identifiant.', 500);
+    }
+    $societe = ATF::societe()->select($id_societe);
+    $contact = ATF::contact()->select($societe["id_contact_signataire"]);
+    $return = array(
+      "civility"=>$contact["civilite"],
+      "firstname"=>$contact["prenom"],
+      "lastname"=>$contact["nom"],
+      "email"=>$contact["email"],
+      "tel"=>$contact["gsm"],
+      "company_name"=>$societe["societe"],
+      "ref"=>ATF::$codename.$societe["code_client"],
+      "IBAN"=>$societe["IBAN"],
+      "BIC"=>$societe["BIC"]
+    );
+    return $return;
+  }
 
 };
 
