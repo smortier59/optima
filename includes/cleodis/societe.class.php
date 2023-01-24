@@ -1105,13 +1105,6 @@ class societe_cleodis extends societe {
     return array("investissement"=>number_format($totalInvestissement,2,"," ," "), "restant"=>number_format($totalRestant+$encours,2,"," ," "));
   }
 
-  public function getUrlSign($id_affaire){
-    $url = __SIGN_URL__."#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
-    return $url/*."&sref=".urlencode($url)*/;
-  }
-  public function _getUrlSign($get,$post){
-    return $this->getUrlSign($get['id_affaire']);
-  }
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>

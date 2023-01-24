@@ -1477,7 +1477,8 @@ class societe_absystech extends societe {
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "pdf_mandat"=> base64_encode($pdf_mandat), // base64
-	  "nom_pdf" => "devis ".$devis_list[0]["ref"]
+	  "nom_pdf" => "devis ".$devis_list[0]["ref"],
+	  "id_devis" => $devis_list[0]["id_devis"]
     );
     return $return;
   }
