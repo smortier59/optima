@@ -1498,7 +1498,7 @@ class societe_absystech extends societe {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
     $societe = ATF::societe()->select($id_societe);
-    $contact = ATF::contact()->select($societe["id_contact_facturation"]);
+    $contact = ATF::contact()->select($societe["id_contact_signataire"]);
     $return = array(
       "civility"=>$contact["civilite"],
       "firstname"=>$contact["prenom"],
