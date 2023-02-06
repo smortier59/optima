@@ -59,6 +59,86 @@ class sell_and_sign extends classes_optima {
 		return true;
 
 	}
+
+	public function getJToken() {
+		ATF::constante()->q->reset()->where("constante","__J_TOKEN_SELL_AND_SIGN__");
+		$constante = ATF::constante()->select_row();
+		return $constante["valeur"];
+	}
+
+	public function getContract($contract_id) {
+		$url = "https://cloud.sellandsign.com/calinda/hub/selling/model/contract/read?action=getContract&contract_id=" . $contract_id;
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'GET',
+			CURLOPT_HTTPHEADER => array(
+			  'j_token: ' . $this->getJToken()
+			),
+		  ));
+
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+        $response = curl_exec($curl);
+
+        $response = json_decode($response);
+        $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($http_status === 200) {
+           return $response;
+        }else{
+			$error = curl_error($curl);
+			throw new errorATF($error);
+		}
+	}
+
+
+	public function getSignedContract($contract_id, $id_commande) {
+		$url = "https://cloud.sellandsign.com/calinda/hub/selling/do?m=getSignedContract&contract_id=" . $contract_id;
+		$j_token = "";
+
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => 'https://cloud.sellandsign.com/calinda/hub/selling/do?m=getSignedContract&contract_id=4361803',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_HTTPHEADER => array(
+				'j_token: ' . $this->getJToken()
+			),
+		));
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+		$response = curl_exec($curl);
+		$error = curl_error($curl);
+
+		curl_close($curl);
+
+		if ( $error != "" ) {
+            return false;
+        }
+
+		return $response;
+
+	}
+
 };
 
 class sell_and_sign_cleodisbe extends sell_and_sign { };
