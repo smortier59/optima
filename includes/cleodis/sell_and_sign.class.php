@@ -111,7 +111,7 @@ class sell_and_sign extends classes_optima {
 		$curl = curl_init();
 
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://cloud.sellandsign.com/calinda/hub/selling/do?m=getSignedContract&contract_id=4361803',
+			CURLOPT_URL => $url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
