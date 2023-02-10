@@ -31,7 +31,7 @@
 {util::push($fieldsKeys, "CourrierRestitutionExists")}
 {util::push($fieldsKeys, "allowBDCCreate")}
 {util::push($fieldsKeys, "allowAllBDCCreate")}
-{if ATF::$codename == "cleodis"} {util::push($fieldsKeys, "ctSGEFExists")}{/if}
+{if ATF::$codename == "cleodis"  || ATF::$codename=="assets"} {util::push($fieldsKeys, "ctSGEFExists")}{/if}
 {if ATF::$codename == "cleodisbe"} {util::push($fieldsKeys, "ctlettreBelfiusExists")}{/if}
 {util::push($fieldsKeys, "envoiCourrierClassiqueExists")}
 
@@ -136,10 +136,10 @@ ATF.renderer.dateCleCommande = function(table, field) {
                             listeners: {
                                 'select': function(fb, v) {
                                     ATF.ajax(
-                                        "commande,updateDate.ajax", 
+                                        "commande,updateDate.ajax",
                                         "id_commande=" + id + "&table={ATF::_r('parent_name')|default:ATF::_r('table')}&key=date_demande_reprise_broker&value=" + fb.value,
-                                        { 
-                                            onComplete: function (result) { 
+                                        {
+                                            onComplete: function (result) {
                                                 store.reload();
                                             }
                                         }
@@ -281,7 +281,7 @@ ATF.renderer.pdfCourriers = function(table, field) {
         }
 
 
-        {if ATF::$codename == "cleodis"}
+        {if ATF::$codename == "cleodis"  || ATF::$codename=="assets"}
             if (record.data.ctSGEFExists == true) {
                 html += '<a href="commande-select-lettreSGEF-' + id + '.dl" target="_blank">';
                 html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('Contrat vente SGEF', 'commande');
@@ -408,7 +408,7 @@ ATF.renderer.pdfCourriers = function(table, field) {
                                     ['contratTransfert', 'Contrat de transfert'],
                                     ['ctSigne', 'Contrat signé'],
                                     ['CourrierRestitution', 'Courrier de restitution'],
-                                    {if ATF::$codename == "cleodis"}
+                                    {if ATF::$codename == "cleodis"  || ATF::$codename=="assets"}
                                         ['lettreSGEF', 'Contrat vente SGEF']
                                     {/if}
                                     {if ATF::$codename == "cleodisbe"}
