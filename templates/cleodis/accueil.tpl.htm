@@ -1,4 +1,4 @@
-{* Tableau de bord 
+{* Tableau de bord
 <div id="dashBoard" style="padding-left:2em"></div>
 
 <script type="text/javascript">/*<![CDATA[*/
@@ -9,20 +9,20 @@
 	<div id="widgets" style="padding-left:2em"></div>
 
 	{$colspan=4}
-	
+
 
 	<script type="text/javascript">/*<![CDATA[*/
-		Ext.onReady(function(){	
+		Ext.onReady(function(){
 			try {
 
-				{foreach from=ATF::accueil()->getAgence() key=k item=agence}					
+				{foreach from=ATF::accueil()->getAgence() key=k item=agence}
 					var widgets_{$agence} = [
 						{foreach from=ATF::accueil()->getWidgets($agence) key=key item=item}
-							
+
 							{
 								xtype:'panel',
 								id:'widget_{$item.module}_{$item.type}',
-								width: 305, 
+								width: 305,
 								style: {
 									float: 'left',
 									marginBottom: '5px'
@@ -30,8 +30,8 @@
 								border: false,
 								layout: 'column',
 								items: [
-									{											    
-										xtype: 'panel', 
+									{
+										xtype: 'panel',
 										height:250,
 										border: true,
 										autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}{if $item.id_agence},id_agence={$item.id_agence}{/if}', scripts:true }
@@ -39,7 +39,7 @@
 								]
 
 							}{if !$key@last},{/if}
-							
+
 						{/foreach}
 					 ];
 				{/foreach}
@@ -49,7 +49,7 @@
 					title: 'Bonjour et bienvenue sur Optima, {ATF::user()->nom(ATF::$usr->getID())}.',
 					layout:'column',
 					items:[
-						{for $colNumber=0; $colNumber<$colspan; $colNumber++}  
+						{for $colNumber=0; $colNumber<$colspan; $colNumber++}
 							{if $colNumber},{/if}
 							{
 								columnWidth:{1/$colspan},
@@ -57,19 +57,19 @@
 								bodyStyle:'padding:5px 15px 5px 15px',
 								border: false,
 								autoWidth:true,
-								items: [ 
+								items: [
 									{foreach from=$widgets key=key item=item}
-										{if ($item@index%$colspan)===$colNumber}											
+										{if ($item@index%$colspan)===$colNumber}
 											{if $item@index>=$colspan}
 											,
-											{/if}											
+											{/if}
 											{
 												xtype:'panel',
 												autoWidth:true,
 												bodyStyle:'margin:10px 0 5px 0',
 												items: [
 													{
-														xtype: 'panel', 
+														xtype: 'panel',
 														title: '{ATF::$usr->trans(widget,$item.module, $item.type)|escape:javascript}',
 														frame: true,
 														border: false,
@@ -86,14 +86,14 @@
 						{/for}
 					]
 				});*/
-				
+
 			} catch(e) {
-				console.log(e); 
+				console.log(e);
 			}
 
 			try {
-				
-					new Ext.Panel({ 
+
+					new Ext.Panel({
 						renderTo:'widgets',
 						layout:'anchor',
 						border: false,
@@ -112,9 +112,9 @@
 							{/foreach}
 						]
 					});
-				
+
 			} catch(e) {
-				console.log(e); 
+				console.log(e);
 			}
 
 
@@ -123,23 +123,23 @@
 {/if}
 
 
-{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe"}
+{if ATF::$codename=="cleodis" || ATF::$codename=="assets" || ATF::$codename=="cleodisbe"}
     <div class="primary" style="width:80%;padding:2em">
         <div class="gingerPrimaryContainer">
             <script type="text/javascript">/*<![CDATA[*/
-                Ext.onReady(function(){		
+                Ext.onReady(function(){
                     var dr = new Ext.DatePicker({
                         startDay : 1
                         ,listeners: {
                             'select': function(node, dd){ ATF.tpl2div('tpl2div.ajax','div=accueilTacheEnCours&template=accueil_tache_imminente&table=accueil&date='+dd.dateFormat("Y-m-d")); }
-                        } 
+                        }
                     });
-                
+
                     dr.render('dr');
                 });
-        
+
             /*]]>*/</script>
-            
+
             <div id="accueilTacheEnCours" style="float:left;width:80%;">{include file="accueil_tache_imminente.tpl.htm" date=$date}</div>
             <div id="dr" style="float:right;"></div>
         </div>
@@ -154,7 +154,7 @@
 	<div id="newsBoard">
 		<div id="news"></div>
 	</div>
-	
+
 	<script type="text/javascript">/*<![CDATA[*/
 		{include file="generic-news.tpl.js"}
 	/*]]>*/</script>
