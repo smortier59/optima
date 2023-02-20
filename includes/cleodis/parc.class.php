@@ -226,7 +226,9 @@ class parc_cleodis extends classes_optima {
 		}
 
 		/*Le serial ne doit pas déjà exister*/
-		$this->q->reset()->addCondition("serial",$item["serial"])->setCount();
+		$this->q->reset()
+			->addCondition("existence", "actif")
+			->addCondition("serial",$item["serial"])->setCount();
 		$countParc=$this->sa();
 		if($countParc["count"]>0){
 			ATF::db($this->db)->rollback_transaction();
@@ -461,7 +463,7 @@ class parc_go_abonnement extends parc_cleodis {
 		$this->colonnes['fields_column']["parc.date_premiere_mise_en_circulation"] = array("renderer"=>"updateDate");
 		$this->colonnes['fields_column']["parc.puissance"] = array("width"=>150,"rowEditor"=>"setPuissance");
 		$this->colonnes['fields_column']["parc.type_energie"] = array("renderer"=>"setType_energie","width"=>200);
-		
+
 
 
 
