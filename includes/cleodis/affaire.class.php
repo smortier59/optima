@@ -3384,6 +3384,8 @@ class affaire_midas extends affaire_cleodis {
 };
 
 class affaire_cleodisbe extends affaire_cleodis { };
+class affaire_itrenting extends affaire_cleodis { };
+
 class affaire_cap extends affaire {
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";

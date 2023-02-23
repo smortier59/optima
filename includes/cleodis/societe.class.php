@@ -2108,6 +2108,20 @@ class societe_cleodisbe extends societe_cleodis {
   }
 };
 
+class societe_itrenting extends societe_cleodis {
+  public function __construct() {
+    parent::__construct();
+    $this->table = "societe";
+
+    unset($this->colonnes['panel']['delai_rav'],
+        $this->colonnes['panel']['delai_fournisseur'],
+        $this->colonnes['panel']['deploiement']);
+
+
+    $this->fieldstructure();
+  }
+};
+
 class societe_cap extends societe_cleodis {
   public function __construct() {
     parent::__construct();

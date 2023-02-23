@@ -2926,6 +2926,9 @@ class commande_cleodis extends commande {
 
 };
 
+
+class commande_itrenting extends commande_cleodis { };
+
 class commande_cleodisbe extends commande_cleodis {
 
 	function __construct($table_or_id=NULL) {

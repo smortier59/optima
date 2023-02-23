@@ -448,6 +448,7 @@ class parc_cleodis extends classes_optima {
 };
 
 class parc_cleodisbe extends parc_cleodis { };
+class parc_itrenting extends parc_cleodis { };
 class parc_bdomplus extends parc_cleodis { };
 
 class parc_boulanger extends parc_cleodis { };
@@ -461,7 +462,7 @@ class parc_go_abonnement extends parc_cleodis {
 		$this->colonnes['fields_column']["parc.date_premiere_mise_en_circulation"] = array("renderer"=>"updateDate");
 		$this->colonnes['fields_column']["parc.puissance"] = array("width"=>150,"rowEditor"=>"setPuissance");
 		$this->colonnes['fields_column']["parc.type_energie"] = array("renderer"=>"setType_energie","width"=>200);
-		
+
 
 
 

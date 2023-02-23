@@ -53,6 +53,13 @@ class accueil_cleodisbe extends accueil_cleodis {
 		return array();
 	}
 };
+
+class accueil_itrenting extends accueil_cleodis {
+	public function getWidgets(){
+		// @todo YG : Gérercela dans les préférences (par exemple)
+		return array();
+	}
+};
 class accueil_cap extends accueil_cleodis {
 	public $onglets = array(
 		"societe"=>array("opened"=>true)

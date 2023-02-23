@@ -90,6 +90,7 @@ class commande_ligne_midas extends commande_ligne_cleodis {
 }
 
 class commande_ligne_cleodisbe extends commande_ligne_cleodis { };
+class commande_ligne_itrenting extends commande_ligne_cleodis { };
 class commande_ligne_cap extends commande_ligne_cleodis { };
 
 
