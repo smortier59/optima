@@ -198,6 +198,7 @@ class contact_cleodis extends contact {
 };
 
 class contact_cleodisbe extends contact_cleodis { };
+class contact_itrenting extends contact_cleodis { };
 class contact_cap extends contact_cleodis {
 	public function __construct() {
 		parent::__construct();

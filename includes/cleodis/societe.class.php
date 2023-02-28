@@ -74,6 +74,30 @@ class societe_cleodis extends societe {
       ,"joignable"
 
     );
+
+    if(ATF::$codename == "cleodisbe"){
+
+      $this->colonnes['panel']['societe_fs']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+        "num_ident"
+        ,"reference_tva"
+      ));
+
+      $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
+
+    }
+
+    if(ATF::$codename == "itrenting"){
+
+      $this->colonnes['panel']['societe_fs']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+        "CIF"
+        ,"reference_tva"
+      ));
+
+      $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
+
+    }
+
+
     $this->panels['societe_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
 
     $this->colonnes['panel']['particulier_fs'] = array(
@@ -194,18 +218,6 @@ class societe_cleodis extends societe {
 
 
     $this->colonnes['bloquees']['select'] = array('joignable');
-
-
-    if(ATF::$codename == "cleodisbe"){
-
-      $this->colonnes['primary']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
-        "num_ident"
-        ,"reference_tva"
-      ));
-
-      $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
-
-    }
 
     $this->fieldstructure();
 
@@ -660,9 +672,15 @@ class societe_cleodis extends societe {
     if ($reset) {
       $this->q->reset();
     }
-    $this->q
-       ->addCondition("societe","%cleodis%",NULL,false,"LIKE")
-       ->addField("tva");
+    $this->q->addField("tva");
+
+    if (ATF::$codename === 'itrenting') {
+      $this->q->addCondition("societe","%cleodis%","OR","filiale","LIKE")
+       ->addCondition("id_societe", 1, "OR","filiale");
+    } else {
+      $this->q->addCondition("societe","%cleodis%",NULL,false,"LIKE");
+    }
+
     $autocomplete= $this->autocomplete($infos,false);
     return $autocomplete;
   }
@@ -1590,9 +1608,9 @@ class societe_cleodis extends societe {
     if($post["api"]) $api = true;
     if(!$post["langue"]) $post["langue"] = "FR";
 
-    if(ATF::$codename == "cleodisbe"){
-      $post["num_ident"] = $post["siret"];
-    }
+    if(ATF::$codename == "cleodisbe")  $post["num_ident"] = $post["siret"];
+    if(ATF::$codename == "itrenting")  $post["cif"] = $post["cif"];
+
     $data = self::getInfosFromCREDITSAFE($post);
 
     if(!$data["societe"]){
@@ -2095,6 +2113,20 @@ class societe_cleodis extends societe {
 };
 
 class societe_cleodisbe extends societe_cleodis {
+  public function __construct() {
+    parent::__construct();
+    $this->table = "societe";
+
+    unset($this->colonnes['panel']['delai_rav'],
+        $this->colonnes['panel']['delai_fournisseur'],
+        $this->colonnes['panel']['deploiement']);
+
+
+    $this->fieldstructure();
+  }
+};
+
+class societe_itrenting extends societe_cleodis {
   public function __construct() {
     parent::__construct();
     $this->table = "societe";

@@ -1,4 +1,4 @@
-{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap" || ATF::$codename=="assets"  || ATF::$codename=="go_abonnement"}
+{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap" || ATF::$codename=="assets" || ATF::$codename=="itrenting" || ATF::$codename=="go_abonnement"}
 	<div id="switchCodenameButton">
 		<script type="text/javascript">
 				function switchCodename(el) {
@@ -38,6 +38,14 @@
 							text:"Assets"
 							,icon: "{ATF::$staticserver}images/logos/assets.png"
 							,value:"assets"
+							,handler: switchCodename
+						},
+						{/if}
+						{if ATF::$codename!=="itrenting"}
+						{
+							text:"IT Renting"
+							,icon: "{ATF::$staticserver}images/logos/itrenting.png"
+							,value:"itrenting"
 							,handler: switchCodename
 						},
 						{/if}
