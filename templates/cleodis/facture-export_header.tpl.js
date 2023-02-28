@@ -1,5 +1,5 @@
 {strip}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets" || ATF::$codename=="itrenting"}
 {
 	text: '{ATF::$usr->trans(export_tableau_autoportes,$current_class->name())}'
 	, handler: function(b,e){
@@ -7,7 +7,7 @@
 	}
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets" || ATF::$codename=="itrenting"}
 {
 	text: '{ATF::$usr->trans(export_tableau_autoportes_avec_refi,$current_class->name())}'
 	, handler: function(b,e){
@@ -15,7 +15,7 @@
 	}
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets" || ATF::$codename == "go_abonnement"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets" || ATF::$codename=="itrenting" || ATF::$codename == "go_abonnement"}
 {
 	text: '{ATF::$usr->trans(export_comptable,$current_class->name())}'
 	, handler: function(b,e){
@@ -23,7 +23,7 @@
 	}
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets" || ATF::$codename=="itrenting"}
 {
 	text: '{ATF::$usr->trans(export_comptable_facture_rejet,$current_class->name())}'
 	, handler: function(b,e){
@@ -31,7 +31,7 @@
 	}
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets" || ATF::$codename=="itrenting"}
 {
 	text: '{ATF::$usr->trans(export_cleofi,$current_class->name())}'
 	, handler: function(b,e){

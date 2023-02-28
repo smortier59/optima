@@ -1186,6 +1186,7 @@ class devis_cleodis extends devis {
 				case "id_filiale":
 					if(ATF::$codename == "cleodis")		return 246;
 					if(ATF::$codename == "cleodisbe")	return 4225;
+					if(ATF::$codename == "itrenting")		return 1;
 				case "emailCopie":
 					return ATF::$usr->get("email");
 				case "tva":
@@ -1924,6 +1925,7 @@ class devis_midas extends devis_cleodis {
 };
 
 class devis_cleodisbe extends devis_cleodis { };
+class devis_itrenting extends devis_cleodis { };
 
 class devis_bdomplus extends devis_cleodis {
 

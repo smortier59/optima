@@ -1206,7 +1206,7 @@ class affaire_cleodis extends affaire {
 		if(ATF::$usr->getID()){
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
-			if (ATF::$codename != "cleodis" && ATF::$codename != "cleodisbe" ) {
+			if (ATF::$codename != "cleodis" && ATF::$codename != "cleodisbe" && ATF::$codename != "itrenting" ) {
 				ATF::constante()->q->reset()->where("constante","__MAIL_SOCIETE__");
 				$mail_societe = ATF::constante()->select_row();
 				ATF::constante()->q->reset()->where("constante","__SOCIETE__");
@@ -3384,6 +3384,8 @@ class affaire_midas extends affaire_cleodis {
 };
 
 class affaire_cleodisbe extends affaire_cleodis { };
+class affaire_itrenting extends affaire_cleodis { };
+
 class affaire_cap extends affaire {
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";

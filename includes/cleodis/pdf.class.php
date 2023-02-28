@@ -11813,7 +11813,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 
 }
+class pdf_itrenting extends pdf_cleodis {
+	public $logo = __PDF_PATH__."/".'itrenting/logo.jpg';
+	public $logo_site = __PDF_PATH__."/".'itrenting/logo.jpg';
+	public $cleodis = 'IT Renting';
 
+	public $texteHT = "HT";
+	public $texteTTC = "TTC";
+	public $bgcolorTableau = "95C11F";
+	public $txtcolorTableau = "000000";
+}
 
 class pdf_midas extends pdf_cleodis {};
 

@@ -118,6 +118,7 @@ class devis_ligne_midas extends devis_ligne_cleodis {
 }
 
 class devis_ligne_cleodisbe extends devis_ligne_cleodis { };
+class devis_ligne_itrenting extends devis_ligne_cleodis { };
 class devis_ligne_cap extends devis_ligne_cleodis { };
 
 class devis_ligne_bdomplus extends devis_ligne_cleodis { };

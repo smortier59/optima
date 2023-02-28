@@ -18,6 +18,7 @@ class magasin_cleodis extends classes_optima {
 }
 
 class magasin_cleodisbe extends magasin_cleodis { };
+class magasin_itrenting extends magasin_cleodis { };
 class magasin_bdomplus extends magasin_cleodis { };
 class magasin_bdom extends magasin_cleodis { };
 class magasin_boulanger extends magasin_cleodis { };

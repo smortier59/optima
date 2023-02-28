@@ -1043,8 +1043,12 @@ class facturation extends classes_optima {
 		$prolongation=ATF::db()->sql2array($query);
 
 		foreach ($prolongation as $key=>$item) {
-			if(ATF::$codename== "cleodisbe"){
-				$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+			if (ATF::$codename== "cleodisbe") {
+    			$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+			}elseif(ATF::$codename== "assets"){
+				$objAffaire = new affaire_assets($item['id_affaire']);
+			}elseif(ATF::$codename== "itrenting"){
+				$objAffaire = new affaire_itrenting($item['id_affaire']);
 			}else{
 				$objAffaire = new affaire_cleodis($item['id_affaire']);
 			}
@@ -1369,8 +1373,12 @@ class facturation extends classes_optima {
 				//Si il n'y a pas de facture
 				if(!$facturePresente){
 					//En restitution et fin de contrat dépassée
-					if(ATF::$codename== "cleodisbe"){
+					if (ATF::$codename== "cleodisbe") {
 						$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+					} elseif(ATF::$codename== "assets"){
+						$objAffaire = new affaire_assets($item['id_affaire']);
+					} elseif(ATF::$codename== "itrenting"){
+						$objAffaire = new affaire_itrenting($item['id_affaire']);
 					}else{
 						$objAffaire = new affaire_cleodis($item['id_affaire']);
 					}
@@ -1716,6 +1724,8 @@ class facturation extends classes_optima {
 };
 
 class facturation_cleodisbe extends facturation { };
+class facturation_itrenting extends facturation { };
+
 class facturation_cap extends facturation { };
 
 class facturation_assets extends facturation {
