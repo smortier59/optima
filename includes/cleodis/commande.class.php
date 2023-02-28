@@ -458,6 +458,8 @@ class commande_cleodis extends commande {
 
 		// Mise à jour du forecast
 		if(ATF::$codename == "cleodisbe") $affaire = new affaire_cleodisbe($infos['id_affaire']);
+		elseif(ATF::$codename == "assets") $affaire = new affaire_assets($infos['id_affaire']);
+		elseif(ATF::$codename == "itrenting") $affaire = new affaire_itrenting($infos['id_affaire']);
 		elseif(ATF::$codename == "bdomplus") $affaire = new affaire_bdomplus($infos['id_affaire']);
 		else $affaire = new affaire_cleodis($infos['id_affaire']);
 
@@ -744,6 +746,8 @@ class commande_cleodis extends commande {
     */
 	public function checkAndUpdateDates($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
+		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "itrenting") $commande = new commande_itrenting($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
 		$affaire = $commande->getAffaire();
@@ -765,6 +769,8 @@ class commande_cleodis extends commande {
 			// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 			foreach ($ap as $a) {
 				if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
+				elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+				elseif(ATF::$codename == "itrenting") $affaires_parentes[] = new affaire_itrenting($a["id_affaire"]);
 				else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 
 			}
@@ -1217,6 +1223,7 @@ class commande_cleodis extends commande {
 		$this->notSingleton();
 		if(ATF::$codename == "cleodisbe") return new affaire_cleodisbe($this->infos['id_affaire']);
 		if(ATF::$codename == "assets") return new affaire_assets($this->infos['id_affaire']);
+		if(ATF::$codename == "itrenting") return new affaire_itrenting($this->infos['id_affaire']);
 		if(ATF::$codename == "bdomplus") return new affaire_bdomplus($this->infos['id_affaire']);
 		return new affaire_cleodis($this->infos['id_affaire']);
 	}
@@ -1233,6 +1240,9 @@ class commande_cleodis extends commande {
 	*/
 	public function can_delete($id,$infos=false){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($id);
+		elseif(ATF::$codename == "assets") $commande = new commande_assets($id);
+		elseif(ATF::$codename == "itrenting") $commande = new commande_itrenting($id);
+		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($id);
 		else $commande = new commande_cleodis($id);
 
 		$affaire = $commande->getAffaire();
@@ -1312,6 +1322,9 @@ class commande_cleodis extends commande {
 
 				// Mise à jour du forecast
 				if(ATF::$codename == "cleodisbe") $affaire = new affaire_cleodisbe($commande['id_affaire']);
+				elseif(ATF::$codename == "assets") $affaire = new affaire_assets($commande['id_affaire']);
+				elseif(ATF::$codename == "itrenting") $affaire = new affaire_itrenting($commande['id_affaire']);
+				elseif(ATF::$codename == "bdomplus") $affaire = new affaire_bdomplus($commande['id_affaire']);
 				else $affaire = new affaire_cleodis($commande['id_affaire']);
 				$affaire->majForecastProcess();
 
@@ -1361,6 +1374,7 @@ class commande_cleodis extends commande {
 
 					if(ATF::$codename == "cleodisbe") $a = new affaire_cleodisbe($this->get('id_affaire'));
 					elseif(ATF::$codename == "assets") $a = new affaire_assets($this->get('id_affaire'));
+					elseif(ATF::$codename == "itrenting") $a = new affaire_itrenting($this->get('id_affaire'));
 					elseif(ATF::$codename == "bdomplus") $a = new affaire_bdomplus($this->get('id_affaire'));
 					else $a = new affaire_cleodis($this->get('id_affaire'));
 
@@ -1818,6 +1832,8 @@ class commande_cleodis extends commande {
 			unset($affaires_parentes);
 
 			if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($item['id_commande']);
+			elseif(ATF::$codename == "assets") $commande = new commande_assets($item['id_commande']);
+			elseif(ATF::$codename == "itrenting") $commande = new commande_itrenting($item['id_commande']);
 			elseif(ATF::$codename == "go_abonnement") $commande = new commande_go_abonnement($item['id_commande']);
 			else $commande = new commande_cleodis($item['id_commande']);
 
@@ -1828,6 +1844,9 @@ class commande_cleodis extends commande {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
+					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "itrenting") $affaires_parentes[] = new affaire_itrenting($a["id_affaire"]);
+					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 
 				}
@@ -1903,6 +1922,7 @@ class commande_cleodis extends commande {
 	public function stopCommande($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
 		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "itrenting") $commande = new commande_itrenting($infos['id_commande']);
 		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
@@ -1940,6 +1960,7 @@ class commande_cleodis extends commande {
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
 					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "itrenting") $affaires_parentes[] = new affaire_itrenting($a["id_affaire"]);
 					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 				}
@@ -1961,6 +1982,7 @@ class commande_cleodis extends commande {
 	public function reactiveCommande($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
 		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "itrenting") $commande = new commande_itrenting($infos['id_commande']);
 		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
@@ -1989,6 +2011,7 @@ class commande_cleodis extends commande {
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
 					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "itrenting") $affaires_parentes[] = new affaire_itrenting($a["id_affaire"]);
 					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 				}

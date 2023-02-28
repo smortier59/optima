@@ -138,7 +138,6 @@ class creditsafe extends classes_optima {
      *         ErrorATF si probleme de constante
      */
     public function getInfosCompanyBySiret($siret){
-
         try {
             log::logger("-- Récuperation du token" , "creditSafe");
             $dataAuth = $this->authenticate();
@@ -159,7 +158,12 @@ class creditsafe extends classes_optima {
             if ($res->totalSize >= 1){
                 $idCreditSafe = $res->companies[0]->id;
 
-                $url = $baseurl.'/companies/'.$idCreditSafe.'?language=fr';
+                $url = $baseurl.'/companies/'.$idCreditSafe;
+
+                if ($pays === 'FR') {
+                    $url .= '?language='.$pays;
+                }
+
                 log::logger("-- Récuperation du report de la societe ".$url , "creditSafe");
                 $societeData = $this->curlCall($url, $token);
                 log::logger($societeData , "creditSafe");

@@ -349,8 +349,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
-		if(ATF::$codename == "cleodisbe"){
-			$affaire = new affaire_cleodisbe($bdc['id_affaire']);
+		if (ATF::$codename == "cleodisbe") {
+    			$affaire = new affaire_cleodisbe($bdc['id_affaire']);
+		} elseif (ATF::$codename == "assets"){
+			$affaire = new affaire_assets($bdc['id_affaire']);
+		} elseif (ATF::$codename == "itrenting"){
+			$affaire = new affaire_itrenting($bdc['id_affaire']);
 		}else{
 			$affaire = new affaire_cleodis($bdc['id_affaire']);
 		}
