@@ -488,6 +488,7 @@ class user_cleodis extends user {
 };
 
 class user_cleodisbe extends user_cleodis { };
+class user_itrenting extends user_cleodis { };
 class user_cap extends user_cleodis {
 
 	public function getFeuilles(){

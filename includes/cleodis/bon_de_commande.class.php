@@ -349,8 +349,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
-		if(ATF::$codename == "cleodisbe"){
-			$affaire = new affaire_cleodisbe($bdc['id_affaire']);
+		if (ATF::$codename == "cleodisbe") {
+    			$affaire = new affaire_cleodisbe($bdc['id_affaire']);
+		} elseif (ATF::$codename == "assets"){
+			$affaire = new affaire_assets($bdc['id_affaire']);
+		} elseif (ATF::$codename == "itrenting"){
+			$affaire = new affaire_itrenting($bdc['id_affaire']);
 		}else{
 			$affaire = new affaire_cleodis($bdc['id_affaire']);
 		}
@@ -1330,6 +1334,23 @@ class bon_de_commande_midas extends bon_de_commande_cleodis {
 	}
 };
 class bon_de_commande_cleodisbe extends bon_de_commande_cleodis {
+	function __construct() {
+		parent::__construct();
+		$this->table = "bon_de_commande";
+
+		unset($this->colonnes['fields_column']["bon_de_commande.date_livraison_estime"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_livraison_prevue"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_livraison_reelle"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_installation_prevue"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_installation_reele"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_limite_rav"] );
+
+
+		$this->fieldstructure();
+	}
+};
+
+class bon_de_commande_itrenting extends bon_de_commande_cleodis {
 	function __construct() {
 		parent::__construct();
 		$this->table = "bon_de_commande";

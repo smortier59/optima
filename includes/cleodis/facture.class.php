@@ -3643,6 +3643,7 @@ class facture_cleodis extends facture {
 };
 
 class facture_cleodisbe extends facture_cleodis { };
+class facture_itrenting extends facture_cleodis { };
 class facture_cap extends facture_cleodis { };
 
 class facture_bdomplus extends facture_cleodis {

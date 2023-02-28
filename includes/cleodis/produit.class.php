@@ -622,6 +622,8 @@ class produit_cleodis extends produit {
 
 class produit_cleodisbe extends produit_cleodis { };
 
+class produit_itrenting extends produit_cleodis { };
+
 class produit_cap extends produit {
 	// Mapping prévu pour un autocomplete sur produit
 	public static $autocompleteMapping = array(
