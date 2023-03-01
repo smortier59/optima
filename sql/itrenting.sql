@@ -17523,5 +17523,6 @@ INSERT INTO `profil_privilege` (`id_profil_privilege`, `id_profil`, `id_privileg
 (5413, 10, 10, 228, NULL),
 (5361, 10, 10, 229, NULL);
 
+ALTER TABLE `devis` CHANGE `id_filiale` `id_filiale` MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '1';
 
 COMMIT;
