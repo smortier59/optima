@@ -1606,7 +1606,10 @@ class societe_cleodis extends societe {
     $apporteur = $utilisateur["id_societe"];
 
     if($post["api"]) $api = true;
-    if(!$post["langue"]) $post["langue"] = "FR";
+    if (ATF::$codename === 'cleodis' || ATF::$codename === 'cleodisbe') {
+      if(!$post["langue"]) $post["langue"] = "FR";
+    }
+
 
     if(ATF::$codename == "cleodisbe")  $post["num_ident"] = $post["siret"];
     if(ATF::$codename == "itrenting")  $post["cif"] = $post["cif"];
@@ -1623,6 +1626,7 @@ class societe_cleodis extends societe {
         $gerants = $data["gerant"];
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
         if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
+        if (!is_float($data["cs_avis_credit"])) unset($data["cs_avis_credit"]);
         /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
                                     ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
         if(ATF::$codename === "cleodisbe"){
@@ -1630,7 +1634,12 @@ class societe_cleodis extends societe {
 
           ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string($data["num_ident"]),"OR","siret")
                                     ->where("reference_tva",$data["reference_tva"],"OR","siret");
-        }else{
+        }elseif(ATF::$codename === "itrenting"){
+          $data["CIF"] = $post["siret"];
+
+          ATF::societe()->q->reset()->where("CIF",ATF::db($this->db)->real_escape_string($data["CIF"]),"OR","siret");
+
+        }else {
           ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
         }
 
