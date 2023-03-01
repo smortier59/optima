@@ -2703,42 +2703,70 @@ class affaire_cleodis extends affaire {
 			));
 
 			$societe = ATF::societe()->select($id_societe);
-			$comite = array  (
-				"id_societe" => $id_societe,
-				"id_affaire" => $devis["id_affaire"],
-				"id_contact" => $id_contact,
-				"activite" => $societe["activite"],
-				"id_refinanceur" => 4,
-				"date_creation" => $societe["date_creation"],
-				"date_compte" => $societe["lastaccountdate"],
-				"capitaux_propres" => $societe["capitaux_propres"],
-				"note" => $societe["cs_score"],
-				"dettes_financieres" => $societe["dettes_financieres"],
-				"limite" => $societe["cs_avis_credit"],
-				"ca" => $societe["ca"],
-				"capital_social" => $societe["capital_social"],
-				"resultat_exploitation" => $societe["resultat_exploitation"],
-				"date" => date("d-m-Y"),
-				"description" => "Comite CreditSafe",
-				"suivi_notifie"=>array(0=>"")
-			);
 
-			$creation = new DateTime( $societe["date_creation"] );
-			$creation = $creation->format("Ymd");
-			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
-			$past2Years = $past2Years->format("Ymd");
+			if (ATF::$codename !== 'itrenting') {
+				$comite = array  (
+					"id_societe" => $id_societe,
+					"id_affaire" => $devis["id_affaire"],
+					"id_contact" => $id_contact,
+					"activite" => $societe["activite"],
+					"id_refinanceur" => 4,
+					"date_creation" => $societe["date_creation"],
+					"date_compte" => $societe["lastaccountdate"],
+					"capitaux_propres" => $societe["capitaux_propres"],
+					"note" => $societe["cs_score"],
+					"dettes_financieres" => $societe["dettes_financieres"],
+					"limite" => $societe["cs_avis_credit"],
+					"ca" => $societe["ca"],
+					"capital_social" => $societe["capital_social"],
+					"resultat_exploitation" => $societe["resultat_exploitation"],
+					"date" => date("d-m-Y"),
+					"description" => "Comite CreditSafe",
+					"suivi_notifie"=>array(0=>"")
+				);
 
-			if( ($societe["cs_score"] > 50 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
-				$comite["etat"] = "accepte";
-				$comite["decisionComite"] = "Accepté automatiquement";
-			}else{
-				$comite["etat"] = "refuse";
-				$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans)";
+				$creation = new DateTime( $societe["date_creation"] );
+				$creation = $creation->format("Ymd");
+				$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
+				$past2Years = $past2Years->format("Ymd");
+
+				if( ($societe["cs_score"] > 50 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
+					$comite["etat"] = "accepte";
+					$comite["decisionComite"] = "Accepté automatiquement";
+				}else{
+					$comite["etat"] = "refuse";
+					$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans)";
+				}
+
+				$comite["reponse"] = date("Y-m-d");
+				$comite["validite_accord"] = date("Y-m-d");
+
+				ATF::comite()->insert(array("comite"=>$comite));
+				if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
+					//Création du comité CLEODIS
+					$comite["description"] = "Comité CLEODIS";
+					$comite["etat"] = "en_attente";
+					$comite["reponse"] = NULL;
+					$comite["validite_accord"] = NULL;
+					ATF::comite()->insert(array("comite"=>$comite));
+				}
+
+				//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
+				if(ATF::$codename=='cleodisbe'){
+					$partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
+					$info_mail["from"] = ATF::$usr->get('contact','email');
+					$info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
+					$info_mail["html"] = false;
+					$info_mail["template"] = "devis_partenaire";
+					$info_mail["partenaire"] = $partenaire;
+					$info_mail["client"] = $societe["societe"];
+					$info_mail["url"] = __MANUAL_WEB_PATH__."accueil.html#affaire-select-".$this->cryptId($devis["id_affaire"]).".html";
+					$info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
+					$info_mail["recipient"] = "request@cleodis.com";
+					$mail = new mail($info_mail);
+					$mail->send($info_mail["recipient"]);
+				}
 			}
-
-			$comite["reponse"] = date("Y-m-d");
-			$comite["validite_accord"] = date("Y-m-d");
-
 
 			ATF::user()->q->reset()->where("nom", "delattre");
 			$users = ATF::user()->select_all();
@@ -2761,31 +2789,6 @@ class affaire_cleodis extends affaire {
 			$suivi["no_redirect"] = true;
 			ATF::suivi()->insert($suivi);
 
-			ATF::comite()->insert(array("comite"=>$comite));
-			if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
-				//Création du comité CLEODIS
-				$comite["description"] = "Comité CLEODIS";
-				$comite["etat"] = "en_attente";
-				$comite["reponse"] = NULL;
-				$comite["validite_accord"] = NULL;
-				ATF::comite()->insert(array("comite"=>$comite));
-			}
-
-			//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
-            if(ATF::$codename=='cleodisbe'){
-                $partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
-                $info_mail["from"] = ATF::$usr->get('contact','email');
-                $info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
-                $info_mail["html"] = false;
-                $info_mail["template"] = "devis_partenaire";
-                $info_mail["partenaire"] = $partenaire;
-                $info_mail["client"] = $societe["societe"];
-                $info_mail["url"] = __MANUAL_WEB_PATH__."accueil.html#affaire-select-".$this->cryptId($devis["id_affaire"]).".html";
-                $info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
-                $info_mail["recipient"] = "request@cleodis.com";
-                $mail = new mail($info_mail);
-                $mail->send($info_mail["recipient"]);
-            }
 
             $dest = array();
             if(ATF::societe()->select($id_societe , "id_owner")) $dest[] = ATF::societe()->select($id_societe , "id_owner");
