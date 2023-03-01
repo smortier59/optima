@@ -2070,6 +2070,7 @@ class souscription_boulanger extends souscription_cleodis {
 
 };
 
+class souscription_itrenting extends souscription_cleodis { };
 class souscription_assets extends souscription_cleodis { };
 
 class souscription_go_abonnement extends souscription_cleodis { };

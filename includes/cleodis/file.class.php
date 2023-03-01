@@ -79,9 +79,9 @@ class file_cleodis extends file {
 			$optima_societe = ATF::constante()->select_row();
 			ATF::constante()->q->reset()->where("constante","__EMAIL_NOTIFIE_UPLOAD_FILE_PARTENAIRE__");
 			$recipient = ATF::constante()->select_row();
-			
+
 			$from = "partenaire@cleodis.com";
-				
+
 			$mail = new mail(array(
 				"recipient"=>$recipient['valeur'],
 				"objet"=>"Nouveau(x) document(s) ajouté(s) depuis le Portail Partenaire",
@@ -101,6 +101,7 @@ class file_cleodis extends file {
 }
 
 class file_cleodisbe extends file_cleodis { }
+class file_itrenting extends file_cleodis { }
 class file_bdomplus extends file_cleodis { }
 class file_boulanger extends file_cleodis { }
 class file_assets extends file_cleodis { }

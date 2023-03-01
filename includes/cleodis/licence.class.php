@@ -102,6 +102,7 @@ class licence extends classes_optima {
 };
 class licence_midas extends licence { };
 class licence_cleodisbe extends licence { };
+class licence_itrenting extends licence { };
 class licence_cap extends licence { };
 class licence_bdomplus extends licence {
 
