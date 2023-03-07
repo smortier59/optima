@@ -3239,6 +3239,11 @@ class affaire_cleodis extends affaire {
 
 	}
 
+	public function displaySignLink($id_affaire) {
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire)->setLimit(1);
+		$commande = ATF::commande()->select_row();
+		return file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? false : true;
+	}
 
 };
 class affaire_midas extends affaire_cleodis {
