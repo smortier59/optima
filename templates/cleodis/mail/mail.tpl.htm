@@ -12,7 +12,7 @@
             </style>
         </head>
         <body>
-            
+
 
 
             <table cellspacing="0" cellpadding="0" border="0">
@@ -26,13 +26,13 @@
                             </td>
                         {/if}
                     {/if}
-                    
+
                     <tr>
                         <!--TEXTE DU TEMPLATE-->
                         <td align="left" valign="top" style="width:640px;">
                             <!--SI TEMPLATE SPECIFIQUE EXISTE-->
                             {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
-                                
+
                                 <br />{include file="mail/{$infos.template}.tpl.htm"}
                             <!--SINON PAR DEFAUT ON MET LE CONTENUE DE 'texte'-->
                             {else}
@@ -54,12 +54,18 @@
                                     {$societe=ATF::societe()->select(1)}
                                      <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}" alt="CAP Recouvrement">
                                 {else}
-                                    {$societe=ATF::societe()->select(246)}
-                                    <a href="http://cleodis.com/">
-                                        <span style="color:blue; text-decoration:none">
-                                            <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodis/cleodis_v3.png")}" alt="Cleodis">
-                                        </span>
-                                    </a>
+                                    {if ATF::$codename == "itrenting"}
+                                        {$societe=ATF::societe()->select(1)}
+                                        <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/itrenting/itrenting.png")}" alt="IT Renting">
+
+                                    {else}
+                                        {$societe=ATF::societe()->select(246)}
+                                        <a href="http://cleodis.com/">
+                                            <span style="color:blue; text-decoration:none">
+                                                <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodis/cleodis_v3.png")}" alt="Cleodis">
+                                            </span>
+                                        </a>
+                                    {/if}
                                 {/if}
                             </p>
                         </td>
