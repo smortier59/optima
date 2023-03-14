@@ -59,7 +59,7 @@ if ($data) {
                                 ATF::sell_and_sign()->u(array("id_sell_and_sign" =>  $sellAndSignData["id_sell_and_sign"], "contrat_signe" => "present"));
 
                                 log::logger("Update de la date de retour contrat sur la commande ", $log_file);
-                                ATF::commande()->u(array("id_commande" =>  $id_commande, "retour_contrat" => date("Y-m-d")));
+                                ATF::commande()->updateDate(array("id_commande" =>  $id_commande,"key" => "retour_contrat", "value" => date("Y-m-d")));
                             } else {
                                 log::logger("PDF non récupéré chez Sell and Sign", $log_file);
                             }
