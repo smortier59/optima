@@ -18,7 +18,6 @@
 				{foreach from=ATF::accueil()->getAgence() key=k item=agence}
 					var widgets_{$agence} = [
 						{foreach from=ATF::accueil()->getWidgets($agence) key=key item=item}
-
 							{
 								xtype:'panel',
 								id:'widget_{$item.module}_{$item.type}',
@@ -34,7 +33,7 @@
 										xtype: 'panel',
 										height:250,
 										border: true,
-										autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}{if $item.id_agence},id_agence={$item.id_agence}{/if}', scripts:true }
+										autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}{if $item.id_agence},id_agence={$item.id_agence}{/if}{if $item.index},index={$item.index}{/if}', scripts:true }
 									}
 								]
 
