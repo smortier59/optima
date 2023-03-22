@@ -349,63 +349,63 @@ class creditsafe extends classes_optima {
                 $seuil = 200;
 
                 $constante_seuil = ATF::constante()->getConstante("__SEUIL_ALERTE_CREDIT_SAFE__");
+                $constante_email_alerte_seuil = ATF::constante()->getConstante("__EMAIL_ALERTE_SEUIL_ALERTE_CREDIT_SAFE__");
+
                 if($constante_seuil){
                     $seuil = ATF::constante()->select($constante_seuil, "valeur");
-                    log::logger("Constante __SEUIL_ALERTE_CREDIT_SAFE__ trouvée, on prend ce seuiil : ".$seuil , "creditSafe");
-                }else{
-                    log::logger("Il n'y a pas de constante __SEUIL_ALERTE_CREDIT_SAFE__ trouvée, on prend le seuil par défaut : ".$seuil , "creditSafe");
-                }
+                    log::logger("Constante __SEUIL_ALERTE_CREDIT_SAFE__ trouvée, on prend ce seuil : ".$seuil , "creditSafe");
 
-                if( ($res->countryAccess->creditsafeConnectOnlineReports[0]->paid - $res->countryAccess->creditsafeConnectOnlineReports[0]->used) < $seuil){
-                    $send_email = true;
+                    if( ($res->countryAccess->creditsafeConnectOnlineReports[0]->paid - $res->countryAccess->creditsafeConnectOnlineReports[0]->used) < $seuil){
 
-                    // On lit le fichier déja créé pour voir si on a déja envoyé un mail depuis 48h
-                    if(file_exists($folder_stat.$fileData)){
-                        $infos = json_decode(file_get_contents($folder_stat.$fileData));
+                        $send_email = true;
 
-                        log::logger("Dernier envoi du mail d'alerte : " . $infos->dernier_envoi_mail_alerte, "creditSafe");
+                        // On lit le fichier déja créé pour voir si on a déja envoyé un mail depuis 48h
+                        if(file_exists($folder_stat.$fileData)){
+                            $infos = json_decode(file_get_contents($folder_stat.$fileData));
 
-                        if ($infos->dernier_envoi_mail_alerte
-                            && date("YmdHi", strtotime($infos->dernier_envoi_mail_alerte)) > date("YmdHi", strtotime("-2 days"))
-                        ){
-                            log::logger("Envoi d'un mail il y a moins de 2 jours, on ne renvoi pas le mail d'alerte" , "creditSafe");
-                            $send_email = false;
+                            log::logger("Dernier envoi du mail d'alerte : " . $infos->dernier_envoi_mail_alerte, "creditSafe");
+
+                            if ($infos->dernier_envoi_mail_alerte
+                                && date("YmdHi", strtotime($infos->dernier_envoi_mail_alerte)) > date("YmdHi", strtotime("-2 days"))
+                            ){
+                                log::logger("Envoi d'un mail il y a moins de 2 jours, on ne renvoi pas le mail d'alerte" , "creditSafe");
+                                $send_email = false;
+                            }
                         }
+
+                        // Si pas de champs ou date envoi du precedent mail > 48h on envoi le mail d'avertissement
+                        if ($send_email && $constante_email_alerte_seuil){
+                            $constante_email_alerte_seuil = ATF::constante()->select($constante_email_alerte_seuil, "valeur");
+
+                            $data["dernier_envoi_mail_alerte"] = date("d-m-Y H:i");
+
+                            $mail = new mail(
+                                array(
+                                    "recipient"=>$constante_email_alerte_seuil,
+                                    "objet"=>"Solde Ticket Credit Safe critique",
+                                    "template"=>"empty",
+                                    "texte" => "Votre solde de crédit ticket Credit Safe a atteint un seuil critique ".
+                                                (
+                                                    $res->countryAccess->creditsafeConnectOnlineReports[0]->paid
+                                                    - $res->countryAccess->creditsafeConnectOnlineReports[0]->used
+                                                )
+                                                ." crédits restant.",
+                                    "html"=>true,
+                                    "from"=>"noreply@cleodis.com"
+                                )
+                            );
+                            $mail->send();
+                            log::logger("Seuil crédit restant atteint, et envoi du mail", "creditSafe");
+                        }
+
+
                     }
-
-                    // Si pas de champs ou date envoi du precedent mail > 48h on envoi le mail d'avertissement
-                    if ($send_email){
-                        $data["dernier_envoi_mail_alerte"] = date("d-m-Y H:i");
-
-
-
-                        $mail = new mail(
-                            array(
-                                "recipient"=>"jerome.loison@cleodis.com",
-								"objet"=>"Solde Ticket Credit Safe critique",
-								"template"=>"empty",
-                                "texte" => "Votre solde de crédit ticket Credit Safe a atteint un seuil critique ".
-                                            (
-                                                $res->countryAccess->creditsafeConnectOnlineReports[0]->paid
-                                                - $res->countryAccess->creditsafeConnectOnlineReports[0]->used
-                                            )
-                                            ." crédits restant.",
-                                "html"=>true,
-								"from"=>"noreply@cleodis.com"
-                            )
-                        );
-		                $mail->send();
-                        log::logger("Seuil crédit restant atteint, et envoi du mail", "creditSafe");
-                    }
-
-
+                } else {
+                    log::logger("Pas de constante __SEUIL_ALERTE_CREDIT_SAFE__ && __EMAIL_ALERTE_SEUIL_ALERTE_CREDIT_SAFE__ trouvée, pour ".ATF::$codename.", on n'envoi pas de mail d'alerte" , "creditSafe");
                 }
 
                 $data["date_interogation"] = date("d-m-Y H:i");
                 $data["data"] = $res->countryAccess->creditsafeConnectOnlineReports;
-
-
-
 
                 file_put_contents($folder_stat.$fileData, json_encode($data, JSON_PRETTY_PRINT));
             } else {

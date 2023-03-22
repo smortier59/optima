@@ -5,12 +5,14 @@
 
 {$infos = ATF::accueil()->type_agence(ATF::_g(type))}
 {$id_agence = $infos.id_agence}
-
+{$index = $infos.index}
+{if !$index}{$index=0}{/if}
+{$data = ATF::creditsafe()->getSolde(false)}
 
 <div id="creditsafe_graphe_{$infos.type}_{$id_agence}" class="widget"></div>
 
     <script type="text/javascript">
-        {$data = ATF::creditsafe()->getSolde(false)}
+
 
         Ext.onReady(function(){
             var chart = new Highcharts.Chart({
@@ -25,7 +27,7 @@
                         "#02FF0F"
                     ],
                     title: {
-                        text: "{$data[0]["title"]}"
+                        text: "{$data[$index]['title']}"
                         ,style :{
                             fontSize: '12px'
                         }
@@ -46,15 +48,14 @@
                     },
                     series: [{
                         type: 'pie',
-                        name: "{$data[0]["serie"]}",
+                        name: "{$data[$index]['serie']}",
                         data: [
-                            ['Utilisé',  {$data[0]["utilise"]} ],
-                            ['Restant',  {$data[0]["restant"]} ]
+                            ['Utilisé',  {$data[$index]['utilise']} ],
+                            ['Restant',  {$data[$index]['restant']} ]
                         ]
                     }]
                 });
         });
     </script>
-
 
 {/strip}
