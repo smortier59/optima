@@ -94,7 +94,6 @@ class societe_cleodis extends societe {
       ));
 
       $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
-
     }
 
 
@@ -114,12 +113,9 @@ class societe_cleodis extends societe {
     $this->panels['particulier_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
 
 
-
-
     foreach ($panel as $key => $value) {
       $this->colonnes['panel'][$key] = $value;
     }
-
 
     $this->colonnes['panel']['fidelite'] = array(
       'num_carte_fidelite',
@@ -176,6 +172,11 @@ class societe_cleodis extends societe {
     $this->colonnes['panel']["coordonnees_supplementaires_fs"]["adresse_siege_social"]=array("xtype"=>"textarea");
 
     $this->colonnes['panel']['adresse_complete_fs']["id_contact_signataire"]=array("xtype"=>"int","numberfield"=>8);
+
+    if (ATF::$codename === "itrenting") {
+      $this->colonnes['panel']['adresse_complete_fs']['cp_ville']["fields"][] = "province";
+      $this->colonnes['panel']['adresse_facturation_complete_fs']["facturation_cp_ville"]["fields"][] = "facturation_province";
+    }
 
     // Portail
     $this->colonnes['panel']['portail_fs'] = array(
@@ -719,6 +720,7 @@ class societe_cleodis extends societe {
 
     // Vérification qu'il n'existe aucun autre parc d'existence active avec le même serial
     $this->infoCollapse($infos);
+    log::logger($infos , "mfleurquin");
 
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
