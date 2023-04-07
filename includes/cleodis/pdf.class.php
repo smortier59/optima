@@ -2812,7 +2812,6 @@ class pdf_cleodis extends pdf {
 		}
 		$this->ln(3);
 
-
 		if ($this->affaire['nature']=="vente") {
 		  $this->setfont('arial','B',8);
 		  $this->multicell(0,5,"ARTICLE 2 : PRIX DE VENTE");
@@ -2895,7 +2894,6 @@ class pdf_cleodis extends pdf {
 		  }
 		  $numArticle = 4;
 		}
-
 
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
@@ -2992,7 +2990,390 @@ class pdf_cleodis extends pdf {
 		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 		}
 
-	 }
+	}
+
+	public function contrat_simple_fuxA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE FLUX");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simple/CG_SimpelFlux.pdf",
+			"cleodis/annexe_simple/Annexe1_SimpelFlux.pdf",
+			"cleodis/annexe_simple/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simple/Annexe4_SimpelFlux.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simple_fuxA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE FLUX");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simple/CG_SimpelFlux.pdf",
+			"cleodis/annexe_simple/Annexe1_SimpelFlux.pdf",
+			"cleodis/annexe_simple/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simple/Annexe4_SimpelFlux.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simple_startA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE START");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simple/CG_SimpelStart.pdf",
+			"cleodis/annexe_simple/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simple/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simple/Annexe4_SimpelStart.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simple_startA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE START");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simple/CG_SimpelStart.pdf",
+			"cleodis/annexe_simple/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simple/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simple/Annexe4_SimpelStart.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+  	function contrat_simple_A4($id, $signature,$sellsign, $titleContrat) {
+
+		$this->initLogo($this->affaire["id_type_affaire"]);
+		$this->image($this->logo,10,10,40);
+
+		$this->sety(10);
+		$this->multicell(0,5,"Le Prestataire",0,'C');
+		$this->setLeftMargin(65);
+		$this->setfont('arial','B',7);
+		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
+		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
+		if($this->societe['id_pays'] =='FR'){
+			$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+		}else{
+			$this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
+		}
+		$this->setLeftMargin(15);
+		$this->ln(5);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,6,"Le Partenaire",0,'C');
+		$this->setLeftMargin(65);
+		$this->setfont('arial','B',7);
+		$this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
+		$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
+		$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
+
+
+		if($this->client['id_pays'] =='FR'){
+			$this->multicell(0,3,"SIRET : ".$this->client['siret']." Tél : ".$this->client['tel'],0);
+		}else{
+			$this->multicell(0,3,"NUMERO DE TVA : ".($this->client['siret']?$this->client['siret']:"-")." Tél : ".$this->client['tel'],0);
+		}
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(0,60,220,60);
+		$this->setLeftMargin(15);
+		$this->setfont('arial','B',10);
+		$this->setY(62);
+
+		if($this->affaire["nature"]=="avenant"){
+			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU Contrat Partenariat N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat partenariat n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
+			$this->ln(5);
+		}else{
+			if($this->devis["type_contrat"] == "presta"){
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat Partenariat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+			}else{
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat Partenariat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+
+			}
+			if($this->lignes && $this->affaire["nature"]=="AR"){
+				foreach($this->AR as $k=>$i){
+				$affaire=ATF::affaire()->select($i['id_affaire']);
+				$ref_ar .=" ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref'])." (".$affaire["affaire"]."), ";
+				}
+				$this->ln(2);
+				$this->setfont('arial','BI',7.5);
+				$this->multicell(0,2,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
+			} else {
+				$this->ln(5);
+			}
+	  	}
+
+		$this->ln(5);
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(0,73,220,73);
+
+		$this->setxy(15,75);
+		$this->SetDrawColor(0,0,0);
+		$this->SetLineWidth(0.2);
+
+
+		$titre = "ARTICLE 1 : OBJET DU CONTRAT";
+
+		$this->setfont('arial','B',8);
+		$this->cell(0,5,$titre,0,1);
+		$this->setfont('arial','B',12);
+		$this->multicell(0,4,$titleContrat,0,'C');
+		$this->ln(5);
+
+		$w = array(20,30,30,105);
+
+		$eq = "EQUIPEMENT(S)";
+
+		if ($this->lignes) {
+			$this->setFillColor(239,239,239);
+			// Groupe les lignes par affaire
+			$lignes=$this->groupByAffaire($this->lignes);
+			// Flag pour savoir si le tableau part en annexe ou pas
+			foreach ($lignes as $k => $i) {
+			$this->setfont('arial','B',10);
+			if (!$k) {
+				if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
+				else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
+
+			} else {
+				$affaire_provenance=ATF::affaire()->select($k);
+				if($this->affaire["nature"]=="avenant"){
+				$title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				}elseif($this->affaire["nature"]=="AR"){
+				$title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				}elseif($this->affaire["nature"]=="vente"){
+				$title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				}
+			}
+			unset($data,$st);
+			foreach ($i as $k_ => $i_) {
+				$produit = ATF::produit()->select($i_['id_produit']);
+				$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
+				$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
+				//On prépare le détail de la ligne
+				$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+				//$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
+				//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+
+				$etat = "( NEUF )";
+				if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
+				if($i_["neuf"] == "non"){
+					$etat = "( OCCASION )";
+				}
+				}
+
+				if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+				//Si c'est une prestation, on affiche pas l'etat
+				if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
+
+				if ($details == "") unset($details);
+				$data[] = array(
+				round($i_['quantite'])
+				,$ssCat
+				,$fab
+				,$i_['produit'].$etat
+				,"details"=>$details
+				);
+
+
+
+				$st[] = array(
+				($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
+				,($details?$this->colsProduitAvecDetail:$this->colsProduit)
+				,($details?$this->colsProduitAvecDetail:$this->colsProduit)
+
+				,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
+				,"details"=>$this->styleDetailsProduit
+				);
+
+			}
+
+			$tableau[$k] = array(
+				"head"=>$head
+				,"data"=>$data
+				,"w"=>$w
+				,"styles"=>$st
+				,"title"=>$title
+			);
+			}
+			unset($data,$st);
+			$h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
+			foreach ($tableau as $k=>$i) {
+			if ($i['head']) $h += 5;
+			$h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+
+			foreach ($tableau as $k=>$i) {
+			$this->setFillColor(239,239,239);
+			$this->setfont('arial','B',10);
+			$this->multicell(0,5,$i['title'],1,'C',1);
+			$this->setfont('arial','',8);
+			if ($h>$this->heightLimitTableContratA4 || $this->commande["clause_logicielle"]=="oui") {
+				$this->multicellAnnexe();
+				$annexes[$k] = $i;
+			} else {
+				$this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+			}
+		}
+		$this->ln(3);
+
+		//$this->sety(167);
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"ARTICLE 2 : DUREE");
+
+		$this->setfont('arial','B',10);
+		$duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
+		$this->setfont('arial','',8);
+		$this->multicell(0,3,"La durée de l'abonnement est fixée à ".$duree." mois.");
+
+		$this->ln(2);
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"ARTICLE 3 : LOYERS");
+		$this->setfont('arial','',7);
+		$this->setfont('arial','',8);
+		if ($this->affaire['nature']=="avenant"){
+			$this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
+		}else{
+			$this->multicell(0,3,"Ils sont payables terme à échoir par Prélèvement automatique et sont fixe et non révisables.");
+		}
+		if($duree){
+		$donnee = array();
+		$head = array("Nombre de Loyers","Périodicité","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
+		foreach ($this->loyer as $k=>$i) {
+			$data[] = array(
+			$i['duree']
+			,strtoupper($i['frequence_loyer'])
+			,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
+			,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])*$this->commande["tva"]),2,"."," ")." €"
+			);
+		}
+		$this->SetLineWidth(0.20);
+		$this->ln(3);
+		$this->tableau($head,$data,180,5);
+		}
+
+		$numArticle = 4;
+
+
+	  $this->setfont('arial','B',8);
+	  $this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
+	  $numArticle++;
+	  $this->setfont('arial','',8);
+	  $this->cell(0,6,"La présente proposition ne deviendra une offre ferme qu'après acceptation du Comité des Agréments de CLEODIS.",0,1);
+
+	  $this->setY(219);
+	  $this->line(0,$this->gety(),238,$this->gety());
+	  $this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
+	  $this->setfont('arial','B',10);
+	  if(!$sellsign){
+		$this->multicell(0,5,"Fait en trois exemplaires",0,'C');
+	  }
+
+	  $this->SetDrawColor(0,0,0);
+	  $this->SetTextColor(0,0,0);
+
+	  $this->setfont('arial','',9);
+
+	  $this->setFillColor(255,255,0);
+
+
+
+
+	  $cadre = array(
+		  "Fait à : "
+		  ,"Le : "
+		  ,"Nom : "
+		  ,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
+	  );
+
+
+
+	  $y = $this->gety()+2;
+	  $t = "Le Partenaire";
+
+	  $this->cadre(20,$y,80,48,$cadre,$t);
+
+	  $cadre = array(
+		  "Fait à : "
+		  ,"Le : "
+		  ,"Nom : "
+		  ,"Qualité : "
+		  ,"Signature et cachet commercial : "
+	  );
+
+	  $this->cadre(110,$y,80,48,$cadre,"Le Prestataire");
+  	}
 
 	/** Génère un Procès verbal
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -5879,133 +6260,6 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',8);
 		$this->cell(0,3,"Montant total des factures envoyées : ".number_format($total,2, ',', ' ')." €",0,1);
 	}
-	/*
-	function facturation_grille_client_non_facture($non_facturer) {
-
-		$this->open();
-		$this->addpage();
-
-		$this->setfont('arial','B',10);
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
-
-
-		$this->setxy(100,10);
-		$this->cell(0,5,"GRILLE DE FACTURATION DES FACTURES NON ENVOYÉES",0,1,'L');
-
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,60,220,60);
-		$this->setLeftMargin(10);
-		$this->sety(62);
-		$this->setfont('arial','B',10);
-
-		$date_debut = date("Y-m-d",mktime(0,0,0,date("m"),01,date("Y")));
-		$date_debut=date("Y-m-d",strtotime($date_debut."+1 month"));
-		$date_fin=date("Y-m-d",strtotime($date_debut."+1 month"));
-		$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
-
-		$this->cell(0,3,"Grille de facturation pour la période du ".utf8_decode($GLOBALS['classes']['main']->date_translator($date_debut,true))." au ".utf8_decode($GLOBALS['classes']['main']->date_translator($date_fin,true)));
-
-		$this->sety(70);
-
-		$this->setfont('arial','',8);
-		$this->cell(0,3,"Liste des factures n'ayant pas été envoyées (".count($non_facturer).") dont ".$non_facturer[0]['nfc']." contrats et ".$non_facturer[0]['nfp']." prolongations.",0,1);
-
-		$this->sety(75);
-		$this->setdrawcolor(0,0,0);
-		$this->SetLineWidth(0.2);
-
-		$this->cell(50,10,"SOCIETE",1,0,'C');
-		$this->cell(15,10,"AFFAIRE",1,0,'C');
-
-		$x = $this->getx();
-		$this->cell(15,5,"DATE",'TRL',0,'C');
-		$this->setxy($x,$this->gety()+5);
-		$this->cell(15,5,"DEBUT",'BRL',0,'C');
-		$this->setxy($this->getx(),$this->gety()-5);
-
-		$x = $this->getx();
-		$this->cell(15,5,"DATE",'TRL',0,'C');
-		$this->setxy($x,$this->gety()+5);
-		$this->cell(15,5,"FIN",'BRL',0,'C');
-		$this->setxy($this->getx(),$this->gety()-5);
-
-		$x = $this->getx();
-		$this->cell(15,5,"MONTANT",'TRL',0,'C');
-		$this->setxy($x,$this->gety()+5);
-		$this->cell(15,5,"".$this->texteHT,'BRL',0,'C');
-		$this->setxy($this->getx(),$this->gety()-5);
-
-		$this->cell(15,10,"TYPE",1,0,'C');
-		$this->cell(65,10,"RAISON",1,1,'C');
-
-		$this->setfont('arial','',6);
-
-		$montant_total=0;
-
-		foreach ($non_facturer as $key => $item) {
-			$this->cell(50,5,ATF::societe()->nom($item["id_societe"]),1,0,'C');
-			$this->cell(15,5,$GLOBALS['classes']['affaire']->select($item["id_affaire"],"ref"),1,0,'C');
-			$this->cell(15,5,date("d/m/Y",strtotime($item["date"])),1,0,'C');
-			$this->cell(15,5,date("d/m/Y",strtotime($item["date_fin"])),1,0,'C');
-			$this->cell(15,5,number_format($item["montant"],2, ',', ' ')." €",1,0,'C');
-			$this->cell(15,5,$item["type"],1,0,'C');
-
-			if($item["cause"]=="an"){
-				$societe=ATF::societe()->select($item["id_societe"]);
-				$this->cell(65,5,"Pas de mail pour le contact ".ATF::contact()->nom($societe["id_contact_facturation"]),1,1,'C');
-			}elseif($item["cause"]=="pc"){
-				$this->cell(65,5,"Pas de contact de facturation pour cette société",1,1,'C');
-			}elseif($item["cause"]=="pi"){
-				$this->cell(65,5,"Problème lors de l'insertion de la facture",1,1,'C');
-			}
-			$montant_total+=$item["montant"];
-		}
-
-		$this->ln(5);
-
-		$this->setfont('arial','',8);
-		$this->cell(0,3,"Montant total des factures non envoyées : ".number_format($montant_total,2, ',', ' ')." €",0,1);
-	}
-	*/
-
-
-	// POUR LES FACTURATON FOURNISSEUR
-	/*function grille_BDCSociete($bdcSociete,$s) {
-		$this->grille_client_bon_de_commande($bdcSociete,$s);
-	}
-
-	function grille_BDCCode($bdcCode,$s) {
-		$this->grille_client_bon_de_commande($bdcCode,$s);
-	}
-
-	function grille_BDCDate($bdcDate,$s) {
-		$this->grille_client_bon_de_commande($bdcDate,$s);
-	}
-
-	function grille_client_bon_de_commande($bdc,$s) {
-
-
-
-		$this->tMargin = 30;
-		//$this->logo = 'cleodis/logo.jpg';
-		$this->grille_client = true;
-		$this->open();
-		$this->addpage();
-		$this->setfont('arial','B',15);
-
-		$this->sety(10);
-
-		$titre="GRILLE DE FACTURATION FOURNISSEUR";
-		$this->multicell(0,10,$titre,0,'C');
-
-
-	}*/
-
-
-
-
 
 
 	public function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
@@ -7057,18 +7311,18 @@ class pdf_cleodis extends pdf {
 
 		$this->setfont('arial',"I",7);
 		$textLeft = "En signant ce formulaire de mandat, vous autorisez (A) le créancier à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions du créancier.
-	Vous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. Une demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte pour un prélèvement autorisé. Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.
+		Vous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. Une demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte pour un prélèvement autorisé. Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.
 
-	Le présent mandat est donné pour le débiteur en référence, il sera utilisable pour les contrats conclus avec celui-ci et aux termes desquels le débiteur donne autorisation de paiement en utilisant le présent mandat.";
+		Le présent mandat est donné pour le débiteur en référence, il sera utilisable pour les contrats conclus avec celui-ci et aux termes desquels le débiteur donne autorisation de paiement en utilisant le présent mandat.";
 
-			$textRight = "Les informations contenues dans le présent mandat, qui doit être complété, sont destinées à n'être utilisées par le créancier que pour la gestion de sa relation avec son client. Elles pourront donner lieu à l'exercice, par ce dernier, de ses droits d'opposition, d’accès et de rectification tels que prévus aux articles 38 et suivants de la Loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés.
+				$textRight = "Les informations contenues dans le présent mandat, qui doit être complété, sont destinées à n'être utilisées par le créancier que pour la gestion de sa relation avec son client. Elles pourront donner lieu à l'exercice, par ce dernier, de ses droits d'opposition, d’accès et de rectification tels que prévus aux articles 38 et suivants de la Loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés.
 
-	En signant ce mandat le débiteur, par dérogation à la règle de pré-notification de 14 jours, déclare que le délai de pré notification des prélèvements par le créancier est fixé à 2 jours avant la date d’échéance du prélèvement.
+		En signant ce mandat le débiteur, par dérogation à la règle de pré-notification de 14 jours, déclare que le délai de pré notification des prélèvements par le créancier est fixé à 2 jours avant la date d’échéance du prélèvement.
 
-	Nonobstant toute indication contraire, le mandat de prélèvement signé par le client est constitutif d'une autorisation
-	de prélèvement nationale jusqu'au 1er février 2014 sauf à ce que le créancier ait informé le client du traitement du mandat sous la norme SEPA.
+		Nonobstant toute indication contraire, le mandat de prélèvement signé par le client est constitutif d'une autorisation
+		de prélèvement nationale jusqu'au 1er février 2014 sauf à ce que le créancier ait informé le client du traitement du mandat sous la norme SEPA.
 
-	Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorrects ou manquants.";
+		Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorrects ou manquants.";
 
 		$y = $this->getY();
 		$this->multicell(90,3, $textLeft ,0, "J");
