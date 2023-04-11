@@ -636,11 +636,6 @@ class pdf_absystech extends pdf {
 		}
 	}
 
-	// Retourne TRUE si on ne doit pas signer avec le nom/prenom
-	public function nePasSignerMonNom($id_user) {
-		return in_array(ATF::user()->select($id_user,'login'),array("aduquesne","rviseux","psorriaux","ppersyn"));
-	}
-
 	public function devis_normal($id){
 		$infos_devis = ATF::devis()->select($id);
 		ATF::devis_ligne()->q->reset()->addCondition("id_devis",ATF::devis()->decryptId($id),"AND")->addCondition('visible',"oui")->addOrder("id_devis_ligne","asc")->end();
@@ -819,11 +814,8 @@ class pdf_absystech extends pdf {
 		$this->ln(5);
 		$this->setx(15);
 		$this->multicell(0,5,ATF::politesse()->nom($infos_devis['id_politesse_post']));
-		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
-			$this->multicell(0,5,"",0,'R');
-		} else {
-			$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
-		}
+		$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+
 
 		$this->pied($infos_societe);
 
@@ -855,11 +847,8 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT COMMERCIAL :",0,1);
 		$this->setfont('arial','',10);
-		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
-			$this->cell(0,5,"",0,1);
-		} else {
-			$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
-		}
+		$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+
 		$this->ln(5);
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT TECHNIQUE :",0,1);
@@ -972,17 +961,15 @@ class pdf_absystech extends pdf {
 						}
 					}else{
 						if($total <= 7500){
-							$coeffCleodis = 0.0310;
+							$coeffCleodis = 0.03151;
 						}elseif($total <= 15000){
-							$coeffCleodis = 0.0300;
+							$coeffCleodis = 0.03137;
 						}elseif($total <= 30000){
-							$coeffCleodis = 0.0290;
+							$coeffCleodis = 0.03128;
 						}elseif($total > 30000){
-							$coeffCleodis = 0.0280;
+							$coeffCleodis = 0.03118;
 						}
 					}
-
-
 
 
 					$total = ($total*$coeffCleodis);
