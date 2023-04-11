@@ -1,7 +1,3 @@
-INSERT INTO `type_affaire` (`id_type_affaire`, `type_affaire`, `libelle_pdf`, `devis_template`, `contrat_template`, `assurance_sans_tva`)
-VALUES
-(NULL, 'SIMPLE FLUX', 'Cléodis', 'devis', 'contrat_simple_fux', 'non'),
-(NULL, 'SIMPLE START', 'Cléodis', 'devis', 'contrat_simple_start', 'non');
 -- Panier et affaire de vente depuis tunnel/api
     -- PASSAGE des loyer produit a 4 chiffres (max 9999,99)
 ALTER TABLE `produit` CHANGE `loyer` `loyer` FLOAT(7,3) NULL DEFAULT NULL;
@@ -18,3 +14,7 @@ ALTER TABLE `commande_ligne` CHANGE `loyer` `loyer` FLOAT(7,3) NULL DEFAULT NULL
     -- Affaire de vente
 ALTER TABLE `panier` ADD `nature` ENUM('location','vente') NOT NULL DEFAULT 'location' AFTER `date`;
 ALTER TABLE `produit` ADD `prix_vente` FLOAT(8,2) NULL DEFAULT NULL AFTER `support`;
+INSERT INTO `type_affaire` (`id_type_affaire`, `type_affaire`, `libelle_pdf`, `devis_template`, `contrat_template`, `assurance_sans_tva`)
+VALUES
+(NULL, 'SIMPLE FLUX', 'Cléodis', 'devis', 'contrat_simpel_fux', 'non'),
+(NULL, 'SIMPLE START', 'Cléodis', 'devis', 'contrat_simpel_start', 'non');

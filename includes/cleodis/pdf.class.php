@@ -2992,8 +2992,8 @@ class pdf_cleodis extends pdf {
 
 	}
 
-	public function contrat_simple_fuxA4Societe($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE FLUX");
+	public function contrat_simpel_fluxA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL FLUX");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
@@ -3001,10 +3001,10 @@ class pdf_cleodis extends pdf {
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelFlux.pdf"
+			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3020,8 +3020,8 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function contrat_simple_fuxA4Particulier($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE FLUX");
+	public function contrat_simpel_fluxA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL FLUX");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
@@ -3029,10 +3029,10 @@ class pdf_cleodis extends pdf {
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelFlux.pdf"
+			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3048,8 +3048,8 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function contrat_simple_startA4Societe($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE START");
+	public function contrat_simpel_startA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
@@ -3057,10 +3057,10 @@ class pdf_cleodis extends pdf {
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelStart.pdf"
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3076,8 +3076,8 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function contrat_simple_startA4Particulier($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE START");
+	public function contrat_simpel_startA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
@@ -3085,10 +3085,10 @@ class pdf_cleodis extends pdf {
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelStart.pdf"
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3104,7 +3104,7 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-  	function contrat_simple_A4($id, $signature,$sellsign, $titleContrat) {
+  	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat) {
 
 		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->image($this->logo,10,10,40);
