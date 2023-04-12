@@ -16,5 +16,5 @@ ALTER TABLE `panier` ADD `nature` ENUM('location','vente') NOT NULL DEFAULT 'loc
 ALTER TABLE `produit` ADD `prix_vente` FLOAT(8,2) NULL DEFAULT NULL AFTER `support`;
 INSERT INTO `type_affaire` (`id_type_affaire`, `type_affaire`, `libelle_pdf`, `devis_template`, `contrat_template`, `assurance_sans_tva`)
 VALUES
-(NULL, 'SIMPLE FLUX', 'Cléodis', 'devis', 'contrat_simpel_fux', 'non'),
-(NULL, 'SIMPLE START', 'Cléodis', 'devis', 'contrat_simpel_start', 'non');
+(NULL, 'SIMPEL FLUX', 'Cléodis', 'devis', 'contrat_simpel_flux', 'non'),
+(NULL, 'SIMPEL START', 'Cléodis', 'devis', 'contrat_simpel_start', 'non');
