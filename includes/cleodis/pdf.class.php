@@ -2992,19 +2992,20 @@ class pdf_cleodis extends pdf {
 
 	}
 
-	public function contrat_simple_fuxA4Societe($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE FLUX");
+	public function contrat_simpel_fluxA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL FLUX");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelFlux.pdf"
+			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3020,19 +3021,20 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function contrat_simple_fuxA4Particulier($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE FLUX");
+	public function contrat_simpel_fluxA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL FLUX");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelFlux.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelFlux.pdf"
+			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3048,19 +3050,20 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function contrat_simple_startA4Societe($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE START");
+	public function contrat_simpel_startA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelStart.pdf"
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3071,24 +3074,26 @@ class pdf_cleodis extends pdf {
 
 				// add a page
 				$this->AddPage();
+				$this->unsetHeader();
 				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 			}
 		}
 	}
 
-	public function contrat_simple_startA4Particulier($id, $signature,$sellsign) {
-		$this->contrat_simple_A4($id, $signature, $sellsign, "SIMPLE START");
+	public function contrat_simpel_startA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
 		$this->unsetHeader();
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"cleodis/annexe_simple/CG_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe23_SimpelStart.pdf",
-			"cleodis/annexe_simple/Annexe4_SimpelStart.pdf"
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3098,13 +3103,14 @@ class pdf_cleodis extends pdf {
 				$tplIdx = $this->importPage($pageNo);
 
 				// add a page
+				$this->unsetHeader();
 				$this->AddPage();
 				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 			}
 		}
 	}
 
-  	function contrat_simple_A4($id, $signature,$sellsign, $titleContrat) {
+  	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat) {
 
 		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->image($this->logo,10,10,40);
@@ -3373,6 +3379,10 @@ class pdf_cleodis extends pdf {
 	  );
 
 	  $this->cadre(110,$y,80,48,$cadre,"Le Prestataire");
+
+	  if ($annexes) {
+		$this->annexes($annexes);
+	  }
   	}
 
 	/** Génère un Procès verbal
@@ -7307,8 +7317,6 @@ class pdf_cleodis extends pdf {
 			$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
 		}
 
-
-
 		$this->setfont('arial',"I",7);
 		$textLeft = "En signant ce formulaire de mandat, vous autorisez (A) le créancier à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions du créancier.
 		Vous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. Une demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte pour un prélèvement autorisé. Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.
@@ -7356,17 +7364,15 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5, "PAYS*       ".strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0, "L");
 		$this->multicell(0,5, "E-mail       ".$this->client["email"] ,0, "L");
 
-		$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
-
-
+		$this->multicell(0,5, "SIREN / SIRET       ".$this->client['siret'] ,0, "L");
 
 		$this->Ln(5);
 		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
 		$this->setfont('arial',"",8);
 		$this->Ln(2);
-		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
-		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
+		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$this->client["IBAN"] ,0, "L");
+		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$this->client["BIC"] ,0, "L");
 
 
 		$this->Ln(5);
