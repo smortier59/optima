@@ -416,7 +416,7 @@ class facture_cleodis extends facture {
 			$facture=$this->select($id);
 
 			ATF::db($this->db)->begin_transaction();
-	//*****************************Transaction********************************
+			//*****************************Transaction********************************
 
 			ATF::facturation()->q->reset()->addCondition("id_facture",$facture["id_facture"])
 										  ->setDimension("row");
@@ -446,7 +446,7 @@ class facture_cleodis extends facture {
 
 
 			ATF::db($this->db)->commit_transaction();
-	//*****************************************************************************
+			//*****************************************************************************
 			ATF::affaire()->redirection("select",$facture["id_affaire"]);
 
 			return true;
@@ -848,23 +848,26 @@ class facture_cleodis extends facture {
 			throw new errorATF("Il faut un prix pour la facture",351);
 		}
 
-
-		if($infos["tva"] == "1.196"){
-			$infos["tva"]= "1.2";
-		}
-
 		if (ATF::$codename == "bdomplus" || ATF::$codename == "boulanger" || ATF::$codename == "go_abonnement") {
 			$infos["ref_externe"] = $this->getRefExterne();
 		}
 
-
 		ATF::db($this->db)->begin_transaction();
 
-	//*****************************Transaction********************************
+		//*****************************Transaction********************************
 
 		////////////////Affaire
 		ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"],"etat"=>"facture"));
 
+		if ($infos["type_facture"] === 'libre' && ($infos["type_libre"] == "liberatoire" || $infos["nature"] == "liberatoire")){
+			// On passe le parc en vendu
+			ATF::parc()->q->reset()->where("existence", "actif")->where("id_affaire", $infos["id_affaire"]);
+			$parcs = ATF::parc()->sa();
+
+			foreach ($parcs as $k => $v) {
+				ATF::parc()->u(array("id_parc" => $v["id_parc"], "existence" => "inactif", "etat" => "vendu"));
+			}
+		}
 
 		if(!$commande["mise_en_place"]){
 			ATF::commande()->u(array("id_commande"=> $infos["id_commande"] , "mise_en_place" => date("Y-m-d")));
@@ -921,7 +924,7 @@ class facture_cleodis extends facture {
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente);
 		}
 
-	//*****************************************************************************
+		//*****************************************************************************
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
