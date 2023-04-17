@@ -494,7 +494,7 @@ class devis_cleodis extends devis {
 
 		if(ATF::$codename === 'cleodis' && $societe['id_famille'] != 9 && $infos["type_contrat"]!=="vente" && !$infos_avenant){
 			//17492 - Frais de dossiers et frais de cession SGEF et BNP - ajouter en produits non visibles
-			$produitSGEFBNP = array('REFI-CESSION-SGEF' ,'REFI-CESSION-BNP', 'REFI-ETUDE-SGEF', 'REFI-ETUDE-BNP');
+			$produitSGEFBNP = array('REFI-CESSION-SGEF' ,'REFI-CESSION-BNP', 'REFI-ETUDE-SGEF', 'REFI-ETUDE-BNP', 'REFI-ETUDE-LIXX');
 		}else{
 			$produitSGEFBNP = array();
 		}
