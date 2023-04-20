@@ -1061,7 +1061,7 @@ class affaire_cleodis extends affaire {
 		}
 
 		$f = new Financial;
-		$freq = array("mois"=>12,"trimestre"=>4,"semestre"=>2,"an"=>1);
+		$freq = array("jour"=>365,"mois"=>12,"trimestre"=>4,"semestre"=>2,"an"=>1);
 		$vr2 = $vr;
 		foreach ($loyers as $i => $loyer) {
 			if ($pv) {
