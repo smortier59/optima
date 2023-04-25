@@ -983,6 +983,9 @@ class facture_cleodis extends facture {
 			unset($post['schema']);
 			$facture = $post;
 
+			if ($facture["mode_paiement"] === "remboursement" && $facture["prix_libre"] > 0) {
+				$facture["prix_libre"] = $facture["prix_libre"] * -1;
+			}
 
 			$affaire = ATF::affaire()->select($post["id_affaire"]);
 			if(!$affaire['id_societe']) {
