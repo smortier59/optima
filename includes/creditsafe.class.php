@@ -233,8 +233,8 @@ class creditsafe extends classes_optima {
 		$return['adresse'] = $basicInfo->contactAddress->street;
         $return['tel'] = str_replace(" ","",$data->report->contactInformation->mainAddress->telephone);
         $return['fax'] = str_replace(" ", "", $data->report->additionalInformation->misc->faxNumber);
-		$return['cp'] = $basicInfo->contactAddress->postalCode;
-		$return['ville'] = $basicInfo->contactAddress->city;
+		$return['cp'] = $data->report->additionalInformation->misc->postalCode;
+		$return['ville'] = $data->report->additionalInformation->misc->municipality;
         $return['id_pays'] = $basicInfo->contactAddress->country;
 
 
