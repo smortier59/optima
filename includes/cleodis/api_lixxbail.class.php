@@ -205,7 +205,9 @@ class api_lixxbail extends classes_optima {
             log::logger($postData , $this->log_file);
             try {
                 $res = $this->curlCall($url, $access_token, 'POST', json_encode($postData));
-                return $res;
+                if (isset($res["acknowledgment_message"])) return array("success"=>true ,"result"=>$res["acknowledgment_message"]);
+                return array("success"=>true ,"result"=>"ok");
+
             } catch (errorATF $e) {
                 throw $e;
             }
