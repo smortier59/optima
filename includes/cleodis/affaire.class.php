@@ -3234,9 +3234,15 @@ class affaire_cleodis extends affaire {
 							ATF::affaire()->q->where('affaire.id_societe', $post['id_societe']);
 						 }
 
+		$affaires =  ATF::affaire()->sa();
 
-		return ATF::affaire()->sa();
+		foreach ($affaires as $key => $value) {
+			ATF::commande()->q->reset()->where("commande.id_affaire", $value["id_affaire"]);
+			$commande = ATF::commande()->sa();
+			$affaires[$key]["contrat"] = $commande[0];
+		}
 
+		return $affaires;
 	}
 
 	public function displaySignLink($id_affaire) {
