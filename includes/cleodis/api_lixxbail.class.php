@@ -5,6 +5,7 @@
 */
 class api_lixxbail extends classes_optima {
     public $log_file = "api_lixxbail";
+    public $id_refinanceur_lixxbail = 12;
 
     /**
 	* Constructeur
@@ -140,79 +141,122 @@ class api_lixxbail extends classes_optima {
         $data = json_decode(base64_decode($infos["data"]), true);
         log::logger($data, "mfleurquin");
         try {
-            log::logger("-- Récuperation du token" , $this->log_file);
-            $dataAuth = $this->authenticate();
+            ATF::affaire()->q->reset()->where("affaire.ref", $data["leasing_information"]["consumer_funding_reference_id"]);
+            $a = ATF::affaire()->select_row();
+            $affaire = ATF::affaire()->select($a["affaire.id_affaire"]);
 
-            $access_token = $dataAuth["access_token"];
-            $baseurl = $dataAuth["baseurl"];
-            $url = $baseurl.'mylixxnet_leasing_fundings/v1/consumer_funding_requests';
+            if ($affaire) {
+                $this->createLixxBailComite($affaire, $data);
 
-            $postData = [
-                "partner" => [
-                    "id" => [
-                        "registration_number" => "45307981600055",
-                        "registration_scheme" => "SIRET"
+                log::logger("-- Récuperation du token" , $this->log_file);
+                $dataAuth = $this->authenticate();
+
+                $access_token = $dataAuth["access_token"];
+                $baseurl = $dataAuth["baseurl"];
+                $url = $baseurl.'mylixxnet_leasing_fundings/v1/consumer_funding_requests';
+
+                $postData = [
+                    "partner" => [
+                        "id" => [
+                            "registration_number" => "45307981600055",
+                            "registration_scheme" => "SIRET"
+                        ],
+                        "email_address" => "jerome.loison@cleodis.com"
                     ],
-                    "email_address" => "jerome.loison@cleodis.com"
-                ],
-                "customer" => [
-                    "id" => [
-                        "registration_number" => $data["customer"]["siret"],
-                        "registration_scheme" => "SIRET"
-                    ]
-                ],
-                "main_asset" => [
-                    "categorization" => [
-                        "type_code" => $data["main_asset"]["categorization"]["type_code"],
-                        "reference_code" => $data["main_asset"]["categorization"]["reference_code"],
-                        "brand_code" => $data["main_asset"]["categorization"]["brand_code"]
+                    "customer" => [
+                        "id" => [
+                            "registration_number" => $data["customer"]["siret"],
+                            "registration_scheme" => "SIRET"
+                        ]
                     ],
-                    "condition_code" => $data["main_asset"]["condition_code"],
-                    "destination_country" => [
-                        "code" => $data["main_asset"]["destination_country"]["code"],
-                        "label" => $data["main_asset"]["destination_country"]["label"]
-                    ],
-                    "quantity" => $data["main_asset"]["quantity"],
-                    "currency_code" => "EUR",
-                    "destination_town_name" => $data["main_asset"]["destination_town_name"],
-                    "has_breakdown_insurance" => ($data["main_asset"]["has_breakdown_insurance"] == 'non') ? false : true,
-                    "financial_loss_insurance_type" => null,
-                    "provider" => [
-                        "registration_number" => $data["main_asset"]["provider"]["registration_number"],
-                        "registration_scheme" => "SIRET"
-                    ]
-                ],
-                "leasing_information" => [
-                    "consumer_funding_reference_id" => $data["leasing_information"]["consumer_funding_reference_id"],
-                    "consumer_request_date_time" => $data["leasing_information"]["consumer_request_date_time"],
-                    "financial_data" => [
-                        "rate_scale_code" => $data["leasing_information"]["financial_data"]["rate_scale_code"],
-                        "payment_term_code" => $data["leasing_information"]["financial_data"]["payment_term_code"],
-                        "payment_type_code" => $data["leasing_information"]["financial_data"]["payment_type_code"],
-                        "payment_period" => intval($data["leasing_information"]["financial_data"]["payment_period"], 10),
-                        "reimbursement_periodicity_code" => $data["leasing_information"]["financial_data"]["reimbursement_periodicity_code"],
-                        "number_of_reimbursement_periodicities" => $data["leasing_information"]["financial_data"]["number_of_reimbursement_periodicities"],
+                    "main_asset" => [
+                        "categorization" => [
+                            "type_code" => $data["main_asset"]["categorization"]["type_code"],
+                            "reference_code" => $data["main_asset"]["categorization"]["reference_code"],
+                            "brand_code" => $data["main_asset"]["categorization"]["brand_code"]
+                        ],
+                        "condition_code" => $data["main_asset"]["condition_code"],
+                        "destination_country" => [
+                            "code" => $data["main_asset"]["destination_country"]["code"],
+                            "label" => $data["main_asset"]["destination_country"]["label"]
+                        ],
+                        "quantity" => $data["main_asset"]["quantity"],
                         "currency_code" => "EUR",
-                        "rent_amount" => $data["leasing_information"]["financial_data"]["rent_amount"],
-                    ]
-                ],
-                "final_update_flag" => false
-            ];
-            if ($data["main_asset"]["condition_code"] === 'OCCA') $postData["main_asset"]["date_of_first_use"] = $data["main_asset"]["date_of_first_use"];
+                        "destination_town_name" => $data["main_asset"]["destination_town_name"],
+                        "has_breakdown_insurance" => ($data["main_asset"]["has_breakdown_insurance"] == 'non') ? false : true,
+                        "financial_loss_insurance_type" => null,
+                        "provider" => [
+                            "registration_number" => $data["main_asset"]["provider"]["registration_number"],
+                            "registration_scheme" => "SIRET"
+                        ]
+                    ],
+                    "leasing_information" => [
+                        "consumer_funding_reference_id" => $data["leasing_information"]["consumer_funding_reference_id"],
+                        "consumer_request_date_time" => $data["leasing_information"]["consumer_request_date_time"],
+                        "financial_data" => [
+                            "rate_scale_code" => $data["leasing_information"]["financial_data"]["rate_scale_code"],
+                            "payment_term_code" => $data["leasing_information"]["financial_data"]["payment_term_code"],
+                            "payment_type_code" => $data["leasing_information"]["financial_data"]["payment_type_code"],
+                            "payment_period" => intval($data["leasing_information"]["financial_data"]["payment_period"], 10),
+                            "reimbursement_periodicity_code" => $data["leasing_information"]["financial_data"]["reimbursement_periodicity_code"],
+                            "number_of_reimbursement_periodicities" => $data["leasing_information"]["financial_data"]["number_of_reimbursement_periodicities"],
+                            "currency_code" => "EUR",
+                            "rent_amount" => $data["leasing_information"]["financial_data"]["rent_amount"],
+                        ]
+                    ],
+                    "final_update_flag" => false
+                ];
+                if ($data["main_asset"]["condition_code"] === 'OCCA') $postData["main_asset"]["date_of_first_use"] = $data["main_asset"]["date_of_first_use"];
 
-            log::logger("-- Envoi de la demande ".$url , $this->log_file);
-            log::logger("Data --> " , $this->log_file);
-            log::logger($postData , $this->log_file);
-            try {
-                $res = $this->curlCall($url, $access_token, 'POST', json_encode($postData));
-                if (isset($res["acknowledgment_message"])) return array("success"=>true ,"result"=>$res["acknowledgment_message"]);
-                return array("success"=>true ,"result"=>"ok");
+                log::logger("-- Envoi de la demande ".$url , $this->log_file);
+                log::logger("Data --> " , $this->log_file);
+                log::logger($postData , $this->log_file);
 
-            } catch (errorATF $e) {
-                throw $e;
+                try {
+                    $res = $this->curlCall($url, $access_token, 'POST', json_encode($postData));
+                    if (isset($res["acknowledgment_message"])) return array("success"=>true ,"result"=>$res["acknowledgment_message"]);
+                    return array("success"=>true ,"result"=>"ok");
+
+                } catch (errorATF $e) {
+                    throw $e;
+                }
+            } else {
+                throw new errorATF("AFFAIRE_NOT_FOUND", 404);
             }
         } catch (errorATF $e) {
             throw $e;
         }
+    }
+
+    function createLixxBailComite($affaire) {
+
+        $societe = ATF::societe()->select($affaire["id_societe"]);
+        //On crée le comité
+        $comite = array  (
+            "id_societe" => $societe["id_societe"],
+            "id_affaire" =>  $affaire["id_affaire"],
+            "id_contact" => ATF::societe()->select($societe["id_societe"], "id_contact_signataire"),
+            "etat"=> "en_attente",
+            "decisionComite"=>'',
+            "activite" => $societe["activite"],
+            "reponse" => null,
+            "validite_accord" => null,
+            "id_refinanceur" => $this->id_refinanceur_lixxbail,
+            "loyer_actualise" => ATF::affaire()->getCompteTLoyerActualise($affaire),
+            "date_creation" => $societe["date_creation"],
+            "date_compte" => $societe["lastaccountdate"],
+            "capitaux_propres" => $societe["capitaux_propres"],
+            "note" => $societe["cs_score"],
+            "dettes_financieres" => $societe["dettes_financieres"],
+            "limite" => $societe["cs_avis_credit"],
+            "ca" => $societe["ca"],
+            "capital_social" => $societe["capital_social"],
+            "resultat_exploitation" => $societe["resultat_exploitation"],
+            "date" => date("d-m-Y"),
+            "description" => "Comité LixxBail",
+            "suivi_notifie"=>array(0=>"")
+        );
+        return ATF::comite()->insert(array("comite"=>$comite));
+
     }
 }
