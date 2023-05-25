@@ -1,3 +1,16 @@
+-- TH 28889 - Optima / Gestion de PDF complémentaire au niveau de l'affaire
+CREATE TABLE `document_complementaire_a_signer` (
+    `id_document_complementaire_a_signer` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+    `id_affaire` MEDIUMINT UNSIGNED NOT NULL ,
+    `id_document_contrat` MEDIUMINT UNSIGNED NOT NULL ,
+    PRIMARY KEY (`id_document_complementaire_a_signer`),
+    INDEX (`id_affaire`),
+    INDEX (`id_document_contrat`)
+) ENGINE = InnoDB;
+
+ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat`(`id_document_contrat`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- MAJ VUE Affaire Espace client pour afficher si la demande lixxbail est faite
 ALTER TABLE `affaire` ADD `demande_lixxbail` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Permet de savoir si une demande Lixxbail a été faite pour ce dossier' AFTER `id_type_affaire`;
