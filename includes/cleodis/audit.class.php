@@ -192,7 +192,7 @@ class audit extends classes_optima {
 	* @param int $id_parent
 	* @return string ref
     */
-	function getRef($date){
+	function getRef($date=date('Y-m-d')){
 		$prefix=date("ym",strtotime($date));
 		$this->q->reset()
 				->addCondition("ref",$prefix."%","AND",false,"LIKE")
