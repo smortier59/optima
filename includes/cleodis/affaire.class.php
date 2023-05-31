@@ -117,6 +117,7 @@ class affaire_cleodis extends affaire {
 			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
+			,'document_complementaire_a_signer'
 			,'commande'=>array('opened'=>true)
 			,'prolongation'
 			,'loyer_prolongation'
