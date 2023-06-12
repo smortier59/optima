@@ -3241,7 +3241,7 @@ class affaire_cleodis extends affaire {
 						 if ($post['onlyActif']) {
 							ATF::affaire()->q
 								->andWhere("affaire.etat", '"devis", "commande", "facture"' ,"subquery", "IN",false, true)
-								->andWhere('affaire.nature', "'affaire', 'avenant', 'vente'", "subquery", "IN",false, true)
+								->andWhere('affaire.nature', "'affaire', 'avenant', 'vente', 'AR'", "subquery", "IN",false, true)
 								->whereIsNull('affaire.id_fille');
 						 }
 		$affaires =  ATF::affaire()->sa();
