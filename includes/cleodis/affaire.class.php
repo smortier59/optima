@@ -3222,16 +3222,26 @@ class affaire_cleodis extends affaire {
 						 ->addField('client.societe', "societe")
 						 ->addField('client.ref', "ref_societe")
 
+						 ->addField('contrat.etat', 'etat')
+
 						 ->from("affaire","id_commercial","user","id_user","commercial")
 						 ->from("affaire","id_societe","societe","id_societe","client")
 						 ->from("client","id_contact_facturation", "contact","id_contact", "contact_facturation")
 						 ->from("client","id_contact_signataire", "contact","id_contact", "signataire")
+						 ->from("affaire","id_affaire", "commande","id_affaire", "contrat")
 
 						 ->setLimit($post['limit'])
 						 ->addOrder('id_affaire', 'DESC');
 
 						 if ($post['id_societe']) {
 							ATF::affaire()->q->where('affaire.id_societe', $post['id_societe']);
+						 }
+
+						 if ($post['onlyActif']) {
+							ATF::affaire()->q
+								->andWhere("affaire.etat", '"devis", "commande", "facture"' ,"subquery", "IN",false, true)
+								->andWhere('affaire.nature', "'affaire', 'avenant', 'vente'", "subquery", "IN",false, true)
+								->whereIsNull('affaire.id_fille');
 						 }
 
 
