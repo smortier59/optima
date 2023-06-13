@@ -18,6 +18,8 @@ class document_contrat extends classes_optima {
 		$this->files["fichier_joint"] = array("type"=>"pdf","no_generate"=>true,"obligatoire"=>true);
 
 		$this->fieldstructure();
+
+		$this->addPrivilege("autocompleteActifDansContrat");
 	}
 
 
@@ -32,6 +34,23 @@ class document_contrat extends classes_optima {
 		$this->q->reset()->where("document_contrat.etat",'actif')
 				->addOrder("document_contrat.document_contrat", 'ASC');
 		return parent::autocomplete($infos,false);
+	}
+
+	/**
+	* Autocomplete avec les termes associés à chaque société
+	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
+	* @param array $infos ($_POST habituellement attendu)
+	*	string $infos[recherche]
+	* @param boolean $reset VRAI si on reset lme querier, FAUX si on a initialisé qqch de précis avant...
+	* @return string HTML de retour
+	*/
+	public function autocompleteActifDansContrat($infos) {
+		$this->q->reset()
+			->addCondition("document_contrat.etat","actif")
+			->addCondition("document_contrat.type_signature","commune_avec_contrat")
+			->addOrder("document_contrat.document_contrat", 'ASC');
+		return  parent::autocomplete($infos,false);
+
 	}
 
 };
