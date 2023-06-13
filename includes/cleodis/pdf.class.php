@@ -253,6 +253,36 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
 
+		//On récupère les documents complementaires à signer de cette affaire
+		ATF::document_complementaire_a_signer()->q->reset()->where("id_affaire", $id_affaire);
+		$doc_complementaire_affaire = ATF::document_complementaire_a_signer()->sa();
+		foreach ($doc_complementaire_affaire as $key => $value) {
+			$doc = ATF::document_contrat()->select($value["id_document_contrat"]);
+			if($doc["etat"] == "actif") {
+				$filepath = ATF::document_contrat()->filepath($value["id_document_contrat"],"fichier_joint");
+				if (file_exists($filepath)){
+					try {
+						$pageCount = $this->setSourceFile($filepath);
+
+						for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						$tplIdx = $this->importPage($pageNo);
+
+						// add a page
+						$this->unsetHeader();
+						$this->unsetFooter();
+						$this->AddPage();
+						$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+						}
+					} catch (Exception $e) {
+						log::logger('filepath CGS = '.$filepath,"error_pdf");
+						log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "error_pdf");
+						log::logger($e->getMessage(),"error_pdf");
+						continue;
+					}
+				}
+			}
+		}
+
 
 		//On récupère les documents du/des produits de cette affaire
 		ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
