@@ -14,7 +14,10 @@ class document_complementaire_a_signer extends classes_optima
         );
         $this->colonnes["primary"] = array(
             "id_affaire"
-            ,"id_document_contrat"
+            ,"id_document_contrat"=>array(
+				"obligatoire"=>true,
+				"autocomplete"=>array("function"=>"autocompleteActifDansContrat")
+			),
         );
         $this->fieldstructure();
 
