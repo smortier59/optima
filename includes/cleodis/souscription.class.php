@@ -37,6 +37,9 @@ class souscription_cleodis extends souscription {
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
+    if (!isset($post['nature'])|| $post['nature'] == null) $post['nature'] = 'location';
+    if (!in_array($post['nature'], ['location', 'vente']) ) throw new errorATF("Nature incorrect", 500);
+
     if ($post['site_associe']) {
 
       ATF::site_associe()->q->reset()->where('site_associe', $post['site_associe']);
@@ -145,7 +148,7 @@ class souscription_cleodis extends souscription {
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"],  $post["renouvellement"]);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"],  $post["renouvellement"], $post['nature']);
 
         $libelle = substr($libelle, 0, 250);
 
@@ -296,6 +299,13 @@ class souscription_cleodis extends souscription {
         }
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
+
+        if ($post['nature'] == 'vente') {
+          // On crée les BDC
+          ATF::bon_de_commande()->createAllBDC(array("id_commande" => $id_contrat));
+        }
+
+
         $affaires['contrats'][] = $id_contrat;
       }
 
@@ -317,7 +327,7 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false, $nature='location') {
     $suffix = "";
     if ($id_pack_produits) {
       foreach ($id_pack_produits as $id_pack) {
@@ -337,15 +347,30 @@ class souscription_cleodis extends souscription {
 
     switch ($site_associe) {
       case "bdomplus":
-        $r = "Abonnement Zen ".$suffix;
+        if ($nature === 'vente') {
+          $r = "Vente Zen ".$suffix;
+        } else {
+          $r = "Abonnement Zen ".$suffix;
+        }
+
       break;
 
       case "boulanger-cafe":
-        $r = "BOULANGER : Abonnement Café ".$suffix;
+        if ($nature === 'vente') {
+          $r = "BOULANGER : Vente Café".$suffix;
+        } else {
+          $r = "BOULANGER : Abonnement Café ".$suffix;
+        }
+
       break;
 
       default:
-        $r = strtoupper($site_associe)." : Location ".$suffix;
+        if ($nature === 'vente') {
+          $r = strtoupper($site_associe)." : Vente ".$suffix;
+        } else {
+          $r = strtoupper($site_associe)." : Location ".$suffix;
+        }
+
       break;
     }
 
@@ -397,6 +422,7 @@ class souscription_cleodis extends souscription {
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
     );
+    if ($post['nature'] === 'vente') $devis['type_contrat'] = 'vente';
 
     if ($post["rum"])  $devis["rum"] = $post["rum"];
 
@@ -439,6 +465,7 @@ class souscription_cleodis extends souscription {
           ->addField('hotline')
           ->addField('supervision')
           ->addField('support')
+          ->addField('prix_vente')
           ->addField("duree")
           ->addField("ean")
           ->addField("id_sous_categorie")
@@ -453,7 +480,7 @@ class souscription_cleodis extends souscription {
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
 
-          if($post["site_associe"] == "bdomplus"){
+          if($post["site_associe"] == "bdomplus" && $post['nature'] == 'location') {
             $toInsertLoyer[0]["loyer__dot__frequence_loyer"] = ATF::pack_produit()->select($id_pack, "frequence");
 
             switch ($toInsertLoyer[0]["loyer__dot__frequence_loyer"]) {
@@ -520,24 +547,29 @@ class souscription_cleodis extends souscription {
           );
         }
 
-        $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["assurance"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] += $produitLoyer["frais_de_gestion"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__serenite"] += $produitLoyer["serenite"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__maintenance"] += $produitLoyer["maintenance"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__hotline"] += $produitLoyer["hotline"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__supervision"] += $produitLoyer["supervision"] * $produit['quantite'];
-        $toInsertLoyer[0]["loyer__dot__support"] += $produitLoyer["support"] * $produit['quantite'];
-
-        $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
-
-        $loyer = $toInsertLoyer[0]["loyer__dot__loyer"] +  $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] + $toInsertLoyer[0]["loyer__dot__serenite"] +  $toInsertLoyer[0]["loyer__dot__maintenance"] + $toInsertLoyer[0]["loyer__dot__hotline"] + $toInsertLoyer[0]["loyer__dot__supervision"] +  $toInsertLoyer[0]["loyer__dot__support"];
-
-        if ($assurance_sans_tva == "oui") {
-          $devis["prix"] = ($loyer * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
+        if ($post['nature'] == 'vente') {
+          $devis['prix_vente'] += $produitLoyer['prix_vente'] * $produit['quantite'];
         } else {
-          $devis["prix"] = $loyer * $toInsertLoyer[0]["loyer__dot__duree"];
+          $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__assurance"] += $produitLoyer["assurance"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] += $produitLoyer["frais_de_gestion"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__serenite"] += $produitLoyer["serenite"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__maintenance"] += $produitLoyer["maintenance"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__hotline"] += $produitLoyer["hotline"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__supervision"] += $produitLoyer["supervision"] * $produit['quantite'];
+          $toInsertLoyer[0]["loyer__dot__support"] += $produitLoyer["support"] * $produit['quantite'];
+
+          $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
+
+          $loyer = $toInsertLoyer[0]["loyer__dot__loyer"] +  $toInsertLoyer[0]["loyer__dot__frais_de_gestion"] + $toInsertLoyer[0]["loyer__dot__serenite"] +  $toInsertLoyer[0]["loyer__dot__maintenance"] + $toInsertLoyer[0]["loyer__dot__hotline"] + $toInsertLoyer[0]["loyer__dot__supervision"] +  $toInsertLoyer[0]["loyer__dot__support"];
+
+          if ($assurance_sans_tva == "oui") {
+            $devis["prix"] = ($loyer * $toInsertLoyer[0]["loyer__dot__duree"]) + $toInsertLoyer[0]["loyer__dot__assurance"];
+          } else {
+            $devis["prix"] = $loyer * $toInsertLoyer[0]["loyer__dot__duree"];
+          }
         }
+
     }
 
     // Faire sauter les index
@@ -562,24 +594,7 @@ class souscription_cleodis extends souscription {
       }
     }
 
-    if ($post["prolongations"]) {
-      foreach(json_decode($post['prolongations'], true) as $kp => $vp) {
-        $toInsertLoyer[] = array(
-          "loyer__dot__loyer"=> $vp["loyer"],
-          "loyer__dot__duree"=> $vp["duree"],
-          "loyer__dot__type"=>"prolongation",
-          "loyer__dot__assurance"=>$vp["assurance"],
-          "loyer__dot__frais_de_gestion"=>$vp["frais_de_gestion"],
-          "loyer__dot__frequence_loyer"=> $vp["frequence"],
-          "loyer__dot__serenite"=>"",
-          "loyer__dot__maintenance"=>"",
-          "loyer__dot__hotline"=>"",
-          "loyer__dot__supervision"=>"",
-          "loyer__dot__support"=>"",
-          "loyer__dot__avec_option"=>"non"
-        );
-      }
-    }
+    log::logger($devis , "mfleurquin");
 
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);

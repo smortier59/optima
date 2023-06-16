@@ -3563,7 +3563,6 @@ class facture_cleodis extends facture {
 		}
 	}
 
-
 	/**
 	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
