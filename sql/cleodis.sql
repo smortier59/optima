@@ -1,24 +1,20 @@
--- Panier et affaire de vente depuis tunnel/api
-    -- PASSAGE des loyer produit a 4 chiffres (max 9999,99)
-ALTER TABLE `produit` CHANGE `loyer` `loyer` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `assurance` `assurance` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `frais_de_gestion` `frais_de_gestion` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `serenite` `serenite` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `maintenance` `maintenance` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `hotline` `hotline` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `supervision` `supervision` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `produit` CHANGE `support` `support` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `devis_ligne` CHANGE `loyer` `loyer` FLOAT(7,3) NULL DEFAULT NULL;
-ALTER TABLE `commande_ligne` CHANGE `loyer` `loyer` FLOAT(7,3) NULL DEFAULT NULL;
+-- TH 28889 - Optima / Gestion de PDF complémentaire au niveau de l'affaire
+CREATE TABLE `document_complementaire_a_signer` (
+    `id_document_complementaire_a_signer` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+    `id_affaire` MEDIUMINT UNSIGNED NOT NULL ,
+    `id_document_contrat` MEDIUMINT UNSIGNED NOT NULL ,
+    PRIMARY KEY (`id_document_complementaire_a_signer`),
+    INDEX (`id_affaire`),
+    INDEX (`id_document_contrat`)
+) ENGINE = InnoDB;
+
+ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat`(`id_document_contrat`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
     -- Affaire de vente
 ALTER TABLE `panier` ADD `nature` ENUM('location','vente') NOT NULL DEFAULT 'location' AFTER `date`;
 ALTER TABLE `produit` ADD `prix_vente` FLOAT(8,2) NULL DEFAULT NULL AFTER `support`;
-INSERT INTO `type_affaire` (`id_type_affaire`, `type_affaire`, `libelle_pdf`, `devis_template`, `contrat_template`, `assurance_sans_tva`)
-VALUES
-(NULL, 'SIMPEL FLUX', 'Cléodis', 'devis', 'contrat_simpel_flux', 'non'),
-(NULL, 'SIMPEL START', 'Cléodis', 'devis', 'contrat_simpel_start', 'non');
-
 -- MAJ VUE Affaire Espace client pour afficher si la demande lixxbail est faite
 ALTER TABLE `affaire` ADD `demande_lixxbail` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Permet de savoir si une demande Lixxbail a été faite pour ce dossier' AFTER `id_type_affaire`;
 
