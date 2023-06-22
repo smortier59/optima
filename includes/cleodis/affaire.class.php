@@ -1371,8 +1371,18 @@ class affaire_cleodis extends affaire {
 	*/
 	public function _affairePartenaire($get,$post) {
 
-		$utilisateur  = ATF::$usr->get("contact");
-		$apporteur = $utilisateur["id_societe"];
+		if (!$post["apporteur"]) {
+			$utilisateur  = ATF::$usr->get("contact");
+			$apporteur = $utilisateur["id_societe"];
+		} else {
+			$apporteur = $post["apporteur"];
+			$get["apporteur"] = $post["apporteur"];
+			$get["limit"] = $post["limit"] ? $post["limit"] : 25;
+			$get["page"] = $post["page"] ? $post["page"] : 0;
+			$get["filters"] = $post["filters"];
+		}
+
+		log::logger($get, "mfleurquin");
 
 		if($apporteur){
 
@@ -1463,7 +1473,6 @@ class affaire_cleodis extends affaire {
 						$retour[$key]["date_max_validite"] = $vcomite["validite_accord"];
 					}
 				}
-
 				/*$retour[$key]["date_paiement"] = NULL;
 
 				if($value["bon_de_commande"] === true){
@@ -1486,13 +1495,6 @@ class affaire_cleodis extends affaire {
 				    	}
 				    }
 				}*/
-
-
-
-
-
-
-
 			}
 
 			return $retour;
@@ -1760,8 +1762,13 @@ class affaire_cleodis extends affaire {
 											  ->where("devis.id_affaire", $value['affaire.id_affaire_fk']);
 				$devis_ligne = ATF::devis_ligne()->sa();
 
-				$utilisateur  = ATF::$usr->get("contact");
-				$apporteur = $utilisateur["id_societe"];
+				if ($get["apporteur"]) {
+					$apporteur = $get["apporteur"];
+				} else {
+					$utilisateur  = ATF::$usr->get("contact");
+					$apporteur = $utilisateur["id_societe"];
+				}
+
 
 				foreach ($devis_ligne as $k => $v) {
 					// Il ne faut prendre que les lignes ou le partenaire est le fourisseur
