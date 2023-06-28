@@ -152,7 +152,16 @@ class commande_cleodis extends commande {
 	 * @return [array]       [description]
 	 */
 	public function _contratPartenaire($get,$post) {
-		if ($apporteur = ATF::$usr->get("contact")) {
+		if ($post['apporteur']) {
+			$apporteur = $post["apporteur"];
+			$get["limit"] = $post["limit"] ? $post["limit"] : 25;
+			$get["page"] = $post["page"] ? $post["page"] : 0;
+		} else {
+			$contact = ATF::$usr->get("contact");
+			$apporteur = $contact["id_societe"];
+		}
+
+		if ($apporteur) {
 
 			// Gestion du tri
 			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "commande.ref";
@@ -173,7 +182,7 @@ class commande_cleodis extends commande {
 				->where("commande.etat", "vente","AND", false, "!=")
 
 
-				->where("affaire.id_partenaire", $apporteur["id_societe"]); // en attendant la resolution du probleme de session
+				->where("affaire.id_partenaire", $apporteur); // en attendant la resolution du probleme de session
 
 			if($get["search"]) {
 				ATF::commande()->q->where("affaire.ref", "%".$get["search"]."%" , "OR", "search", "LIKE")
@@ -192,13 +201,26 @@ class commande_cleodis extends commande {
 				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
 			}
 
-			if($commande = ATF::commande()->sa($get['tri'],$get['trid'])){
+			if ($get['limit']) {
+				$this->q->setLimit($get['limit']);
+				$r = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+				$commande = $r['data'];
+				header("ts-total-row: ".$r['count']);
+				header("ts-max-page: ".ceil($r['count']/$get['limit']));
+				header("ts-active-page: ".$get['page']);
+				log::logger($commande , "mfleurquin");
+			} else {
+				$commande = ATF::commande()->sa($get['tri'],$get['trid']);
+				header("ts-total-row: ".count($commande));
+			}
+
+			if($commande){
 				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
 				foreach ($commande as $key => $cmd) {
 					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
 					$commande[$key]["somme_loyer"] = $cmd["loyer"] * $cmd["duree"];
 				}
-				header("ts-total-row: ".count($commande));
+
 				return $commande;
 			}
 			else {

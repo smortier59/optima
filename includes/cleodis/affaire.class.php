@@ -1382,7 +1382,7 @@ class affaire_cleodis extends affaire {
 			$get["filters"] = $post["filters"];
 		}
 
-		log::logger($get, "mfleurquin");
+
 
 		if($apporteur){
 
@@ -2581,10 +2581,17 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
-		$utilisateur  = ATF::$usr->get("contact");
+		if ($post['apporteur']) {
+			$id_partenaire = $post['apporteur'];
+			$apporteur = ATF::societe()->select($id_partenaire, 'id_apporteur');
+		} else {
+			$utilisateur  = ATF::$usr->get("contact");
+			$id_partenaire = ATF::$usr->get('contact','id_societe');
+		}
 
-		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
+		$user_partenaire = 116;
 
+		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($id_partenaire);
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2615,10 +2622,10 @@ class affaire_cleodis extends affaire {
 			  "date" => date("d-m-Y"),
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
-			  "id_user"=>ATF::$usr->getID(),
+			  "id_user"=>$user_partenaire,
 		      "id_type_affaire"=>$id_type_affaire,
 			  "langue"=>ATF::societe()->select($id_societe, "langue"),
-			  "id_partenaire"=>ATF::$usr->get('contact','id_societe')
+			  "id_partenaire"=>$id_partenaire
 			);
 
 
@@ -2663,7 +2670,7 @@ class affaire_cleodis extends affaire {
 			  "devis_ligne__dot__commentaire"=>"",
 			  "devis_ligne__dot__neuf"=>"oui",
 			  "devis_ligne__dot__id_produit_fk"=>"",
-			  "devis_ligne__dot__id_fournisseur_fk"=>$utilisateur["id_societe"]
+			  "devis_ligne__dot__id_fournisseur_fk"=>$id_partenaire
 			);
 			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
@@ -2674,14 +2681,15 @@ class affaire_cleodis extends affaire {
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
-
-			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+			if ($post["apporteur"]) {
+				ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>$post["apporteur"]));
+			} else {
+				ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>$id_partenaire));
+			}
+			$code_client_partenaire = ATF::societe()->select($id_partenaire,'code_client_partenaire');
 
 			//Recupere Apporteur de ta société
-			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
-
-			//Recuperation du code client Partenaire
-			$code_client_partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'code_client_partenaire');
+			$apporteur = ATF::societe()->select($id_partenaire,'id_apporteur');
 
 			//si le code_client_partenaire n'est pas vide alors je mets à jour la table société
 			if($post["code_client_partenaire"] && !empty($post["code_client_partenaire"])){
@@ -2695,7 +2703,7 @@ class affaire_cleodis extends affaire {
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],
 									"provenance"=>"partenaire",
-									'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+									'id_partenaire'=>$id_partenaire));
 
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
@@ -2761,8 +2769,8 @@ class affaire_cleodis extends affaire {
 
 				//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
 				if(ATF::$codename=='cleodisbe'){
-					$partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
-					$info_mail["from"] = ATF::$usr->get('contact','email');
+					$partenaire = ATF::societe()->select($id_partenaire, 'societe');
+					// $info_mail["from"] = ATF::$usr->get('contact','email');
 					$info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
 					$info_mail["html"] = false;
 					$info_mail["template"] = "devis_partenaire";
@@ -2857,9 +2865,12 @@ class affaire_cleodis extends affaire {
 	*/
 	public function _AffaireParc($get,$post){
 		// on recupère l'apporteur;
-		$utilisateur  = ATF::$usr->get("contact");
-		$apporteur = $utilisateur["id_societe"];
-
+		if ($post["apporteur"]) {
+			$apporteur = $post["apporteur"];
+		} else {
+			$utilisateur  = ATF::$usr->get("contact");
+			$apporteur = $utilisateur["id_societe"];
+		}
 
 		if($apporteur){
 			$societes = $ret= [];
@@ -2881,8 +2892,6 @@ class affaire_cleodis extends affaire {
 			if($get["id_affaire"])  ATF::affaire()->q->where("affaire.id_affaire",$get['id_affaire']);
 
 			$affaires = ATF::affaire()->select_all();
-
-
 
 			if($affaires){
 
