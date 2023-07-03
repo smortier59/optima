@@ -208,7 +208,6 @@ class commande_cleodis extends commande {
 				header("ts-total-row: ".$r['count']);
 				header("ts-max-page: ".ceil($r['count']/$get['limit']));
 				header("ts-active-page: ".$get['page']);
-				log::logger($commande , "mfleurquin");
 			} else {
 				$commande = ATF::commande()->sa($get['tri'],$get['trid']);
 				header("ts-total-row: ".count($commande));

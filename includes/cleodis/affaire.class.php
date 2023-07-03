@@ -2860,17 +2860,89 @@ class affaire_cleodis extends affaire {
 			"id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"])
 		);
 	}
+
+	public function _AffaireParcV2($get,$post){
+
+
+		if (!$post["apporteur"]) throw new errorATF(500, "NO PARTENAIRE");
+		$apporteur = $post["apporteur"];
+
+		$limit = $post["limit"] ? $post["limit"] : 25;
+		$page = $post["page"] ? $post["page"] : 0;
+
+		if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.ref";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		ATF::parc()->q->reset()->from("parc", "id_affaire", "affaire", "id_affaire")
+							   ->from("affaire","id_affaire","commande","id_affaire")
+							   ->from("parc","id_societe","societe","id_societe")
+							   ->addField("affaire.ref","affaire_ref")
+							   ->addField("affaire.affaire","affaire_libelle")
+							   ->addField("societe.code_client","client_code_client")
+							   ->addField("societe.ref","client_ref")
+							   ->addField("societe.societe","client_nom")
+							   ->addField("societe.nom_commercial","client_nom_commercial")
+							   ->addAllFields("parc")
+							   ->where('affaire.id_partenaire',$apporteur)
+							   ->where("affaire.etat","devis","AND",false,"!=")
+							   ->where("affaire.etat","perdue","AND",false,"!=")
+							   ->where("affaire.etat","terminee","AND",false,"!=")
+							   ->where("affaire.nature","vente","AND",false,"!=")
+							   ->where("commande.etat", "non_loyer","AND", false, "!=")
+							   ->where("commande.etat", "AR","AND", false, "!=")
+							   ->where("commande.etat", "arreter","AND", false, "!=")
+							   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+							   ->where("commande.etat", "vente","AND", false, "!=")
+							   ->addCondition("parc.existence","inactif","AND",NULL,"!=")
+							   ->addCondition("parc.etat","broke","AND",1,"!=");
+
+
+		if($post["id_societe"])	ATF::parc()->q->where("affaire.id_societe",$post['id_societe']);
+		if($post["id_affaire"])  ATF::parc()->q->where("affaire.id_affaire",$post['id_affaire']);
+
+		ATF::parc()->q->setLimit($get['limit']);
+		$r = ATF::parc()->sa($get['tri'],$get['trid'],$page,true);
+		header("ts-total-row: ".$r['count']);
+		header("ts-max-page: ".ceil($r['count']/$limit));
+		header("ts-active-page: ".$page);
+
+		ATF::parc()->q->reset()->from("parc", "id_affaire", "affaire", "id_affaire")
+							   ->from("affaire","id_affaire","commande","id_affaire")
+							   ->from("parc","id_societe","societe","id_societe")
+							   ->addField("affaire.id_affaire","id_affaire")
+							   ->addField("affaire.id_societe","id_societe")
+							   ->addField("affaire.ref","affaire_ref")
+							   ->addField("affaire.affaire","affaire_libelle")
+							   ->addField("societe.code_client","client_code_client")
+							   ->addField("societe.ref","client_ref")
+							   ->addField("societe.societe","client_nom")
+							   ->addField("societe.nom_commercial","client_nom_commercial")
+							   ->where('affaire.id_partenaire',$apporteur)
+							   ->where("affaire.etat","devis","AND",false,"!=")
+							   ->where("affaire.etat","perdue","AND",false,"!=")
+							   ->where("affaire.etat","terminee","AND",false,"!=")
+							   ->where("affaire.nature","vente","AND",false,"!=")
+							   ->where("commande.etat", "non_loyer","AND", false, "!=")
+							   ->where("commande.etat", "AR","AND", false, "!=")
+							   ->where("commande.etat", "arreter","AND", false, "!=")
+							   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+							   ->where("commande.etat", "vente","AND", false, "!=")
+							   ->addCondition("parc.existence","inactif","AND",NULL,"!=")
+							   ->addCondition("parc.etat","broke","AND",1,"!=")
+							   ->addGroup("affaire.id_affaire");
+		$aff = 	ATF::parc()->sa();
+
+		return array( "parc" => $r['data'], "affaires" => $aff);
+	}
+
+
 	/** Fonction qui retourne les affaires / societes liés à un id partenaire
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _AffaireParc($get,$post){
 		// on recupère l'apporteur;
-		if ($post["apporteur"]) {
-			$apporteur = $post["apporteur"];
-		} else {
-			$utilisateur  = ATF::$usr->get("contact");
-			$apporteur = $utilisateur["id_societe"];
-		}
+		$utilisateur  = ATF::$usr->get("contact");
+		$apporteur = $utilisateur["id_societe"];
 
 		if($apporteur){
 			$societes = $ret= [];
