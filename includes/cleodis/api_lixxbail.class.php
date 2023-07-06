@@ -73,7 +73,13 @@ class api_lixxbail extends classes_optima {
         curl_setopt($ch, CURLOPT_ENCODING, '');
         curl_setopt($ch, CURLOPT_TIMEOUT, 0);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json', 'Authorization: Bearer '.$token) );
+
+        if ($headers) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge($headers, ['Content-Type: application/json', 'Authorization: Bearer '.$token]));
+        } else {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json', 'Authorization: Bearer '.$token) );
+        }
+
 
         if($method === 'GET'){
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -84,7 +90,7 @@ class api_lixxbail extends classes_optima {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         }
 
-        if ($headers) curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
 
         $response = curl_exec($ch);
         $response = json_decode($response);
@@ -227,7 +233,7 @@ class api_lixxbail extends classes_optima {
                 log::logger($postData , $this->log_file);
                 $uuid = $this->guidv4();
                 log::logger("correlationId --> " . $uuid, $this->log_file);
-                $headers = [ 'Correlationid' => $uuid ];
+                $headers = [ 'Correlationid: '.$uuid ];
 
 
                 try {
