@@ -2605,6 +2605,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Description blocage", "size"=>30),
 								array("title"=> "RIB", "size"=>15),
 								array("title"=> "Refinanceur", "size"=>30),
+								array("title"=> "Partenaire", "size"=>30),
 								array("title"=> "Comité", "size"=>15),
 								array("title"=> "Décision Comité", "size"=>15),
 								array("title"=> "Validité de l'accord", "size"=>15),
@@ -2680,12 +2681,16 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $suivi_description;
  			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"rib_client"))? "oui": "non";;
 
+			$partenaire = '';
+			$id_partenaire = ATF::affaire()->select($value["affaire.id_affaire_fk"], "id_partenaire");
+			if ($id_partenaire) $partenaire = ATF::societe()->select($id_partenaire, 'societe');
 
 
 			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"])->addOrder("date", 'DESC');
 			$comite = ATF::comite()->select_row();
 			if($comite){
 				$row_data[$key][] = ATF::refinanceur()->select($comite["id_refinanceur"] , "refinanceur");
+				$row_data[$key][] = $partenaire;
 				$row_data[$key][] = $comite["date"];
 				$row_data[$key][] = $comite["commentaire"];
 				$row_data[$key][] = $comite["decisionComite"];
@@ -2693,6 +2698,7 @@ class commande_cleodis extends commande {
 				$row_data[$key][] = $comite["observations"];
 			} else {
 				$row_data[$key][] = "";
+				$row_data[$key][] = $partenaire;
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
