@@ -1,4 +1,12 @@
 {$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire}
+
+{if ATF::$codename === 'itrenting'}
+    {$fields = [RIB,BIC,IBAN,nom_banque,adresse_banque,cp_banque,ville_banque,province_banque,date_previsionnelle,RUM]}
+{else}
+    {$fields = [RIB,BIC,IBAN,nom_banque,ville_banque,date_previsionnelle,RUM]}
+{/if}
+
+
 <td colspan="2">
     <div id="specificFacturation"></div>
     <script type="application/javascript">
@@ -14,7 +22,7 @@
 				height:20
             },
             items: [
-                {foreach from=[RIB,BIC,IBAN,nom_banque,ville_banque,date_previsionnelle,RUM] item=d}
+                {foreach from=$fields item=d}
                     {if !$d@first},{/if}
                     {
                         fieldLabel: '{ATF::$usr->trans($d,affaire)}',
@@ -27,7 +35,7 @@
                     }
                 {/foreach}
             ]
-        });	
+        });
     });
     </script>
 </td>
