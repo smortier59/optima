@@ -90,7 +90,7 @@ class societe_cleodis extends societe {
 
       $this->colonnes['panel']['societe_fs']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
         "CIF"
-        ,"reference_tva"
+        ,"DNI"
       ));
 
       $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
@@ -131,8 +131,8 @@ class societe_cleodis extends societe {
 
 
     /* Définition statique des clés étrangère de la table */
-    $this->onglets = array(
-       'contact'=>array('opened'=>true)
+    $this->onglets = [
+      'contact'=>array('opened'=>true)
       ,'affaire'=>array('opened'=>true)
       ,'formation_devis'
       ,'suivi'=>array('opened'=>true)
@@ -144,7 +144,26 @@ class societe_cleodis extends societe {
       ,'pdf_societe'
       ,'user'
       ,'societe'=>array('field'=>'societe.id_filiale')/*,'societe_domaine'*/
-    );
+    ];
+
+    if (ATF::$codename === "itrenting") {
+      $this->onglets = [
+        'contact'=>array('opened'=>true)
+        ,'societe_signataire'=>array('opened'=>true)
+        ,'affaire'=>array('opened'=>true)
+        ,'formation_devis'
+        ,'suivi'=>array('opened'=>true)
+        ,'devis'
+        ,'commande'
+        ,'tache'
+        ,'parc'
+        ,'ged'
+        ,'pdf_societe'
+        ,'user'
+        ,'societe'=>array('field'=>'societe.id_filiale')/*,'societe_domaine'*/
+      ];
+    }
+
     // Infos codifiées
     $this->colonnes['panel']['codes_fs']["les_codes"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
       "code_groupe"
@@ -165,8 +184,17 @@ class societe_cleodis extends societe {
     $this->colonnes['panel']['facturation_fs'][]="RUM";
     $this->colonnes['panel']['facturation_fs'][]="divers_2";
     $this->colonnes['panel']['facturation_fs'][]="nom_banque";
-    $this->colonnes['panel']['facturation_fs'][]="ville_banque";
     $this->colonnes['panel']['facturation_fs'][]='rum';
+
+    if(ATF::$codename == "itrenting"){
+      $this->colonnes['panel']['facturation_fs'][]="adresse_banque";
+      $this->colonnes['panel']['facturation_fs'][]="adresse_banque";
+      $this->colonnes['panel']['facturation_fs'][]="cp_banque";
+      $this->colonnes['panel']['facturation_fs'][]="ville_banque";
+      $this->colonnes['panel']['facturation_fs'][]="province_banque";
+    } else {
+      $this->colonnes['panel']['facturation_fs'][]="ville_banque";
+    }
 
     // Adresses en +
     $this->colonnes['panel']["coordonnees_supplementaires_fs"]["adresse_siege_social"]=array("xtype"=>"textarea");
