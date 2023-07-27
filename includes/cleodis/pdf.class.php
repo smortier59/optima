@@ -12176,10 +12176,12 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->setfont('arial','',8);
 		$this->multicell(0,3,"DE UNA PARTE, RENTING INFORMÁTICO Y TECNOLÓGICO, S.A, con C.I.F. A-83266106 y con domicilio en C/ La Granja, 82, Polígono Industrial, 28108 Alcobendas (Madrid), inscrita en el Registro Mercantil de Madrid al Tomo 17.495, Folio 165, Hoja M-300.451, Inscripción 1ª, representada en este acto por Dª Elena Pérez Dávila, con DNI nº 50.847.542-Q, con poderes suficientes en virtud de la escritura pública otorgada el día 15 de Noviembre de 2019 ante el Notario de Madrid, D. Valerio Pérez de Madrid Carreras, bajo el número 3.088 de orden de su protocolo, en adelante el Arrendador.", 0 ,'L');
 
-		ATF::societe_structure()->q->reset()->where("structure", $this->client['structure']);
-		$societe_structure = ATF::societe_structure()->select_row();
 		$structure = 'entreprise';
-		if ($societe_structure) $structure = $societe_structure["type"];
+		if ($this->client['structure']) {
+			ATF::societe_structure()->q->reset()->where("structure", $this->client['structure']);
+			$societe_structure = ATF::societe_structure()->select_row();
+			if ($societe_structure) $structure = $societe_structure["type"];
+		}
 
 		if ($structure === "autonome") {
 			$this->MultiCell(0,3, "Y DE OTRA, ".$this->client["societe"].", con DNI nº".$this->client["DNI"]." y con domicilio social en ".$this->client["adresse"].", C.P. ".$this->client["cp"]." de ".$this->client["ville"]." ( ".$this->client["province"]."), en adelante el Arrendatario.",0,"L");
