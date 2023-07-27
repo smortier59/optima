@@ -194,11 +194,11 @@ class commande_cleodis extends commande {
 			}
 			// filtre sur les dates
 			if ($get["filters"] && $get["filters"]["startdate"]){
-				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"]);
+				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"], "AND", false, ">=");
 			}
 
 			if ($get["filters"] && $get["filters"]["enddate"]){
-				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
+				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"], "AND", false, "<=");
 			}
 
 			if ($get['limit']) {
