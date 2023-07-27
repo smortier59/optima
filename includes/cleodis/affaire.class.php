@@ -1380,22 +1380,23 @@ class affaire_cleodis extends affaire {
 	* @return array un tableau avec les données
 	*/
 	public function _affairePartenaire($get,$post) {
-
 		if (!$post["apporteur"]) {
 			$utilisateur  = ATF::$usr->get("contact");
 			$apporteur = $utilisateur["id_societe"];
 		} else {
+
 			$apporteur = $post["apporteur"];
 			$get["apporteur"] = $post["apporteur"];
 			$get["limit"] = $post["limit"] ? $post["limit"] : 25;
 			$get["page"] = $post["page"] ? $post["page"] : 0;
 			$get["filters"] = $post["filters"];
+
+			ATF::user()->q->reset()->where("login", "partenaire")->setLimit(1);
+			$userPartenaire = ATF::user()->select_row();
+			ATF::$usr = new usr($userPartenaire["id_user"]);
 		}
 
-
-
 		if($apporteur){
-
 			// Gestion du tri
 			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
 			if (!$get['trid']) $get['trid'] = "desc";
@@ -1714,7 +1715,6 @@ class affaire_cleodis extends affaire {
 
 			}
 
-
 			foreach ($data['data'] as $key => $value) {
 				foreach ($value as $k_=>$val) {
 					if (strpos($k_,".")) {
@@ -1724,6 +1724,7 @@ class affaire_cleodis extends affaire {
 					}
 				}
 
+				log::logger($this->cryptId($value['affaire.id_affaire_fk']) , "mfleurquin");
 
 				$texte  = "Bonjour Madame, Monsieur,%0D%0A%0D%0A";
 				$texte .= "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.%0D%0A";
