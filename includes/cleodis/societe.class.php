@@ -90,11 +90,10 @@ class societe_cleodis extends societe {
 
       $this->colonnes['panel']['societe_fs']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
         "CIF"
-        ,"reference_tva"
+        ,"DNI"
       ));
 
       $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
-
     }
 
 
@@ -114,12 +113,9 @@ class societe_cleodis extends societe {
     $this->panels['particulier_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
 
 
-
-
     foreach ($panel as $key => $value) {
       $this->colonnes['panel'][$key] = $value;
     }
-
 
     $this->colonnes['panel']['fidelite'] = array(
       'num_carte_fidelite',
@@ -135,8 +131,8 @@ class societe_cleodis extends societe {
 
 
     /* Définition statique des clés étrangère de la table */
-    $this->onglets = array(
-       'contact'=>array('opened'=>true)
+    $this->onglets = [
+      'contact'=>array('opened'=>true)
       ,'affaire'=>array('opened'=>true)
       ,'formation_devis'
       ,'suivi'=>array('opened'=>true)
@@ -148,7 +144,26 @@ class societe_cleodis extends societe {
       ,'pdf_societe'
       ,'user'
       ,'societe'=>array('field'=>'societe.id_filiale')/*,'societe_domaine'*/
-    );
+    ];
+
+    if (ATF::$codename === "itrenting") {
+      $this->onglets = [
+        'contact'=>array('opened'=>true)
+        ,'societe_signataire'=>array('opened'=>true)
+        ,'affaire'=>array('opened'=>true)
+        ,'formation_devis'
+        ,'suivi'=>array('opened'=>true)
+        ,'devis'
+        ,'commande'
+        ,'tache'
+        ,'parc'
+        ,'ged'
+        ,'pdf_societe'
+        ,'user'
+        ,'societe'=>array('field'=>'societe.id_filiale')/*,'societe_domaine'*/
+      ];
+    }
+
     // Infos codifiées
     $this->colonnes['panel']['codes_fs']["les_codes"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
       "code_groupe"
@@ -169,13 +184,27 @@ class societe_cleodis extends societe {
     $this->colonnes['panel']['facturation_fs'][]="RUM";
     $this->colonnes['panel']['facturation_fs'][]="divers_2";
     $this->colonnes['panel']['facturation_fs'][]="nom_banque";
-    $this->colonnes['panel']['facturation_fs'][]="ville_banque";
     $this->colonnes['panel']['facturation_fs'][]='rum';
+
+    if(ATF::$codename == "itrenting"){
+      $this->colonnes['panel']['facturation_fs'][]="adresse_banque";
+      $this->colonnes['panel']['facturation_fs'][]="adresse_banque";
+      $this->colonnes['panel']['facturation_fs'][]="cp_banque";
+      $this->colonnes['panel']['facturation_fs'][]="ville_banque";
+      $this->colonnes['panel']['facturation_fs'][]="province_banque";
+    } else {
+      $this->colonnes['panel']['facturation_fs'][]="ville_banque";
+    }
 
     // Adresses en +
     $this->colonnes['panel']["coordonnees_supplementaires_fs"]["adresse_siege_social"]=array("xtype"=>"textarea");
 
     $this->colonnes['panel']['adresse_complete_fs']["id_contact_signataire"]=array("xtype"=>"int","numberfield"=>8);
+
+    if (ATF::$codename === "itrenting") {
+      $this->colonnes['panel']['adresse_complete_fs']['cp_ville']["fields"][] = "province";
+      $this->colonnes['panel']['adresse_facturation_complete_fs']["facturation_cp_ville"]["fields"][] = "facturation_province";
+    }
 
     // Portail
     $this->colonnes['panel']['portail_fs'] = array(
@@ -719,6 +748,7 @@ class societe_cleodis extends societe {
 
     // Vérification qu'il n'existe aucun autre parc d'existence active avec le même serial
     $this->infoCollapse($infos);
+    log::logger($infos , "mfleurquin");
 
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
@@ -1602,14 +1632,18 @@ class societe_cleodis extends societe {
    */
   public function _infosCredisafePartenaire($get, $post){
     log::logger($post, "creditsafe");
-    $utilisateur  = ATF::$usr->get("contact");
-    $apporteur = $utilisateur["id_societe"];
+
+    if (!$post["apporteur"]) {
+			$utilisateur  = ATF::$usr->get("contact");
+      $apporteur = $utilisateur["id_societe"];
+		} else {
+			$apporteur = $post["apporteur"];
+		}
 
     if($post["api"]) $api = true;
     if (ATF::$codename === 'cleodis' || ATF::$codename === 'cleodisbe') {
       if(!$post["langue"]) $post["langue"] = "FR";
     }
-
 
     if(ATF::$codename == "cleodisbe")  $post["num_ident"] = $post["siret"];
     if(ATF::$codename == "itrenting")  $post["cif"] = $post["cif"];
@@ -1619,8 +1653,6 @@ class societe_cleodis extends societe {
     if(!$data["societe"]){
       throw new errorATF("erreurCS",404);
     }
-
-    log::logger($data, "creditsafe");
 
     if($data){
         $gerants = $data["gerant"];

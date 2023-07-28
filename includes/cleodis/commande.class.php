@@ -152,7 +152,16 @@ class commande_cleodis extends commande {
 	 * @return [array]       [description]
 	 */
 	public function _contratPartenaire($get,$post) {
-		if ($apporteur = ATF::$usr->get("contact")) {
+		if ($post['apporteur']) {
+			$apporteur = $post["apporteur"];
+			$get["limit"] = $post["limit"] ? $post["limit"] : 25;
+			$get["page"] = $post["page"] ? $post["page"] : 0;
+		} else {
+			$contact = ATF::$usr->get("contact");
+			$apporteur = $contact["id_societe"];
+		}
+
+		if ($apporteur) {
 
 			// Gestion du tri
 			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "commande.ref";
@@ -173,7 +182,7 @@ class commande_cleodis extends commande {
 				->where("commande.etat", "vente","AND", false, "!=")
 
 
-				->where("affaire.id_partenaire", $apporteur["id_societe"]); // en attendant la resolution du probleme de session
+				->where("affaire.id_partenaire", $apporteur); // en attendant la resolution du probleme de session
 
 			if($get["search"]) {
 				ATF::commande()->q->where("affaire.ref", "%".$get["search"]."%" , "OR", "search", "LIKE")
@@ -185,20 +194,32 @@ class commande_cleodis extends commande {
 			}
 			// filtre sur les dates
 			if ($get["filters"] && $get["filters"]["startdate"]){
-				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"]);
+				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"], "AND", false, ">=");
 			}
 
 			if ($get["filters"] && $get["filters"]["enddate"]){
-				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
+				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"], "AND", false, "<=");
 			}
 
-			if($commande = ATF::commande()->sa($get['tri'],$get['trid'])){
+			if ($get['limit']) {
+				$this->q->setLimit($get['limit']);
+				$r = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+				$commande = $r['data'];
+				header("ts-total-row: ".$r['count']);
+				header("ts-max-page: ".ceil($r['count']/$get['limit']));
+				header("ts-active-page: ".$get['page']);
+			} else {
+				$commande = ATF::commande()->sa($get['tri'],$get['trid']);
+				header("ts-total-row: ".count($commande));
+			}
+
+			if($commande){
 				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
 				foreach ($commande as $key => $cmd) {
 					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
 					$commande[$key]["somme_loyer"] = $cmd["loyer"] * $cmd["duree"];
 				}
-				header("ts-total-row: ".count($commande));
+
 				return $commande;
 			}
 			else {
@@ -2605,6 +2626,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Description blocage", "size"=>30),
 								array("title"=> "RIB", "size"=>15),
 								array("title"=> "Refinanceur", "size"=>30),
+								array("title"=> "Partenaire", "size"=>30),
 								array("title"=> "Comité", "size"=>15),
 								array("title"=> "Décision Comité", "size"=>15),
 								array("title"=> "Validité de l'accord", "size"=>15),
@@ -2680,12 +2702,16 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $suivi_description;
  			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"rib_client"))? "oui": "non";;
 
+			$partenaire = '';
+			$id_partenaire = ATF::affaire()->select($value["affaire.id_affaire_fk"], "id_partenaire");
+			if ($id_partenaire) $partenaire = ATF::societe()->select($id_partenaire, 'societe');
 
 
 			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"])->addOrder("date", 'DESC');
 			$comite = ATF::comite()->select_row();
 			if($comite){
 				$row_data[$key][] = ATF::refinanceur()->select($comite["id_refinanceur"] , "refinanceur");
+				$row_data[$key][] = $partenaire;
 				$row_data[$key][] = $comite["date"];
 				$row_data[$key][] = $comite["commentaire"];
 				$row_data[$key][] = $comite["decisionComite"];
@@ -2693,6 +2719,7 @@ class commande_cleodis extends commande {
 				$row_data[$key][] = $comite["observations"];
 			} else {
 				$row_data[$key][] = "";
+				$row_data[$key][] = $partenaire;
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";

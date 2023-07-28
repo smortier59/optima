@@ -253,6 +253,37 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
 
+		//On récupère les documents complementaires à signer de cette affaire
+		ATF::document_complementaire_a_signer()->q->reset()->where("id_affaire", ATF::affaire()->decryptId($id_affaire));
+		$doc_complementaire_affaire = ATF::document_complementaire_a_signer()->sa();
+		log::logger($doc_complementaire_affaire, "mfleurquin");
+		foreach ($doc_complementaire_affaire as $key => $value) {
+			$doc = ATF::document_contrat()->select($value["id_document_contrat"]);
+			if($doc["etat"] == "actif") {
+				$filepath = ATF::document_contrat()->filepath($value["id_document_contrat"],"fichier_joint");
+				if (file_exists($filepath)){
+					try {
+						$pageCount = $this->setSourceFile($filepath);
+
+						for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+							$tplIdx = $this->importPage($pageNo);
+
+							// add a page
+							$this->unsetHeader();
+							$this->unsetFooter();
+							$this->AddPage();
+							$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+						}
+					} catch (Exception $e) {
+						log::logger('filepath CGS = '.$filepath,"error_pdf");
+						log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "error_pdf");
+						log::logger($e->getMessage(),"error_pdf");
+						continue;
+					}
+				}
+			}
+		}
+
 
 		//On récupère les documents du/des produits de cette affaire
 		ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
@@ -2998,6 +3029,7 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
@@ -3026,6 +3058,7 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
@@ -3054,6 +3087,7 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
@@ -3071,6 +3105,7 @@ class pdf_cleodis extends pdf {
 
 				// add a page
 				$this->AddPage();
+				$this->unsetHeader();
 				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 			}
 		}
@@ -3082,6 +3117,7 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
+		$this->SetTopMargin(10);
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
@@ -3098,6 +3134,7 @@ class pdf_cleodis extends pdf {
 				$tplIdx = $this->importPage($pageNo);
 
 				// add a page
+				$this->unsetHeader();
 				$this->AddPage();
 				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 			}
@@ -3373,6 +3410,10 @@ class pdf_cleodis extends pdf {
 	  );
 
 	  $this->cadre(110,$y,80,48,$cadre,"Le Prestataire");
+
+	  if ($annexes) {
+		$this->annexes($annexes);
+	  }
   	}
 
 	/** Génère un Procès verbal
@@ -7307,8 +7348,6 @@ class pdf_cleodis extends pdf {
 			$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
 		}
 
-
-
 		$this->setfont('arial',"I",7);
 		$textLeft = "En signant ce formulaire de mandat, vous autorisez (A) le créancier à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions du créancier.
 		Vous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. Une demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte pour un prélèvement autorisé. Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.
@@ -7356,17 +7395,15 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5, "PAYS*       ".strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0, "L");
 		$this->multicell(0,5, "E-mail       ".$this->client["email"] ,0, "L");
 
-		$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
-
-
+		$this->multicell(0,5, "SIREN / SIRET       ".$this->client['siret'] ,0, "L");
 
 		$this->Ln(5);
 		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
 		$this->setfont('arial',"",8);
 		$this->Ln(2);
-		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
-		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
+		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$this->client["IBAN"] ,0, "L");
+		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$this->client["BIC"] ,0, "L");
 
 
 		$this->Ln(5);
@@ -12074,8 +12111,454 @@ class pdf_itrenting extends pdf_cleodis {
 
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
-	public $bgcolorTableau = "95C11F";
-	public $txtcolorTableau = "000000";
+
+	public $bgcolorTableau = "16145d";
+	public $txtcolorTableau = "ffffff";
+
+	public $REnteteTextColor = 255;
+	public $GEnteteTextColor = 255;
+	public $BEnteteTextColor = 255;
+
+	public function Footer() {
+		if ($this->getFooter()) return false;
+
+		$this->ATFSetStyle($style);
+		$this->SetXY(10,-15);
+		$this->ln(-3);
+		$this->Cell(0,3,$this->PageNo(),0,0,'R');
+	}
+
+	public function contrat_BBVAA4Particulier($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
+	public function contrat_BBVAA4Societe($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
+	public function contrat_BBVA($id) {
+		$garants = ATF::affaire_garant()->ss("id_affaire", $this->devis['id_affaire']);
+		foreach($garants as $k => $v) {
+			if ($v["id_societe"]) {
+				$v["nom"] = ATF::societe()->select($v["id_societe"], "societe");
+				$v["type"] = "morale";
+				$v["adresse"] = ATF::societe()->select($v["id_societe"], "adresse");
+				$v["cp"] = ATF::societe()->select($v["id_societe"], "cp");
+				$v["ville"] = ATF::societe()->select($v["id_societe"], "ville");
+				$v["province"] = ATF::societe()->select($v["id_societe"], "province");
+				$this->garant = $v;
+			}
+
+			if ($v["id_contact"]) {
+				$v["nom"] = ATF::contact()->select($v["id_contact"], "nom")." ".ATF::contact()->select($v["id_contact"], "prenom");
+				$v["type"] = "physique";
+				$v["adresse"] = ATF::contact()->select($v["id_contact"], "adresse");
+				$v["cp"] = ATF::contact()->select($v["id_contact"], "cp");
+				$v["ville"] = ATF::contact()->select($v["id_contact"], "ville");
+				$v["province"] = ATF::contact()->select($v["id_contact"], "province");
+				$this->garant = $v;
+			}
+		}
+
+		$notaire = false;
+		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 50000) $notaire = true;
+
+		$this->unsetHeader();
+
+		$this->contrat_BBVA_p1($notaire);
+		$this->contrat_BBVA_p2($notaire);
+		$this->contrat_BBVA_cg($notaire);
+		$this->contrat_BBVA_notification();
+
+		if ($this->garant) {
+			$this->contrat_BBVA_page_garant();
+		}
+	}
+
+	function contrat_BBVA_p1($notaire) {
+		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO Nº ".$this->affaire["ref"],0,'C');
+
+		$this->ln(10);
+		$this->setfont('arial','',8);
+		$this->multicell(0,3,"DE UNA PARTE, RENTING INFORMÁTICO Y TECNOLÓGICO, S.A, con C.I.F. A-83266106 y con domicilio en C/ La Granja, 82, Polígono Industrial, 28108 Alcobendas (Madrid), inscrita en el Registro Mercantil de Madrid al Tomo 17.495, Folio 165, Hoja M-300.451, Inscripción 1ª, representada en este acto por Dª Elena Pérez Dávila, con DNI nº 50.847.542-Q, con poderes suficientes en virtud de la escritura pública otorgada el día 15 de Noviembre de 2019 ante el Notario de Madrid, D. Valerio Pérez de Madrid Carreras, bajo el número 3.088 de orden de su protocolo, en adelante el Arrendador.", 0 ,'L');
+
+		$structure = 'entreprise';
+		if ($this->client['structure']) {
+			ATF::societe_structure()->q->reset()->where("structure", $this->client['structure']);
+			$societe_structure = ATF::societe_structure()->select_row();
+			if ($societe_structure) $structure = $societe_structure["type"];
+		}
+
+		if ($structure === "autonome") {
+			$this->MultiCell(0,3, "Y DE OTRA, ".$this->client["societe"].", con DNI nº".$this->client["DNI"]." y con domicilio social en ".$this->client["adresse"].", C.P. ".$this->client["cp"]." de ".$this->client["ville"]." ( ".$this->client["province"]."), en adelante el Arrendatario.",0,"L");
+		} else {
+			$this->texte_societe($this->client["id_societe"]);
+		}
+
+		if ($this->garant) {
+			if ($this->garant["type"] === "physique") {
+				$this->ln(3);
+				$garant = ATF::contact()->select($this->garant["id_contact"]);
+				$this->multicell(0,3,"Y DE OTRA, ".$this->garant["nom"].", con DNI nº".$garant["num_dni"]." y con domicilio en ".$garant["adresse"].", C.P. ".$garant["cp"]." de ".$garant["ville"]." (".$garant["province"]."), en adelante el Avalista.", 0 ,'L');
+			} else {
+				$this->texte_societe($this->garant["id_societe"]);
+			}
+		}
+
+		$this->ln(3);
+		$this->multicell(0,3,"Reconociéndose recíprocamente capacidad legal suficiente para obligarse y otorgar el presente contrato mercantil de arrendamiento, acuerdan llevarlo a efecto conforme a las siguientes Condiciones Generales y Particulares.");
+
+		$this->ln(10);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,10,"CONDICIONES PARTICULARES",0,'C');
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"PRIMERA.- BIEN OBJETO DEL ARRENDAMIENTO",0,'L');
+		$this->setfont('arial','',8);
+		$this->Multicell(0,3,"Constituyen el objeto del presente contrato de arrendamiento del/los biene/s (en adelante el Bien) descrito/s en el Anexo I.\n\n");
+		$this->Multicell(0,3,"El Arrendatario reconoce que el Arrendador ha adquirido el Bien objeto del contrato de acuerdo con su solicitud expresa para su posterior cesión en arrendamiento, recibiendo directamente de los proveedores el Bien. ");
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"SEGUNDA.- DURACIÓN DEL CONTRATO DE ARRENDAMIENTO",0,'L');
+		$this->setfont('arial','',8);
+		$this->Multicell(0,3,"El arrendamiento se pacta por un periodo irrevocable para ambas partes de ".$this->loyer[0]["duree"]." meses contados a partir de la fecha de la entrega de la totalidad de los bienes objeto del presente contrato de arrendamiento.");
+
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"TERCERA.- PRECIO DEL ARRENDAMIENTO Y LUGAR DE PAGO",0,'L');
+		$this->setfont('arial','',8);
+
+		$this->Multicell(0,3,"El precio del arrendamiento del Bien relacionado en la Estipulación Primera de las presentes Condiciones Particulares se fracciona en mensualidades prepagables, siendo el importe de cada mensualidad de ".$this->loyer[0]["loyer"]."€ más IVA (en lo sucesivo las rentas).");
+		$this->ln(3);
+		$this->Multicell(0,3,"El pago de la primera mensualidad (en adelante rentas) se iniciará el ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"])).".");
+		$this->ln(3);
+		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"]." sucursal sita en ".$this->affaire["adresse_banque"].", C.P. ".$this->affaire["cp_banque"]." de ".$this->affaire["ville_banque"].", (".$this->affaire["province_banque"]."), manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"CUARTA.- LUGAR DE LA ENTREGA");
+		$this->setfont('arial','',8);
+		$this->Multicell(0,3,"Se fija como lugar de la entrega al Arrendatario de los bienes objeto del presente contrato de arrendamiento el situado en ".$this->client["adresse"].", C.P. ".$this->client["cp"]." de ".$this->client["ville"]." (".$this->client["province"].").",0,'L');
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"QUINTA.- AMPLIACIÓN O SUSTITUCIÓN DE LOS PRODUCTOS");
+		$this->setfont('arial','',8);
+		$this->Multicell(0,3,"El Arrendador y el Arrendatario podrán negociar durante la vigencia del contrato la ampliación o sustitución del Bien arrendado por otros de una categoría similar o superior.",0,'L');
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"SEXTA.- COMUNICACIONES PARA EL CASO DE CESIÓN DEL CONTRATO");
+		$this->setfont('arial','',8);
+		$this->Multicell(0,3,"El Arrendatario se ratifica expresamente en lo dispuesto en la Condición General Séptima. No obstante, RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. quedará como único interlocutor para cualquier gestión comercial.",0,'L');
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,8,"SÉPTIMA.- FIN DE PERIODO CONTRATO");
+		$this->setfont('arial','',8);
+		$this->Multicell(0,3,"En el contexto de finalización del periodo de arrendamiento, el Arrendatario se obliga a devolver al Arrendador el material en el plazo de 48 horas desde la fecha de fin del contrato y se encarga de los gastos derivados de la devolución, incluyendo el desmontaje, embalaje y transporte del material.",0, "L");
+		$this->ln(3);
+		$this->Multicell(0,3,"Si el Arrendatario continuase en posesión de los bienes arrendados después de la fecha de finalización del contrato, estará obligado a abonar al Arrendador en concepto de pago por su uso y disfrute una cantidad igual al importe de las rentas estipuladas sin que esto perjudique a la resolución del contrato mismo durante un periodo de seis meses.",0, "L");
+		$this->ln(3);
+		$this->Multicell(0,3,"En el caso de que el material falte o este dañado, el Arrendador podrá abonar costes en función del estado del material.",0, "L");
+
+		$this->cadre_signature($notaire);
+	}
+
+	function contrat_BBVA_p2($notaire) {
+		$this->addPage();
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº".$this->affaire["ref"],0,'C');
+
+		$this->ln(5);
+		$this->setfont('arial','BU',8);
+		$this->multicell(0,8,"DESCRIPCIÓN DE LOS PRODUCTOS",0,'L');
+
+		$head = array("CANTITAD","DESCRIPCIÓN");
+		$w = array(63,126);
+		$styles = [];
+		$data = [];
+
+		foreach($this->lignes as $k => $v) {
+			$data[] = [ $v["quantite"], $v["ref"]." - ".$v["produit"] ];
+		}
+		$data[] = ["NOTA", "SALVO INDICACIÓN EXPRESA, LA GARANTÍA DE LOS BIENES RELACIONADOS EN ESTA DESCRIPCIÓN ES LA BÁSICA DE SUS RESPECTIVOS FABRICANTES"];
+
+
+		$this->tableauBigHead($head,$data, $w);
+
+		$this->ln(10);
+		$this->setfont('arial','BU',8);
+		$this->multicell(0,8,"ACTA DE ENTREGA Y CONFORMIDAD DE LOS BIENES DEL CONTRATO DE ARRENDAMIENTO Nº".$this->affaire["ref"],0,'C');
+
+		$this->setfont('arial','',8);
+		$this->multicell(0,3, "Por la presente, confirmamos nuestra aceptación de los Bienes relacionados en el Anexo número I del Contrato de Arrendamiento número ".$this->affaire["ref"]." firmado con fecha de inicio ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"]))." entre RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. y el Arrendatario.");
+		$this->ln();
+		$this->multicell(0,3, "Por lo cual aceptamos nos sean cargados los recibos correspondientes a las rentas del arrendamiento del citado contrato en el domicilio bancario descrito a continuación:");
+		$this->ln();
+
+		$this->cell(30,3,'Banco:');
+		$this->cell(160,3,$this->affaire["nom_banque"],0,1);
+
+		$this->cell(30,3,'Domicilio:');
+		$this->cell(160,3,$this->affaire["adresse_banque"],0,1);
+		$this->SetLeftMargin(40);
+		$this->cell(160,3,$this->affaire["cp_banque"]." - ". $this->affaire["ville_banque"]." (".$this->affaire["province_banque"].")",0,1);
+		$this->SetLeftMargin(10);
+
+		$this->cell(30,3,'IBAN:');
+		$this->cell(160,3,$this->affaire["IBAN"],0,1);
+
+		$this->cadre_signature($notaire);
+
+	}
+
+	function contrat_BBVA_cg($notaire) {
+		$this->addPage();
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"CONDICIONES GENERALES",0,'C');
+		$this->ln(5);
+		$this->cell(0,5,"Nº DE CONTRATO: ".$this->affaire["ref"],1,1,'C');
+
+		$articles = [
+			[
+				"PRIMERA.- OBJETO DEL CONTRATO",
+				"El presente contrato tiene por objeto el arrendamiento del/los Bien/es (en adelante el Bien) detallado/s en el Anexo I de las Condiciones Particulares.\nLas presentes Condiciones Generales y las Particulares anexas anulan y sustituyen a cualquier otro acuerdo, escrito o verbal, relativo a los productos informáticos que son objeto del presente contrato."
+			],
+			[
+				"SEGUNDA.- ELECCIÓN DE LOS PRODUCTOS",
+				"2.1 El Arrendatario manifiesta haber seleccionado y elegido el Bien arrendado personalmente, con total libertad e independencia y bajo su exclusiva responsabilidad, así como su fabricante. Reconoce tener conocimiento de las especificaciones técnicas, uso y mantenimiento con carácter previo a su arrendamiento."
+			],
+			[
+				"TERCERA.- DURACIÓN DEL CONTRATO DE ARRENDAMIENTO",
+				"3.1 La duración del contrato de arrendamiento será la pactada en la Condición Particular II. A dicho plazo se añadirá la fracción de mes a que se hace referencia en el apartado 5.4 y el plazo de prórroga que pueda resultar de la aplicación del apartado siguiente.\n3.2 Una vez finalizado el plazo de Arrendamiento, el Arrendador y el Arrendatario pactan que el Contrato de arrendamiento se entenderá prorrogado por un periodo de un año, en idénticas condiciones de precio, salvo que cualquiera de ellos manifestara por escrito a la otra parte su intención de no prorrogar el Contrato, con una antelación de seis (6) meses al vencimiento inicial o al vencimiento de la prórroga. Transcurrido el plazo prorrogado de un año el Arrendatario podrá resolver el contrato en cualquier momento notificando fehacientemente su decisión en este sentido al Arrendador con una antelación mínima de un mes.\n3.3 Si el Bien encargado fuera suministrado por el fabricante o proveedor por entregas parciales, RENTING INFORMÁTICO Y TECNOLÓGICO, S.A., tendrá derecho, pagando el precio de la entrega parcial, a facturar mensualmente la cantidad que corresponda como renta del elemento entregado, durante el tiempo no computable a efectos del plazo del arrendamiento que falte para la instalación de la totalidad del Bien entregado."
+			],
+			[
+				"CUARTA.- COMIENZO DEL ARRENDAMIENTO",
+				"El arrendamiento comenzará el día en que se efectúe la entrega del Bien objeto del presente contrato al Arrendatario.\nSe entiende por entrega la puesta a disposición del Bien y su instalación, si procede, en los locales designados por el Arrendatario, de cuya circunstancia se levantará el Acta de Recepción y Conformidad del Bien que deberá ser firmada por el Arrendatario salvo causa justificada en derecho, debiendo, en tal caso, remitir al Arrendador por telegrama con acuse de recibo, en el día siguiente, explicando los reparos que se opongan a su firma. En el caso de no remitir dicho telegrama ni el Acta de Entrega y Conformidad del Bien en el plazo de 90 días, el Arrendador podrá desistir de la puesta en vigor del presente contrato, asumiendo el Arrendatario, en tal caso, todos los gastos y posibles perjuicios que hubieran podido ocasionarse durante dicho periodo."
+			],
+			[
+				"QUINTA.- PRECIO DEL ARRENDAMIENTO",
+				"5.1 El pago de las rentas que se acuerdan en las Condiciones Particulares anexas se realizará por mensualidades anticipadas dentro de los cinco primeros días de cada mes en la cuenta que el Arrendatario posee.\n5.2 El Arrendatario queda obligado, en el momento de comienzo del arrendamiento y de su prórroga, en su caso, a aceptar, a requerimiento del Arrendador y a su elección, letras de cambio o a librar pagarés del mismo importe y vencimiento de cada una de las rentas pactadas.\n5.3 El Arrendador queda expresamente autorizado por el Arrendatario para realizar el cobro de las rentas mensuales a través de la entidad bancaria crediticia o financiera que el propio Arrendador designe, comprometiéndose el Arrendatario a comunicar a la entidad tenedora de los títulos de cobro, el nombre y domicilio del establecimiento en que desee domiciliar los pagos, así como el número de cuenta y suscribiendo a tal efecto los oportunos documentos de domiciliación de los pagos con cargo a la referida cuenta. El Arrendador podrá exigir en cualquier momento del Arrendatario el otorgamiento de una orden irrevocable de pago de las rentas.\n5.4 El pago de la primera renta se realizará el día de comienzo del arrendamiento, en la forma consignada en las Condiciones Particulares anexas.\nSi el comienzo del arrendamiento tuviera lugar con anterioridad al primer día del mes, la primera renta se abonará en proporción a los días que falten por transcurrir de dicho mes, entendiéndose en este caso prorrogada la duración del arrendamiento en la fracción de mes abonada.\n5.5 Todos los impuestos, arbitrios, tasas, contribuciones o gravámenes de cualquier tipo que en la actualidad o en el futuro puedan gravar este contrato y en general todos los gastos que se deriven del presente contrato y del ejercicio de los derechos en él establecidos, incluso los honorarios de abogado y procurador aunque su intervención no sea preceptiva, serán por cuenta exclusiva del Arrendatario. El Arrendatario deberá soportar cuantos incrementos de tipo de gravamen puedan producirse en el futuro, en virtud de la oportuna normativa.\n5.6 Serán de cuenta y cargo del Arrendatario cualesquiera impuestos específicos que graven o puedan gravar los productos informáticos cuyo arrendamiento constituye el objeto del presente contrato.\nSi el Arrendador hubiese de anticipar el pago de los referidos impuestos, el Arrendatario queda obligado a reembolsar su importe contra la presentación del correspondiente justificante o carta de pago."
+			],
+			[
+				"SEXTA.- MANTENIMIENTO, REPARACIÓN Y UTILIZACIÓN DE LOS PRODUCTOS INFORMÁTICOS ARRENDADOS.",
+				"6.1 Todos los gastos derivados de la puesta a disposición, entrega e instalación del Bien serán de cuenta y cargo exclusivo del Arrendatario.\n6.2 El Bien arrendado será utilizado exclusivamente por el Arrendatario quién observará la máxima diligencia en el uso del mismo, en su conservación y respetará las indicaciones que reciba el proveedor o fabricante. Todos los gastos necesarios para el uso y mantenimiento del Bien arrendado y las reparaciones necesarias serán por cuenta del Arrendatario.\nEl Arrendatario se compromete a gestionar y obtener del fabricante, el oportuno contrato de mantenimiento y asistencia técnica del Bien (piezas de recambio y mano de obra), siendo de cuenta y cargo exclusivo del Arrendatario todos los gastos que del referido contrato se deriven. \n6.3 El Arrendatario está obligado a observar estrictamente en la utilización del Bien las instrucciones del fabricante (especialmente en lo que respecta al medio ambiente y climatización de los locales, suministro de accesorios, energía eléctrica, etc.), así como a tomar las debidas precauciones para su mantenimiento en perfecto estado y funcionamiento durante la vigencia del arrendamiento, mediante la celebración a su cuenta y cargo exclusivo, del referido contrato de mantenimiento y asistencia técnica, con el propio fabricante. El Arrendatario se obliga a recabar del Fabricante, en todo momento, la información necesaria para la adecuada utilización e instalación del Bien (especialmente en lo concerniente a la energía eléctrica, climatización de los locales y espacio requerido para su instalación), ateniéndose, en este punto, a las especificaciones que le sean facilitadas por el Fabricante. En el supuesto de que el Bien no pudiera comenzar a ser utilizado por alguna de las causas mencionadas en este mismo apartado u otra cualquiera imputable al Arrendatario, la fecha de entrada en vigor del presente contrato no sufrirá aplazamiento alguno. \n6.4 El Arrendatario deberá adoptar, en todo momento, durante la vigencia del presente contrato, cuantas medidas sean necesarias o convenientes en lo que respecta al software preciso para el funcionamiento del Bien.\n6.5 Cualquier accesorio incorporado o elementos sustituidos en el Bien, ya sea éste parte integrante, pertenencia o componente del mismo, durante la vigencia del arrendamiento, pasará a ser automáticamente de la propiedad del Arrendador, sin derecho a compensación alguna por parte del Arrendatario.\n6.6 El Arrendatario deberá poner inmediatamente en conocimiento del Arrendador todo daño o deterioro que sobrevenga al Bien por cualquier causa.\n6.7 El Arrendatario podrá utilizar el Bien que se arrienda de modo continuo, sin que por tal causa venga obligado a abonar al Arrendador cantidad alguna en concepto de horas suplementarias.\n6.8 El Bien estará provisto de unas placas de identificación de la propiedad. El Arrendatario se obliga a:\na) Mantener, asimismo, perfectamente legibles todas las inscripciones relativas a la identificación del material.\nb) Defender los bienes arrendados de cualquier pretensión de embargo de terceros, tomando a su costa todas las medidas necesarias para su evitación o levantamiento, a fin de hacer valer el derecho de propiedad, debiendo ser notificado inmediatamente el Arrendador de cualquier clase de actuación.\nc) No incluir en su activo los bienes arrendados, en el supuesto de concurso, y evitar, en caso de quiebra, que se incluyan en la masa activa.\n6.9 El Bien arrendado solo podrá ser utilizado por el Arrendatario o por sus dependientes o empleados, bajo la inmediata y directa responsabilidad de aquél, destinándolo exclusivamente a los fines del negocio que explota. En consecuencia, el Arrendatario tiene prohibida la transferencia de su detentación o uso por cualquier forma, modalidad o título (subarriendo, cesión, permuta, préstamo, prenda, garantía, aportación social, traspaso de la empresa o de su fondo de comercio, etc.) bien sea título oneroso o gratuito, sin previo consentimiento del Arrendador.\n6.10 Con independencia de lo dispuesto en la Condición General Octava, el Arrendatario asume toda la responsabilidad y todos los riesgos desde el momento de la entrega del Bien y responderá de los daños, del deterioro, del menoscabo, de la sustracción, etc., que sufriera el mismo y, asimismo, de los daños y perjuicios ocasionados por un tercero aún cuando se deriven del uso correcto del Bien; y aunque se produzcan por fuerza mayor o caso fortuito."
+			],
+			[
+				"SÉPTIMA.- CESIÓN DEL CONTRATO",
+				"7.1 El Arrendatario autoriza expresamente al Arrendador la enajenación, cesión en garantía o gestión de cobro del presente contrato o de los derechos y acciones en él contenidos o de los títulos que los representen, en cualquier tiempo durante la vigencia del mismo, a favor de persona física o jurídica. \n7.2 El Arrendatario reconoce al Arrendador el derecho a transmitir la propiedad del Bien y ceder a un tercero los derechos que ostenta como Arrendador de este contrato, durante toda la vigencia del mismo, sin más compromiso que el de notificar al Arrendatario la cesión referida cuando esta se produzca.\n7.3 En consecuencia, el Arrendatario vendrá obligado a abonar puntualmente al Cesionario del contrato cualesquiera cantidades derivadas del mismo, con renuncia expresa a oponer excepciones cualquiera que sea su causa, o a exigir del referido Cesionario compensación ni deducción alguna o a ejercitar contra éste acciones reconvencionales por razón de derechos de crédito, que pudiera hacer valer frente a RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. Asimismo, el Arrendatario hace renuncia expresa y formal a cualesquiera acciones que pudiera ejercitar contra el Cesionario, en relación con la fabricación, entrega e instalación del Bien o con cualquier otra causa que derive del contrato cedido, en especial con las obligaciones contenidas en la Condición General 2ª, 8ª y 10ª, así como en la 5ª y 6ª de las Condiciones Particulares del contrato cedido, cuyo cumplimiento queda expresamente a cargo del cedente. El Arrendatario se reserva, no obstante, cuantas acciones puedan asistirle respecto de RENTING INFORMÁTICO Y TECNOLÓGICO, S.A.\n7.4 Las eventuales comunicaciones inherentes al contrato y al Bien objeto del mismo deberán ser dirigidas, como consecuencia de la cesión, al Cesionario. No obstante, el Arrendatario deberá, además dirigirse a RENTING INFORMÁTICO Y TECNOLÓGICO, S.A., para toda cuestión técnica concerniente al Bien, a su ampliación y su sustitución y a las relativas al seguro a todo riesgo del Bien que continúa a su cuenta y cargo en los términos de la Condición General 8ª del contrato cedido."
+			],
+			[
+				"OCTAVA.- SEGUROS",
+				"El Arrendador a su propio cargo asegura el Bien arrendado durante todo el plazo de arrendamiento, en los términos recogidos en el Certificado de Seguro, cuya copia se obliga a enviar al Arrendatario. Esta cobertura de seguro no exime ni limita la responsabilidad del Arrendatario recogido en el apartado 10 en la Condición General Sexta. \nEn consecuencia, el Arrendatario podrá suscribir a su cargo y con la compañía que estime oportuno, cualquier otro tipo de riesgos no cubierto por el seguro antes citado. \nEl Arrendatario vendrá obligado en todos los casos, a poner en conocimiento del Arrendador cada siniestro sufrido por el Bien, mediante la notificación escrita con acuse de recibo, no más tarde de las 48 horas siguientes a su acaecimiento."
+			],
+			[
+				"NOVENA.- EXCLUSIÓN DE RESPONSABILIDAD O BENEFICIO DE GARANTÍAS DEL ARRENDADOR",
+				"9.1 El Arrendatario seleccionará el Bien con la sola garantía de su propio funcionamiento. El Arrendador, de forma directa, no establecerá términos, condiciones o garantías de ninguna clase o índole en relación con el Bien, y cualquier término, condición o garantía de esta índole queda expresamente excluida del presente Contrato. El Arrendador no será responsable bajo ninguna circunstancia de las declaraciones o representaciones realizadas por cualquier distribuidor o fabricante del Bien, o por cualquier persona que pudiera tomar parte de la negociación o formalización del presente Contrato. \n9.2 El Arrendador no será considerado responsable de cualquier inadaptación de los productos y/o de los Programas a las necesidades del Arrendatario, ni de la insuficiencia de resultados o de la falta de compatibilidad de los productos y/o de los Programas entre sí.\nTampoco lo será, si es necesaria una puesta a punto para el funcionamiento del material o si las evoluciones técnicas modifican la compatibilidad de los materiales y/o de los Programas.\n9.3 Salvo que la Ley prohíba expresamente dicha exclusión, el Arrendador no tendrá responsabilidad alguna (directa o indirecta) por el Contrato, por lesión jurídica, o de cualquier otro modo con respecto al Arrendatario en relación con el Bien, su estado o cualquier defecto o disfunción del mismo, ni en lo que respecta a la infracción de cualquier derecho de propiedad intelectual que de ellos derive, o surja como consecuencia de la operación que se detalla en el presente Contrato. Ni el Arrendador, ni cualquiera de sus representantes se verán obligados a la devolución de las cuotas de arrendamiento percibidas, o a facilitar la reposición de cualquier bien si en un momento dado no se dispusiera de él o no se encontrara en buen estado. \n9.4 Por el presente Contrato, el Arrendador cede al Arrendatario durante el período en el que se prolongue el arrendamiento, los beneficios de cualquier indemnización y/o, garantía que el fabricante o el distribuidor pudieran conceder al Arrendador por el Bien, siempre que antes de que el Arrendatario exija el pago de cualquier indemnización y/o garantía de esta índole, el Arrendador sea completamente indemnizado por el Arrendatario, hasta cubrir los costes, reclamaciones, pérdidas y gastos en que hubiera incurrido, siempre que, además no se permita al Arrendatario llevar a cabo ningún procedimiento en nombre del Arrendador sin previo consentimiento por escrito del Arrendador."
+			],
+			[
+				"DÉCIMA.- CANCELACIÓN ANTICIPADA DEL CONTRATO",
+				"10.1.- El presente contrato de arrendamiento quedará perfeccionado desde el momento en que las partes estampen su firma al pie del mismo en prueba de conformidad de todo lo en él expuesto y estipulado, y tendrá plena validez y eficacia jurídica, con el carácter de irrevocable, durante toda la duración prevista en las Condiciones Generales y Particulares.\n10.2 No obstante lo dispuesto en el párrafo precedente, el Arrendatario podrá cancelar el contrato notificando su decisión en este sentido al Arrendador en forma fehaciente con una antelación mínima de quince días naturales a la fecha prevista para la entrega del Bien y abonando al Arrendador, en concepto de cláusula penal, el importe correspondiente a nueve mensualidades de la renta pactada, cuyo importe se verá incrementado con los correspondientes impuestos en vigor en el momento de producirse la resolución. La notificación de la cancelación del contrato no producirá efectos hasta que el Arrendatario haya satisfecho al Arrendador el importe de la referida cláusula del penal."
+			],
+			[
+				"UNDÉCIMA.- INCUMPLIMIENTO DEL ARRENDATARIO Y SUS CONSECUENCIAS",
+				"12.1.- A la finalización del presente contrato de arrendamiento, el Arrendatario vendrá obligado a entregar al Arrendador el Bien en perfecto estado de conservación y funcionamiento, salvo el desgaste resultante del uso normal del mismo, de acuerdo con lo pactado en el Contrato. Todos los gastos que, eventualmente, fuera necesario efectuar para la reparación o restauración del Bien restituido, serán por cuenta y cargo exclusivo del Arrendatario.	\n12.2.- Los gastos que originen de la retirada, el desmontaje y el transporte del Bien serán de cuenta y cargo exclusivo del Arrendatario.\n12.3.- El Arrendador podrá exigir al Arrendatario la oportuna certificación acreditativa de que el Bien ha estado, en todo momento durante la vigencia del arrendamiento, sujeto a un contrato de conservación y mantenimiento.\n12.4 Cuando el Arrendatario alegue algún impedimento a la retirada del Bien y dicho impedimento se prolongue más allá del día en que venza o sea resuelto el Contrato, deberá abonar, como cláusula penal y salvo que se produjeran mayores daños o perjuicios, la cantidad del 5% de la última cuota por cada día de retraso, a partir del día en que venza el Contrato."
+			],
+			[
+				"DUODÉCIMA.- RESTITUCIÓN DEL BIEN",
+				"12.1.- A la finalización del presente contrato de arrendamiento, el Arrendatario vendrá obligado a entregar al Arrendador el Bien en perfecto estado de conservación y funcionamiento, salvo el desgaste resultante del uso normal del mismo, de acuerdo con lo pactado en el Contrato. Todos los gastos que, eventualmente, fuera necesario efectuar para la reparación o restauración del Bien restituido, serán por cuenta y cargo exclusivo del Arrendatario.	\n12.2.- Los gastos que originen de la retirada, el desmontaje y el transporte del Bien serán de cuenta y cargo exclusivo del Arrendatario.\n12.3.- El Arrendador podrá exigir al Arrendatario la oportuna certificación acreditativa de que el Bien ha estado, en todo momento durante la vigencia del arrendamiento, sujeto a un contrato de conservación y mantenimiento.\n12.4 Cuando el Arrendatario alegue algún impedimento a la retirada del Bien y dicho impedimento se prolongue más allá del día en que venza o sea resuelto el Contrato, deberá abonar, como cláusula penal y salvo que se produjeran mayores daños o perjuicios, la cantidad del 5% de la última cuota por cada día de retraso, a partir del día en que venza el Contrato."
+			],
+			[
+				"DECIMOTERCERA.- NOTIFICACIONES",
+				"13.1 El Arrendatario se obliga a comunicar fehacientemente al Arrendador cualquier cambio de domicilio que pudiera producirse durante la vigencia de este contrato.\n13.2 Toda notificación, comunicación, requerimiento, citación y/o emplazamiento que deba realizarse al Arrendatario, se practicará en el domicilio que del mismo consta en el presente contrato y se reputarán bien hechos y válidos, a los efectos previstos en este contrato, incluso en el caso de que los destinatarios se hubiesen ausentado del mismo, los rechazasen o rehusasen, no fueran recogidos, no se hallaren los notificados en los mismos o fueran recibidos por familiares, empleados, vecinos o cualquier otra tercera persona, salvo que hubiesen indicado al Arrendador el cambio de domicilio de forma fehaciente."
+			],
+			[
+				"DECIMOCUARTA.- AUTORIZACIÓN UTILIZACIÓN DATOS DEL CONTRATO",
+				"El Arrendatario queda informado de que sus datos personales, que son necesarios para la formalización de este contrato, se incorporan al correspondiente fichero SS.AA., que el Arrendador queda autorizado para el tratamiento informático de los mismos para su utilización en el presente contrato y para la oferta y contratación de sus productos y servicios, pudiendo cederlos a las sociedades pertenecientes al Grupo RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. con el mismo objeto. El responsable del fichero es RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. con domicilio en C/ La Granja, 82, Polígono Industrial, 28108 Alcobendas (Madrid), pudiendo el Arrendatario acceder, actualizar, rectificar o cancelar los datos personales contenidos en el citado fichero en los términos establecidos en la normativa vigente.\nEl Arrendatario autoriza expresamente la cesión y/o comunicación de los Datos Personales establecidos en este contrato al Cesionario del presente contrato de arrendamiento, en el supuesto de cesión del mismo por parte del arrendador, necesarios para ejecución del presente contrato."
+			],
+			[
+				"DECIMOQUINTA.- LICENCIA DE USO DE SOFTWARE",
+				"Cuando el Bien al que se refiere este contrato incluya software, ya sea de base o de aplicación, el Arrendatario será usufructuario de dicho software a título de sub-licencia de uso. La citada sub-licencia no será exclusiva y no podrá ser transferida por el Arrendatario, quedando sujeta a todas las Condiciones Particulares y Condiciones Generales del presente contrato, así como a las condiciones de licencia del titular del software. El Arrendatario acepta que en ningún caso podrá adquirir la propiedad del referido software, y que le queda expresamente prohibido modificarlo, duplicarlo, hacer copias del mismo (que no sean las necesarias para la seguridad del sistema) o facilitar cualquier tipo de información a terceros. La sublicencia de uso entrará en vigor en el momento en que lo haga este Contrato."
+			],
+			[
+				"DECIMOSEXTA.- CONDICIONES GENERALES DE CONTRATACIÓN",
+				"Se advierte expresamente por el Arrendador que las cláusulas de este contrato han sido redactadas previamente por el mismo, por lo que aquellas que no recojan pactos de carácter financiero o que no vengan reguladas por una disposición de carácter personal o específico que las haga de aplicación obligatoria para los contratantes o que no hayan sido objeto de una negociación específica, se consideran condiciones generales de la contratación, dejando constancia los contratantes de la aceptación expresa de las mismas y de su incorporación al contrato, de conformidad con la ley 7/1998, de 13 de abril, sobre Condiciones Generales de Contratación."
+			],
+			[
+				"DECIMOSÉPTIMA.- JURISDICCIÓN Y COMPETENCIA",
+				"Para toda cuestión relacionada con la interpretación, cumplimiento y ejecución del presente contrato, las partes se someten a la jurisdicción y competencia de los Juzgados y Tribunales de Madrid con renuncia expresa a cualquier otro fuero que pudiera corresponderles.\nEl Arrendatario acepta expresamente los términos, condiciones y responsabilidades establecidos en el presente conjunto de Condiciones Particulares y Generales, y en prueba de conformidad con cuanto antecede, firman este documento a un solo efecto, reconociendo las partes haber obtenido copia del mismo y de sus Anexos"
+			]
+
+		];
+		$this->ln(8);
+		foreach($articles as $k => $v){
+			$this->ln(1);
+			$this->setfont('arial','B',8);
+			$this->multicell(0,3,$v[0]);
+			$this->setfont('arial','',7);
+			$this->multicell(0,3,$v[1]);
+		}
+		$this->setfont('arial','',8);
+		$this->cadre_signature($notaire);
+	}
+
+	function texte_societe($id_societe) {
+		$societe = ATF::societe()->select($id_societe);
+		$signataires = ATF::societe_signataire()->ss("id_societe", $id_societe);
+		$notaire = ATF::contact()->select($societe["id_contact_notaire"]);
+		$signataire = "";
+		foreach($signataires as $k=>$v) {
+			if ($k > 0) $signataire .=" y";
+			$contact = ATF::contact()->select($v["id_contact"]);
+			$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+		}
+		$t = "Y DE OTRA, ".$societe["societe"].", con CIF ".$societe["CIF"]." y con domicilio social en ".$societe["adresse"].", C.P. ".$societe["cp"]." de ".$societe["ville"]." (".$societe["province"].")";
+		$t .= ", inscrita en el Registro Mercantil de ".$societe["lieu_registre"].", Tomo ".$societe["numero_tomo"].", Folio ".$societe["numero_folio"].", Hoja ".$societe["numero_hoja"].", Inscripción ".$societe["numero_inscription"].", ";
+		$t .= "representada por".$signataire.",  ";
+		$t .= "con poderes suficientes en virtud del poder otorgado en ".$signataires[0]["date_autorisation_pouvoir"].", ";
+		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
+		$this->ln();
+		$this->multicell(0,3, $t,0,"L");
+	}
+
+	function cadre_signature($notaire) {
+		if ($notaire) {
+			$this->MultiCell(0,3,"Y, en prueba de conformidad, lo suscriben en el lugar y fecha indicados, solicitando su intervención por el Notario que las partes designen.");
+		} else {
+			$this->MultiCell(0,3,"Firmado el ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"])).".");
+		}
+
+		$this->ln(10);
+		$y = $this->getY();
+		$this->setfont('arial','',8);
+		$this->cell(64,5,"El Arrendador",0,1);
+		$this->setfont('arial','B',6);
+		$this->MultiCell(64,3,"RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. \n P.P.",0,'L');
+
+		$this->setY($y);
+		$this->SetLeftMargin(74);
+		$this->setfont('arial','',8);
+		$this->cell(64,5,"El Arrendatario",0,1);
+		$this->setfont('arial','B',6);
+		$this->MultiCell(64,3,$this->client["societe"]."\nP.P.",0,'L');
+
+
+		if ($this->garant) {
+			$this->setY($y);
+			$this->SetLeftMargin(138);
+
+			$this->setfont('arial','',8);
+			$this->cell(64,5,"El Arrendatario",0,1);
+			$this->setfont('arial','B',6);
+			$this->MultiCell(64,3,$this->garant["nom"]."\nP.P.",0,'L');
+			$this->ln(10);
+
+		}
+
+		$this->SetLeftMargin(10);
+
+		// $this->cell(64,5,"El Avalista",0,1);
+		// $this->cell(64,5,$this->garants[0]["nom"]." ".$this->garants[0]["prenom"],1);
+
+
+	}
+
+	function contrat_BBVA_notification() {
+		$this->addPage();
+		$this->image($this->logo,10,0,35);
+		$this->setfont('arial','B',10);
+		$this->setY(25);
+		$this->multicell(0,5,"NOTIFICACIÓN ARRENDATARIOS",0,'C');
+
+		$this->ln(10);
+		$this->setfont('arial','B',8);
+		$this->cell(0,3,$this->client["societe"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(0,4,$this->client["adresse"].",",0,1);
+		$this->cell(0,4,$this->client["cp"]." - ".$this->client["ville"].",(".$this->client["province"].")",0,1);
+		$this->cell(0,4,"En madrid, a ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).',',0,1,'R');
+
+		$this->ln(10);
+
+		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
+		$this->ln(5);
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
+		$this->ln(5);
+		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", lo que les notificamos a los efectos pertinentes y, especialmente en lo que respecta al abono de las rentas del mencionado contrato, que a partir de la fecha de hoy sólo tendrá efecto liberatorio cuando se realice directamente a BBVA, S.A.");
+		$this->ln(5);
+		$this->multicell(0,4,"Para cualquier cuestión relacionada con este asunto, les rogamos se pongan en contacto con BBVA, S.A., en el teléfono 902.220.144.");
+		$this->ln(5);
+		$this->multicell(0,4,"No obstante, a la cesión comunicada mediante la presente carta, les comunicamos que para cualquier cuestión técnica o comercial concerniente a/a los bien/es arrendados, a su ampliación, sustitución y devolución, les rogamos se pongan en contacto con Dª Elena Pérez Dávila, de RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. en el teléfono 902.180.844.");
+		$this->ln(5);
+		$this->multicell(0,4,"Atentamente,");
+
+		$this->ln(5);
+		$this->setfont('arial','B',8);
+		$this->multicell(0,4,"RENTING INFORMÁTICO Y TECNOLÓGICO, S.A.");
+
+		$this->ln(10);
+		$this->multicell(0,4,"ENTERADOS Y CONFORMES CON EL CONTENIDO DE LA PRESENTE.\n".$this->client["societe"]);
+
+
+		$style1 = array("decoration"=>"B","size"=>8);
+		$style = array("decoration"=>"","size"=>8);
+		$style2 = array("decoration"=>"","size"=>6);
+		$footerTexte = $this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." (".$this->societe["province"].")";
+
+
+		$this->SetXY(10,-40);
+		$this->ATFSetStyle($style1);
+		$this->multicell(0,4,$this->societe['nom_commercial'],0, "C");
+		$this->ATFSetStyle($style);
+		$this->multicell(0,4,$footerTexte,0,'C');
+		$this->ATFSetStyle($style1);
+		$this->multicell(0,4,"Tel: ".$this->societe["tel"]." Fax: ".$this->societe["fax"]." ".$this->societe["web"],0, "C");
+		$this->ATFSetStyle($style2);
+		$this->multicell(0,4,"Inscrita en el Registro ".$this->societe["lieu_registre"]." · Tomo ".$this->societe["numero_tomo"]." · Libro 0, Folio ".$this->societe["numero_folio"].", Sección 8, Hoja ".$this->societe["numero_hoja"].", Inscripción ".$this->societe["numero_inscription"]." · C.I.F. ".$this->societe["CIF"],0,'C');
+	}
+
+	function contrat_BBVA_page_garant() {
+		$this->addPage();
+		$this->image($this->logo,10,0,35);
+		$this->setfont('arial','B',10);
+		$this->setY(25);
+		$this->multicell(0,5,"NOTIFICACIÓN FIADORES",0,'C');
+
+		$this->ln(10);
+		$this->setfont('arial','B',8);
+		$this->cell(0,3,$this->garant["nom"],0,1);
+		$this->setfont('arial','',8);
+		$this->cell(0,3,$this->garant["adresse"].",",0,1);
+		$this->cell(0,3,$this->garant["cp"]." - ".$this->garant["ville"].",(".$this->garant["province"].")",0,1);
+		$this->cell(0,3,"En madrid, a ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).',',0,1,'R');
+
+		$this->ln(10);
+
+		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
+		$this->ln(5);
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº".$this->affaire["ref"].", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
+		$this->ln(5);
+		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá sus efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"]))." lo que le/s notificamos a los efectos pertinentes");
+		$this->ln(5);
+		$this->multicell(0,4,"Atentamente,");
+
+		$this->ln(5);
+		$this->setfont('arial','B',8);
+		$this->multicell(0,4,"RENTING INFORMÁTICO Y TECNOLÓGICO, S.A.");
+
+		$this->ln(10);
+		$this->multicell(0,4,"ENTERADO Y CONFORME CON EL CONTENIDO DE LA PRESENTE.\n".$this->garant["nom"]);
+
+		$style1 = array("decoration"=>"B","size"=>8);
+		$style = array("decoration"=>"","size"=>8);
+		$style2 = array("decoration"=>"","size"=>6);
+		$footerTexte = $this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." (".$this->societe["province"].")";
+
+
+		$this->SetXY(10,-40);
+		$this->ATFSetStyle($style1);
+		$this->multicell(0,4,$this->societe['nom_commercial'],0, "C");
+		$this->ATFSetStyle($style);
+		$this->multicell(0,4,$footerTexte,0,'C');
+		$this->ATFSetStyle($style1);
+		$this->multicell(0,4,"Tel: ".$this->societe["tel"]." Fax: ".$this->societe["fax"]." ".$this->societe["web"],0, "C");
+		$this->ATFSetStyle($style2);
+		$this->multicell(0,4,"Inscrita en el Registro ".$this->societe["lieu_registre"]." · Tomo ".$this->societe["numero_tomo"]." · Libro 0, Folio ".$this->societe["numero_folio"].", Sección 8, Hoja ".$this->societe["numero_hoja"].", Inscripción ".$this->societe["numero_inscription"]." · C.I.F. ".$this->societe["CIF"],0,'C');
+
+	}
+
+
 }
 
 class pdf_midas extends pdf_cleodis {};

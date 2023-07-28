@@ -1251,8 +1251,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 						$texte = 'Bonjour,<br />Veuillez trouver la commande pour '.$client["code_client"].' '.$client["societe"].' en pièce jointe.';
 						$texte .= '<br /> - '.($client['nom_commercial'] ? $client['nom_commercial'] : $client['societe']);
-						$texte .= '<br /> - '.($client['ref_externe'] ? $client['ref_externe'] : $client['ref']);
-						$texte .= '<br /> - Marques utilisées : '.$bdc["bon_de_commande"];
+						$texte .= '<br /> - '.$client['code_client'];
+						$texte .= '<br /> - Affaire : '.$bdc["bon_de_commande"];
 						$texte .= '<br /> - '.$contact['nom'].' '.$contact['prenom'].($contact['gsm']?' '.$contact['gsm']:'').($contact['tel']?' '.$contact['tel']:''). ' - '.$contact['email'];
 						$texte .= '<br /> - SIRET : '.$client["siret"];
 						$texte .= '<br /><br />Merci à vous, Cordialement.';
