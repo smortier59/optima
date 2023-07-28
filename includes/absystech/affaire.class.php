@@ -1210,7 +1210,14 @@ class affaire_partenaire extends affaire {
 	 */
 	public function getJalons($get) {
 		ATF::jalon()->q->reset()->where('module','affaire');
+
+		if ($get["idAffaire"]) {
+			$codeProjet = ATF::affaire()->select(ATF::affaire()->decryptId($get["idAffaire"]), "id_code_projet_ec");
+			ATF::jalon()->q->where('id_code_projet_ec', $codeProjet);
+		}
+
 		$r = ATF::jalon()->sa();
+
 
 		if ($get['groupByCategory']) {
 			$result = array();
@@ -1245,6 +1252,7 @@ class affaire_partenaire extends affaire {
 	 * @return array     Collection des jalons affecté a une affaire
 	 */
 	public function getJalonsHistory($id) {
+
 		ATF::affaire_etat()->q->reset()
 			->where('id_affaire',ATF::affaire()->decryptId($id))
 			->addOrder('date','desc');
@@ -1263,8 +1271,15 @@ class affaire_partenaire extends affaire {
 	 * @param  array $jalon Modèle de jalon
 	 * @return array        Modèle de jalon complété avec les informations supplémentaires
 	 */
-	private function infosJalon($jalon) {
 
+	private function infosJalon($jalon) {
+		$infoJalon = ATF::jalon()->select($jalon["id_jalon"]);
+		$jalon['jalon'] = $infoJalon["jalon"];
+		$jalon['category'] = $infoJalon["category"];
+		$jalon['icon'] = $infoJalon["icone"];
+		$jalon['classname'] = $infoJalon["classname"];
+
+		/*
 		switch ($jalon['id_jalon']) {
 			case 1: // Préparation en cours
 				$jalon['icon'] = "pli-box-open";
@@ -1335,7 +1350,7 @@ class affaire_partenaire extends affaire {
 		} else {
 			$jalon['classname'] = "primary";
 		}
-
+		*/
 		return $jalon;
 	}
 
