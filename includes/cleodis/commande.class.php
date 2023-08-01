@@ -193,13 +193,13 @@ class commande_cleodis extends commande {
 								->where("affaire.affaire", "%".$get["search"]."%" , "OR", "search", "LIKE");
 			}
 			// filtre sur les dates
-			if ($get["filters"] && $get["filters"]["startdate"]){
-				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"], "AND", false, ">=");
-			}
+			if ($get["filters"] && $get["filters"]["startdate"]) ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"], "AND", false, ">=");
+			if ($get["filters"] && $get["filters"]["enddate"]) ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"], "AND", false, "<=");
 
-			if ($get["filters"] && $get["filters"]["enddate"]){
-				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"], "AND", false, "<=");
-			}
+			if ($get["filters"] && $get["filters"]["startdate_min"]) ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate_min"], "AND", false, ">=");
+			if ($get["filters"] && $get["filters"]["startdate_max"]) ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate_max"], "AND", false, "<=");
+			if ($get["filters"] && $get["filters"]["enddate_min"]) ATF::commande()->q->where("commande.date_evolution", $get["filters"]["enddate_min"], "AND", false, ">=");
+			if ($get["filters"] && $get["filters"]["enddate_max"]) ATF::commande()->q->where("commande.date_evolution", $get["filters"]["enddate_max"], "AND", false, "<=");
 
 			if ($get['limit']) {
 				$this->q->setLimit($get['limit']);
