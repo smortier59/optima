@@ -47,3 +47,7 @@ ALTER TABLE `societe` ADD `numero_tomo` VARCHAR(255) NULL DEFAULT NULL;
 ALTER TABLE `societe` ADD `numero_folio` VARCHAR(255) NULL DEFAULT NULL;
 ALTER TABLE `societe` ADD `numero_hoja` VARCHAR(255) NULL DEFAULT NULL;
 ALTER TABLE `societe` ADD `numero_inscription` VARCHAR(255) NULL DEFAULT NULL;
+
+ALTER TABLE `societe` ADD `id_contact_notaire` MEDIUMINT UNSIGNED NULL DEFAULT NULL;
+ALTER TABLE `societe` ADD FOREIGN KEY (`id_contact_notaire`) REFERENCES `contact`(`id_contact`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `contact` ADD `num_ordre_notaire` VARCHAR(50) NULL DEFAULT NULL;

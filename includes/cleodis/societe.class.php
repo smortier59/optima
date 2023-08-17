@@ -258,13 +258,12 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_apporteur"] = "societe";
     $this->foreign_key["id_fournisseur"] = "societe";
     $this->foreign_key["id_contact_signataire"] = "contact";
+    $this->foreign_key["id_contact_notaire"] = "contact";
     $this->foreign_key["id_prospection"] = "contact";
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
 
     $this->files["logo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
-
-
 
 
     // Pouvoir modifier massivement
