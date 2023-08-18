@@ -1213,7 +1213,7 @@ class affaire_partenaire extends affaire {
 
 		if ($get["idAffaire"]) {
 			$codeProjet = ATF::affaire()->select(ATF::affaire()->decryptId($get["idAffaire"]), "id_code_projet_ec");
-			ATF::jalon()->q->where('id_code_projet_ec', $codeProjet);
+			if ($codeProjet) ATF::jalon()->q->where('id_code_projet_ec', $codeProjet);
 		}
 
 		$r = ATF::jalon()->sa();
