@@ -12184,7 +12184,7 @@ class pdf_itrenting extends pdf_cleodis {
 		}
 
 		if ($structure === "autonome") {
-			$this->ln(10);
+			$this->ln(5);
 			$this->MultiCell(0,3, "Y DE OTRA, ".$this->client["societe"].", con DNI nº".$this->client["DNI"]." y con domicilio social en ".$this->client["adresse"].", C.P. ".$this->client["cp"]." de ".$this->client["ville"]." ( ".$this->client["province"]."), en adelante el Arrendatario.",0,"L");
 		} else {
 			$this->texte_societe($this->client["id_societe"]);
