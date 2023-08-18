@@ -12184,6 +12184,7 @@ class pdf_itrenting extends pdf_cleodis {
 		}
 
 		if ($structure === "autonome") {
+			$this->ln(10);
 			$this->MultiCell(0,3, "Y DE OTRA, ".$this->client["societe"].", con DNI nº".$this->client["DNI"]." y con domicilio social en ".$this->client["adresse"].", C.P. ".$this->client["cp"]." de ".$this->client["ville"]." ( ".$this->client["province"]."), en adelante el Arrendatario.",0,"L");
 		} else {
 			$this->texte_societe($this->client["id_societe"]);
@@ -12258,7 +12259,7 @@ class pdf_itrenting extends pdf_cleodis {
 	function contrat_BBVA_p2($notaire) {
 		$this->addPage();
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº".$this->affaire["ref"],0,'C');
+		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº ".$this->affaire["ref"],0,'C');
 
 		$this->ln(5);
 		$this->setfont('arial','BU',8);
@@ -12406,13 +12407,14 @@ class pdf_itrenting extends pdf_cleodis {
 		$t = "Y DE OTRA, ".$societe["societe"].", con CIF ".$societe["CIF"]." y con domicilio social en ".$societe["adresse"].", C.P. ".$societe["cp"]." de ".$societe["ville"]." (".$societe["province"].")";
 		$t .= ", inscrita en el Registro Mercantil de ".$societe["lieu_registre"].", Tomo ".$societe["numero_tomo"].", Folio ".$societe["numero_folio"].", Hoja ".$societe["numero_hoja"].", Inscripción ".$societe["numero_inscription"].", ";
 		$t .= "representada por".$signataire.",  ";
-		$t .= "con poderes suficientes en virtud del poder otorgado en ".$signataires[0]["date_autorisation_pouvoir"].", ";
+		$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
 		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
 		$this->ln();
 		$this->multicell(0,3, $t,0,"L");
 	}
 
 	function cadre_signature($notaire) {
+		$this->ln(5);
 		if ($notaire) {
 			$this->MultiCell(0,3,"Y, en prueba de conformidad, lo suscriben en el lugar y fecha indicados, solicitando su intervención por el Notario que las partes designen.");
 		} else {
@@ -12473,7 +12475,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", lo que les notificamos a los efectos pertinentes y, especialmente en lo que respecta al abono de las rentas del mencionado contrato, que a partir de la fecha de hoy sólo tendrá efecto liberatorio cuando se realice directamente a BBVA, S.A.");
 		$this->ln(5);
@@ -12527,7 +12529,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº".$this->affaire["ref"].", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"].", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá sus efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"]))." lo que le/s notificamos a los efectos pertinentes");
 		$this->ln(5);
