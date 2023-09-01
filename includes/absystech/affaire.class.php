@@ -1042,7 +1042,7 @@ class affaire_partenaire extends affaire {
 			throw new Exception("Vous devriez être connecté en tant que partenaire pour accéder a cette demande.", 1526);
 		}
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "id_affaire";
+		if (!$get['tri']) $get['tri'] = "last_jalon";
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
