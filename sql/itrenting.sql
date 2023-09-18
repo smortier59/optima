@@ -14,6 +14,7 @@ ALTER TABLE affaire ADD province_banque VARCHAR(200) NULL DEFAULT NULL AFTER `vi
 ALTER TABLE contact ADD `num_dni` VARCHAR(50) NULL AFTER `id_contact`;
 ALTER TABLE contact ADD `date_autorisation_pouvoir` VARCHAR(50) NULL;
 ALTER TABLE contact ADD `num_ordre_notaire` VARCHAR(50) NULL;
+ALTER TABLE `contact` ADD `province` VARCHAR(255) NOT NULL AFTER `ville`;
 
 CREATE TABLE societe_structure (
     `id_societe_structure` INT UNSIGNED NOT NULL AUTO_INCREMENT ,

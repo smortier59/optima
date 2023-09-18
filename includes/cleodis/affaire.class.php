@@ -273,6 +273,13 @@ class affaire_cleodis extends affaire {
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
 
+		if (ATF::$codename === "itrenting") {
+			$affaire["adresse_banque"]=$infos["adresse_banque"];
+			$affaire["cp_banque"]=$infos["cp_banque"];
+			$affaire["province_banque"]=$infos["province_banque"];
+
+		}
+
 		$affaire["id_commercial"] = ATF::societe()->select($infos["id_societe"], "id_owner");
 
 

@@ -12132,6 +12132,7 @@ class pdf_itrenting extends pdf_cleodis {
 	public function contrat_BBVAA4Societe($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
 	public function contrat_BBVA($id) {
 		$garants = ATF::affaire_garant()->ss("id_affaire", $this->devis['id_affaire']);
+
 		foreach($garants as $k => $v) {
 			if ($v["id_societe"]) {
 				$v["nom"] = ATF::societe()->select($v["id_societe"], "societe");
@@ -12153,24 +12154,27 @@ class pdf_itrenting extends pdf_cleodis {
 				$this->garant = $v;
 			}
 		}
+		log::logger($this->garant , "mfleurquin");
 
 		$notaire = false;
 		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 50000) $notaire = true;
 
 		$this->unsetHeader();
 
-		$this->contrat_BBVA_p1($notaire);
-		$this->contrat_BBVA_p2($notaire);
-		$this->contrat_BBVA_cg($notaire);
+		$ref = $this->affaire["ref_externe"] ? $this->affaire["ref_externe"] : $this->affaire["ref"];
+
+		$this->contrat_BBVA_p1($notaire, $ref);
+		$this->contrat_BBVA_p2($notaire, $ref);
+		$this->contrat_BBVA_cg($notaire, $ref);
 		$this->contrat_BBVA_notification();
 
 		if ($this->garant) {
-			$this->contrat_BBVA_page_garant();
+			$this->contrat_BBVA_page_garant($ref);
 		}
 	}
 
-	function contrat_BBVA_p1($notaire) {
-		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO Nº ".$this->affaire["ref"],0,'C');
+	function contrat_BBVA_p1($notaire, $ref) {
+		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO Nº ".$ref,0,'C');
 
 		$this->ln(10);
 		$this->setfont('arial','',8);
@@ -12191,12 +12195,29 @@ class pdf_itrenting extends pdf_cleodis {
 		}
 
 		if ($this->garant) {
+			$this->ln(3);
+
 			if ($this->garant["type"] === "physique") {
-				$this->ln(3);
 				$garant = ATF::contact()->select($this->garant["id_contact"]);
 				$this->multicell(0,3,"Y DE OTRA, ".$this->garant["nom"].", con DNI nº".$garant["num_dni"]." y con domicilio en ".$garant["adresse"].", C.P. ".$garant["cp"]." de ".$garant["ville"]." (".$garant["province"]."), en adelante el Avalista.", 0 ,'L');
-			} else {
-				$this->texte_societe($this->garant["id_societe"]);
+			}
+
+			if ($this->garant["type"] === "morale") {
+				$societe_garant = ATF::societe()->select($this->garant["id_societe"]);
+				$signataires = ATF::societe_signataire()->ss("id_societe", $this->garant["id_societe"]);
+				$notaire = ATF::contact()->select($societe_garant["id_contact_notaire"]);
+				$signataire = "";
+				foreach($signataires as $k=>$v) {
+					if ($k > 0) $signataire .=" y";
+					$contact = ATF::contact()->select($v["id_contact"]);
+					$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+				}
+				$t = "Y DE OTRA, ".$societe_garant["societe"].", con CIF ".$societe_garant["CIF"]." y con domicilio social en ".$societe_garant["adresse"].", C.P. ".$societe_garant["cp"]." de ".$societe_garant["ville"]." (".$societe_garant["province"].")";
+				$t .= ", inscrita en el Registro Mercantil de ".$societe_garant["lieu_registre"].", Tomo ".$societe_garant["numero_tomo"].", Folio ".$societe_garant["numero_folio"].", Hoja ".$societe_garant["numero_hoja"].", Inscripción ".$societe_garant["numero_inscription"].", ";
+				$t .= "representada por".$signataire.",  ";
+				$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
+				$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
+				$this->multicell(0,3, $t,0,"L");
 			}
 		}
 
@@ -12244,22 +12265,13 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->setfont('arial','',8);
 		$this->Multicell(0,3,"El Arrendatario se ratifica expresamente en lo dispuesto en la Condición General Séptima. No obstante, RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. quedará como único interlocutor para cualquier gestión comercial.",0,'L');
 
-		$this->setfont('arial','B',8);
-		$this->multicell(0,8,"SÉPTIMA.- FIN DE PERIODO CONTRATO");
-		$this->setfont('arial','',8);
-		$this->Multicell(0,3,"En el contexto de finalización del periodo de arrendamiento, el Arrendatario se obliga a devolver al Arrendador el material en el plazo de 48 horas desde la fecha de fin del contrato y se encarga de los gastos derivados de la devolución, incluyendo el desmontaje, embalaje y transporte del material.",0, "L");
-		$this->ln(3);
-		$this->Multicell(0,3,"Si el Arrendatario continuase en posesión de los bienes arrendados después de la fecha de finalización del contrato, estará obligado a abonar al Arrendador en concepto de pago por su uso y disfrute una cantidad igual al importe de las rentas estipuladas sin que esto perjudique a la resolución del contrato mismo durante un periodo de seis meses.",0, "L");
-		$this->ln(3);
-		$this->Multicell(0,3,"En el caso de que el material falte o este dañado, el Arrendador podrá abonar costes en función del estado del material.",0, "L");
-
 		$this->cadre_signature($notaire);
 	}
 
-	function contrat_BBVA_p2($notaire) {
+	function contrat_BBVA_p2($notaire, $ref) {
 		$this->addPage();
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº ".$this->affaire["ref"],0,'C');
+		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº ".$ref,0,'C');
 
 		$this->ln(5);
 		$this->setfont('arial','BU',8);
@@ -12280,10 +12292,10 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->ln(10);
 		$this->setfont('arial','BU',8);
-		$this->multicell(0,8,"ACTA DE ENTREGA Y CONFORMIDAD DE LOS BIENES DEL CONTRATO DE ARRENDAMIENTO Nº".$this->affaire["ref"],0,'C');
+		$this->multicell(0,8,"ACTA DE ENTREGA Y CONFORMIDAD DE LOS BIENES DEL CONTRATO DE ARRENDAMIENTO Nº".$ref,0,'C');
 
 		$this->setfont('arial','',8);
-		$this->multicell(0,3, "Por la presente, confirmamos nuestra aceptación de los Bienes relacionados en el Anexo número I del Contrato de Arrendamiento número ".$this->affaire["ref"]." firmado con fecha de inicio ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"]))." entre RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. y el Arrendatario.");
+		$this->multicell(0,3, "Por la presente, confirmamos nuestra aceptación de los Bienes relacionados en el Anexo número I del Contrato de Arrendamiento número ".$ref." firmado con fecha de inicio ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"]))." entre RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. y el Arrendatario.");
 		$this->ln();
 		$this->multicell(0,3, "Por lo cual aceptamos nos sean cargados los recibos correspondientes a las rentas del arrendamiento del citado contrato en el domicilio bancario descrito a continuación:");
 		$this->ln();
@@ -12304,12 +12316,12 @@ class pdf_itrenting extends pdf_cleodis {
 
 	}
 
-	function contrat_BBVA_cg($notaire) {
+	function contrat_BBVA_cg($notaire, $ref) {
 		$this->addPage();
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"CONDICIONES GENERALES",0,'C');
 		$this->ln(5);
-		$this->cell(0,5,"Nº DE CONTRATO: ".$this->affaire["ref"],1,1,'C');
+		$this->cell(0,5,"Nº DE CONTRATO: ".$ref,1,1,'C');
 
 		$articles = [
 			[
@@ -12395,20 +12407,20 @@ class pdf_itrenting extends pdf_cleodis {
 	}
 
 	function texte_societe($id_societe) {
-		$societe = ATF::societe()->select($id_societe);
+		$societe_garant = ATF::societe()->select($id_societe);
 		$signataires = ATF::societe_signataire()->ss("id_societe", $id_societe);
-		$notaire = ATF::contact()->select($societe["id_contact_notaire"]);
+		$notaire = ATF::contact()->select($societe_garant["id_contact_notaire"]);
 		$signataire = "";
 		foreach($signataires as $k=>$v) {
 			if ($k > 0) $signataire .=" y";
 			$contact = ATF::contact()->select($v["id_contact"]);
 			$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
 		}
-		$t = "Y DE OTRA, ".$societe["societe"].", con CIF ".$societe["CIF"]." y con domicilio social en ".$societe["adresse"].", C.P. ".$societe["cp"]." de ".$societe["ville"]." (".$societe["province"].")";
-		$t .= ", inscrita en el Registro Mercantil de ".$societe["lieu_registre"].", Tomo ".$societe["numero_tomo"].", Folio ".$societe["numero_folio"].", Hoja ".$societe["numero_hoja"].", Inscripción ".$societe["numero_inscription"].", ";
+		$t = "Y DE OTRA, ".$societe_garant["societe"].", con CIF ".$societe_garant["CIF"]." y con domicilio social en ".$societe_garant["adresse"].", C.P. ".$societe_garant["cp"]." de ".$societe_garant["ville"]." (".$societe_garant["province"].")";
+		$t .= ", inscrita en el Registro Mercantil de ".$societe_garant["lieu_registre"].", Tomo ".$societe_garant["numero_tomo"].", Folio ".$societe_garant["numero_folio"].", Hoja ".$societe_garant["numero_hoja"].", Inscripción ".$societe_garant["numero_inscription"].", ";
 		$t .= "representada por".$signataire.",  ";
 		$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
-		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
+		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
 		$this->ln();
 		$this->multicell(0,3, $t,0,"L");
 	}
@@ -12441,7 +12453,7 @@ class pdf_itrenting extends pdf_cleodis {
 			$this->SetLeftMargin(138);
 
 			$this->setfont('arial','',8);
-			$this->cell(64,5,"El Arrendatario",0,1);
+			$this->cell(64,5,"El Avalista",0,1);
 			$this->setfont('arial','B',6);
 			$this->MultiCell(64,3,$this->garant["nom"]."\nP.P.",0,'L');
 			$this->ln(10);
@@ -12473,7 +12485,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->ln(10);
 
-		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
+		$this->cell(0,4,"Muy señores nuestros,",0,1);
 		$this->ln(5);
 		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
@@ -12510,7 +12522,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->multicell(0,4,"Inscrita en el Registro ".$this->societe["lieu_registre"]." · Tomo ".$this->societe["numero_tomo"]." · Libro 0, Folio ".$this->societe["numero_folio"].", Sección 8, Hoja ".$this->societe["numero_hoja"].", Inscripción ".$this->societe["numero_inscription"]." · C.I.F. ".$this->societe["CIF"],0,'C');
 	}
 
-	function contrat_BBVA_page_garant() {
+	function contrat_BBVA_page_garant($ref) {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
 		$this->setfont('arial','B',10);
@@ -12527,9 +12539,9 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->ln(10);
 
-		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
+		$this->cell(0,4,"Muy señores nuestros,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"].", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$ref.", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá sus efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"]))." lo que le/s notificamos a los efectos pertinentes");
 		$this->ln(5);
