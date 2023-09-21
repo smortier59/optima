@@ -2768,6 +2768,7 @@ class affaire_cleodis extends affaire {
 				$comite["etat"] = "en_attente";
 				$comite["reponse"] = NULL;
 				$comite["validite_accord"] = NULL;
+				$comite["decisionComite"] = NULL;
 				ATF::comite()->insert(array("comite"=>$comite));
 
 				//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
