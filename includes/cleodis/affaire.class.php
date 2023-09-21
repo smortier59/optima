@@ -1399,6 +1399,7 @@ class affaire_cleodis extends affaire {
 			if ($get['no-limit']) $get['page'] = false;
 			$colsData = array("affaire.affaire",
 				"affaire.id_affaire",
+				"affaire.date_livraison_prevu",
 				"affaire.etat",
 				'affaire.date',
 				'affaire.ref',
@@ -1419,6 +1420,8 @@ class affaire_cleodis extends affaire {
 
 			$this->q->addField($colsData)
 					->addField("famille.famille","famille")
+					->addField("societe.nom_commercial","nom_commercial")
+					->addField("societe.code_client", "code_client")
 
 					->from("affaire","id_societe","societe","id_societe")
 					->from("societe","id_contact_signataire","contact","id_contact")
@@ -1713,8 +1716,6 @@ class affaire_cleodis extends affaire {
 						unset($data['data'][$key][$k_]);
 					}
 				}
-
-				log::logger($this->cryptId($value['affaire.id_affaire_fk']) , "mfleurquin");
 
 				$texte  = "Bonjour Madame, Monsieur,%0D%0A%0D%0A";
 				$texte .= "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.%0D%0A";
@@ -2704,7 +2705,9 @@ class affaire_cleodis extends affaire {
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],
 									"provenance"=>"partenaire",
-									'id_partenaire'=>$id_partenaire));
+									'id_partenaire'=>$id_partenaire,
+									"date_livraison_prevu" => $post['date_livraison_prevu'])
+								);
 
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
@@ -2759,14 +2762,13 @@ class affaire_cleodis extends affaire {
 				$comite["validite_accord"] = date("Y-m-d");
 
 				ATF::comite()->insert(array("comite"=>$comite));
-				if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
-					//Création du comité CLEODIS
-					$comite["description"] = "Comité CLEODIS";
-					$comite["etat"] = "en_attente";
-					$comite["reponse"] = NULL;
-					$comite["validite_accord"] = NULL;
-					ATF::comite()->insert(array("comite"=>$comite));
-				}
+
+				//Création du comité CLEODIS
+				$comite["description"] = "Comité CLEODIS";
+				$comite["etat"] = "en_attente";
+				$comite["reponse"] = NULL;
+				$comite["validite_accord"] = NULL;
+				ATF::comite()->insert(array("comite"=>$comite));
 
 				//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
 				if(ATF::$codename=='cleodisbe'){
