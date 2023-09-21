@@ -2586,6 +2586,13 @@ class affaire_cleodis extends affaire {
 		if ($post['apporteur']) {
 			$id_partenaire = $post['apporteur'];
 			$apporteur = ATF::societe()->select($id_partenaire, 'id_apporteur');
+
+			ATF::contact()->q->reset()->where("email", $post["email_contact"])
+									  ->where("id_societe", $id_partenaire)
+									  ->where("etat", "actif")
+									  ->setLimit(1);
+			$contact = ATF::contact()->select_row();
+			$utilisateur = $contact;
 		} else {
 			$utilisateur  = ATF::$usr->get("contact");
 			$id_partenaire = ATF::$usr->get('contact','id_societe');
@@ -2791,6 +2798,9 @@ class affaire_cleodis extends affaire {
 			ATF::user()->q->reset()->where("nom", "delattre");
 			$users = ATF::user()->select_all();
 
+			ATF::user()->q->reset()->where("login", "espaceclient")->setLimit(1);
+			$partenaireUser = ATF::user()->select_row();
+
 			$notifie = array();
 			foreach ($users as $key => $value) {
 				$notifie[] = $value["id_user"];
@@ -2805,6 +2815,7 @@ class affaire_cleodis extends affaire {
 				,'public'=>'oui'
 				,'suivi_societe'=>NULL
 				,'suivi_notifie'=>$notifie
+				,'id_user' => $partenaireUser["id_user"]
 			);
 			$suivi["no_redirect"] = true;
 			ATF::suivi()->insert($suivi);
