@@ -2598,7 +2598,8 @@ class affaire_cleodis extends affaire {
 			$id_partenaire = ATF::$usr->get('contact','id_societe');
 		}
 
-		$user_partenaire = 116;
+		ATF::user()->q->reset()->where('login', 'partenaire')->setLimit(1);
+		$user_partenaire = ATF::user()->select_row();
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($id_partenaire);
 
@@ -2631,7 +2632,7 @@ class affaire_cleodis extends affaire {
 			  "date" => date("d-m-Y"),
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
-			  "id_user"=>$user_partenaire,
+			  "id_user"=>$user_partenaire["id_user"],
 		      "id_type_affaire"=>$id_type_affaire,
 			  "langue"=>ATF::societe()->select($id_societe, "langue"),
 			  "id_partenaire"=>$id_partenaire
