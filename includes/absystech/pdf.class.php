@@ -734,11 +734,19 @@ class pdf_absystech extends pdf {
 			$this->cell(141,5,"",0,0,'L');
 			$this->cell(20,5,"Total HT",1,0,'R');
 			$this->cell(25,5,number_format($totalPeriodique,2,',',' ')." €",1,1,'R');
-			if (defined("__TVA__") && __TVA__>1) {
-				$this->cell(141,5,"",0,0,'L');
-				$this->cell(20,5,"Total TTC",1,0,'R');
-				$this->cell(25,5,number_format($totalPeriodique * __TVA__,2,',',' ')." €",1,1,'R');
+
+			if(($infos_client["facturation_id_pays"]=="FR" && $infos_client["facturation_adresse"]) || (!$infos_client["facturation_adresse"] && $infos_client["id_pays"]=="FR") && (!$infos_client["reference_tva"] || substr($infos_client["reference_tva"],0,2)=="FR")){
+				if (defined("__TVA__") && __TVA__>1) {
+					$this->cell(141,5,"",0,0,'L');
+					$this->cell(20,5,"Total TTC",1,0,'R');
+					$this->cell(25,5,number_format($totalPeriodique * __TVA__,2,',',' ')." €",1,1,'R');
+				}
+			}else{
+				$this->cell(140,5,"",0,0,'L');
+				$this->cell(21,5,"Total exonéré",1,0,'R');
+				$this->cell(25,5,number_format($totalPeriodique,2,',',' ')." €",1,1,'R');
 			}
+
 			$this->ln(5);
 		}
 
