@@ -2757,12 +2757,15 @@ class affaire_cleodis extends affaire {
 				$creation = $creation->format("Ymd");
 				$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 				$past2Years = $past2Years->format("Ymd");
+				$decision = null;
 
 				if( ($societe["cs_score"] > 39 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
 					$comite["etat"] = "accepte";
+					$decision = "accepte";
 					$comite["decisionComite"] = "Accepté automatiquement";
 				}else{
 					$comite["etat"] = "refuse";
+					$decision = "refuse";
 					$comite["decisionComite"] = "Refusé automatiquement (Note < 39, ou ancienneté < 2ans)";
 				}
 
@@ -2872,7 +2875,7 @@ class affaire_cleodis extends affaire {
 		}
 		return array(
 			"result"=>true,
-			"resultat_comite" => $comite["etat"],
+			"resultat_comite" => $decision,
 			"id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"])
 		);
 	}
