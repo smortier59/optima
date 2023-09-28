@@ -1,0 +1,1 @@
+jQuery.extend(ATF.loc,{"etat":"estado"});
