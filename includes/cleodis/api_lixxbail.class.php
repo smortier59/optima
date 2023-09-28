@@ -15,6 +15,19 @@ class api_lixxbail extends classes_optima {
 		$this->table = "creditsafe";
 	}
 
+    function guidv4($data = null) {
+        // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+        $data = $data ?? random_bytes(16);
+        assert(strlen($data) == 16);
+
+        // Set version to 0100
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        // Set bits 6-7 to 10
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        // Output the 36 character UUID.
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
 
     /**
      * Recupere les constantes necessaires à l'API LIXXBAIL
@@ -48,7 +61,7 @@ class api_lixxbail extends classes_optima {
      * @param  array $params
      * @return array response
      */
-    public function curlCall($url, $token, $method='GET', $params = null){
+    public function curlCall($url, $token, $method='GET', $params = null, $headers = null){
 
         log::logger("-- URL : ".$url , $this->log_file);
 
@@ -60,7 +73,13 @@ class api_lixxbail extends classes_optima {
         curl_setopt($ch, CURLOPT_ENCODING, '');
         curl_setopt($ch, CURLOPT_TIMEOUT, 0);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json', 'Authorization: Bearer '.$token) );
+
+        if ($headers) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge($headers, ['Content-Type: application/json', 'Authorization: Bearer '.$token]));
+        } else {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json', 'Authorization: Bearer '.$token) );
+        }
+
 
         if($method === 'GET'){
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -70,6 +89,8 @@ class api_lixxbail extends classes_optima {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         }
+
+
 
         $response = curl_exec($ch);
         $response = json_decode($response);
@@ -139,7 +160,6 @@ class api_lixxbail extends classes_optima {
     public function _newConsumerFundingRequest($infos) {
         log::logger("NEW CONSUMER FUNDING REQUEST", "mfleurquin");
         $data = json_decode(base64_decode($infos["data"]), true);
-        log::logger($data, "mfleurquin");
         try {
             ATF::affaire()->q->reset()->where("affaire.ref", $data["leasing_information"]["consumer_funding_reference_id"]);
             $a = ATF::affaire()->select_row();
@@ -211,9 +231,13 @@ class api_lixxbail extends classes_optima {
                 log::logger("-- Envoi de la demande ".$url , $this->log_file);
                 log::logger("Data --> " , $this->log_file);
                 log::logger($postData , $this->log_file);
+                $uuid = $this->guidv4();
+                log::logger("correlationId --> " . $uuid, $this->log_file);
+                $headers = [ 'Correlationid: '.$uuid ];
+
 
                 try {
-                    $res = $this->curlCall($url, $access_token, 'POST', json_encode($postData));
+                    $res = $this->curlCall($url, $access_token, 'POST', json_encode($postData), $headers);
                     if (isset($res["acknowledgment_message"])) return array("success"=>true ,"result"=>$res["acknowledgment_message"]);
                     return array("success"=>true ,"result"=>"ok");
 
