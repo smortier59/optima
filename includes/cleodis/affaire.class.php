@@ -1057,7 +1057,7 @@ class affaire_cleodis extends affaire {
 		require_once 'finance.class.php';
 
 		// Baser les calculs sur la valeur résiduelle de la demande de refi acceptée
-		if ($demandeRefi = $this->getDemandeRefiValidee()) {
+		if (!$vr == NULL && $demandeRefi = $this->getDemandeRefiValidee()) {
 			$vr = $demandeRefi->get("valeur_residuelle");
 		}
 
