@@ -373,7 +373,13 @@ class comite extends classes_optima {
 					return $devis->infos['prix'];
 			case "description":	return $affaire['affaire'];
 			case "loyer_actualise":		return ATF::affaire()->getCompteTLoyerActualise($affaire);
-
+			case "valeur_residuelle":
+				$demande_refi = ATF::affaire()->getDemandeRefiValidee($id_affaire);
+				if ($demande_refi) {
+					return $demande_refi->get("valeur_residuelle");
+				} else {
+					return false;
+				}
 			case "pourcentage_materiel" : $pourcentage = ATF::affaire()->getPourcentagesMateriel($id_affaire);
 										  return $pourcentage["pourcentagesMat"];
 			case "suivi_notifie" :		  if(ATF::_r("id_comite")){
