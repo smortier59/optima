@@ -1446,7 +1446,14 @@ class affaire_cleodis extends affaire {
 
 			if($get["search"]){
 				$this->q->where("affaire.affaire","%".$get["search"]."%","AND","searchquery","LIKE")
+						->where("affaire.ref","%".$get["search"]."%","OR","searchquery","LIKE")
 						->where("societe.societe","%".$get["search"]."%","OR","searchquery","LIKE");
+			}
+
+			if ($get['filters']["search"]) {
+				$this->q->where("affaire.affaire","%".$get['filters']["search"]."%","AND","searchquery","LIKE")
+						->where("affaire.ref","%".$get['filters']["search"]."%","OR","searchquery","LIKE")
+						->where("societe.societe","%".$get['filters']["search"]."%","OR","searchquery","LIKE");
 			}
 
 			$retour =  $this->returnGetPortail($get, $post);
