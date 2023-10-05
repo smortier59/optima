@@ -12116,13 +12116,187 @@ class pdf_itrenting extends pdf_cleodis {
 	public $GEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
 
+	public function frequenceEspagnol($freq, $pluriel) {
+		switch($freq) {
+			case "jour":
+				if ($pluriel) return 'dias';
+				return 'día';
+			break;
+
+			case "mois":
+				if ($pluriel) return 'meses';
+				return 'mes';
+			break;
+			case "trimestre":
+				if ($pluriel) return 'cuartos';
+				return 'cuarto';
+			break;
+
+			case "semestre":
+				if ($pluriel) return 'semestres';
+				return 'semestre';
+			break;
+
+			case "an":
+				if ($pluriel) return 'años';
+				return 'año';
+			break;
+		}
+
+	}
+
+	public function devis($id,$s) {
+
+		$this->devis = ATF::devis()->select($id);
+		$this->loyer = ATF::loyer()->ss('id_affaire', $this->devis['id_affaire']);
+		ATF::devis_ligne()->q->reset()->where("visible", "oui")->where("id_devis", $this->devis['id_devis']);
+
+		$affaire = ATF::affaire()->select($this->devis['id_affaire']);
+		log::logger($affaire , "mfleurquin");
+
+		$this->lignes = ATF::devis_ligne()->sa();
+		$this->user = ATF::user()->select($this->devis['id_user']);
+		$this->partenaire = $affaire['id_partenaire'] ?  ATF::societe()->select($affaire['id_partenaire']) : null;
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
+		$this->client = ATF::societe()->select($this->devis['id_societe']);
+		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
+		$this->agence = ATF::agence()->select($this->user['id_agence']);
+
+		$this->unsetHeader();
+		$this->Addpage();
+		$this->image($this->logo,20,10,40);
+		$this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',150,20,20);
+
+		$this->SetLeftMargin(15);
+		$this->setY(50);
+
+		$y = $this->getY();
+		if ($this->partenaire) {
+			$this->setfont('arial','B',8);
+			$this->cell(85,4,$this->partenaire["societe"],0,0);
+			$this->setfont('arial','',8);
+
+			$this->cell(85,4,'',0,1);
+			$this->cell(85,4,$this->partenaire["tel"],0,1);
+			$this->cell(85,4,$this->partenaire["email"],0,1);
+		}
+
+
+		$this->setY($y);
+		$this->SetLeftMargin(100);
+		$this->setfont('arial','B',8);
+		$this->cell(85,4,$this->societe["nom_commercial"],0,1);
+		$this->setfont('arial','',8);
+		$this->cell(85,4,$this->user["prenom"].' '.$this->user["nom"],0,1);
+		$this->cell(85,4,$this->societe["tel"],0,1);
+		$this->cell(85,4,$this->user["email"],0,1);
+
+		$this->SetLeftMargin(15);
+		$this->ln(15);
+		$this->setfont('arial','B',8);
+		$this->cell(200,4,'Cliente final: '.$this->client["societe"],0,1);
+
+		$this->ln(5);
+		$date = getdate(strtotime($this->affaire["date"]));
+		$this->cell(200,4,'Fecha oferta: '. $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'],0,0);
+
+		$this->ln(5);
+
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "OFERTA DE RENTING SIMPEL",0,1,'C');
+
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(59,10, "IMPORTE OPERACIÓN",0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, "PLAZO",0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, "CUOTA MENSUAL",0,1,'C',1);
+
+
+		$duree = $this->loyer[0]["duree"];
+		$totMens = $this->loyer[0]["loyer"];
+		$total = $duree * $totMens;
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+		$this->cell(59,10, number_format($total, 2, ',', ' ').'€ + IVA',0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, $duree . " ". strtoupper($this->frequenceEspagnol($this->loyer[0]["frequence_loyer"], ($duree > 1))),0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, number_format($totMens, 2, ',', ' ').'€ + IVA',0,1,'C',1);
+
+		$this->ln(5);
+
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "Principales ventajas del renting:",0,1);
+		$this->ln(4);
+
+
+		$y=$this->getY();
+		$this->image(__PDF_PATH__.'itrenting/icone1.jpg',18,$this->getY()+4,5);
+		$this->image(__PDF_PATH__.'itrenting/icone2.jpg',18,$this->getY()+15,5);
+		$this->image(__PDF_PATH__.'itrenting/icone3.jpg',18,$this->getY()+27,5);
+
+		$this->SetDrawColor(153,204,51);
+		$this->SetLeftMargin(25);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',9);
+		$this->MultiCell(25,4, "\nContables\n\n\nFinancieras\n\n\nFiscales\n\n", 'R');
+
+
+		$this->SetLeftMargin(55);
+		$this->setY($y);
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',9);
+		$this->ln(4);
+		$this->MultiCell(140,4, "Al no adquirir en compra los equipos y servicios, la operación, no alteraría la composición del balance.");
+		$this->ln(4);
+		$this->MultiCell(140,4, "No consumiría vías naturales de financiación, al no aparecer la deuda en el pasivo del balance.");
+		$this->ln(4);
+		$this->MultiCell(140,4, "Gasto 100% deducible, adecuando totalmente la salida de tesorería a la deducción fiscal.");
+
+		$this->SetLeftMargin(15);
+		$this->ln(5);
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "Condiciones particulares:",0,1);
+		$this->SetLeftMargin(25);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+		$this->MultiCell(0,4, "- La operación queda supeditada a la aprobación de la oferta por parte del cliente.\n- Operación sujeta a evaluación del riesgo financiero.\n- La validez de esta oferta es de 15 días hábiles.");
+
+	}
+
+
 	public function Footer() {
 		if ($this->getFooter()) return false;
 
-		$this->ATFSetStyle($style);
+		$this->ATFSetStyle(["color" => "fff"]);
 		$this->SetXY(10,-15);
 		$this->ln(-3);
+		$this->SetFillColor(0,51,102);
+		$this->SetLeftMargin(0);
+		$this->MultiCell(210, 18, "",0, 'C', 1);
+		$this->SetLeftMargin(15);
+		$this->settextcolor(255, 255, 255);
+
+		$this->SetXY(10,-10);
 		$this->Cell(0,3,$this->PageNo(),0,0,'R');
+
+		$this->SetXY(15,-10);
+		$this->setfont('arial','B',8);
+		$this->Cell(60,3,"Renting Informático y Tecnológico S.A.",0,0,'C');
+		$this->Cell(60,3,"91 490 51 73 ",0,0,'C');
+		$this->Cell(60,3,"www.itrenting.com",0,0,'C');
+
+
 	}
 
 	public function contrat_BBVAA4Particulier($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
