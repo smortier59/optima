@@ -1498,11 +1498,12 @@ class facture_cleodis extends facture {
 							$choix = "prolongation";
 						}
 						// Pro rata
+						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
+								|| ($item["facture.nature"] === "prorata")){
+							$choix = "pro_rata";
+						}
 						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "LIXXBAIL"){
 							$choix = "affaire_refi_lixxbail";
-						} elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
-							  || ($item["facture.nature"] === "prorata")){
-							$choix = "pro_rata";
 						}
 						else{
 							if($item['facture.date_periode_debut']) {
