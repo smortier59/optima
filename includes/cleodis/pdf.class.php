@@ -12152,16 +12152,16 @@ class pdf_itrenting extends pdf_cleodis {
 		ATF::devis_ligne()->q->reset()->where("visible", "oui")->where("id_devis", $this->devis['id_devis']);
 
 		$affaire = ATF::affaire()->select($this->devis['id_affaire']);
-		log::logger($affaire , "mfleurquin");
 
 		$this->lignes = ATF::devis_ligne()->sa();
-		$this->user = ATF::user()->select($this->devis['id_user']);
+
 		$this->partenaire = $affaire['id_partenaire'] ?  ATF::societe()->select($affaire['id_partenaire']) : null;
-		$this->societe = ATF::societe()->select($this->user['id_societe']);
 		$this->client = ATF::societe()->select($this->devis['id_societe']);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
+		$this->user = ATF::user()->select($this->affaire['id_commercial']);
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
 
 		$this->unsetHeader();
 		$this->Addpage();
@@ -12174,12 +12174,20 @@ class pdf_itrenting extends pdf_cleodis {
 		$y = $this->getY();
 		if ($this->partenaire) {
 			$this->setfont('arial','B',8);
-			$this->cell(85,4,$this->partenaire["societe"],0,0);
+			$this->cell(85,4,$this->partenaire["societe"],0,1);
 			$this->setfont('arial','',8);
 
-			$this->cell(85,4,'',0,1);
-			$this->cell(85,4,$this->partenaire["tel"],0,1);
-			$this->cell(85,4,$this->partenaire["email"],0,1);
+			if ($this->partenaire["id_contact_signataire"]) {
+				$contactPartenaire = ATF::contact()->select($this->partenaire["id_contact_signataire"]);
+				$this->cell(85,4,$contactPartenaire["prenom"].' '.$contactPartenaire["nom"],0,1);
+				$this->cell(85,4,$contactPartenaire["tel"],0,1);
+				$this->cell(85,4,$contactPartenaire["email"],0,1);
+			} else {
+				$this->cell(85,4,'',0,1);
+				$this->cell(85,4,$this->partenaire["tel"],0,1);
+				$this->cell(85,4,$this->partenaire["email"],0,1);
+			}
+
 		}
 
 
@@ -12195,7 +12203,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->SetLeftMargin(15);
 		$this->ln(15);
 		$this->setfont('arial','B',8);
-		$this->cell(200,4,'Cliente final: '.$this->client["societe"],0,1);
+		$this->cell(200,4,'Cliente final: '.$this->client["societe"]. " - ".$this->client["CIF"],0,1);
 
 		$this->ln(5);
 		$date = getdate(strtotime($this->affaire["date"]));
@@ -12205,7 +12213,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->SetTextColor(0,51,102);
 		$this->setfont('arial','B',10);
-		$this->cell(180,10, "OFERTA DE RENTING SIMPEL",0,1,'C');
+		$this->cell(180,10, "OFERTA DE RENTING SIMPEL ".$this->affaire["ref"],0,1,'C');
 
 		$this->SetTextColor(255,255,255);
 		$this->setfont('arial','B',8);
@@ -12216,10 +12224,14 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->cell(1,10, "",0,0,'C');
 		$this->cell(59,10, "CUOTA MENSUAL",0,1,'C',1);
 
-
 		$duree = $this->loyer[0]["duree"];
-		$totMens = $this->loyer[0]["loyer"];
-		$total = $duree * $totMens;
+		$total = 0;
+		foreach($this->lignes as $l) {
+			if ($l["id_fournisseur"] == $affaire['id_partenaire']) {
+				$total += $l["prix_achat"];
+			}
+		}
+		$totMens = $total / $duree;
 
 		$this->SetTextColor(0,0,0);
 		$this->setfont('arial','B',8);
