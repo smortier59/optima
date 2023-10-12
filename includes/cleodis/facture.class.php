@@ -1498,11 +1498,12 @@ class facture_cleodis extends facture {
 							$choix = "prolongation";
 						}
 						// Pro rata
+						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
+								|| ($item["facture.nature"] === "prorata")){
+							$choix = "pro_rata";
+						}
 						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "LIXXBAIL"){
 							$choix = "affaire_refi_lixxbail";
-						} elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
-							  || ($item["facture.nature"] === "prorata")){
-							$choix = "pro_rata";
 						}
 						else{
 							if($item['facture.date_periode_debut']) {
@@ -1514,7 +1515,6 @@ class facture_cleodis extends facture {
 								if( ATF::$codename == "cleodisbe") {
 									$choix = "affaire_en_cours_cleodisbe";
 								} else {
-									log::logger("EN COURS ??? ". $en_cours, "mfleurquin");
 									//Affaire non refi ou refinancée par CLEODIS
 									if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
 										$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
@@ -1627,10 +1627,23 @@ class facture_cleodis extends facture {
 					break;
 
 					case 'affaire_refi_lixxbail':
-						$libelle = "CLIXXB";
-						$ligne[2]["D"] ="467810";
-						unset($ligne[3]);
-						unset($ligne[4]);
+						if ($item['facture.nature'] === 'prorata') {
+							$ligne[1]["D"] ="411000";
+							$ligne[2]["D"] ="706300";
+							$ligne[3]["D"] ="706300";
+							$ligne[4]["D"] ="445660";
+						} else {
+							ATF::facture()->q->reset()->where("id_affaire", $item['facture.id_affaire_fk'])
+													 ->where("nature", 'engagement')
+													 ->addOrder("id_facture", "ASC");
+							$facs = ATF::facture()->sa();
+
+							if($facs[0]['id_facture'] !== $item['facture.id_facture_fk']) 	$libelle = "CLIXXB";
+
+							$ligne[2]["D"] ="467810";
+							unset($ligne[3]);
+							unset($ligne[4]);
+						}
 					break;
 					case 'pro_rata':
 						$ligne[2]["D"] = "706300";
@@ -1656,8 +1669,6 @@ class facture_cleodis extends facture {
 							unset($ligne[4]);
 							$ligne[2]["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						}
-
-
 					break;
 
 					case 'affaire_en_cours_refi_bmf':
@@ -1717,7 +1728,7 @@ class facture_cleodis extends facture {
 						}else{
 							$row_data["F"] = 'C';
 						}
-						if ($choix === 'affaire_refi_lixxbail') {
+						if ($choix === 'affaire_refi_lixxbail' && $item["facture.type_facture"] === "facture_refi") {
 							$row_data["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						} else {
 							$row_data["G"] = $ligne[$i]["G"] ? $ligne[$i]["G"] : abs($item['facture.prix']);
