@@ -705,6 +705,9 @@ class pdf_absystech extends pdf {
 
 		$this->ln(3);
 
+		$tva = __TVA__;
+		if ($infos_devis["tva"]) $tva = $infos_devis["tva"];
+
 		$periodique = array();
 		$non_periodique = array();
 		foreach ($infos_devis_produit as $key => $value) {
@@ -736,10 +739,10 @@ class pdf_absystech extends pdf {
 			$this->cell(25,5,number_format($totalPeriodique,2,',',' ')." €",1,1,'R');
 
 			if(($infos_client["facturation_id_pays"]=="FR" && $infos_client["facturation_adresse"]) || (!$infos_client["facturation_adresse"] && $infos_client["id_pays"]=="FR") && (!$infos_client["reference_tva"] || substr($infos_client["reference_tva"],0,2)=="FR")){
-				if (defined("__TVA__") && __TVA__>1) {
+				if ($tva>1) {
 					$this->cell(141,5,"",0,0,'L');
 					$this->cell(20,5,"Total TTC",1,0,'R');
-					$this->cell(25,5,number_format($totalPeriodique * __TVA__,2,',',' ')." €",1,1,'R');
+					$this->cell(25,5,number_format($totalPeriodique * $tva,2,',',' ')." €",1,1,'R');
 				}
 			}else{
 				$this->cell(141,5,"",0,0,'L');
@@ -749,7 +752,6 @@ class pdf_absystech extends pdf {
 
 			$this->ln(5);
 		}
-
 
 		if(!empty($non_periodique)){
 			$data = array();
@@ -799,15 +801,15 @@ class pdf_absystech extends pdf {
 			}
 
 			if(($infos_client["facturation_id_pays"]=="FR" && $infos_client["facturation_adresse"]) || (!$infos_client["facturation_adresse"] && $infos_client["id_pays"]=="FR") && (!$infos_client["reference_tva"] || substr($infos_client["reference_tva"],0,2)=="FR")){
-				if (defined("__TVA__") && __TVA__>1) {
+				if ($tva >1) {
 					$this->cell(140,5,"",0,0,'L');
 
 					if($infos_devis["type_devis"] == "normal"){
 						$this->cell(21,5,"Total TTC",1,0,'R');
-						$this->cell(25,5,number_format($total * __TVA__,2,',',' ')." €",1,1,'R');
+						$this->cell(25,5,number_format($total * $tva,2,',',' ')." €",1,1,'R');
 					}else{
 						$this->cell(23,5,"Total TTC /mois",1,0,'R');
-						$this->cell(22,5,number_format($infos_devis["prix_location"]* __TVA__,2,',',' ')." €",1,1,'R');
+						$this->cell(22,5,number_format($infos_devis["prix_location"]* $tva,2,',',' ')." €",1,1,'R');
 					}
 
 				}
