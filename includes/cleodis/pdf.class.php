@@ -12287,8 +12287,6 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->MultiCell(0,4, "- La operación queda supeditada a la aprobación de la oferta por parte del cliente.\n- Operación sujeta a evaluación del riesgo financiero.\n- La validez de esta oferta es de 15 días hábiles.");
 
 	}
-
-
 	public function Footer() {
 		if ($this->getFooter()) return false;
 		if ($this->footerWithBG) {
@@ -12828,6 +12826,109 @@ class pdf_itrenting extends pdf_cleodis {
 
 	}
 
+	public function cession($id, $s) {
+		$this->commandeInit($id,$s,$previsu);
+
+		$notaire = false;
+		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 30000) $notaire = true;
+
+		$this->unsetHeader();
+		$this->Open();
+		$this->AddPage();
+		$this->SetLeftMargin(15);
+
+		$this->image($this->logo,20,10,40);
+		$this->setfont('arial','B',10);
+		log::logger($this->commande, "mfleurquin");
+		$this->setY(30);
+		$this->setX(125);
+		$date = getdate(strtotime($this->commande["date_debut"]));
+		$dateDebutEsp = $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'];
+		$this->cell(100,4,'En Madrid, a : '. $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'],0,1);
+		$this->setX(15);
+
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "REUNIDOS",0,1,'C');
+		$this->setfont('arial','B',8);
+		$this->cell(180,10, "DE UNA PARTE:",0,1);
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"BBVA, S.A., con C.I.F. A-48265169 y con domicilio en Bilbao, Plaza de San Nicolás, nº 4, inscrita en el Registro Mercantil de Vizcaya, folio 183, libro 1.545 de la sección 3ª de sociedades, tomo 2.083, hoja nº 14.741, inscripción 1ª, en cuanto a su constitución, folio 49, libro 1.657, sección 3ª de sociedades, tomo 2.227, hoja nº BI-17A, inscripción 256, representada en este acto por D.  Luis Carlos Ruano Tavares, mayor de edad, con NIF 50.861.357-P, en calidad de apoderado y en uso de las facultades que tiene conferidas en virtud de poder otorgado a su favor, el día 22 de Noviembre de 2018, ante el Notario del Ilustre Colegio de Madrid, D. Juan José de Palacio Rodriguez, con el número 4.255 de su protocolo.");
+		$this->ln(2);
+		$this->setfont('arial','B',8);
+		$this->cell(180,10, "Y DE OTRA PARTE:",0,1);
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"RENTING INFORMÁTICO Y TECNOLÓGICO, S.A., con C.I.F. A-83266106, con domicilio en Alcobendas, C/ La Granja 82, Polígono Industrial, 28108 Alcobendas (Madrid), inscrita en el Registro Mercantil de Madrid, al  tomo 17.495, libro 0, folio 165, Sección 8ª, hoja M-300.451, inscripción 1ª, representada en este acto por Dª Elena Pérez Dávila con D.N.I. 50.847.542-Q, con poderes suficientes en virtud de la escritura pública otorgada ante el Notario del Ilustre Colegio de Madrid, D. Valerio Pérez de Madrid Carreras, el día 15 de Noviembre de 2019, bajo el número 3.088 de su protocolo, que en adelante se denominará IT RENTING.");
+
+		$this->setfont('arial','B',10);
+		$this->ln(5);
+		$this->cell(180,10, "EXPONEN",0,1,'C');
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"I.- Que IT RENTING es propietario del bien que se relaciona en las Condiciones Particulares del contrato de arrendamiento que más adelante se detalla, encontrándose dicho bien libre de cargas y gravámenes.");
+		$this->ln(2);
+		$this->multicell(0,5,"II.-Que IT RENTING tiene cedido en arrendamiento el bien a que se hace referencia en el Expositivo I, de acuerdo a las condiciones estipuladas en el contrato mercantil de arrendamiento Nº".$this->affaire["ref"]." de fecha de inicio ".$dateDebutEsp." con ".$this->client["societe"].", cuyo original se adjunta a este documento como ANEXO A.");
+		$this->ln(2);
+		$this->multicell(0,5,"III.- Que es propósito de IT RENTING transmitir a BBVA, S.A. el bien que se detalla en el Expositivo I, así como todos los derechos que le corresponden como arrendadora en el contrato mercantil que se acompaña como ANEXO A, asumiendo BBVA, S.A. los derechos y obligaciones dimanantes del mismo, incluida la posición de propietario del bien cedido en arrendamiento, sin perjuicio de lo establecido en la cláusula novena.");
+		$this->ln(2);
+		$this->multicell(0,5,"IV.- Que IT RENTING, ha cumplido puntualmente hasta el día de hoy todas las obligaciones derivadas del contrato que se cede, y expresamente las relativas a la entrega y puesta a disposición del arrendatario del bien arrendado, así como todas las obligaciones de tipo fiscal que dimanan del mismo.");
+		$this->ln(2);
+		$this->multicell(0,5,"V.- Y expuesto cuanto antecede, las partes llevan a cabo la cesión del contrato de arrendamiento citado, con arreglo a las siguientes");
+
+
+		$this->setfont('arial','B',10);
+		$this->ln(5);
+		$this->cell(180,10, "ESTIPULACIONES",0,1,'C');
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"PRIMERA.- IT RENTING, por medio de sus representantes, transmite a BBVA, S.A., que acepta, por medio de sus representantes, el bien a que se refiere el Expositivo I, así como los derechos y obligaciones que le corresponden como arrendadora, derivados del contrato de arrendamiento descrito en el Expositivo II del presente documento, sin perjuicio de lo establecido en la cláusula novena.");
+		$this->ln(2);
+		$this->multicell(0,5,"SEGUNDA.- El precio de la transmisión de los bienes y de la cesión de los derechos inherentes al contrato citado es el de [MONTANT TOTAL HT]  ([MONTANT TOTAL HT LETTRES] ), más [MONTANT IVA]  ([MONTANT IVA LETTRES]) , en concepto de IVA, que se abonará mediante transferencia bancaria en la cuenta ES51 0182 2336 2902 0154 7827 que IT RENTING tiene abierta a su nombre en la entidad bancaria BBVA, S.A.");
+
+		$this->addPage();
+		$this->multicell(0,5,"TERCERA.- IT RENTING responde de la existencia y legitimidad del contrato de arrendamiento que se cede, así como de los derechos que de éste se derivan contra el arrendatario y sus garantes, caso de que los haya, aunque no de la solvencia de ninguno de ellos.");
+		$this->ln(2);
+		$this->multicell(0,5,"Serán de cuenta y cargo exclusivo de IT RENTING, la pérdida o daños que pudieran sufrir los bienes arrendados hasta el momento en que se produzca la cesión efectiva de los contratos. IT RENTING responderá de los daños, del deterioro, del menoscabo, de la sustracción, etc., que sufriera el material arrendado y, asimismo, de los daños y perjuicios ocasionados a un tercero aún cuando se deriven del uso correcto del material, y aunque se produzca por fuerza mayor o caso fortuito, hasta la fecha de entrada en vigor de la cesión del/los contrato/s de arrendamiento.");
+		$this->ln(2);
+		$this->multicell(0,5,"CUARTA.- La cesión del contrato citado se hace con todos los derechos inherentes al mismo, incluyendo los accesorios; tales como fianzas, hipotecas, prendas, privilegios, y cualesquiera otros que correspondieran al arrendador sobre el arrendatario y sus garantes.");
+		$this->ln(2);
+		$this->multicell(0,5,"QUINTA.- BBVA, S.A. queda subrogada en la posición del arrendador en el respectivo contrato de arrendamiento y asume los derechos y obligaciones que se deriven del mismo, y que hasta el día de hoy correspondieron a IT RENTING, con independencia de cual sea el momento de sus vencimientos, a excepción de las obligaciones derivadas de la entrega e instalación de los bienes arrendados que serán responsabilidad de IT RENTING así como las establecidas en la cláusula novena.");
+		$this->ln(2);
+		$this->multicell(0,5,"SEXTA.- Con independencia del momento en que haya de producir efecto el negocio jurídico celebrado entre IT RENTING y el arrendatario del contrato objeto de cesión, la subrogación efectuada solo produce plenos efectos respecto de este último a partir de la fecha de notificación al arrendatario de la presente cesión. IT RENTING se compromete a notificar al arrendatario mediante carta, cuyo modelo se adjunto como ANEXO B, por cualquier medio que asegure su recepción, la cesión en el domicilio que figura en el contrato de arrendamiento objeto de cesión, o en el domicilio que posteriormente le haya notificado el arrendatario. Para proceder al abono del precio de la cesión señalado en la cláusula segunda, será condición necesaria que se entregue a BBVA, S.A. justificante de haber efectuado la citada comunicación y de que ésta ha llegado al domicilio del arrendatario.  ");
+		$this->ln(2);
+		$this->multicell(0,5,"Dicha notificación se hará extensiva a los fiadores si los hubiere y que serán los que figuran en el correspondiente contrato objeto de cesión. Se acompaña como ANEXO C modelo de carta de notificación a los fiadores.");
+		$this->ln(2);
+		$this->multicell(0,5,"SÉPTIMA.- El presente contrato de transmisión de bienes y de cesión de derechos, entra en vigor y empieza a producir sus efectos de conformidad con lo dispuesto en la Estipulación SEXTA de este documento. En consecuencia, IT RENTING se compromete a abonar a BBVA, S.A. aquellas cantidades que pudiera recibir por el pago de rentas de arrendamiento de fecha posterior a la cesión del contrato de arrendamiento");
+		$this->ln(2);
+		$this->multicell(0,5,"OCTAVA.- IT RENTING responderá ante BBVA, S.A. de cualquier reclamación, así como de cualquier tipo de coste fiscal que ésta pudiere tener a causa de algún incumplimiento por parte de IT RENTING, de los descritos en el Expositivo IV, bastando en este caso para el abono por parte de IT RENTING a BBVA, S.A., la notificación de ésta acreditando, mediante fotocopia de la correspondiente reclamación, la cantidad resultante y que deberá ser abonada en un plazo máximo de 30 días a partir de la citada notificación.");
+		$this->ln(2);
+		$this->multicell(0,5,"NOVENA.- IT RENTING continuará siendo responsable frente al arrendatario, para aquellas cuestiones que en virtud de la cláusula séptima del contrato de arrendamiento, siga realizando IT RENTING frente al Arrendatario, pese a la cesión producida y en los términos en los que se hubiera comprometido en el contrato de arrendamiento. A tales efectos IT RENTING quedará como interlocutor frente al arrendatario para toda cuestión técnica o comercial concerniente a los equipos su ampliación, sustitución, devolución y los relativos al seguro de pérdida o daños de los equipos arrendados que en su caso hubiera suscrito IT RENTING, manteniendo indemne a BBVA, S.A. de cualquier reclamación presentada por el arrendatario por cualquiera de estas causas.");
+		$this->ln(2);
+		$this->multicell(0,5,"IT RENTING se responsabilizará del correcto funcionamiento de los equipos en los mismos términos en los que se hubiera comprometido en el contrato de arrendamiento suscrito con el Cliente. IT RENTING quedará como interlocutor frente al arrendatario para toda cuestión técnica o comercial concerniente a los equipos y asume todos los riesgos derivados del adecuado funcionamiento de los equipos, manteniendo indemne a BBVA, S.A. de cualquier impago o reclamación presentada por el arrendatario por cualquiera de estas causas. ");
+		$this->ln(2);
+		$this->multicell(0,5,"DÉCIMA.- IT RENTING garantiza la recompra al término del plazo pactado como duración de los contrato de arrendamiento (renting que hayan sido cedidos por IT RENTING a BBVA, S.A., de todos los derechos, incluido el dominical, sobre los equipos objeto de los contratos mencionados, con independencia del estado en que se encuentren, donde estén y en posesión de quien estén. La recompra se llevará a cabo en el plazo máximo de 30 (treinta) días desde el primer requerimiento escrito de BBVA, S.A. comunicándole el vencimiento del contrato, por el precio de 20 EUROS por la totalidad de los equipos objeto del contrato de arrendamiento más el IVA que corresponda o impuesto que lo sustituya. Tras el abono por IT RENTING a BBVA, S.A. de dicho precio, ésta cederá a aquella todos sus derechos sobre dicho equipo. La retirada, desinstalación y transporte de éstos se efectuará por IT RENTING con todos los costes a su cargo.");
+		$this->ln(2);
+		$this->multicell(0,5,"Esta garantía se mantendrá en vigor hasta que la obligación de recompra asumida por IT RENTING, en virtud del presente documento, haya sido totalmente cumplida respecto al contrato de arrendamiento cedido.");
+		$this->ln(2);
+		$this->multicell(0,5,"UNDECIMA.-  El presente contrato de cesión de bienes y derechos entrará en vigor y empezará a producir efectos, a partir de la fecha del presente documento");
+		$this->ln(2);
+		$this->multicell(0,5,"En todo lo no establecido expresamente en este documento le será de aplicación el Acuerdo de Colaboración formalizado entre IT RENTING y BBVA, S.A. el día 10 de Diciembre de 2008.");
+		$this->ln(2);
+		$this->multicell(0,5,"DUODÉCIMA.- IT RENTING y BBVA, S.A. se comprometen asimismo, a otorgar cuantos documentos fueran necesarios para aclarar o completar este contrato y se obligan expresamente a realizar cuantos actos de cualquier índole sean necesarios, en orden a la más eficaz gestión de los bienes y derechos que son objeto de este contrato");
+		$this->ln(2);
+		$this->multicell(0,5,"DECIMOTERCERA.- Para cualquier cuestión que pueda surgir en relación con la interpretación o cumplimiento del presente contrato, las partes se someten al fuero de los Juzgados y Tribunales de Madrid Capital, con renuncia expresa a cualquier otro que pudiera corresponderles.");
+		$this->ln(2);
+		$this->multicell(0,5,"Y en prueba de conformidad con lo que antecede, las partes lo ratifican y firman por duplicado, en el lugar y fecha que en el encabezamiento se indica.");
+		$this->ln(2);
+
+		if ($notaire) {
+			$this->multicell(0,5,"Y, en prueba de conformidad, lo suscriben en el lugar y fecha indicados, solicitando su intervención por el Notario que las partes designen.");
+		} else {
+			$this->multicell(0,5,"Firmado el ".$dateDebutEsp.".");
+		}
+		$this->ln(20);
+		$this->setfont('arial','B',8);
+		$this->cell(120, 5, "BBVA, S.A.");
+		$this->cell(120, 5, "RENTING INFORMÁTICO Y TECNOLÓGICO, S.A.",0,1);
+
+	}
 
 }
 
