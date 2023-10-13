@@ -12105,6 +12105,7 @@ class pdf_itrenting extends pdf_cleodis {
 	public $logo = __PDF_PATH__."/".'itrenting/logo.jpg';
 	public $logo_site = __PDF_PATH__."/".'itrenting/logo.jpg';
 	public $cleodis = 'IT Renting';
+	public $footerWithBG = false;
 
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
@@ -12164,6 +12165,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->societe = ATF::societe()->select($this->user['id_societe']);
 
 		$this->unsetHeader();
+		$this->footerWithBG = true;
 		$this->Addpage();
 		$this->image($this->logo,20,10,40);
 		$this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',150,20,20);
@@ -12289,24 +12291,27 @@ class pdf_itrenting extends pdf_cleodis {
 
 	public function Footer() {
 		if ($this->getFooter()) return false;
+		if ($this->footerWithBG) {
+			$this->ATFSetStyle(["color" => "fff"]);
+			$this->SetXY(10,-15);
+			$this->ln(-3);
+			$this->SetFillColor(0,51,102);
+			$this->SetLeftMargin(0);
+			$this->MultiCell(210, 18, "",0, 'C', 1);
+			$this->SetLeftMargin(15);
+			$this->settextcolor(255, 255, 255);
 
-		$this->ATFSetStyle(["color" => "fff"]);
-		$this->SetXY(10,-15);
-		$this->ln(-3);
-		$this->SetFillColor(0,51,102);
-		$this->SetLeftMargin(0);
-		$this->MultiCell(210, 18, "",0, 'C', 1);
-		$this->SetLeftMargin(15);
-		$this->settextcolor(255, 255, 255);
+			$this->SetXY(10,-10);
+			$this->Cell(0,3,$this->PageNo(),0,0,'R');
 
-		$this->SetXY(10,-10);
-		$this->Cell(0,3,$this->PageNo(),0,0,'R');
+			$this->SetXY(15,-10);
+			$this->setfont('arial','B',8);
+			$this->Cell(60,3,"Renting Informático y Tecnológico S.A.",0,0,'C');
+			$this->Cell(60,3,"91 490 51 73 ",0,0,'C');
+			$this->Cell(60,3,"www.itrenting.com",0,0,'C');
+		}
 
-		$this->SetXY(15,-10);
-		$this->setfont('arial','B',8);
-		$this->Cell(60,3,"Renting Informático y Tecnológico S.A.",0,0,'C');
-		$this->Cell(60,3,"91 490 51 73 ",0,0,'C');
-		$this->Cell(60,3,"www.itrenting.com",0,0,'C');
+
 
 
 	}
@@ -12649,7 +12654,6 @@ class pdf_itrenting extends pdf_cleodis {
 
 
 	}
-
 	function contrat_BBVA_notification() {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
@@ -12703,7 +12707,6 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->ATFSetStyle($style2);
 		$this->multicell(0,4,"Inscrita en el Registro ".$this->societe["lieu_registre"]." · Tomo ".$this->societe["numero_tomo"]." · Libro 0, Folio ".$this->societe["numero_folio"].", Sección 8, Hoja ".$this->societe["numero_hoja"].", Inscripción ".$this->societe["numero_inscription"]." · C.I.F. ".$this->societe["CIF"],0,'C');
 	}
-
 	function contrat_BBVA_page_garant($ref) {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
@@ -12751,6 +12754,77 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->multicell(0,4,"Tel: ".$this->societe["tel"]." Fax: ".$this->societe["fax"]." ".$this->societe["web"],0, "C");
 		$this->ATFSetStyle($style2);
 		$this->multicell(0,4,"Inscrita en el Registro ".$this->societe["lieu_registre"]." · Tomo ".$this->societe["numero_tomo"]." · Libro 0, Folio ".$this->societe["numero_folio"].", Sección 8, Hoja ".$this->societe["numero_hoja"].", Inscripción ".$this->societe["numero_inscription"]." · C.I.F. ".$this->societe["CIF"],0,'C');
+
+	}
+
+	/** Génère un Procès verbal
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 11-02-2011
+	*/
+	public function contratPV($id,$s,$previsu) {
+		$this->commandeInit($id,$s,$previsu);
+
+		$this->unsetHeader();
+		$this->Open();
+		$this->AddPage();
+
+		$this->image($this->logo,20,10,40);
+		$this->setfont('arial','B',10);
+
+		$this->SetLeftMargin(15);
+		$this->setY(40);
+
+		$date = getdate(strtotime(date('Y-m-d')));
+		$this->setX(125);
+		$this->cell(100,4,'Fecha: '. $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'],0,0);
+		$this->setX(15);
+		$this->ln(25);
+
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "CERTIFICADO DE ENTREGA",0,1,'C');
+		$this->ln(25);
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',9);
+
+		$txt = "D. ............................................................................................................................ ";
+		$txt .= "certifica que todos los productos relacionados con el contrato ";
+		$txt .= $this->affaire["ref"]. " a nombre de ". $this->client["societe"].", han sido entregados en perfecto orden y estado el día .........................................";
+		$txt .= "en la dirección ................................................................................................ por la empresa ................................................................................................";
+		$this->MultiCell(0,5, $txt);
+
+		$this->ln(10);
+
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(60,10, "CANTIDAD",0,0,'C',1);
+		$this->cell(120,10, "DESCRIPCIÓN",0,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+
+		foreach($this->lignes as $l) {
+			log::logger($l , "mfleurquin");
+			$this->cell(60, 10, $l["quantite"], 0, 0, 'C', 1);
+			$this->cell(120, 10, $l["ref"]." ".$l["produit"], 0, 1, 'L', 1);
+		}
+
+		$this->setY(225);
+		$this->setfont('arial','',8);
+		$this->cell(120, 5, "Firma del personal de entrega");
+		$this->cell(120, 5, "Firma del cliente",0,1);
+
+		$this->cell(120, 5, "Nombre:");
+		$this->cell(120, 5, "Nombre:",0,1);
+		$this->cell(120, 5, "DNI:");
+		$this->cell(120, 5, "DNI:",0,1);
+		$this->cell(120, 5, "Fecha:");
+		$this->cell(120, 5, "Fecha:",0,1);
+
+		$this->ln(10);
+		$this->cell(180,5, "C/ La Granja, 82. Polígono Industrial Alcobendas. 28108 Alcobendas - Madrid.", 0, 0, 'C');
 
 	}
 
