@@ -12233,7 +12233,7 @@ class pdf_itrenting extends pdf_cleodis {
 				$total += $l["prix_achat"];
 			}
 		}
-		$totMens = $total / $duree;
+		$totMens = $this->loyer[0]["loyer"];
 
 		$this->SetTextColor(0,0,0);
 		$this->setfont('arial','B',8);
