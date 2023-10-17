@@ -12168,7 +12168,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->footerWithBG = true;
 		$this->Addpage();
 		$this->image($this->logo,20,10,0,20);
-		$this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',150,10,0,20);
+		// $this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',150,10,0,20);
 
 		$this->SetLeftMargin(15);
 		$this->setY(50);
