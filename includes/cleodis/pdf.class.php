@@ -12828,9 +12828,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 	public function cession($id, $s) {
 		$this->commandeInit($id,$s,$previsu);
-
-		$montant_ht = 0;
-		$IVA = 0;
+		$montant_ht = $IVA = 0;
 
 		ATF::demande_refi()->q->reset()->where("id_affaire", $this->affaire["id_affaire"])
 									   ->where("etat", "valide")->setLimit(1);
@@ -12840,9 +12838,6 @@ class pdf_itrenting extends pdf_cleodis {
 			$montant_ht = $demande_refi["prix"];
 			$IVA = $demande_refi["prix"] * ($this->commande["tva"] - 1);
 		}
-
-		log::logger(util::nb2texteespanol($montant_ht, true), "mfleurquin");
-		log::logger(util::nb2texteespanol($IVA, true), "mfleurquin");
 
 		$notaire = false;
 		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 30000) $notaire = true;
