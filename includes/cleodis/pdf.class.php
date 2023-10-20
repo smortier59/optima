@@ -12836,11 +12836,13 @@ class pdf_itrenting extends pdf_cleodis {
 									   ->where("etat", "valide")->setLimit(1);
 		$demande_refi = ATF::demande_refi()->select_row();
 
-		$montant_ht = 12600;
 		if ($demande_refi) {
-			// $montant_ht = $demande_refi["prix"];
+			$montant_ht = $demande_refi["prix"];
 			$IVA = $demande_refi["prix"] * ($this->commande["tva"] - 1);
 		}
+
+		log::logger(util::nb2texteespanol($montant_ht, true), "mfleurquin");
+		log::logger(util::nb2texteespanol($IVA, true), "mfleurquin");
 
 		$notaire = false;
 		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 30000) $notaire = true;
