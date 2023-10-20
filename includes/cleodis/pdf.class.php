@@ -12836,8 +12836,9 @@ class pdf_itrenting extends pdf_cleodis {
 									   ->where("etat", "valide")->setLimit(1);
 		$demande_refi = ATF::demande_refi()->select_row();
 
+		$montant_ht = 12600;
 		if ($demande_refi) {
-			$montant_ht = $demande_refi["prix"];
+			// $montant_ht = $demande_refi["prix"];
 			$IVA = $demande_refi["prix"] * ($this->commande["tva"] - 1);
 		}
 
@@ -12891,7 +12892,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->setfont('arial','',8);
 		$this->multicell(0,5,"PRIMERA.- IT RENTING, por medio de sus representantes, transmite a BBVA, S.A., que acepta, por medio de sus representantes, el bien a que se refiere el Expositivo I, así como los derechos y obligaciones que le corresponden como arrendadora, derivados del contrato de arrendamiento descrito en el Expositivo II del presente documento, sin perjuicio de lo establecido en la cláusula novena.");
 		$this->ln(2);
-		$this->multicell(0,5,"SEGUNDA.- El precio de la transmisión de los bienes y de la cesión de los derechos inherentes al contrato citado es el de ".number_format($montant_ht,2, ',', ' ')."€  (".util::nb2texteespanol($montant_ht)."), más ".number_format($IVA,2, ',', ' ')."€  (".util::nb2texteespanol($IVA).") , en concepto de IVA, que se abonará mediante transferencia bancaria en la cuenta ES51 0182 2336 2902 0154 7827 que IT RENTING tiene abierta a su nombre en la entidad bancaria BBVA, S.A.");
+		$this->multicell(0,5,"SEGUNDA.- El precio de la transmisión de los bienes y de la cesión de los derechos inherentes al contrato citado es el de ".number_format($montant_ht,2, ',', ' ')."€  (".util::nb2texteespanol($montant_ht, true)."), más ".number_format($IVA,2, ',', ' ')."€  (".util::nb2texteespanol($IVA, true).") , en concepto de IVA, que se abonará mediante transferencia bancaria en la cuenta ES51 0182 2336 2902 0154 7827 que IT RENTING tiene abierta a su nombre en la entidad bancaria BBVA, S.A.");
 
 		$this->addPage();
 		$this->multicell(0,5,"TERCERA.- IT RENTING responde de la existencia y legitimidad del contrato de arrendamiento que se cede, así como de los derechos que de éste se derivan contra el arrendatario y sus garantes, caso de que los haya, aunque no de la solvencia de ninguno de ellos.");
