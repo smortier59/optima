@@ -273,6 +273,13 @@ class affaire_cleodis extends affaire {
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
 
+		if (ATF::$codename === "itrenting") {
+			$affaire["adresse_banque"]=$infos["adresse_banque"];
+			$affaire["cp_banque"]=$infos["cp_banque"];
+			$affaire["province_banque"]=$infos["province_banque"];
+
+		}
+
 		$affaire["id_commercial"] = ATF::societe()->select($infos["id_societe"], "id_owner");
 
 
@@ -434,6 +441,7 @@ class affaire_cleodis extends affaire {
 					case "date_livraison_prevu": break;
 
 					case "date_ouverture": break;
+					case "date_demarrage_previsionnel": break;
 
 					default:
 						throw new errorATF("date_invalide",988);
@@ -483,7 +491,10 @@ class affaire_cleodis extends affaire {
 				case "IBAN":
 				case "RUM":
 				case "nom_banque":
+				case "adresse_banque":
+				case "cp_banque":
 				case "ville_banque":
+				case "province_banque":
 				case "date_previsionnelle":
 				case "reference_refinanceur":
 					if($infos["field"] == "RUM"){
@@ -510,6 +521,12 @@ class affaire_cleodis extends affaire {
 							$affaire->set("IBAN", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "IBAN") );
 							$affaire->set("nom_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "nom_banque") );
 							$affaire->set("ville_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "ville_banque") );
+
+							if (ATF::$codename === "itrenting") {
+								$affaire->set("adresse_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "adresse_banque") );
+								$affaire->set("cp_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "cp_banque") );
+								$affaire->set("province_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "province_banque") );
+							}
 
 							$esp = true;
 						}
@@ -3408,7 +3425,39 @@ class affaire_midas extends affaire_cleodis {
 };
 
 class affaire_cleodisbe extends affaire_cleodis { };
-class affaire_itrenting extends affaire_cleodis { };
+class affaire_itrenting extends affaire_cleodis {
+	function __construct($table_or_id=NULL) {
+		$this->table = "affaire";
+		parent::__construct($table_or_id);
+
+		$this->onglets = array(
+			'affaire_garant'
+			,'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
+			,'devis'=>array('opened'=>true)
+			,'comite'=>array('opened'=>true)
+			,'document_complementaire_a_signer'
+			,'commande'=>array('opened'=>true)
+			,'prolongation'
+			,'loyer_prolongation'
+			,'bon_de_commande'
+			,'demande_refi'
+			,'facture'=>array('opened'=>true)
+			,'facture_fournisseur'
+			,'facture_non_parvenue'
+			,'facturation'
+			,'intervention'
+			,'parc'
+			,'livraison'
+			,'suivi'
+			,'tache'
+			,"pdf_affaire"
+		);
+	}
+
+
+};
 
 class affaire_cap extends affaire {
 	function __construct($table_or_id=NULL) {
