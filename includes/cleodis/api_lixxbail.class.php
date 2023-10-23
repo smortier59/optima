@@ -104,8 +104,17 @@ class api_lixxbail extends classes_optima {
             $response = json_decode($response);
             return $response;
         } else {
-            log::logger($http_status , $this->log_file);
-            throw new errorATF("error:".$response->error_description."|code:".$response->error,$http_status);
+            if (gettype($response->error_description) === "string") throw new errorATF("error:".str_replace(":","",$response->error_description)."|code:".$response->error,$http_status);
+            if (gettype($response->error_description) === "object") {
+                $string_error = "";
+                foreach($response->error_description as $k => $v) {
+                    $string_error .= $v[0]." ".$k."\n";
+                }
+                throw new errorATF("error:".$string_error."|code:".$response->error,$http_status);
+            }
+
+
+
         }
     }
 
@@ -219,7 +228,7 @@ class api_lixxbail extends classes_optima {
                             "payment_type_code" => $data["leasing_information"]["financial_data"]["payment_type_code"],
                             "payment_period" => intval($data["leasing_information"]["financial_data"]["payment_period"], 10),
                             "reimbursement_periodicity_code" => $data["leasing_information"]["financial_data"]["reimbursement_periodicity_code"],
-                            "number_of_reimbursement_periodicities" => $data["leasing_information"]["financial_data"]["number_of_reimbursement_periodicities"],
+                            "number_of_reimbursement_periodicities" => intval($data["leasing_information"]["financial_data"]["number_of_reimbursement_periodicities"],10),
                             "currency_code" => "EUR",
                             "rent_amount" => $data["leasing_information"]["financial_data"]["rent_amount"],
                         ]
@@ -238,6 +247,7 @@ class api_lixxbail extends classes_optima {
 
                 try {
                     $res = $this->curlCall($url, $access_token, 'POST', json_encode($postData), $headers);
+                    ATF::affaire()->u(["id_affaire"=> $a["affaire.id_affaire"], "demande_lixxbail" => 'oui']);
                     if (isset($res["acknowledgment_message"])) return array("success"=>true ,"result"=>$res["acknowledgment_message"]);
                     return array("success"=>true ,"result"=>"ok");
 
