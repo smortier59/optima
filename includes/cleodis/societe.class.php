@@ -1631,14 +1631,18 @@ class societe_cleodis extends societe {
    */
   public function _infosCredisafePartenaire($get, $post){
     log::logger($post, "creditsafe");
-    $utilisateur  = ATF::$usr->get("contact");
-    $apporteur = $utilisateur["id_societe"];
+
+    if (!$post["apporteur"]) {
+			$utilisateur  = ATF::$usr->get("contact");
+      $apporteur = $utilisateur["id_societe"];
+		} else {
+			$apporteur = $post["apporteur"];
+		}
 
     if($post["api"]) $api = true;
     if (ATF::$codename === 'cleodis' || ATF::$codename === 'cleodisbe') {
       if(!$post["langue"]) $post["langue"] = "FR";
     }
-
 
     if(ATF::$codename == "cleodisbe")  $post["num_ident"] = $post["siret"];
     if(ATF::$codename == "itrenting")  $post["cif"] = $post["cif"];
