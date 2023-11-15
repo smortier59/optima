@@ -45,4 +45,5 @@ class opportunite_itrenting extends opportunite { };
 class opportunite_bdomplus extends opportunite { };
 class opportunite_boulanger extends opportunite { };
 class opportunite_assets extends opportunite { };
+class opportunite_solo extends opportunite { };
 class opportunite_go_abonnement extends opportunite { };

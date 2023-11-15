@@ -44,5 +44,6 @@ class facture_ligne_boulanger extends facture_ligne_cleodis { };
 
 
 class facture_ligne_assets extends facture_ligne_cleodis { };
+class facture_ligne_solo extends facture_ligne_cleodis { };
 
 class facture_ligne_go_abonnement extends facture_ligne_cleodis { };

@@ -19,7 +19,7 @@ class campagne extends classes_optima {
 class campagne_cleodisbe extends campagne {};
 class campagne_itrenting extends campagne {};
 class campagne_cap extends campagne {};
-
+class campagne_solo extends campagne {};
 
 class campagne_bdomplus extends campagne { };
 class campagne_boulanger extends campagne { };

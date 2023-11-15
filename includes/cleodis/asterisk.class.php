@@ -35,6 +35,7 @@ class asterisk_cleodis extends asterisk {
 
 class asterisk_cleodisbe extends asterisk_cleodis { };
 class asterisk_itrenting extends asterisk_cleodis { };
+class asterisk_solo extends asterisk_cleodis { };
 class asterisk_cap extends asterisk_cleodis { };
 class asterisk_bdomplus extends asterisk_cleodis { };
 class asterisk_boulanger extends asterisk_cleodis { };

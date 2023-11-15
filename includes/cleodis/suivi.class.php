@@ -353,6 +353,7 @@ class suivi_cleodis extends suivi {
 class suivi_cleodisbe extends suivi_cleodis { };
 class suivi_itrenting extends suivi_cleodis { };
 class suivi_cap extends suivi_cleodis { };
+class suivi_solo extends suivi_cleodis { };
 
 class suivi_bdomplus extends suivi_cleodis { };
 
