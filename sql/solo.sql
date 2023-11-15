@@ -89,7 +89,8 @@ CREATE TABLE `affaire` (
   `prestataire_paiement` enum('slimpay','mercanetv1','mercanetv2','adyen') DEFAULT NULL COMMENT 'Permet d''identifier quel prestataire de paiement est utilisé pour cette affaire',
   `vendeur` varchar(255) DEFAULT NULL,
   `commentaire` text DEFAULT NULL,
-  `id_type_affaire` int(11) UNSIGNED DEFAULT NULL
+  `id_type_affaire` int(11) UNSIGNED DEFAULT NULL,
+  `demande_lixxbail` enum('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Permet de savoir si une demande Lixxbail a été faite pour ce dossier'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
