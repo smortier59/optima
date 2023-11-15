@@ -14713,4 +14713,28 @@ ALTER TABLE `profil_privilege`
   ADD CONSTRAINT `profil_privilege_ibfk_2` FOREIGN KEY (`id_privilege`) REFERENCES `privilege` (`id_privilege`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `profil_privilege_ibfk_3` FOREIGN KEY (`id_module`) REFERENCES `module` (`id_module`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+
+INSERT INTO `refinanceur` (`id_refinanceur`, `refinanceur`, `code`, `adresse`, `adresse_2`, `cp`, `ville`, `statut`, `siren`, `capital`, `email`, `tel`, `gsm`, `fax`, `numero_emetteur`, `code_refi`) VALUES
+(1, 'ING LEASE France', 'R01', 'Cœur Défense –Tour A La Défense 4,', '110, Esplanade du Général de Gaulle', '92931', 'PARIS LA DEFENSE CEDEX', 'snc', '338472533', '225 000', NULL, NULL, NULL, NULL, '238333', 'CING99'),
+(2, 'KBC LEASE France', 'R02', '55 avenue Foch', NULL, '69006', 'LYON', 'sa', '379733587', '3 640 400', 'lyon6@kbclease.fr', '04 72 69 34 43', NULL, '04 72 82 09 17', '147567', ''),
+(3, 'BNP PARIBAS LEASE GROUP', 'R03', '12 Rue du Port', NULL, '92000', 'NANTERRE', 'sa', '632017513', '284 755 616', NULL, NULL, NULL, NULL, '100196', 'CBNP00'),
+(4, 'CLEODIS', 'R00', '144 rue Nationale', NULL, '59000', 'LILLE', 'sarl', '453079816', '280000', NULL, '0328140200', NULL, '0328140209', 'FR83ZZZ492537', 'REFACTURATION'),
+(5, 'KBC BAIL France', 'R04', '55 avenue Foch', NULL, '69006', 'LYON ', 'sa', '421204777', '6583590', NULL, NULL, NULL, NULL, NULL, ''),
+(6, 'MIDAS FRANCE ', 'VEN', '108,avenue Jean Moulin', 'BP 53', '78170', 'LA CELLE SAINT CLOUD', 'sa', '997536818', '17475000', NULL, NULL, NULL, NULL, NULL, ''),
+(7, 'GCE BAIL', 'R05', '42 Avenue Raymond Poincare', NULL, '75116', 'PARIS 16', 'sarl', '340785385', '29924000', NULL, NULL, NULL, NULL, NULL, ''),
+(8, 'BNP PARIBAS LEASE GROUP BELGIQUE', 'B01', 'Avenue Louise 489', NULL, '1050 ', 'BRUXELLES', 'sa', '444779741', NULL, NULL, NULL, NULL, NULL, NULL, ''),
+(10, 'BARCLAYS BAIL', 'R04', '183 Avenue Daumesnil', NULL, '75012', 'PARIS', 'sa', NULL, NULL, NULL, '01 55 78 73 55', NULL, NULL, NULL, ''),
+(11, 'BPLC - LOREQUIPBAIL', 'R06', '3 Rue Francois de Curel', 'BP 40124', '57021', 'METZ', 'sa', '356801571', '178750000', NULL, '0820337001', NULL, NULL, NULL, 'CBPLC9'),
+(12, 'LIXXBAIL', 'R07', 'TSA 51274', NULL, '72099', 'LE MANS CEDEX 09', 'sa', '682039078', '33298127.57', NULL, '0472693433', NULL, NULL, NULL, 'REFACTURATION'),
+(13, 'IFF', 'R06', NULL, NULL, NULL, NULL, 'sarl', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'R06'),
+(14, 'CLEOFI', 'RR0', '144, Rue Nationale', NULL, '59000', 'LILLE', 'sarl', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'REFACTURATION'),
+(15, 'BMF', 'RR1', '91, cours des Roches Noisiel', NULL, '74424', 'Marne-La-Vallée Cedex 2', 'sa', NULL, NULL, 'locfi@casden.banquepopulaire.fr', '0164629500', NULL, '0164622288', NULL, 'REFACTURATION'),
+(16, 'FRANFINANCE LOCATION SGEF', 'R08', '53 rue du Port', NULL, '92000', 'NANTERRE', 'sarl', '314975806', '53088000', NULL, '0141296796', NULL, NULL, NULL, 'CSGEF0'),
+(17, 'FRANFINANCE', 'RR2', '53 rue du Port', NULL, '92000', 'NANTERRE', 'sarl', '314975806', '53088000', NULL, '0141296796', NULL, NULL, NULL, 'REFACTURATION'),
+(18, 'NE PAS UTILISER', 'RBU', '45, rue Solferino', NULL, '59000', 'LILLE', 'sarl', '453079816', NULL, NULL, NULL, NULL, NULL, NULL, 'BUG'),
+(19, 'FRANFINANCE LOCATION SGEFMANDATE', 'R09', '53 rue du Port', NULL, '92000', 'NANTERRE', 'sarl', '314975809', '53088000', NULL, '0141296796', NULL, NULL, NULL, 'REFACTURATION'),
+(20, 'BNP PARIBAS LEASE MANDATE', 'R10', '12 Rue du Port', NULL, '92000', 'NANTERRE', 'sarl', '632017513', '284 755 616', NULL, NULL, NULL, NULL, NULL, 'REFACTURATION'),
+(21, 'BPCE LEASE', 'R11', NULL, NULL, NULL, NULL, 'sa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CBPCL'),
+(22, 'MEELO', 'R99', NULL, NULL, NULL, NULL, 'sarl', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'MEELO');
+
 COMMIT;
