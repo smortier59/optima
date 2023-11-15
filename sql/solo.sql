@@ -14737,4 +14737,25 @@ INSERT INTO `refinanceur` (`id_refinanceur`, `refinanceur`, `code`, `adresse`, `
 (21, 'BPCE LEASE', 'R11', NULL, NULL, NULL, NULL, 'sa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CBPCL'),
 (22, 'MEELO', 'R99', NULL, NULL, NULL, NULL, 'sarl', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'MEELO');
 
+UPDATE `module` SET couleur = 'yellow';
+
+
+CREATE TABLE `document_complementaire_a_signer` (
+  `id_document_complementaire_a_signer` mediumint(8) UNSIGNED NOT NULL,
+  `id_affaire` mediumint(8) UNSIGNED NOT NULL,
+  `id_document_contrat` mediumint(8) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `document_complementaire_a_signer`
+  ADD PRIMARY KEY (`id_document_complementaire_a_signer`),
+  ADD KEY `id_affaire` (`id_affaire`),
+  ADD KEY `id_document_contrat` (`id_document_contrat`);
+
+ALTER TABLE `document_complementaire_a_signer`
+  MODIFY `id_document_complementaire_a_signer` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+ALTER TABLE `document_complementaire_a_signer`
+  ADD CONSTRAINT `document_complementaire_a_signer_ibfk_1` FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `document_complementaire_a_signer_ibfk_2` FOREIGN KEY (`id_affaire`) REFERENCES `affaire` (`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 COMMIT;
