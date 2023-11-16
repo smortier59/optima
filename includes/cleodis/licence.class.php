@@ -178,5 +178,6 @@ class licence_boulanger extends licence { };
 class licence_assets extends licence { };
 
 class licence_solo extends licence { };
+class licence_arrow extends licence { };
 
 class licence_go_abonnement extends licence { };

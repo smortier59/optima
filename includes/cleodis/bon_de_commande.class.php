@@ -1404,6 +1404,23 @@ class bon_de_commande_solo extends bon_de_commande_cleodis {
 	}
 };
 
+class bon_de_commande_arrow extends bon_de_commande_cleodis {
+	function __construct() {
+		parent::__construct();
+		$this->table = "bon_de_commande";
+
+		unset($this->colonnes['fields_column']["bon_de_commande.date_livraison_estime"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_livraison_prevue"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_livraison_reelle"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_installation_prevue"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_installation_reele"]
+			 ,$this->colonnes['fields_column']["bon_de_commande.date_limite_rav"] );
+
+
+		$this->fieldstructure();
+	}
+};
+
 
 class bon_de_commande_bdomplus extends bon_de_commande_cleodis { };
 class bon_de_commande_boulanger extends bon_de_commande_cleodis { };

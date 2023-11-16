@@ -129,3 +129,4 @@ class devis_ligne_assets extends devis_ligne_cleodis { };
 class devis_ligne_go_abonnement extends devis_ligne_cleodis { };
 
 class devis_ligne_solo extends devis_ligne_cleodis { };
+class devis_ligne_arrow extends devis_ligne_cleodis { };

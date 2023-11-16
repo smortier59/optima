@@ -145,6 +145,7 @@ class sell_and_sign_cleodisbe extends sell_and_sign { };
 class sell_and_sign_citrenting extends sell_and_sign { };
 class sell_and_sign_cap extends sell_and_sign { };
 class sell_and_sign_solo extends sell_and_sign { };
+class sell_and_sign_arrow extends sell_and_sign { };
 
 class sell_and_sign_bdomplus extends sell_and_sign { };
 class sell_and_sign_bdom extends sell_and_sign { };

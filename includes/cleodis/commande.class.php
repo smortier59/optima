@@ -3252,3 +3252,4 @@ class commande_assets extends commande_cleodis { };
 
 class commande_go_abonnement extends commande_cleodis { };
 class commande_solo extends commande_cleodis { };
+class commande_arrow extends commande_cleodis { };

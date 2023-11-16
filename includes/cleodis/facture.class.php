@@ -3890,6 +3890,7 @@ class facture_boulanger extends facture_cleodis {
 class facture_assets extends facture_cleodis { };
 
 class facture_solo extends facture_cleodis { };
+class facture_arrow extends facture_cleodis { };
 
 class facture_go_abonnement extends facture_cleodis {
 

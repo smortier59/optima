@@ -316,3 +316,4 @@ class conge_assets extends conge_cleodis { };
 class conge_go_abonnement extends conge_cleodis { };
 
 class conge_solo extends conge_cleodis { };
+class conge_arrow extends conge_cleodis { };

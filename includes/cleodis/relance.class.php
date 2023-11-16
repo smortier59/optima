@@ -142,6 +142,7 @@ class relance_cleodisbe extends relance_cleodis { };
 class relance_itrenting extends relance_cleodis { };
 class relance_cap extends relance_cleodis { };
 class relance_solo extends relance_cleodis { };
+class relance_arrow extends relance_cleodis { };
 
 class relance_bdomplus extends relance_cleodis { };
 

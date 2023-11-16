@@ -456,6 +456,7 @@ class parc_bdomplus extends parc_cleodis { };
 class parc_boulanger extends parc_cleodis { };
 class parc_assets extends parc_cleodis { };
 class parc_solo extends parc_cleodis { };
+class parc_arrow extends parc_cleodis { };
 
 class parc_go_abonnement extends parc_cleodis {
 	function __construct() {

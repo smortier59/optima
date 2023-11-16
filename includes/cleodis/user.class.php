@@ -507,6 +507,7 @@ class user_boulanger extends user_cleodis { };
 
 class user_assets extends user_cleodis { };
 class user_solo extends user_cleodis { };
+class user_arrow extends user_cleodis { };
 
 
 class user_go_abonnement extends user_cleodis { };

@@ -106,6 +106,7 @@ class file_bdomplus extends file_cleodis { }
 class file_boulanger extends file_cleodis { }
 class file_assets extends file_cleodis { }
 class file_solo extends file_cleodis { }
+class file_arrow extends file_cleodis { }
 
 class file_go_abonnement extends file_cleodis { }
 ?>

@@ -84,6 +84,12 @@ class accueil_solo extends accueil_cleodis {
 	}
 };
 
+class accueil_arrow extends accueil_cleodis {
+	public function getWidgets(){
+		return array();
+	}
+};
+
 
 class accueil_bdomplus extends accueil_cleodis { };
 class accueil_boulanger extends accueil_cleodis { };

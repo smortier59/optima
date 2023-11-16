@@ -136,7 +136,7 @@ CREATE TABLE `agence` (
 --
 
 INSERT INTO `agence` (`id_agence`, `agence`, `adresse`, `adresse_2`, `adresse_3`, `cp`, `ville`, `id_pays`, `tel`, `fax`, `objectif_devis_reseaux`, `objectif_devis_autre`, `objectif_mep_reseaux`, `objectif_mep_autre`) VALUES
-(1, 'Madrid', NULL, NULL, NULL, NULL, 'Madrid', NULL, NULL, NULL, 0, 0, 0, 0);
+(1, 'Saultain', '4 Rue Roger Salengro', NULL, NULL, 59990, 'Saultain', NULL, NULL, NULL, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 

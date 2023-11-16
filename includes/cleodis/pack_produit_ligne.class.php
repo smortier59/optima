@@ -67,5 +67,6 @@ class pack_produit_ligne_cleodisbe extends pack_produit_ligne { };
 class pack_produit_ligne_itrenting extends pack_produit_ligne { };
 class pack_produit_ligne_cap extends pack_produit_ligne { };
 class pack_produit_ligne_solo extends pack_produit_ligne { };
+class pack_produit_ligne_arrow extends pack_produit_ligne { };
 
 ?>

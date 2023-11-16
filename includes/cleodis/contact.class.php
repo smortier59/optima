@@ -251,3 +251,4 @@ class contact_assets extends contact_cleodis { };
 class contact_go_abonnement extends contact_cleodis { };
 
 class contact_solo extends contact_cleodis { };
+class contact_arrow extends contact_cleodis { };

@@ -324,6 +324,7 @@ class agence_cleodis extends agence {
 class agence_cleodisbe extends agence_cleodis { };
 class agence_itrenting extends agence_cleodis { };
 class agence_solo extends agence_cleodis { };
+class agence_arrow extends agence_cleodis { };
 
 class agence_bdomplus extends agence_cleodis { };
 class agence_boulanger extends agence_cleodis { };

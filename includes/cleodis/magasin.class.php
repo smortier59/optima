@@ -23,6 +23,7 @@ class magasin_bdomplus extends magasin_cleodis { };
 class magasin_bdom extends magasin_cleodis { };
 class magasin_boulanger extends magasin_cleodis { };
 class magasin_solo extends magasin_cleodis { };
+class magasin_arrow extends magasin_cleodis { };
 
 class magasin_go_abonnement extends magasin_cleodis { };
 

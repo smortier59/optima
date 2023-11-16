@@ -16894,6 +16894,41 @@ class pdf_solo extends pdf_cleodis
 
 }
 
+class pdf_arrow extends pdf_cleodis
+{
+    public $logo = __PDF_PATH__ . "/solo/arrow.jpg";
+    public $heightLimitTableContratPV = 70;
+    public $langue = "FR";
+
+    public $Rentete = 28;
+    public $Gentete = 30;
+    public $Bentete = 60;
+
+	public $REnteteTextColor = 254;
+	public $GEnteteTextColor = 202;
+	public $BEnteteTextColor = 25;
+
+    public $id_societe = 1;
+
+    public $bgcolorTableau = "1c1e3c";
+    public $txtcolorTableau = "ffffff";
+
+	public function conditionsGeneralesDeLocationA4($type)  {
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."solo/cgv-contrat.pdf");
+
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		}
+	}
+
+}
+
 class pdf_go_abonnement extends pdf_cleodis {
 	public $logo = __PDF_PATH__."/".'go_abonnement/byMyCar.jpg';
 	// public $logo = 'bdomplus/logo.jpg';

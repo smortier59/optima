@@ -25,5 +25,6 @@ class licence_type_boulanger extends licence_type { };
 class licence_type_assets extends licence_type { };
 
 class licence_type_solo extends licence_type { };
+class licence_type_arrow extends licence_type { };
 
 class licence_type_go_abonnement extends licence_type { };

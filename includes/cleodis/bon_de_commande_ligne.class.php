@@ -217,6 +217,7 @@ class bon_de_commande_ligne_midas extends bon_de_commande_ligne_cleodis {
 class bon_de_commande_ligne_cleodisbe extends bon_de_commande_ligne_cleodis { };
 class bon_de_commande_ligne_itrenting extends bon_de_commande_ligne_cleodis { };
 class bon_de_commande_ligne_solo extends bon_de_commande_ligne_cleodis { };
+class bon_de_commande_ligne_arrow extends bon_de_commande_ligne_cleodis { };
 
 class bon_de_commande_ligne_cap extends bon_de_commande_ligne_cleodis { };
 

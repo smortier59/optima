@@ -21,6 +21,7 @@ class reglement_cleodisbe extends reglement_cleodis { };
 class reglement_itrenting extends reglement_cleodis { };
 class reglement_cap extends reglement_cleodis { };
 class reglement_solo extends reglement_cleodis { };
+class reglement_arrow extends reglement_cleodis { };
 
 class reglement_bdomplus extends reglement_cleodis { };
 
