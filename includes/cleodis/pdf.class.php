@@ -16896,7 +16896,7 @@ class pdf_solo extends pdf_cleodis
 
 class pdf_arrow extends pdf_cleodis
 {
-    public $logo = __PDF_PATH__ . "/solo/arrow.jpg";
+    public $logo = __PDF_PATH__ . "arrow/arrow.jpg";
     public $heightLimitTableContratPV = 70;
     public $langue = "FR";
 
@@ -16913,20 +16913,246 @@ class pdf_arrow extends pdf_cleodis
     public $bgcolorTableau = "1c1e3c";
     public $txtcolorTableau = "ffffff";
 
-	public function conditionsGeneralesDeLocationA4($type)  {
-		$this->unsetHeader();
+
+	public function contrat_mise_a_disposition_logicielA4Particulier($id, $signature, $sellAndSign) { $this->contrat_mise_a_disposition_logiciel($id, "particulier"); }
+	public function contrat_mise_a_disposition_logicielA4Societe($id, $signature, $sellAndSign) { $this->contrat_mise_a_disposition_logiciel($id, "pro"); }
+
+	public function contrat_mise_a_disposition_logiciel($id, $type) {
 		$this->unsetFooter();
+		$this->image($this->logo,10,10,60);
 
-		$pageCount = $this->setSourceFile(__PDF_PATH__."solo/cgv-contrat.pdf");
+		$this->setY(30);
+		$this->cell(0,4,"CONTRAT DE MISE A DISPOSITION DE LOGICIELS",0,1,'C');
 
-		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-			$tplIdx = $this->importPage($pageNo);
-			// add a page
-			$this->AddPage();
-			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,38,210,38);
+		$this->ln(6);
+
+		$this->setFont('Arial','B', 8);
+		$this->cell(0,4,"Entre les soussignées :",0,1);
+
+		$this->setFont('Arial',null, 8);
+		$loueur = [
+			["label" => "Dénomination",	"valeur" => "ARROW CAPITAL SOLUTIONS",	"style" => 'B'],
+			["label" => "Forme et capital",	"valeur" => "SAS au capital de 40 000 EUR",	"style" => null],
+			["label" => "N° unique d’identification",	"valeur" => "RCS n° 453 738 551",	"style" => null],
+			["label" => "Siège social",	"valeur" => "Immeuble CANOPY – 6, Rue du général Audran 6 – 92400 COURBEVOIE",	"style" => null],
+			["label" => "Représentée par",	"valeur" => "Arnaud BAFFIE en qualité de Directeur Commercial",	"style" => null],
+		];
+		foreach($loueur as $v) {
+			$this->setFont('Arial',null, 8);
+			$this->cell(50,4,$v["label"]." :",0,0);
+			$this->setFont('Arial',$v["style"], 8);
+			$this->cell(160,4,$v["valeur"],0,1);
 		}
+		$this->setFont('Arial',null, 8);
+		$this->cell(0,4,"Ayant tous les pouvoirs à l’effet des présentes",0,1);
+		$this->ln(2);
+
+		$this->cell(0,4,"Ci-après désignée « Bailleur »",0,1);
+		$this->cell(0,4,"D'une part,",0,1);
+		$this->ln(2);
+		$this->setFont('Arial','B', 8);
+		$this->cell(0,4,"Et",0,1);
+		$this->setFont('Arial',null, 8);
+		$this->ln(2);
+
+		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->contact =  ATF::contact()->select($this->devis['id_contact']);
+
+		$bailleur = [
+			["label" => "Dénomination",	"valeur" => $this->client["societe"],	"style" => 'B'],
+			["label" => "Forme et capital",	"valeur" => $this->client["structure"]." au capital de ".number_format($this->client["capital"],0,',',' ')." EUR",	"style" => null],
+			["label" => "N° unique d’identification",	"valeur" => "RCS n° ".$this->client["siren"],	"style" => null],
+			["label" => "Siège social",	"valeur" => $this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"],	"style" => null],
+			["label" => "Représentée par",	"valeur" => $this->contact["prenom"]." ".$this->contact["nom"]." en qualité de ".$this->contact["fonction"],	"style" => null],
+		];
+		foreach($bailleur as $v) {
+			$this->setFont('Arial',null, 8);
+			$this->cell(50,4,$v["label"]." :",0,0);
+			$this->setFont('Arial',$v["style"], 8);
+			$this->cell(160,4,$v["valeur"],0,1);
+		}
+		$this->setFont('Arial',null, 8);
+		$this->cell(0,4,"Ayant tous les pouvoirs à l’effet des présentes",0,1);
+		$this->ln(2);
+
+		$this->cell(0,4,"Ci-après désignée « Client »",0,1);
+		$this->cell(0,4,"D'autre part,",0,1);
+		$this->ln(2);
+		$this->cell(0,4,"Ci-après désignées ensemble « les Parties »,",0,1);
+		$this->ln(2);
+
+		$this->cg_ct_mise_a_disposition();
+
+		$this->ln(10);
+
+		$this->cell(0,4,"Fait en deux exemplaires à Paris, le ".date("d/m/Y"));
+
+
+
 	}
 
+	public function cg_ct_mise_a_disposition() {
+		$this->setFont('Arial','B', 8);
+		$this->cell(0,4,"CONDITIONS GENERALES",0,1, 'C');
+		$this->ln(2);
+		$this->cell(0,4,"PREAMBULE",0,1, 'C');
+		$this->ln(2);
+
+		$this->setFont('Arial','', 7);
+		$this->multicell(0,3,"Le Client souhaite pouvoir louer un ensemble de LOGICIELS pour les besoins de ses activités.\nLe Client a pris connaissance des termes et conditions de l’ensemble des licences d’utilisation des LOGICIELS.\nSous réserve du respect par le Client des termes du présent contrat, le Bailleur accepte de mettre à la disposition du Client les LOGICIELS dans le cadre d’une location financière.\nA ce titre, il est rappelé que ACS n’intervient qu’en qualité de bailleur pour la mise à disposition temporaire des LOGICIELS. Le Client sera dans tous les cas lié par les termes et conditions de licence de chaque éditeur pour les LOGICIELS.");
+
+		$y = $this->getY();
+
+		$this->ln(2);
+		$this->setFont('Arial','B', 7);
+		$this->cell(90,4,"ARTICLE 1. DEFINITIONS",0,1);
+
+		$definitions = [
+			["titre" => "ANNEXE A :", "texte" => "Document annexé au présent CONTRAT DE MISE A DISPOSITION sur lequel figurent la désignation des LOGICIELS, objet de la MISE A DISPOSITION, ainsi que les caractéristiques de l'opération et les éventuelles conditions particulières applicables."],
+			["titre" => "FOURNISSEUR :", "texte" => "Editeur ou distributeur auprès duquel L’Utilisateur a choisi les LOGICIELS objet du présent contrat."],
+			["titre" => "ÉDITEUR :", "texte" => "éditeur d’un LOGICIEL disposant des droits patrimoniaux relatifs à celui-ci et consentant à l’Utilisateur les droits d’utilisation dans le cadre de la licence."],
+			["titre" => "LOGICIELS :", "texte" => "Les exemplaires des LOGICIELS désignés en ANNEXE A, pour lesquels le Bailleur a obtenu de leur ÉDITEUR le droit de les mettre à disposition. Les conditions d'utilisation du logiciel ont été préalablement acceptées par l’Utilisateur."],
+			["titre" => "Délivrance conforme :", "texte" => "Ensemble des opérations effectuées par L’Utilisateur (et/ou un tiers désigné par l’Utilisateur) et le FOURNISSEUR, à l'issue desquelles il est attesté de l’absence de défaut de conformité des LOGICIELS livrés par rapport à leur documentation et de leur support. La DELIVRANCE CONFORME est attestée par la signature par Le Client d’un procès-verbal de réception conforme sans réserve. "],
+			["titre" => "LIVRAISON :", "texte" => "fourniture de la totalité des LOGICIELS sur leur support au Client."],
+
+		];
+		foreach ($definitions as $def) {
+			$this->ln(2);
+			$this->setFont('Arial','B', 7);
+			$this->cell(90,4,$def["titre"],0,1);
+			$this->setFont('Arial','', 7);
+			$this->MultiCell(90,3, $def["texte"]);
+		}
+		$this->MultiCell(90,3,"Les termes ci-dessus définis sont indiqués en majuscules dans le présent document. Lorsque ces termes apparaissent en minuscules, ils retrouvent leur sens générique.");
+
+		$this->setY($y);
+		$this->setLeftMargin(100);
+		$artP1 = [
+			["titre" => "ARTICLE 2. DOCUMENTS CONTRACTUELS", "texte" => "2.1. Les présentes conditions générales et l’ANNEXE A contiennent l'intégralité des engagements des Parties l'une à l'égard de l'autre, relatifs à la MISE A DISPOSITION des LOGICIELS. L'ensemble de ces documents forme le CONTRAT DE MISE A DISPOSITION.\n\n2.2. En cas de contradiction entre ces différents documents, les Parties conviennent expressément que les conditions générales prévaudront sur l’ANNEXE A (excepté lorsqu’une dérogation expresse aux conditions générales y est mentionnée)."],
+			["titre" => "ARTICLE 3. OBJET DU CONTRAT DE MISE A DISPOSITION", "texte" => "3.1. Le présent CONTRAT DE MISE A DISPOSITION prend effet à sa signature par les Parties, il a pour objet de fixer les modalités, notamment financières, de mise à disposition des LOGICIELS.\n\n3.2. Il n’emporte aucune modification aux conditions d’utilisation des LOGICIELS fixées par les EDITEURS à l’exception d’éventuelles dispositions relatives aux redevances."],
+			["titre" => "ARTICLE 4. CHOIX DES LOGICIELS - LIVRAISON - RÉCEPTION", "texte" => "4.1. Les LOGICIELS sont choisis auprès du FOURNISSEUR exclusivement par L’Utilisateur, tant pour son compte que celui du Bailleur. Le Client détermine librement avec le FOURNISSEUR, les conditions, délais, modalités et lieu de livraison. Pour le cas où des prestations complémentaires de Mise en OEuvre sont prévues en Annexe A, les conditions de leur réalisation sont déterminées exclusivement entre l’utilisateur et le fournisseur ou l’Editeur, sans remise en cause du Procès-Verbal de délivrance conforme signé par l’utilisateur.\n\n4.2. Le Bailleur sera présumé avoir rempli l’ensemble de ses obligations relatives aux LOGICIELS dès lors que le Client aura retourné signé le procès-verbal de DELIVRANCE CONFORME sans réserve."],
+		];
+		foreach ($artP1 as $def) {
+			$this->ln(2);
+			$this->setFont('Arial','B', 7);
+			$this->cell(90,4,$def["titre"],0,1);
+			$this->setFont('Arial','', 7);
+			$this->MultiCell(90,3, $def["texte"]);
+		}
+
+		$pages = [
+			[
+				"left" => [
+					["titre" => "ARTICLE 5. GARANTIE DES LOGICIELS - RESPONSABILITE", "texte" => "5.1. Le Bailleur, dont l’intervention est de nature financière, n’engage pas sa responsabilité au regard des LOGICIELS choisis par Le Client auprès des EDITEURS.
+					\n5.2. Il est rappelé que le Bailleur ne se substitue pas à l'Editeur et que les garanties légales ou contractuelles ne lui sont pas opposables et ne lient que l'Editeur et Le Client.
+					\n5.3. Le Client fera son affaire personnelle de tout litige ou difficulté résultant d'un des motifs ci-dessus."],
+					["titre" => "ARTICLE 6. UTILISATION - SUPPORT – MAINTENANCE", "texte" => "6.1. Le Client s'engage à utiliser les LOGICIELS conformément aux termes de chaque licence d'utilisation applicable à chacun des LOGICIELS visés en ANNEXE A.
+					\n6.2. L'Editeur demeure propriétaire de l'intégralité des droits patrimoniaux de propriété intellectuelle afférents aux LOGICIELS et le bailleur demeure propriétaire des exemplaires. Le Client ne peut pas, sauf accord écrit de l'Editeur et du Bailleur, mettre à disposition d'un tiers, sous-louer, concéder ou nantir tout ou partie des LOGICIELS, céder ou modifier les droits de l'une quelconque des licences d'utilisation applicables aux LOGICIELS ou (sauf accord du Bailleur) résultant du présent CONTRAT DE MISE A DISPOSITION, ou remettre tout ou partie des LOGICIELS à un tiers.
+					\n6.3. Le Client devra conclure un contrat de support et de maintenance pour les LOGICIELS auprès du FOURNISSEUR, de L'EDITEUR des LOGICIELS ou de tout tiers de son choix. Excepté en cas de disposition expresse contraire prévue à l'ANNEXE A, ce contrat de support et de maintenance est indépendant du contrat de MISE A DISPOSITION. Il ne fait pas l'objet d'une quelconque facturation par le Bailleur.
+					\n6.4. Le Client pourra effectuer une copie de sauvegarde, conformément aux dispositions de l'article L. 122-6-1-II du Code de la Propriété Intellectuelle, et pourra faire assurer les risques générés par la MISE A DISPOSITION des LOGICIELS."],
+					["titre" => "ARTICLE 7. DATE DE PRISE D'EFFET – LOYERS", "texte" => "7.1. Pour l'ensemble des LOGICIELS mis à disposition, Le Client paiera au Bailleur les loyers de MISE A DISPOSITION indiqués à l'ANNEXE A, augmentés des taxes en vigueur au moment de l'exigibilité de chaque terme. Les loyers de MISE A DISPOSITION indiqués à l'ANNEXE A sont fermes et non révisables pendant toute la durée de la MISE A DISPOSITION telle que définie à l'article 13 ci-dessous, sauf adjonctions ou échanges de LOGICIELS tels que prévus à l'article 10.
+					\n7.2. La durée de la MISE A DISPOSITION prend effet dans les conditions définies à l'article 13 ci-dessous.
+					\n7.3. Les loyers relatifs à la MISE A DISPOSITION des LOGICIELS deviendront exigibles de plein droit à compter de la date de signature par Le Client du procès-verbal de DELIVRANCE CONFORME des LOGICIELS. Ils sont payables le premier jour de chaque période (telle que définie en ANNEXE A) par virement ou prélèvement bancaire. A cet effet, l'Utilisateur signera une autorisation de prélèvement lors de la signature du présent CONTRAT DE MISE A DISPOSITION et procédera aux formalités requises à cet effet.
+					\n7.4. Les loyers de MISE A DISPOSITION resteront dus en toute circonstance, même dans le cas où tout ou partie des LOGICIELS cessent de fonctionner ou ne peuvent être utilisés pour une durée et une cause quelconques, y compris en cas de résiliation de la licence d'utilisation de tout ou partie des LOGICIELS consécutive au non respect par l'Utilisateur des conditions d'utilisation. Si le CONTRAT DE MISE A DISPOSITION est résilié en raison d'un des évènements ci-dessus, Le Client sera alors redevable de l'indemnité de résiliation prévue à l'article 11 ci-après.
+					\n7.5. Si les LOGICIELS objet du CONTRAT DE MISE A DISPOSITION ne sont pas conformes à leur documentation ou contiennent des vices cachés, Le Client ne pourra adresser de réclamation à ce titre qu'au FOURNISSEUR et/ou à l'EDITEUR et renonce à mettre en cause, directement ou indirectement, la responsabilité du Bailleur ainsi que la validité ou la continuation du CONTRAT DE MISE A DISPOSITION. Les Parties conviennent expressément, par dérogation à l'article 1724 du Code Civil, que Le Client ne pourra demander aucune diminution du montant des redevances de MISE A DISPOSITION, même si les LOGICIELS sont inutilisables pendant plus de 40 jours.
+					\n7.6. En cas de retard dans le paiement de toute somme due par Le Client, les intérêts de retard seront calculés à compter du jour suivant la date d'échéance du loyer ou de la somme due concernée jusqu'à celle du paiement effectif, au taux fixé conventionnellement à trois (3) fois le taux d'intérêt légal auquel s'ajoutera le remboursement d'une indemnité forfaitaire pour les frais engagés pour tout rappel d'échéance d'un montant de 40 euros."]
+				],
+				"right" => [
+					["titre" => "ARTICLE 8. IMPOTS ET TAXES", "texte" => "Toute somme due au titre du présent CONTRAT DE MISE A DISPOSITION, notamment les loyers, à l'exception des intérêts de retard dus au titre de l'article 7.6 ci-dessus, sera majorée de la T.V.A. au taux en vigueur au moment du paiement de tous les droits, impôts ou taxes applicables."
+					],
+					["titre" => "ARTICLE 9. RESPONSABILITE", "texte" => "9.1. Le Bailleur n'est en aucun cas responsable :\n- des retards ou manquements à l'une des obligations mises à sa charge par le présent CONTRAT DE MISE A DISPOSITION dès lors que ce retard ou ce manquement est dû à un cas de force majeure, à un cas fortuit, au fait du Client, du Fournisseur, de l'Editeur et plus généralement de tout tiers ;
+					\n9.2. Le Client est, à l'égard du bailleur, seul responsable de l'utilisation des LOGICIELS objet du présent CONTRAT DE MISE A DISPOSITION et notamment de l'utilisation conforme aux conditions d'utilisation fixées par l'éditeur, et en est le seul gardien. Chaque LOGICIEL est utilisé sous la seule direction, le contrôle et la responsabilité du Client, qui en détermine notamment l'usage adéquat.
+					\n9.3. A l'exception de la livraison conforme des LOGICIELS laquelle constitue une obligation de résultat, le Bailleur ne sera tenu qu'à une obligation de moyens dans l'exécution de ses obligations. Le Bailleur ne pourra voir sa responsabilité recherchée que pour les dommages directs résultant de l'inexécution ou de l'exécution tardive de ses obligations. Les Parties conviennent que constituent des dommages indirects, n'ouvrant pas droit à indemnisation, tout préjudice financier, d'atteinte à l'image de marque, de perte de bénéfice ou d'économie escomptée, de préjudice commercial, des pertes de données, causé directement ou indirectement par l'utilisation ou le fonctionnement des LOGICIELS, leurs dysfonctionnements, erreurs ou indisponibilité.
+					\n9.4. En tout état de cause, les Parties conviennent que le montant total des dommages intérêts qui pourraient être réclamés par Le Client et auxquels le Bailleur pourrait être condamné, quels qu'en soient la cause et le fondement, ne pourra excéder le montant total des loyers H.T. de MISE A DISPOSITION dus par l'Utilisateur, conformément aux dispositions des articles 1151 et 1152 du Code Civil."
+					],
+					["titre" => "ARTICLE 10. ADJONCTION OU ECHANGE DE LOGICIELS", "texte" => "10.1. Le Client pourra demander au Bailleur, au cours de l'exécution du présent CONTRAT DE MISE A DISPOSITION :\n- d'inclure des LOGICIELS additionnels à ceux figurant à l'ANNEXE A. Les conditions financières et la durée de la MISE A DISPOSITION seront alors fixées pour ces nouveaux LOGICIELS, d'un commun accord entre le Bailleur et L'Utilisateur.\n- le remplacement total ou partiel des LOGICIELS mis à disposition.\nEn cas d'accord du Bailleur, les conditions financières et la durée de la MISE A DISPOSITION seront alors fixées pour ces nouveaux LOGICIELS et feront l'objet d'un avenant au présent CONTRAT DE MISE A DISPOSITION.
+					\n10.2. Il est précisé que le ou les contrats de maintenance des LOGICIELS qui devront être souscrits par l'Utilisateur pour les LOGICIELS sont totalement indépendants du présent CONTRAT DE MISE A DISPOSITION. En conséquence, la résiliation, la cessation ou la résolution de tout ou partie des contrats de maintenance n'aura aucun effet sur le présent CONTRAT DE MISE A DISPOSITION. Le Client garantit faire son affaire des conséquences liées à la continuation ou la résiliation des contrats de maintenance susvisés en cas de résiliation ou d'arrivée au terme du présent CONTRAT DE MISE A DISPOSITION.
+					\n10.3. En tout état de cause, toute adjonction ou échange de LOGICIELS sera conditionné à l'accord préalable de l'Editeur."
+					],
+					["titre" => "ARTICLE 11. RESILIATION DU CONTRAT DE MISE À DISPOSITION", "texte" => "11.1. Le présent CONTRAT DE MISE A DISPOSITION est conclu entre les Parties dès sa signature.
+					\n11.2. Le Client est fondé à résilier de plein droit le présent CONTRAT DE MISE A DISPOSITION en cas de manquement grave du Bailleur aux obligations prévues aux présentes, sans qu’il soit besoin de remplir aucune formalité judiciaire, trente (30) jours après l'envoi au Bailleur d’une mise en demeure de remédier au manquement, restée sans effet.
+					\n11.3. Le présent CONTRAT DE MISE A DISPOSITION pourra être résilié de plein droit par le Bailleur, sans qu’il soit besoin de remplir aucune formalité judiciaire, trente (30) jours après l'envoi par le Bailleur d’une mise en demeure restée sans effet, dans les cas suivants :\n- non paiement à l’échéance de l’un des loyers,\n- manquement grave par l’Utilisateur à ses obligations contractuelles au titre du présent CONTRAT DE MISE A DISPOSITION.
+					\n11.4. La résiliation du CONTRAT DE MISE A DISPOSITION dans l’un des cas visés au point 11.3 ci-dessus entraînera de plein droit la déchéance du terme de l’ensemble des loyers restant à devoir, indépendamment du droit pour le BAILLEUR de demander réparation de son entier préjudice."
+					]
+				]
+			],
+			[
+				"left" => [
+					["titre" => null, "texte" => "11.5. En conséquence de la résiliation du CONTRAT DE MISE A DISPOSITION, l'Utilisateur devra :\n- verser immédiatement au Bailleur la totalité des loyers échus et impayés ainsi que les loyers restant à échoir au jour de la résiliation,\n- honorer les obligations prévues à l’article 12 ci dessous.
+					\n11.6. Le présent CONTRAT DE MISE A DISPOSITION ne saurait être résilié, dénoncé ou annulé du fait de la résiliation, de la dénonciation, de l’annulation ou de l’impossibilité pour l’Utilisateur de souscrire à tout contrat portant sur du matériel informatique ou sur des prestations de maintenance des LOGICIELS. D’une manière générale, Le Client sera seul responsable des matériels informatiques et de leur adéquation aux spécifications techniques des LOGICIELS.",
+					],
+					["titre" => "ARTICLE 12. RESTITUTION", "texte" => "Sans préjudice des droits acquis par ailleurs par Le Client auprès de l’Editeur, en cas de résiliation du CONTRAT DE MISE A DISPOSITION, ou a l’échéance de son terme, l’utilisateur devra :\nRestituer au Bailleur ou toute personne désignée par lui les LOGICIELS objet du présent contrat.\nA défaut adresser au Bailleur les attestations confirmant qu’il a détruits ces LOGICIELS.",
+					],
+					["titre" => "ARTICLE 13. DUREE", "texte" => "La durée de la MISE A DISPOSITION prend effet à la signature du procès-verbal de DELIVRANCE CONFORME par l’Utilisateur qui rend exigible le paiement du premier loyer de MISE A DISPOSITION. La durée de la MISE A DISPOSITION , prévue à l’ ANNEXE A, est ferme et irrévocable.\nAu terme de la durée de MISE A DISPOSITION, le présent contrat cessera de produire ses effets. Toutefois, Le Client pourra continuer à utiliser les LOGICIELS dans le cadre de la licence qui lui a été consentie par ailleurs par l’Editeur, sans cout supplémentaire"
+					],
+					["titre" => "ARTICLE 14. CESSION - DELEGATION", "texte" => "14.1 Le Client reconnaît que le Bailleur l’a tenu informé de l’éventualité d’une cession des créances au profit d’une banque, d’un établissement financier. Le Client consent dès à présent et sans réserve à une telle opération et s’engage à signer à première demande du Bailleur tout document nécessaire à la régularisation de l’opération. Cette opération pourra lui être simplement et valablement signifiée par lettre recommandée avec accusé de réception.
+					\n14.2 En conséquence, le Cessionnaire sera substitué au Bailleur à la date de la cession, et acquerra tous les droits et obligations contre et envers Le Client, sous réserve de ce qui est dit à l’article 14.3. Le Client reconnaît expressément que le Cessionnaire deviendra le Bailleur et s’engage notamment à lui verser la totalité des redevances de mise à disposition, en principal, intérêts, accessoires et TVA à partir de la date de substitution.
+					\n14.3 Le Cessionnaire ne sera tenu à l’égard du Client d’aucune obligation, quelle qu’elle soit, à l’exception de laisser au Client la disposition des LOGICIELS conformément à l’article 13 ci-dessus. Toutes les autres obligations relatives au présent contrat et aux LOGICIELS resteront à la charge du Bailleur."
+					],
+					["titre" => "ARTICLE 15. ELECTION DE DOMICILE", "texte" => "Le Bailleur et Le Client élisent domicile à leur siège social indiqué ci-dessus. Sauf disposition contraire visée au présent contrat, toute notification afférente au CONTRAT DE MISE A DISPOSITION devra être donnée par lettre recommandée avec avis de réception. Toute modification des dispositions du CONTRAT DE MISE A DISPOSITION et de ses annexes ne pourra être effectuée que sous la forme d’un écrit sur support tangible signé des représentants légaux des Parties ou leur mandataire."
+					],
+					["titre" => "ARTICLE 16. DONNEES PERSONNELLES", "texte" => "16.1. Dans le cadre de leurs relations contractuelles, les parties s’engagent à respecter la réglementation en vigueur applicable au traitement de données à caractère personnel et, en particulier, le règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 . Les informations nominatives recueillies dans le cadre du présent CONTRAT DE MISE A DISPOSITION, à savoir les coordonnées du signataire du présent contrat et la copie de sa carte nationale d’identité, sont nécessaires pour le traitement de la demande du Client. Elles sont destinées au Bailleur pour les besoins de la gestion de l’opération. Il appartient au Client de fournir l’information aux personnes concernées par les opérations de traitement au moment de la collecte des données.
+					\n16.2. Elles pourront être communiquées par le Bailleur à l’établissement financier cessionnaire du présent contrat en cas de cession dans le cadre de l’article 14 des présentes, ce que le Client autorise expressément."
+					]
+				],
+				"right" => [
+					["titre" => null, "texte" => "16.3 Le Bailleur s'engage à :\n- traiter les données uniquement pour la ou les seule(s) finalité(s) exprimées au présent article ;\n- traiter les données conformément aux instructions documentées du Client. Si le Bailleur considère qu’une instruction constitue une violation du règlement européen sur la protection des données ou de toute autre disposition du droit de l’Union ou du droit des Etats membres relative à la protection des données, il en informe immédiatement le Client ;\n- garantir la confidentialité des données à caractère personnel traitées dans le cadre du présent contrat ;\n- veiller à ce que les personnes autorisées à traiter les données à caractère personnel en vertu du présent contrat (i) s’engagent à respecter la confidentialité ou soient soumises à une obligation légale appropriée de confidentialité, et (ii) reçoivent la formation nécessaire en matière de protection des données à caractère personnel ;\n- prendre en compte, s’agissant de ses outils, produits, applications ou services, les principes de protection des données dès la conception et de protection des données par défaut.
+					\nLe Bailleur notifiera au Client toute violation de données à caractère personnel dans un délai maximum de 48 heures après en avoir pris connaissance et par courriel. Cette notification est accompagnée de toute documentation utile afin de permettre au Client, si nécessaire, de notifier cette violation à l’autorité de contrôle compétente.
+					\nLe Bailleur s’engage à mettre en oeuvre les mesures de sécurité prévues par sa Charte Informatique.
+					\n16.4. Lorsque les personnes concernées exercent auprès du Bailleur des demandes d’exercice de leurs droits, le Bailleur adressera ces demandes dès réception par courrier électronique à la Direction Générale du Bailleur à l’adresse suivante : financing.acs.fr@arrow.com. Les droits d’accès, de rectification, ou d’opposition de l’Utilisateur peuvent être exercés auprès du secrétariat général du Bailleur à l'adresse du siège social. Le responsable du traitement est le Bailleur.
+					\n16.5 Au terme du contrat, le Bailleur s’engage à détruire toutes les données à caractère personnel du Client."
+					],
+					["titre" =>"ARTICLE 17. CLAUSE ATTRIBUTIVE DE COMPETENCE", "texte" => "Le présent CONTRAT DE MISE A DISPOSITION est soumis au droit français. Toutes difficultés relatives à la formation, l’exécution, la résiliation ou le terme du CONTRAT DE MISE A DISPOSITION seront soumises, à défaut d'accord amiable entre les Parties mettant fin à leur litige, à la compétence exclusive des Tribunaux dans le ressort de la Cour d’Appel de Paris. Cette clause d'élection de compétence, par accord exprès des Parties, s'applique même en cas de procédure en référé, de pluralité de défendeurs ou d'appel en garantie."],
+					["titre" =>"ARTICLE 18. SANCTIONS ET EMBARGOS", "texte" => "Le Locataire déclare qu’à la date de signature des présentes :\n(i) ni lui-même, ses sous-traitants, dirigeants, agents ou employés ;\n(ii) ni ses sociétés affiliées, leurs sous-traitants, dirigeants, agents ou employés ci-après dénommées les « Personnes Soumises », ne font l’objet ou ne sont menacées de Sanctions (y compris notamment, en raison du fait qu’elles sont:\n(a) détenues ou contrôlées directement ou indirectement par toute personne qui est visée par des Sanctions ou\n(b) constituées en vertu du droit d’un pays soumis à des Sanctions générales ou étendues à ce pays ou\n(c) citoyennes ou résidentes dudit pays).
+					\nLe Locataire s’engage pendant toute la durée du Contrat à ne pas contracter directement ou indirectement avec une personne morale ou physique (ci-après la « Personne sous sanction ») qui fait l’objet ou qui est menacée de Sanctions et se porte fort pour que les Personnes Soumises ne contractent pas avec la Personne sous sanction. Étant entendu que « Sanctions » désigne toutes sanctions économiques ou financières, embargos commerciaux ou mesures similaires adoptées, appliquées ou mises en oeuvre par l’une quelconque des autorités suivantes (ou par un de leurs organismes) :\n(A) les Nations-Unies; ou\n(B) les États-Unis d’Amérique; ou\n(C) l’Union européenne ou tout État membre de l’Union européenne actuel ou futur; ou\n(D) le Royaume Uni.
+					\nDans l’hypothèse où :\n(i) cette déclaration s’avérait fausse ou;\n(ii) le Locataire, ou les Personnes Soumises feraient l’objet ou seraient menacés de Sanctions au cours du Contrat ou;\n(iii) le Locataire ou les Personnes Soumises contracteraient avec la Personne sous sanction,\nle Contrat sera résilié de plein droit sans mise en demeure préalable aux conditions prévues à l’article 11."],
+				]
+			],
+			[
+				"left" => [
+					["titre" =>"ARTICLE 19. CODE DE CONDUITE – RESPECT DES LOIS", "texte" => "Le Client garantit au Bailleur qu’il se conformera à toutes les lois et règlements applicables, y compris, sans limitation, toutes les lois anti-corruption applicables au Client et les lois régissant les transactions avec l’état, les administrations, les organismes publics et privés, les lois antitrust et de libre concurrence, les lois applicables aux les délits d'initiés, les lois financières et comptables. Le Client se conformera au Code de conduite des Partenaires Arrow, qui peut être consulté ici : http://www.arrow.com/about_arrow/BusinessPartnerCodeofConduct.pdf (tel que mis à jour occasionnellement) ou à un code de conduite au moins aussi contraignant que celui d’Arrow."]
+				],
+			]
+		];
+
+
+		foreach($pages as $page){
+			$this->addPage();
+			$this->setLeftMargin(10);
+			$y = $this->getY();
+
+			foreach($page["left"] as $art) {
+				$this->ln(2);
+				if ($art["titre"]) {
+					$this->setFont('Arial','B', 7);
+					$this->cell(90,4,$art["titre"],0,1);
+				}
+				$this->setFont('Arial','', 7);
+				$this->MultiCell(90,3, $art["texte"]);
+			}
+
+			if ($page["right"]) {
+				$this->setY($y);
+				$this->setLeftMargin(100);
+				foreach($page["right"] as $art) {
+					$this->ln(2);
+					if ($art["titre"]) {
+						$this->setFont('Arial','B', 7);
+						$this->cell(90,4,$art["titre"],0,1);
+					}
+					$this->setFont('Arial','', 7);
+					$this->MultiCell(90,3, $art["texte"]);
+				}
+			}
+
+		}
+
+		$this->setLeftMargin(10);
+
+	}
 }
 
 class pdf_go_abonnement extends pdf_cleodis {
@@ -17174,7 +17400,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 		if ($btob) {
 			$this->setY(255);
-			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
+			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d'intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
 		}
 
 	}
@@ -17384,7 +17610,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 
 			$this->ln(5);
-			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
+			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d'intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
 
 		}
 
@@ -17416,7 +17642,7 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->ln(3);
 
 		$texte = "En signant ce formulaire de mandat, vous autorisez GO Abonnement à envoyer des instructions à votre banque pour débiter votre compte, et votre banque à débiter votre compte conformément aux instructions de GO Abonnement.";
-		$texte .= "\nVous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passées avec elle. Une demande de remboursement doit être présentée :";
+		$texte .= "\nVous bénéficiez du droit d'être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passées avec elle. Une demande de remboursement doit être présentée :";
 		$texte .= "\n      -	Dans les 8 semaines suivant la date de votre compte pour un prélèvement autorisé.";
 		$texte .= "\n      -	Sans tarder et au plus tard dans les 13 mois en cas de prélèvement non autorisé.";
 		$this->MultiCell(185,5, $texte, 1, 'L');
@@ -17540,11 +17766,11 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat d'abonnement n° : ".$ref, $type_client);
 
-		$this->multicell(0,3,"Les présentes conditions particulières au contrat d’abonnement automobile GOA FREE (ci-après les « Conditions Particulières d’Abonnement ») sont conclues entre la société Go Abonnement et le Client, tel que désigné ci-avant.");
-		$this->multicell(0,3,"\nLes Conditions Particulières d’Abonnement et les Conditions Générales d’Abonnement forment ensemble le Contrat d’Abonnement GOA FREE.\n");
+		$this->multicell(0,3,"Les présentes conditions particulières au contrat d'abonnement automobile GOA FREE (ci-après les « Conditions Particulières d'Abonnement ») sont conclues entre la société Go Abonnement et le Client, tel que désigné ci-avant.");
+		$this->multicell(0,3,"\nLes Conditions Particulières d'Abonnement et les Conditions Générales d'Abonnement forment ensemble le Contrat d'Abonnement GOA FREE.\n");
 
 		$this->articleContrat("ARTICLE 1 : CONTENU DE L'ABONNEMENT");
-		$this->multicell(0,4,"Dans le cadre de l’abonnement au service GOA FREE, le Client a souhaité bénéficier de l’offre :",0,1);
+		$this->multicell(0,4,"Dans le cadre de l'abonnement au service GOA FREE, le Client a souhaité bénéficier de l'offre :",0,1);
 		$this->ln(3);
 
 		$head = array("SERVICE(S)","Taux de TVA sur le prix annuel",);
@@ -17556,7 +17782,7 @@ class pdf_go_abonnement extends pdf_cleodis {
         }
 
 
-		$this->articleContrat("ARTICLE 2 : DUREE DU CONTRAT D’ABONNEMENT");
+		$this->articleContrat("ARTICLE 2 : DUREE DU CONTRAT D'ABONNEMENT");
 		$duree = [];
 		foreach($this->loyer as $k => $v) {
             if ($v['type'] === "engagement") {
@@ -17579,11 +17805,11 @@ class pdf_go_abonnement extends pdf_cleodis {
 			$an = $an." ans";
 		}
 
-		$this->multicell(0,4,"La durée de la période initiale de l’abonnement est fixée à ".$an.".",0,1);
-		$this->multicell(0,4,"Les modalités de tacite reconduction et de résiliation sont précisées dans les Conditions Générales d’Abonnement.",0,1);
+		$this->multicell(0,4,"La durée de la période initiale de l'abonnement est fixée à ".$an.".",0,1);
+		$this->multicell(0,4,"Les modalités de tacite reconduction et de résiliation sont précisées dans les Conditions Générales d'Abonnement.",0,1);
 
-		$this->articleContrat("ARTICLE 3 : PRIX DE L’ABONNEMENT – MODALITES DE PAIEMENT");
-		$this->multicell(0,4,"Le prix de l’abonnement annuel au service GOA FREE est fixé comme suit",0,1);
+		$this->articleContrat("ARTICLE 3 : PRIX DE L'ABONNEMENT – MODALITES DE PAIEMENT");
+		$this->multicell(0,4,"Le prix de l'abonnement annuel au service GOA FREE est fixé comme suit",0,1);
 		$this->ln(3);
 
 		$head = array("Unité","Périodicité","Abonnement Hors Taxes", 'TVA', 'TOTAL TTC');
@@ -17625,10 +17851,10 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->ln(5);
 
 
-		$this->multicell(0,4,"Le prix de l’abonnement au service GOA FREE est payable suivant les modalités détaillées dans les Conditions Générales d’Abonnement, en fonction de la modalité de souscription choisie par le Client.",0,1);
+		$this->multicell(0,4,"Le prix de l'abonnement au service GOA FREE est payable suivant les modalités détaillées dans les Conditions Générales d'Abonnement, en fonction de la modalité de souscription choisie par le Client.",0,1);
 
 		$this->articleContrat("ARTICLE 4 : GRILLE TARIFAIRE DE FRAIS");
-		$this->multicell(0,4,"Les frais suivants sont susceptibles d’être facturés par GoAb au Client en fonction des options choisies ou en cas de manquement à ses obligations, telle que stipulées au Contrat d’Abonnement. La grille tarifaire de frais est susceptible d’évoluer à tout moment, à la seule discrétion de GoAb. En cas de modification de la présente grille tarifaire, GoAb notifiera le Client et lui communiquera la grille modifiée ; laquelle entrera en vigueur suivant un délai de préavis de trente (30) jours suivant sa notification au Client.",0,1);
+		$this->multicell(0,4,"Les frais suivants sont susceptibles d'être facturés par GoAb au Client en fonction des options choisies ou en cas de manquement à ses obligations, telle que stipulées au Contrat d'Abonnement. La grille tarifaire de frais est susceptible d'évoluer à tout moment, à la seule discrétion de GoAb. En cas de modification de la présente grille tarifaire, GoAb notifiera le Client et lui communiquera la grille modifiée ; laquelle entrera en vigueur suivant un délai de préavis de trente (30) jours suivant sa notification au Client.",0,1);
 		$this->ln(5);
 		$data = [
 			[
