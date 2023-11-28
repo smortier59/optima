@@ -197,9 +197,7 @@ class creditsafe extends classes_optima {
                 if ($value->gender == "Male") $director = str_replace('M ', '', $director);
                 if ($value->gender == "Female") $director = str_replace('Mme ', '', $director);
             }
-
-            $explodeNom = explode(" ", $director);
-            $nom = $explodeNom[0];
+                        $nom = str_replace($value->firstNames, '', $director);
             $prenom = str_replace($nom.' ', '', $director);
 
 			$return['gerant'][] = array("nom"=>$nom,
