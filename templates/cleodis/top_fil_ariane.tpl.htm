@@ -65,6 +65,22 @@
 							,handler: switchCodename
 						},
 						{/if}
+						{if ATF::$codename!=="solo"}
+						{
+							text:"Solo Energie"
+							,icon: "{ATF::$staticserver}images/logos/solo.png"
+							,value:"solo"
+							,handler: switchCodename
+						},
+						{/if}
+						{if ATF::$codename!=="arrow"}
+						{
+							text:"Arrow"
+							,icon: "{ATF::$staticserver}images/logos/arrow.png"
+							,value:"arrow"
+							,handler: switchCodename
+						},
+						{/if}
 						]
 					}
 				});
