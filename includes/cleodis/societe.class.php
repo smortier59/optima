@@ -1767,6 +1767,23 @@ class societe_cleodis extends societe {
 
     try {
       $data = ATF::meelo()->getInfosCompanyByRegistrationNumber($registrationNumber, $pays);
+    } catch (errorATF $e) {
+      log::logger("====================================================================", "meelo");
+      log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+      log::logger($e->getMessage(), "meelo");
+      throw new errorATF($e->getMessage(),500);
+    }
+
+    try {
+      $scoring = ATF::meelo()->getScoring($registrationNumber, $pays);
+    } catch (errorATF $e) {
+
+      log::logger("====================================================================", "meelo");
+      log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+      log::logger($e->getMessage(), "meelo");
+    }
+
+    try {
       if ($data) {
         ATF::db()->begin_transaction();
         if(ATF::$codename === "cleodisbe"){
@@ -1792,6 +1809,9 @@ class societe_cleodis extends societe {
           "id_apporteur" => $apporteur ? $apporteur : null,
           "id_fournisseur" => $apporteur ? $apporteur : null
         ];
+
+        if ($scoring->score) $commun["cs_score"] = $scoring->score;
+
         switch ($company->country) {
           case 'FR':
             foreach ($company->establishments as $etablissement) {

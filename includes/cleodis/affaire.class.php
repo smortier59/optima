@@ -2756,6 +2756,8 @@ class affaire_cleodis extends affaire {
 
 			$societe = ATF::societe()->select($id_societe);
 
+
+
 			if (ATF::$codename !== 'itrenting') {
 				$comite = array  (
 					"id_societe" => $id_societe,

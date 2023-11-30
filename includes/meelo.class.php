@@ -161,6 +161,99 @@ class meelo extends classes_optima {
             throw $e;
         }
     }
+
+
+    public function getScoring($registrationNumber, $pays=null) {
+        log::logger("-- GET SCORING" , $this->logFile);
+        try {
+            $constantes = $this->checkAndGetConstante();
+            $token = $constantes["token"];
+            $scoringUrl = $constantes["scoringUrl"];
+
+            if (!$pays) {
+                $pays = ATF::constante()->getConstante("__API_CREDIT_PAYS_RECHERCHE__");
+                if (!$pays) {
+                    $pays = 'FR';
+                } else {
+                    $pays = ATF::constante()->select($pays, "valeur");
+                }
+            }
+
+            // Generation du journey ID
+            $journeyID = $this->getJourneyId($scoringUrl, $token);
+
+            // Creation de la demande
+            $res = $this->scoreTask($scoringUrl, $token, $journeyID, $registrationNumber, $pays);
+
+            // Recuperation des infos scoring
+            if ($res && $res->id) {
+               return self::scoreResultTask($scoringUrl, $token, $res->id);
+            } else {
+                throw new errorATF("MEELO ERROR : Demande failed");
+            }
+        } catch (errorATF $e) {
+            log::logger("Error 1" , $this->logFile);
+            throw $e;
+        }
+    }
+
+
+    function getJourneyId($url, $token) {
+        log::logger("-- GET JOURNEY ID" , $this->logFile);
+        $url = $url."/journey-id";
+        log::logger("-- Création Journey ID" , $this->logFile);
+        return $this->curlCall($url, $token, 'GET');
+    }
+
+    function scoreTask($url, $token, $journeyID, $registrationNumber, $pays) {
+        log::logger("-- POST SCORE TASK" , $this->logFile);
+        $data = [
+            "requestOptions" => [ "requestId" => "CREDIT_SAFE_SCORE"],
+            "companyProfile" => [
+                "address" => [
+                  "country" => $pays
+                ],
+                "registrationNumber" => $registrationNumber
+            ],
+            "additionalParameters" => [],
+            "rulesOptions" => []
+        ];
+
+        $url = $url."/v2/task/score?journeyId=".$journeyID;
+        log::logger("-- Création de la demande score" , $this->logFile);
+        return $this->curlCall($url, $token, 'POST', $data);
+    }
+
+    function scoreResultTask($scoringURL, $token, $id, $try=0) {
+        log::logger("-- POST SCORE RESULT" , $this->logFile);
+        $url = $scoringURL.'/v2/task/'.$id;
+        log::logger("-- Récuperation du report de score de la societe ".$url , $this->logFile);
+
+        $report = $this->curlCall($url, $token);
+        log::logger($report, $this->logFile);
+        switch ($report->status) {
+            case 'FAILED':
+                throw new errorATF("MEELO ERROR : ".$report->statusReason);
+            break;
+
+            case 'IN_PROGRESS':
+                if ($try < 5) {
+                    log::logger("On retry", $this->logFile);
+                    sleep(2);
+                    return self::scoreResultTask($scoringURL, $token, $id, $try++);
+                } else {
+                    return null;
+                }
+            break;
+
+            case 'SUCCESS':
+                return $report->result;
+            break;
+            default:
+                log::logger("STAUT NON GERE ". $report->status, "meelo");
+            break;
+        }
+    }
 };
 
 ?>
