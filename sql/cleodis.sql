@@ -79,3 +79,5 @@ VALUES
 (NULL, '__API_MEELO_TOKEN__', 'iUgrr935439f3-4b55-467a-8687-bc5aab4b2450'),
 (NULL, '__API_MEELO_CHECK_COMPANY_BASEURL__', 'https://check-company.api.getmeelo.com'),
 (NULL, '__API_MEELO_SCORING_BASEURL__', 'https://scoring.api.getmeelo.com');
+
+ALTER TABLE `type_affaire` ADD `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' AFTER `assurance_sans_tva`;
