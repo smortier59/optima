@@ -1504,8 +1504,9 @@ class facture_cleodis extends facture {
 						}
 						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "LIXXBAIL"){
 							$choix = "affaire_refi_lixxbail";
-						}
-						else{
+						} elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "BNP PARIBAS LEASE MANDATE") {
+							$choix = 'refi_refinanceur_BNP_PARIBAS_LEASE_MANDATE';
+						} else{
 							if($item['facture.date_periode_debut']) {
 								//Si le contrat est en cours pendant la période de la facture, pas d'analytique
 								if(strtotime($infos_commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) && strtotime($infos_commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
@@ -1519,7 +1520,10 @@ class facture_cleodis extends facture {
 									if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
 										$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
 									//Affaire en cours et refinancée par BMF
-									}elseif(!$ResRefinancement || ($ResRefinancement && $refinancement == "LIXXBAIL") && $en_cours){
+									}elseif(!$ResRefinancement || ($ResRefinancement && $refinancement == "BNP PARIBAS LEASE MANDATE") && $en_cours){
+										$choix = "refi_refinanceur_BNP_PARIBAS_LEASE_MANDATE";
+									//Affaire en cours et refinancée par BMF
+									} elseif(!$ResRefinancement || ($ResRefinancement && $refinancement == "LIXXBAIL") && $en_cours){
 										$choix = "affaire_refi_lixxbail";
 									//Affaire en cours et refinancée par BMF
 									}elseif($ResRefinancement && $refinancement == "BMF"){
@@ -1584,6 +1588,14 @@ class facture_cleodis extends facture {
 						$ligne[4]["H"] = $h;
 					break;
 
+					case 'refi_refinanceur_BNP_PARIBAS_LEASE_MANDATE':
+						$libelle = $refinanceur["code_refi"];
+						$ligne[1]["D"] =  "411300";
+						$ligne[2]["D"] =  "707110";
+						$ligne[3]["D"] =  "707110";
+						$ligne[4]["H"] = $h;
+					break;
+
 					case 'refi_autre':
 						$libelle = $refinanceur["code_refi"];
 						$ligne[1]["D"] =  "411300";
@@ -1633,13 +1645,6 @@ class facture_cleodis extends facture {
 							$ligne[3]["D"] ="706300";
 							$ligne[4]["D"] ="445660";
 						} else {
-							ATF::facture()->q->reset()->where("id_affaire", $item['facture.id_affaire_fk'])
-													 ->where("nature", 'engagement')
-													 ->addOrder("id_facture", "ASC");
-							$facs = ATF::facture()->sa();
-
-							if($facs[0]['id_facture'] !== $item['facture.id_facture_fk']) 	$libelle = "CLIXXB";
-
 							$ligne[2]["D"] ="467810";
 							unset($ligne[3]);
 							unset($ligne[4]);
@@ -1728,7 +1733,7 @@ class facture_cleodis extends facture {
 						}else{
 							$row_data["F"] = 'C';
 						}
-						if ($choix === 'affaire_refi_lixxbail' && $item["facture.type_facture"] === "facture_refi") {
+						if ($choix === 'affaire_refi_lixxbail' && ($item["facture.type_facture"] === "facture_refi" || count($ligne) == 2)) {
 							$row_data["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						} else {
 							$row_data["G"] = $ligne[$i]["G"] ? $ligne[$i]["G"] : abs($item['facture.prix']);
