@@ -31,6 +31,8 @@ class scanner_cleodis extends scanner {
 class scanner_cleodisbe extends scanner_cleodis { };
 class scanner_itrenting extends scanner_cleodis { };
 class scanner_cap extends scanner_cleodis { };
+class scanner_solo extends scanner_cleodis { };
+class scanner_arrow extends scanner_cleodis { };
 
 class scanner_bdomplus extends scanner_cleodis { };
 

@@ -4579,6 +4579,9 @@ class affaire_assets extends affaire_cleodis {
 
 };
 
+class affaire_solo extends affaire_cleodis { };
+class affaire_arrow extends affaire_cleodis { };
+
 class affaire_go_abonnement extends affaire_cleodis {
 
 	function __construct($table_or_id=NULL) {

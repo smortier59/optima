@@ -74,6 +74,8 @@ class sous_categorie_cleodis extends sous_categorie {
 class sous_categorie_cleodisbe extends sous_categorie_cleodis { };
 class sous_categorie_itrenting extends sous_categorie_cleodis { };
 class sous_categorie_cap extends sous_categorie_cleodis { };
+class sous_categorie_solo extends sous_categorie_cleodis { };
+class sous_categorie_arrow extends sous_categorie_cleodis { };
 
 class sous_categorie_bdomplus extends sous_categorie_cleodis { };
 

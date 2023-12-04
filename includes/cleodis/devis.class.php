@@ -1954,6 +1954,9 @@ class devis_itrenting extends devis_cleodis {
 
 };
 
+class devis_solo extends devis_cleodis { };
+class devis_arrow extends devis_cleodis { };
+
 class devis_bdomplus extends devis_cleodis {
 
 	function __construct($table_or_id=NULL) {

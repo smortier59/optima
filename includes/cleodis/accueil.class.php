@@ -71,10 +71,23 @@ class accueil_itrenting extends accueil_cleodis {
 		return array();
 	}
 };
+
 class accueil_cap extends accueil_cleodis {
 	public $onglets = array(
 		"societe"=>array("opened"=>true)
 	);
+};
+
+class accueil_solo extends accueil_cleodis {
+	public function getWidgets(){
+		return array();
+	}
+};
+
+class accueil_arrow extends accueil_cleodis {
+	public function getWidgets(){
+		return array();
+	}
 };
 
 

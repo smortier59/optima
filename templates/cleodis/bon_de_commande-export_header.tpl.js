@@ -1,5 +1,5 @@
 {strip}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe"  || ATF::$codename=="assets" || ATF::$codename=="itrenting"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe"  || ATF::$codename=="assets" || ATF::$codename=="itrenting" || ATF::$codename=="solo" || ATF::$codename=="arrow"}
 {
   text: 'Export CEGID'
   , handler: function(b,e){
