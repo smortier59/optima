@@ -1,17 +1,3 @@
--- TH 28889 - Optima / Gestion de PDF complémentaire au niveau de l'affaire
-CREATE TABLE `document_complementaire_a_signer` (
-    `id_document_complementaire_a_signer` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
-    `id_affaire` MEDIUMINT UNSIGNED NOT NULL ,
-    `id_document_contrat` MEDIUMINT UNSIGNED NOT NULL ,
-    PRIMARY KEY (`id_document_complementaire_a_signer`),
-    INDEX (`id_affaire`),
-    INDEX (`id_document_contrat`)
-) ENGINE = InnoDB;
-
-ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat`(`id_document_contrat`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
     -- Affaire de vente
 ALTER TABLE `panier` ADD `nature` ENUM('location','vente') NOT NULL DEFAULT 'location' AFTER `date`;
 ALTER TABLE `produit` ADD `prix_vente` FLOAT(8,2) NULL DEFAULT NULL AFTER `support`;
@@ -72,12 +58,3 @@ where
     `affaire`.`etat` not in ('demande_refi', 'facture_refi')
     and (`commande`.`etat` in ('non_loyer', 'mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux', 'AR', 'arreter')
         or `affaire`.`nature` = 'vente');
-
-
-INSERT INTO `constante` (`id_constante`, `constante`, `valeur`)
-VALUES
-(NULL, '__API_MEELO_TOKEN__', 'iUgrr935439f3-4b55-467a-8687-bc5aab4b2450'),
-(NULL, '__API_MEELO_CHECK_COMPANY_BASEURL__', 'https://check-company.api.getmeelo.com'),
-(NULL, '__API_MEELO_SCORING_BASEURL__', 'https://scoring.api.getmeelo.com');
-
-ALTER TABLE `type_affaire` ADD `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' AFTER `assurance_sans_tva`;
