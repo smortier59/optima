@@ -17495,6 +17495,73 @@ class pdf_arrow extends pdf_cleodis
 
 	}
 
+	public function cession($id, $s) {
+
+		$contrat = ATF::commande()->select(ATF::commande()->decryptId($id));
+		$client = ATF::societe()->select($contrat["id_societe"]);
+
+		ATF::demande_refi()->q->reset()->where("demande_refi.id_affaire", $contrat["id_affaire"])->where("demande_refi.etat", "valide")->setLimit(1);
+		$demande_refi = ATF::demande_refi()->select_row();
+		$refinanceur = ATF::refinanceur()->select($demande_refi["id_refinanceur"]);
+
+		$this->unsetFooter();
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->image($this->logo,74,10,60);
+
+		$this->setY(30);
+		$this->setFont('Arial','B', '14');
+		$this->cell(0,4,"Fiche Financière - Acte de Cession",0,1,'C');
+		$this->setFont('Arial','', '9');
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,38,200,38);
+		$this->ln(6);
+
+		$this->multicell(0,4, "En vertu de la Convention de Coopération signée, la société ARROW CAPITAL SOLUTIONS SAS (ci-après dénommée « ARROW CAPITAL SOLUTIONS ») cède à ".$refinanceur["refinanceur"]." (ci-après dénommée «".$refinanceur["refinanceur"]."») divers matériels ayant fait l’objet d’un Contrat de Location N°".$contrat["ref"]." négocié et conclu le ".date('d/m/Y', strtotime($contrat["date"]))." entre ARROW CAPITAL SOLUTIONS et ".$client["societe"]." Siren ".$client["siren"].". (ci-après dénommé « le Locataire »), dont les caractéristiques sont décrites ci-après.");
+		$this->ln(2);
+
+		$this->multicell(0,4, "La présente vente est faite à la date et au prix indiqué ci-dessous.");
+		$this->ln(2);
+
+		$this->multicell(0,4, "Par ailleurs, ARROW CAPITAL SOLUTIONS s’engage à racheter les matériels à ".$refinanceur["refinanceur"]." au terme du Contrat de Location, et ce en vertu de l’article VIII de ladite Convention, au prix fixé ci-après.");
+		$this->ln(2);
+
+		$this->titleContrat("CONTRAT DE LOCATION :");
+		ATF::loyer()->q->reset()->where("id_affaire", $contrat["id_affaire"]);
+		$duree = 0;
+		$periodicite = "mois";
+		foreach(ATF::loyer()->select_all() as $l) {
+			$duree += $l["duree"];
+			$periodicite = $l["frequence_loyer"];
+		}
+		$this->cell(0,4, "Durée du contrat : ".$duree." ".$periodicite,0, 1);
+		$this->cell(0,4, "Périodicité et Terme : ...........................................",0, 1);
+		$this->cell(0,4, "Echeancier : ...........................................",0, 1);
+		$this->cell(0,4, "Valeur résiduelle : ...........................................",0, 1);
+		$this->cell(0,4, "Désignation du matériel : ...........................................",0, 1);
+
+		$this->cell(0,4, "L’adresse de facturation est la suivante  :",0, 1);
+
+
+		$this->titleContrat("ASSURANCE DOMMAGE SOUSCRIPTEUR :");
+
+		$this->titleContrat("VENTE DU MATERIEL :");
+		$this->cell(0,4, "Date de la vente : ...........................................",0, 1);
+		$this->cell(0,4, "Date de cession : ...........................................",0, 1);
+		$this->cell(0,4, "Prix de vente : ............ H.T. Euros – ............ TTC Euros.",0, 1);
+		$this->cell(0,4, "La date d’effet est fixée au : ...........................................",0, 1);
+
+		$this->titleContrat("RACHAT DU MATERIEL :");
+		$this->cell(0,4, ".............................. HT Euros",0, 1);
+
+		$this->ln(10);
+		$this->signatureInfos(null, "ARROW CAPITAL SOLUTIONS", $refinanceur["refinanceur"]);
+
+
+	}
+
 
 	/*
 		UTILS POUR ARROW PDF
@@ -17521,21 +17588,25 @@ class pdf_arrow extends pdf_cleodis
 		foreach($lines as $k => $v) {
 			$this->cell(90, 4, $k.": ".$v, 0, 1);
 		}
-		$this->setY($y);
-		$this->setLeftMargin(105);
-		if ($bailleur) {
-			$this->cell(90, 4, $client ? $client : '', 0, 1, 'C');
+
+		if ($contact) {
+			$this->setY($y);
+			$this->setLeftMargin(105);
+			if ($bailleur) {
+				$this->cell(90, 4, $client ? $client : '', 0, 1, 'C');
+			}
+			$lines = [
+				"Représentée par" => $this->contact["prenom"]." ".$this->contact["nom"],
+				"Qualité" => $this->contact["fonction"],
+				"Cachet de la société" => "",
+				"Signature" => ""
+			];
+			foreach($lines as $k => $v) {
+				$this->cell(90, 4, $k.": ".$v, 0, 1);
+			}
+			$this->setLeftMargin(15);
 		}
-		$lines = [
-			"Représentée par" => $this->contact["prenom"]." ".$this->contact["nom"],
-			"Qualité" => $this->contact["fonction"],
-			"Cachet de la société" => "",
-			"Signature" => ""
-		];
-		foreach($lines as $k => $v) {
-			$this->cell(90, 4, $k.": ".$v, 0, 1);
-		}
-		$this->setLeftMargin(15);
+
 	}
 
 	function affichageCG($pages, $addFirstPage=true) {
