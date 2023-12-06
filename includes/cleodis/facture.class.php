@@ -44,7 +44,7 @@ class facture_cleodis extends facture {
 			,"id_fournisseur_prepaiement"=>array("autocomplete"=>array(
    				"function"=>"autocompleteFournisseurs"
      		))
-			,"date"
+			,"date"=>array("disabled"=>true)
 			,"date_previsionnelle"
 			,"date_envoi"
 			,"designation"=>array("xtype"=>"textarea")
