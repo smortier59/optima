@@ -58,3 +58,7 @@ where
     `affaire`.`etat` not in ('demande_refi', 'facture_refi')
     and (`commande`.`etat` in ('non_loyer', 'mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux', 'AR', 'arreter')
         or `affaire`.`nature` = 'vente');
+
+
+-- TH 30409 - Export Vente - Num Facture
+ALTER TABLE `facture` ADD `numero` VARCHAR(12) NULL DEFAULT NULL AFTER `ref`;

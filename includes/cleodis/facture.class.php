@@ -469,6 +469,51 @@ class facture_cleodis extends facture {
 		return false;
 	}
 
+	function setNumero($jour) {
+		$prefix = date("Ym", strtotime($jour));
+		$nb = $this->getMaxNumero($prefix);
+		$max = $nb ? $nb["max_numero"] : null;
+		ATF::facture()->q->reset()->whereIsNull("numero")->where("date", $jour);
+		$factures = ATF::facture()->sa();
+		foreach ($factures as $facture) {
+			$numero = $this->getNumero($prefix, $max);
+			ATF::facture()->u(["id_facture" => $facture["id_facture"], "numero" => $numero]);
+			$max++;
+		}
+	}
+
+	function getMaxNumero($prefix){
+		$this->q->reset()
+				->addCondition("numero",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`numero`,7)+1',"max_numero")
+				->addOrder('numero',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+		$nb=$this->sa();
+
+		return $nb;
+	}
+
+	function getNumero($prefix, $max) {
+		if($max){
+			if($max<10){
+				$suffix="00000".$max;
+			}elseif($max<100){
+				$suffix="0000".$max;
+			}elseif($max<1000){
+				$suffix="000".$max;
+			}elseif($max<10000){
+				$suffix="00".$max;
+			}elseif($max<100000){
+				$suffix="0".$max;
+			}else{
+				$suffix=$max;
+			}
+		}else{
+			$suffix="000001";
+		}
+		return $prefix.$suffix;
+	}
 
 
 	/**
@@ -1259,10 +1304,10 @@ class facture_cleodis extends facture {
 	* @return boolean
 	*/
 	public function can_delete($id){
-		if($this->select($id,"etat")=="impayee"){
+		if ($this->select($id, 'exporte') === 'oui' || $this->select($id, 'numero') !== null) {
+			throw new errorATF("Impossible de supprimer cette facture car elle est validée (En comptabilité)",879);
+		} else {
 			return true;
-		}else{
-			throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
 		}
 	}
 
