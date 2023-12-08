@@ -192,9 +192,12 @@ class creditsafe extends classes_optima {
 
         $directors = $data->report->directors->currentDirectors;
         foreach ($directors as $key => $value) {
-			$return['gerant'][] = array("nom"=>$value->surname,
+            if ($value->directorType === 'Person') {
+                $return['gerant'][] = array("nom"=>$value->surname,
 								        "prenom"=>$value->firstNames,
 								        "fonction"=>$value->positions[0]->positionName);
+            }
+
 		}
 
         $companySummary = $data->report->companySummary;
