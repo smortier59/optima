@@ -17568,6 +17568,9 @@ class pdf_arrow extends pdf_cleodis
 	*/
 
 	function signatureInfos($contact, $denominationArrow, $denominationClient, $bailleur = null, $client=null) {
+		$nomSignataire = ATF::constante()->getConstante("__NOM_SIGNATAIRE__");
+        $fonctionSignataire = ATF::constante()->getConstante("__FONCTION_SIGNATAIRE__");
+
 		$this->ln(5);
 		$this->cell(0,4,"Fait en deux exemplaires à Paris, le ".date("d/m/Y"),0, 1);
 		$this->ln(5);
@@ -17578,8 +17581,8 @@ class pdf_arrow extends pdf_cleodis
 
 		$this->setFont('Arial','', '8');
 		$lines = [
-			"Représentée par" => "Arnaud BAFFIE",
-			"Qualité" => "Directeur Commercial",
+			"Représentée par" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE",
+			"Qualité" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Directeur Commercial",
 			"Cachet de la société" => "",
 			"Signature" => ""
 		];
@@ -17649,6 +17652,10 @@ class pdf_arrow extends pdf_cleodis
 	}
 
 	function entete($denominationLoueur, $denominationClient) {
+		$nomSignataire = ATF::constante()->getConstante("__NOM_SIGNATAIRE__");
+        $fonctionSignataire = ATF::constante()->getConstante("__FONCTION_SIGNATAIRE__");
+
+
 		$this->setFont('Arial','B', 8);
 		$this->cell(0,4,"Entre les soussignées :",0,1);
 
@@ -17658,7 +17665,7 @@ class pdf_arrow extends pdf_cleodis
 			["label" => "Forme et capital",	"valeur" => "SAS au capital de 40 000 EUR",	"style" => null],
 			["label" => "N° unique d’identification",	"valeur" => "RCS n° 453 738 551",	"style" => null],
 			["label" => "Siège social",	"valeur" => "Immeuble CANOPY – 6, Rue du général Audran 6 – 92400 COURBEVOIE",	"style" => null],
-			["label" => "Représentée par",	"valeur" => "Arnaud BAFFIE en qualité de Directeur Commercial",	"style" => null],
+			["label" => "Représentée par",	"valeur" => (ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE")." en qualité de ".(ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial"),	"style" => null],
 		];
 		foreach($loueur as $v) {
 			$this->setFont('Arial',null, 8);
