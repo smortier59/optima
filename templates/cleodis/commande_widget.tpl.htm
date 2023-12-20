@@ -7,7 +7,6 @@
 
 {$id_agence = $infos.id_agence}
 
-
 {if $infos.type=="o2m" || $infos.type=="reseau"}
     {$titre = 'Ct MEP RESEAUX'}
     {$objectif = ATF::agence()->select($id_agence, "objectif_mep_reseaux")}
@@ -17,10 +16,6 @@
 {else}
     {$titre = 'Ct MEP S'}
 {/if}
-
-
-
-
 
 <div id="{$module}_graphe_{$infos.type}_{$id_agence}" class="widget"></div>
 <script type="text/javascript">
@@ -37,22 +32,22 @@ Ext.onReady(function(){
         },
         xAxis: {
             categories: [
-                            {foreach $data["categories"]["category"] as $cat}                    
+                            {foreach $data["categories"]["category"] as $cat}
                                 '{$cat["label"]}' {if !$cat@last},{/if}
                             {/foreach}
                         ]
         },
-        tooltip: {           
+        tooltip: {
             shared: true
         },
-        series: [                       
+        series: [
                     {
                         type: 'column',
                         name: 'Réel ({$data["year"][date("Y")]["count"]})',
                         data: [
-                                {foreach $data["dataset"]["reel"] as $reel}   
+                                {foreach $data["dataset"]["reel"] as $reel}
                                     {$reel["value"]} {if !$reel@last},{/if}
-                                {/foreach} 
+                                {/foreach}
 
                               ]
                     }
@@ -62,35 +57,35 @@ Ext.onReady(function(){
                         type: 'spline',
                         name: 'Moyenne',
                         data: [
-                                {foreach $data["dataset"]["moyenne"] as $obj}   
+                                {foreach $data["dataset"]["moyenne"] as $obj}
                                      {$obj["value"]} {if !$obj@last},{/if}
-                                {/foreach}   
-                            ]                  
+                                {/foreach}
+                            ]
                     } ,
                     {
                         type: 'spline',
                         name: 'Objectif ({$objectif})',
                         data: [
-                                {foreach $data["dataset"]["objectif"] as $obj}   
+                                {foreach $data["dataset"]["objectif"] as $obj}
                                      {$obj["value"]} {if !$obj@last},{/if}
-                                {/foreach}   
-                            ]                  
-                    }     
-                    {/if}                 
-                ]        
+                                {/foreach}
+                            ]
+                    }
+                    {/if}
+                ]
     });
-});    
+});
 </script>
 
 
 <div>
 {if $id_agence == 1}
-    {foreach $data["year"] as $annee}        
+    {foreach $data["year"] as $annee}
         <div style="width:50%; float:left;"><b>{$annee["annee"]}</b> : {$annee["count"]}</div>
     {/foreach}
 {else}
-    {foreach $data["year"] as $annee} 
-        {if $annee["annee"] >= date("Y") }       
+    {foreach $data["year"] as $annee}
+        {if $annee["annee"] >= date("Y") }
         <div style="width:50%; float:left;"><b>{$annee["annee"]}</b> : {$annee["count"]}</div>
         {/if}
     {/foreach}

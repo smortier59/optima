@@ -2944,9 +2944,8 @@ class commande_cleodis extends commande {
 						$totalPrec += $avg[$key]["value"];
 					}
 
-
 					foreach ($avg as $key => $value) {
-						$pourcentage = ($avg[$key]["value"]/$totalPrec)*100;
+						$pourcentage = $totalPrec != 0 ? ($avg[$key]["value"]/$totalPrec)*100 : 0;
 						$obj[$key]["value"] = round(($objectif/100)*$pourcentage);
 					}
 
