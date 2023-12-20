@@ -287,6 +287,9 @@ class souscription_cleodis extends souscription {
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
+          case 'solo':
+            $this->createComite($id_affaire, $societe, "accepte", "Comité SOLO", date("Y-m-d"), date("Y-m-d"));
+          break;
 
           case 'bdomplus':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CLEODIS", date("Y-m-d"), date("Y-m-d"));
@@ -828,6 +831,7 @@ class souscription_cleodis extends souscription {
       case 'hippopotamus':
       case 'instore':
       case 'inovshop':
+      case 'solo':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1109,6 +1113,9 @@ class souscription_cleodis extends souscription {
       break;
       case 'inovshop':
         $r = "LO";
+      break;
+      case 'solo':
+        $r = "SO";
       break;
       default:
         $r = substr($site_associe, 0, 2);
@@ -2087,7 +2094,13 @@ class souscription_boulanger extends souscription_cleodis {
 
 class souscription_itrenting extends souscription_cleodis { };
 class souscription_assets extends souscription_cleodis { };
-class souscription_solo extends souscription_cleodis { };
+class souscription_solo extends souscription_cleodis {
+
+  public $id_user = 1; // ID Du user qui sera en créateur des éléments
+  public $fournisseur = 2; // ID Du fournisseur par défaut qui sera attaché aux éléments DEFAULT : cléodis
+  public $codename = "solo"; // Utile pour le stockage des fichiers lors de la récuperation des fichiers signés
+
+};
 class souscription_arrow extends souscription_cleodis { };
 
 class souscription_go_abonnement extends souscription_cleodis { };
