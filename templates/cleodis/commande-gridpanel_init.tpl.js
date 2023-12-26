@@ -203,6 +203,12 @@ ATF.renderer.pdfCommande = function(table, field) {
             html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('cession', 'commande');
             html += '</a><br /><hr>';
         {/if}
+
+        {if ATF::$codename === 'arrow'}
+            html += '<a href="cession-' + id + '.pdf" target="_blank">';
+            html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('cession', 'commande');
+            html += '</a><br /><hr>';
+        {/if}
         return '<div id="' + idDiv + '">' + html + '</div>';
     }
 };
