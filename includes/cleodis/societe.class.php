@@ -1733,10 +1733,10 @@ class societe_cleodis extends societe {
             log::logger($e->getMessage(), "creditsafe");
             log::logger($data, "creditsafe");
             throw $e;
-        } catch (ATFerror $e) {
+        } catch (errorATF $e) {
             log::logger("====================================================================", "creditsafe");
             log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
-            log::logger($data, "creditsafe");
+            log::logger($e, "creditsafe");
             throw new errorATF("erreurCS inside",500);
         }
     } else{

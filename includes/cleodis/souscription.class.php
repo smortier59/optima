@@ -284,6 +284,7 @@ class souscription_cleodis extends souscription {
           case 'hippopotamus':
           case 'instore':
           case 'inovshop':
+          case 'laboutiquedunet':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -828,6 +829,7 @@ class souscription_cleodis extends souscription {
       case 'hippopotamus':
       case 'instore':
       case 'inovshop':
+      case 'laboutiquedunet':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1109,6 +1111,9 @@ class souscription_cleodis extends souscription {
       break;
       case 'inovshop':
         $r = "LO";
+      break;
+      case 'laboutiquedunet':
+        $r = "BN";
       break;
       default:
         $r = substr($site_associe, 0, 2);
