@@ -1439,6 +1439,8 @@ class affaire_cleodis extends affaire {
 					->addField("famille.famille","famille")
 					->addField("societe.nom_commercial","nom_commercial")
 					->addField("societe.code_client", "code_client")
+					->addField("apporteur.id_societe", "id_apporteur")
+					->addField("apporteur.societe", "apporteur")
 
 					->from("affaire","id_societe","societe","id_societe")
 					->from("societe","id_contact_signataire","contact","id_contact")
@@ -1447,11 +1449,12 @@ class affaire_cleodis extends affaire {
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
 					->from("societe","id_famille", "famille", "id_famille")
+					->from("affaire","id_partenaire","societe","id_societe", "apporteur")
 					//->where("provenance",'partenaire')
-					->where("id_partenaire", $apporteur)
-
 					->addGroup("affaire.id_affaire");
-
+			foreach (explode(',', $apporteur) as $key => $value) {
+				$this->q->where("id_partenaire", $value, 'OR', 'subApporteur', '=');
+			}
 
 			if ($get['filters']['sans-suite'] == "on"){
 				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande");
