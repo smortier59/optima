@@ -12438,7 +12438,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->ln(3);
 		$this->Multicell(0,3,"El pago de la primera mensualidad (en adelante rentas) se iniciará el ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"])).".");
 		$this->ln(3);
-		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"]." sucursal sita en ".$this->affaire["adresse_banque"].", C.P. ".$this->affaire["cp_banque"]." de ".$this->affaire["ville_banque"].", (".$this->affaire["province_banque"]."), manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
+		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"].", manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
 
 		$this->setfont('arial','B',8);
 		$this->multicell(0,8,"CUARTA.- LUGAR DE LA ENTREGA");
