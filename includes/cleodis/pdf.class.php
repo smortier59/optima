@@ -12474,11 +12474,12 @@ class pdf_itrenting extends pdf_cleodis {
 
 		foreach($this->lignes as $k => $v) {
 			$data[] = [ $v["quantite"], $v["ref"]." - ".$v["produit"] ];
+			$styles[] = [ ["align" => "C","size"=>9 ], ["align" => "L","size"=>9 ]];
 		}
 		$data[] = ["NOTA", "SALVO INDICACIÓN EXPRESA, LA GARANTÍA DE LOS BIENES RELACIONADOS EN ESTA DESCRIPCIÓN ES LA BÁSICA DE SUS RESPECTIVOS FABRICANTES"];
+		$styles[] = [ ["align" => "C","size"=>9 ], ["align" => "L","size"=>9 ]];
 
-
-		$this->tableauBigHead($head,$data, $w);
+		$this->tableauBigHead($head,$data,$w,5,$styles);
 
 		$this->ln(10);
 		$this->setfont('arial','BU',8);
