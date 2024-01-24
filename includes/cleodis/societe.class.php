@@ -1835,7 +1835,7 @@ class societe_cleodis extends societe {
           case 'ES':
             $specifique = [ "capital" => $legalUnit->shareCapital->value ];
             if (ATF::$codename === "itrenting") {
-              $specifique["cif"] = $legalUnit->registrationNumber;
+              $specifique["cif"] = $legalUnit->companyRegistrationNumber;
             } else {
               $specifique["siren"] = $legalUnit->registrationNumber;
             }

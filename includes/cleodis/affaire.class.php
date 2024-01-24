@@ -2825,16 +2825,15 @@ class affaire_cleodis extends affaire {
 				}
 			}
 
-			ATF::user()->q->reset()->where("nom", "delattre");
-			$users = ATF::user()->select_all();
+			$constantNotifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_AFFAIRE_PARTENAIRE__");
+			$responsableSociete = ATF::societe()->select($id_societe, 'id_owner');
 
 			ATF::user()->q->reset()->where("login", "espaceclient")->setLimit(1);
 			$partenaireUser = ATF::user()->select_row();
 
-			$notifie = array();
-			foreach ($users as $key => $value) {
-				$notifie[] = $value["id_user"];
-			}
+			$notifie = [];
+			if ($constantNotifie) $notifie = $constantNotifie;
+			if ($responsableSociete) $notifie[] = $responsableSociete;
 
 			$suivi = array(
 				 "id_societe"=>$id_societe
