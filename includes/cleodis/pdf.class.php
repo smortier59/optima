@@ -12356,7 +12356,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->contrat_BBVA_p1($notaire, $ref);
 		$this->contrat_BBVA_p2($notaire, $ref);
 		$this->contrat_BBVA_cg($notaire, $ref);
-		$this->contrat_BBVA_notification();
+		$this->contrat_BBVA_notification($ref);
 
 		if ($this->garant) {
 			$this->contrat_BBVA_page_garant($ref);
@@ -12652,7 +12652,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 
 	}
-	function contrat_BBVA_notification() {
+	function contrat_BBVA_notification($ref) {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
 		$this->setfont('arial','B',10);
@@ -12671,7 +12671,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->cell(0,4,"Muy señores nuestros,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$ref." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", lo que les notificamos a los efectos pertinentes y, especialmente en lo que respecta al abono de las rentas del mencionado contrato, que a partir de la fecha de hoy sólo tendrá efecto liberatorio cuando se realice directamente a BBVA, S.A.");
 		$this->ln(5);
