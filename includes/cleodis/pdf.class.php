@@ -12181,7 +12181,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$y = $this->getY();
 		if ($this->partenaire) {
 			$this->setfont('arial','B',8);
-			$this->cell(85,4,$this->partenaire["societe"],0,1);
+			$this->MultiCell(85,4,$this->partenaire["societe"],0,'L');
 			$this->setfont('arial','',8);
 
 			if ($this->partenaire["id_contact_signataire"]) {
@@ -12201,7 +12201,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->setY($y);
 		$this->SetLeftMargin(100);
 		$this->setfont('arial','B',8);
-		$this->cell(85,4,$this->societe["nom_commercial"],0,1);
+		$this->MultiCell(85,4,$this->societe["nom_commercial"],0,1);
 		$this->setfont('arial','',8);
 		$this->cell(85,4,$this->user["prenom"].' '.$this->user["nom"],0,1);
 		$this->cell(85,4,$this->societe["tel"],0,1);
