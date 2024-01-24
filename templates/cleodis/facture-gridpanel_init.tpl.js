@@ -28,6 +28,7 @@ ATF.renderer.typeFacture=function(table,field) {
 {util::push($fieldsKeys,"id_autreFacture")}
 {util::push($fieldsKeys,"ref_autreFacture")}
 {util::push($fieldsKeys,"allowRelance")}
+{util::push($fieldsKeys, "allowAvoir")}
 
 var trad = new Object();
 trad["non_rejet"] = "Acceptée";
@@ -327,6 +328,25 @@ ATF.renderer.relanceFacture=function(table,field) {
 	}
 };
 
+
+ATF.renderer.createAvoir=function(table,field) {
+	return function(filetype, meta, record, rowIndex, colIndex, store) {
+		var idDiv = Ext.id();
+		var id = record.data[table + '__dot__id_' + table];
+		var html = "";
+
+		if (record.data['allowAvoir']) {
+			html += '<p>';
+			html += '<a href="javascript:;" onclick="if (confirm(\'' + ATF.usr.trans('Etes_vous_sur') + '\')) ATF.ajax(\'facture,createAvoir.ajax\',\'id_facture=' + id + '\');">';
+			html += '<img src="{ATF::$staticserver}images/icones/remboursement.png" width="30px" />';
+			html += '</a>';
+			html += '</p>';
+		}
+
+		return '<div id="' + idDiv + '">' + html + '</div>';
+
+	}
+};
 
 /*
 	Renderer pour la modification d'un texte.
