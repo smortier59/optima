@@ -12494,12 +12494,6 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->cell(30,3,'Banco:');
 		$this->cell(160,3,$this->affaire["nom_banque"],0,1);
 
-		$this->cell(30,3,'Domicilio:');
-		$this->cell(160,3,$this->affaire["adresse_banque"],0,1);
-		$this->SetLeftMargin(40);
-		$this->cell(160,3,$this->affaire["cp_banque"]." - ". $this->affaire["ville_banque"]." (".$this->affaire["province_banque"].")",0,1);
-		$this->SetLeftMargin(10);
-
 		$this->cell(30,3,'IBAN:');
 		$this->cell(160,3,$this->affaire["IBAN"],0,1);
 
