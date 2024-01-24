@@ -12336,7 +12336,7 @@ class pdf_itrenting extends pdf_cleodis {
 			}
 
 			if ($v["id_contact"]) {
-				$v["nom"] = ATF::contact()->select($v["id_contact"], "nom")." ".ATF::contact()->select($v["id_contact"], "prenom");
+				$v["nom"] = ATF::contact()->select($v["id_contact"], "prenom")." ".ATF::contact()->select($v["id_contact"], "nom");
 				$v["type"] = "physique";
 				$v["adresse"] = ATF::contact()->select($v["id_contact"], "adresse");
 				$v["cp"] = ATF::contact()->select($v["id_contact"], "cp");
@@ -12400,13 +12400,13 @@ class pdf_itrenting extends pdf_cleodis {
 				foreach($signataires as $k=>$v) {
 					if ($k > 0) $signataire .=" y";
 					$contact = ATF::contact()->select($v["id_contact"]);
-					$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+					$signataire .= " ".$contact["prenom"]." ".$contact["nom"].", con DNI nº".$contact["num_dni"];
 				}
 				$t = "Y DE OTRA, ".$societe_garant["societe"].", con CIF ".$societe_garant["CIF"]." y con domicilio social en ".$societe_garant["adresse"].", C.P. ".$societe_garant["cp"]." de ".$societe_garant["ville"]." (".$societe_garant["province"].")";
 				$t .= ", inscrita en el Registro Mercantil de ".$societe_garant["lieu_registre"].", Tomo ".$societe_garant["numero_tomo"].", Folio ".$societe_garant["numero_folio"].", Hoja ".$societe_garant["numero_hoja"].", Inscripción ".$societe_garant["numero_inscription"].", ";
 				$t .= "representada por".$signataire.",  ";
 				$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
-				$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
+				$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["prenom"]." ".$notaire["nom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
 				$this->multicell(0,3, $t,0,"L");
 			}
 		}
@@ -12604,13 +12604,13 @@ class pdf_itrenting extends pdf_cleodis {
 		foreach($signataires as $k=>$v) {
 			if ($k > 0) $signataire .=" y";
 			$contact = ATF::contact()->select($v["id_contact"]);
-			$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+			$signataire .= " ".$contact["prenom"]." ".$contact["nom"].", con DNI nº".$contact["num_dni"];
 		}
 		$t = "Y DE OTRA, ".$societe_client["societe"].", con CIF ".$societe_client["CIF"]." y con domicilio social en ".$societe_client["adresse"].", C.P. ".$societe_client["cp"]." de ".$societe_client["ville"]." (".$societe_client["province"].")";
 		$t .= ", inscrita en el Registro Mercantil de ".$societe_client["lieu_registre"].", Tomo ".$societe_client["numero_tomo"].", Folio ".$societe_client["numero_folio"].", Hoja ".$societe_client["numero_hoja"].", Inscripción ".$societe_client["numero_inscription"].", ";
 		$t .= "representada por".$signataire.",  ";
 		$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
-		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
+		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["prenom"]." ".$notaire["nom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
 		$this->ln();
 		$this->multicell(0,3, $t,0,"L");
 	}
