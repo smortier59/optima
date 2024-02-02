@@ -240,6 +240,18 @@ class souscription_cleodis extends souscription {
 
         if($post["facture"]) ATF::facture_magasin()->i(array("id_affaire"=> $id_affaire, "ref_facture"=> strtoupper($post["facture"])));
 
+        // On check si on a un montant de frais de dossier sur les packs
+        $fraisDossier = 0;
+        foreach ($post['id_pack_produit'] as $v) {
+          $frais = ATF::pack_produit()->select($v, "frais_dossier");
+          if ($frais) $fraisDossier += $frais;
+        }
+        if ($fraisDossier) {
+          // Créer une facture libre de frais de dossier
+          // $this->createFactureFrais($post, $frais);
+        }
+
+
         // On stock le JSON du pack complet au cas où.
         if ($post['id_pack_produit']) {
           foreach ($post['id_pack_produit'] as $id_pack_produit) {
