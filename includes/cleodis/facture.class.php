@@ -1561,7 +1561,7 @@ class facture_cleodis extends facture {
 						if( $item["facture.prix"] < 0 ) {
 							if ($item["facture.date_periode_debut"] && $item["facture.date_periode_fin"]) {
 
-								if (str_contains($item['facture.ref'], '-RE')) {
+								if (strrpos($item['facture.ref'], '-RE') != false) {
 									$choix = "avoir_facture_refi";
 								} else {
 									// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
