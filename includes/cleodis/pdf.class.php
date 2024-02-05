@@ -12181,7 +12181,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$y = $this->getY();
 		if ($this->partenaire) {
 			$this->setfont('arial','B',8);
-			$this->cell(85,4,$this->partenaire["societe"],0,1);
+			$this->MultiCell(85,4,$this->partenaire["societe"],0,'L');
 			$this->setfont('arial','',8);
 
 			if ($this->partenaire["id_contact_signataire"]) {
@@ -12201,7 +12201,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->setY($y);
 		$this->SetLeftMargin(100);
 		$this->setfont('arial','B',8);
-		$this->cell(85,4,$this->societe["nom_commercial"],0,1);
+		$this->MultiCell(85,4,$this->societe["nom_commercial"],0,1);
 		$this->setfont('arial','',8);
 		$this->cell(85,4,$this->user["prenom"].' '.$this->user["nom"],0,1);
 		$this->cell(85,4,$this->societe["tel"],0,1);
@@ -12336,7 +12336,7 @@ class pdf_itrenting extends pdf_cleodis {
 			}
 
 			if ($v["id_contact"]) {
-				$v["nom"] = ATF::contact()->select($v["id_contact"], "nom")." ".ATF::contact()->select($v["id_contact"], "prenom");
+				$v["nom"] = ATF::contact()->select($v["id_contact"], "prenom")." ".ATF::contact()->select($v["id_contact"], "nom");
 				$v["type"] = "physique";
 				$v["adresse"] = ATF::contact()->select($v["id_contact"], "adresse");
 				$v["cp"] = ATF::contact()->select($v["id_contact"], "cp");
@@ -12356,7 +12356,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->contrat_BBVA_p1($notaire, $ref);
 		$this->contrat_BBVA_p2($notaire, $ref);
 		$this->contrat_BBVA_cg($notaire, $ref);
-		$this->contrat_BBVA_notification();
+		$this->contrat_BBVA_notification($ref);
 
 		if ($this->garant) {
 			$this->contrat_BBVA_page_garant($ref);
@@ -12400,13 +12400,13 @@ class pdf_itrenting extends pdf_cleodis {
 				foreach($signataires as $k=>$v) {
 					if ($k > 0) $signataire .=" y";
 					$contact = ATF::contact()->select($v["id_contact"]);
-					$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+					$signataire .= " ".$contact["prenom"]." ".$contact["nom"].", con DNI nº".$contact["num_dni"];
 				}
 				$t = "Y DE OTRA, ".$societe_garant["societe"].", con CIF ".$societe_garant["CIF"]." y con domicilio social en ".$societe_garant["adresse"].", C.P. ".$societe_garant["cp"]." de ".$societe_garant["ville"]." (".$societe_garant["province"].")";
 				$t .= ", inscrita en el Registro Mercantil de ".$societe_garant["lieu_registre"].", Tomo ".$societe_garant["numero_tomo"].", Folio ".$societe_garant["numero_folio"].", Hoja ".$societe_garant["numero_hoja"].", Inscripción ".$societe_garant["numero_inscription"].", ";
 				$t .= "representada por".$signataire.",  ";
 				$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
-				$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
+				$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["prenom"]." ".$notaire["nom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
 				$this->multicell(0,3, $t,0,"L");
 			}
 		}
@@ -12438,7 +12438,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->ln(3);
 		$this->Multicell(0,3,"El pago de la primera mensualidad (en adelante rentas) se iniciará el ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"])).".");
 		$this->ln(3);
-		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"]." sucursal sita en ".$this->affaire["adresse_banque"].", C.P. ".$this->affaire["cp_banque"]." de ".$this->affaire["ville_banque"].", (".$this->affaire["province_banque"]."), manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
+		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"].", manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
 
 		$this->setfont('arial','B',8);
 		$this->multicell(0,8,"CUARTA.- LUGAR DE LA ENTREGA");
@@ -12474,11 +12474,12 @@ class pdf_itrenting extends pdf_cleodis {
 
 		foreach($this->lignes as $k => $v) {
 			$data[] = [ $v["quantite"], $v["ref"]." - ".$v["produit"] ];
+			$styles[] = [ ["align" => "C","size"=>9 ], ["align" => "L","size"=>9 ]];
 		}
 		$data[] = ["NOTA", "SALVO INDICACIÓN EXPRESA, LA GARANTÍA DE LOS BIENES RELACIONADOS EN ESTA DESCRIPCIÓN ES LA BÁSICA DE SUS RESPECTIVOS FABRICANTES"];
+		$styles[] = [ ["align" => "C","size"=>9 ], ["align" => "L","size"=>9 ]];
 
-
-		$this->tableauBigHead($head,$data, $w);
+		$this->tableauBigHead($head,$data,$w,5,$styles);
 
 		$this->ln(10);
 		$this->setfont('arial','BU',8);
@@ -12492,12 +12493,6 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->cell(30,3,'Banco:');
 		$this->cell(160,3,$this->affaire["nom_banque"],0,1);
-
-		$this->cell(30,3,'Domicilio:');
-		$this->cell(160,3,$this->affaire["adresse_banque"],0,1);
-		$this->SetLeftMargin(40);
-		$this->cell(160,3,$this->affaire["cp_banque"]." - ". $this->affaire["ville_banque"]." (".$this->affaire["province_banque"].")",0,1);
-		$this->SetLeftMargin(10);
 
 		$this->cell(30,3,'IBAN:');
 		$this->cell(160,3,$this->affaire["IBAN"],0,1);
@@ -12597,20 +12592,20 @@ class pdf_itrenting extends pdf_cleodis {
 	}
 
 	function texte_societe($id_societe) {
-		$societe_garant = ATF::societe()->select($id_societe);
+		$societe_client = ATF::societe()->select($id_societe);
 		$signataires = ATF::societe_signataire()->ss("id_societe", $id_societe);
-		$notaire = ATF::contact()->select($societe_garant["id_contact_notaire"]);
+		$notaire = ATF::contact()->select($societe_client["id_contact_notaire"]);
 		$signataire = "";
 		foreach($signataires as $k=>$v) {
 			if ($k > 0) $signataire .=" y";
 			$contact = ATF::contact()->select($v["id_contact"]);
-			$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+			$signataire .= " ".$contact["prenom"]." ".$contact["nom"].", con DNI nº".$contact["num_dni"];
 		}
-		$t = "Y DE OTRA, ".$societe_garant["societe"].", con CIF ".$societe_garant["CIF"]." y con domicilio social en ".$societe_garant["adresse"].", C.P. ".$societe_garant["cp"]." de ".$societe_garant["ville"]." (".$societe_garant["province"].")";
-		$t .= ", inscrita en el Registro Mercantil de ".$societe_garant["lieu_registre"].", Tomo ".$societe_garant["numero_tomo"].", Folio ".$societe_garant["numero_folio"].", Hoja ".$societe_garant["numero_hoja"].", Inscripción ".$societe_garant["numero_inscription"].", ";
+		$t = "Y DE OTRA, ".$societe_client["societe"].", con CIF ".$societe_client["CIF"]." y con domicilio social en ".$societe_client["adresse"].", C.P. ".$societe_client["cp"]." de ".$societe_client["ville"]." (".$societe_client["province"].")";
+		$t .= ", inscrita en el Registro Mercantil de ".$societe_client["lieu_registre"].", Tomo ".$societe_client["numero_tomo"].", Folio ".$societe_client["numero_folio"].", Hoja ".$societe_client["numero_hoja"].", Inscripción ".$societe_client["numero_inscription"].", ";
 		$t .= "representada por".$signataire.",  ";
 		$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
-		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
+		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["prenom"]." ".$notaire["nom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
 		$this->ln();
 		$this->multicell(0,3, $t,0,"L");
 	}
@@ -12657,7 +12652,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 
 	}
-	function contrat_BBVA_notification() {
+	function contrat_BBVA_notification($ref) {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
 		$this->setfont('arial','B',10);
@@ -12676,7 +12671,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->cell(0,4,"Muy señores nuestros,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$ref." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", lo que les notificamos a los efectos pertinentes y, especialmente en lo que respecta al abono de las rentas del mencionado contrato, que a partir de la fecha de hoy sólo tendrá efecto liberatorio cuando se realice directamente a BBVA, S.A.");
 		$this->ln(5);
