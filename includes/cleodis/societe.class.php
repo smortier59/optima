@@ -1654,11 +1654,14 @@ class societe_cleodis extends societe {
 
                 if($res["langue"] !== $post["langue"]) $this->u(array("id_societe"=>$id_societe, "langue"=>$post["langue"]));
 
-                if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
+                if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"] || "date_creation" !== $data["date_creation"] ||
+                "cs_score" !== $data["cs_score"]){
                   ATF::societe()->u(array("id_societe"=>$id_societe,
                                           "adresse"=>$data["adresse"],
                                           "cp"=>$data["cp"],
-                                          "ville"=>$data["ville"]
+                                          "ville"=>$data["ville"],
+                                          "date_creation" => $data["date_creation"],
+                                          "cs_score" => $data["cs_score"]
                                        ));
                 }
 
