@@ -688,7 +688,8 @@ class souscription_cleodis extends souscription {
     $affaire = ATF::affaire()->select($id_affaire);
     $commande = ATF::commande()->select($id_commande);
 
-    $facture["facture"] = array(
+    if ($prix > 0) {
+      $facture["facture"] = array(
         "id_societe" => $affaire["id_societe"],
         "type_facture" => "libre",
         "mode_paiement" => "cb",
@@ -701,10 +702,11 @@ class souscription_cleodis extends souscription {
         "prix_libre" => round($prix, 2),
         "nature" => "contrat",
         "designation" => "Frais de dossier"
-    );
-    $facture["values_facture"]["produits"] = json_encode([]);
+      );
+      $facture["values_facture"]["produits"] = json_encode([]);
 
-    ATF::facture()->insert($facture);
+      ATF::facture()->insert($facture);
+    }
   }
 
   /**
