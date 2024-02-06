@@ -142,6 +142,7 @@ class facture_cleodis extends facture {
 		$this->addPrivilege("aPrelever");
 		$this->addPrivilege("aPreleverEchec");
 		$this->addPrivilege("createAvoir");
+		$this->addPrivilege("canCreateAvoir");
 
 		$this->addPrivilege("massPrelevementSlimpay");
 
@@ -156,28 +157,34 @@ class facture_cleodis extends facture {
 
 
 	public function createAvoir($data, &$s) {
-		$f = ATF::facture()->select($this->decryptId($data["id_facture"]));
-		ATF::facture_ligne()->q->reset()->where("id_facture", $f["id_facture"]);
-		$lignes = ATF::facture_ligne()->sa();
-		unset($f["id_facture"]);
-		$f["prix"] = $f["prix"] * -1;
-		$f["prix_sans_tva"] = $f["prix_sans_tva"] * -1;
-		$f["envoye"] = 'non';
-		$f["exporte"] = 'non';
-		$f["ref"] = $f["ref"]."-AV";
-		$f["numero"] = null;
-		$f["date"] = date("Y-m-d");
 
-		$id = ATF::facture()->i($f);
-		foreach ($lignes as $value) {
-			$l = $value;
-			unset($l["id_facture_ligne"]);
-			$l["id_facture"] = $id;
-			ATF::facture_ligne()->i($l);
+
+		if ($this->canCreateAvoir($data["id_facture"])) {
+			$f = ATF::facture()->select($this->decryptId($data["id_facture"]));
+			ATF::facture_ligne()->q->reset()->where("id_facture", $f["id_facture"]);
+			$lignes = ATF::facture_ligne()->sa();
+			unset($f["id_facture"]);
+			$f["prix"] = $f["prix"] * -1;
+			$f["prix_sans_tva"] = $f["prix_sans_tva"] * -1;
+			$f["envoye"] = 'non';
+			$f["exporte"] = 'non';
+			$f["ref"] = $f["ref"]."-AV";
+			$f["numero"] = null;
+			$f["date"] = date("Y-m-d");
+
+			$id = ATF::facture()->i($f);
+			foreach ($lignes as $value) {
+				$l = $value;
+				unset($l["id_facture_ligne"]);
+				$l["id_facture"] = $id;
+				ATF::facture_ligne()->i($l);
+			}
+			$this->move_files($id,$s);
+
+			ATF::affaire()->redirection("select",$f["id_affaire"]);
+		} else {
+			throw new errorATF('Impossible de créer un avoir, car il existe déja un avoir pour cette facture');
 		}
-		$this->move_files($id,$s);
-
-		ATF::affaire()->redirection("select",$f["id_affaire"]);
 	}
 
 	/**
@@ -1468,17 +1475,23 @@ class facture_cleodis extends facture {
             if ($idr3 = ATF::relance()->getIdRelance($i['facture.id_facture'],"mise_en_demeure")) $return['data'][$k]['id_relance_mise_en_demeure'] = ATF::relance()->cryptId($idr3);
             $return['data'][$k]['allowRelance'] = $i['facture.etat']=="payee"?false:true;
 
-			$allowAvoir = true;
-
-			ATF::facture()->q->reset()->where("facture.ref", $i['facture.ref']."-AV");
-			$exist = ATF::facture()->sa();
-
-			if ($exist) $allowAvoir = false;
-			if ($i['facture.prix'] < 0) $allowAvoir = false;
-			$return['data'][$k]['allowAvoir'] = $allowAvoir;
+			$return['data'][$k]['allowAvoir'] = $i['facture.prix'] < 0 ? false : true;
         }
 
         return $return;
+	}
+
+	public function canCreateAvoir($idFacture) {
+		$f = ATF::facture()->select($idFacture);
+
+		if ($f["prix"] < 0) {
+			return false;
+		} else {
+			ATF::facture()->q->reset()->where("facture.ref", $f["ref"]."-AV");
+			$exist = ATF::facture()->sa();
+			if ($exist) return false;
+		}
+		return true;
 	}
 
      /** Mise en place du contenu
