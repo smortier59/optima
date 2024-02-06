@@ -1560,16 +1560,22 @@ class facture_cleodis extends facture {
 						// avoir
 						if( $item["facture.prix"] < 0 ) {
 							if ($item["facture.date_periode_debut"] && $item["facture.date_periode_fin"]) {
-								// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
-								ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
-														  ->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
-														  ->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
-								$facture_avoir = ATF::facture()->select_row();
-								if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
-									$choix = "avoir_sur_prolongation";
-								} elseif ( in_array($infos_commande['etat'], ['mis_loyer', 'mis_loyer_contentieux']) ) {
-									// Avoir sur un contrat en cours
-									$choix = "avoir_affaire_en_cours";
+
+								if (strrpos($item['facture.ref'], '-RE') != false) {
+									$choix = "avoir_facture_refi";
+								} else {
+									// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
+									ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
+										->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
+										->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
+									$facture_avoir = ATF::facture()->select_row();
+
+									if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
+										$choix = "avoir_sur_prolongation";
+									} elseif ( in_array($infos_commande['etat'], ['mis_loyer', 'mis_loyer_contentieux']) ) {
+										// Avoir sur un contrat en cours
+										$choix = "avoir_affaire_en_cours";
+									}
 								}
 							}
 						}
@@ -1692,6 +1698,20 @@ class facture_cleodis extends facture {
 					case 'avoir_affaire_vente':
 						$ligne[2]["D"] =  "707110";
 						$ligne[3]["D"] =  "707110";
+						$ligne[4]["F"] ="D";
+					break;
+
+					case 'avoir_cout_copie':
+						$ligne[2]["D"] = "706220";
+						$ligne[3]["D"] = "706220";
+						$ligne[4]["D"] = "445712";
+						$ligne[4]["F"] ="D";
+					break;
+
+					case 'avoir_facture_refi':
+						$ligne[2]["D"] = "707110";
+						$ligne[3]["D"] = "707110";
+						$ligne[4]["D"] = "445712";
 						$ligne[4]["F"] ="D";
 					break;
 
