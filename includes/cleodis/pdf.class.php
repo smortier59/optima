@@ -1182,7 +1182,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"",0,1,'C');
 
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Les engagements Cléodis : ");
+		$this->multicell(0,5,"Les engagements ".$this->cleodis.": ");
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"Nous nous engageons à vous fournir :");
 		$this->setfont('arial','',8);
