@@ -211,7 +211,12 @@ class pdf_cleodis extends pdf {
 
 					}
 
-					$this->image($this->logo,170,5,20);
+					if (ATF::$codename == "arrow") {
+						$this->image($this->logo,160,10,40);
+					} else {
+						$this->image($this->logo,170,5,20);
+					}
+
 				}
 
 				$this->sety(20);
@@ -464,7 +469,12 @@ class pdf_cleodis extends pdf {
 			$this->SetLeftMargin(15);
 
 			$this->RoundedRect(15,50,180,70,5);
-			$this->image($this->logo,85,55,45);
+			if (ATF::$codename == 'arrow') {
+				$this->image($this->logo,65,55,85);
+			} else {
+				$this->image($this->logo,85,55,45);
+			}
+
 			$this->sety(90);
 			$this->setfont('arial','B',12);
 			$this->multicell(0,5,"",0,'C');
@@ -1109,7 +1119,7 @@ class pdf_cleodis extends pdf {
 
 		$this->sety(10);
 		$this->setfont('arial','B',14);
-		if(ATF::$codename == "cleodis"){
+		if(ATF::$codename == "cleodis" || ATF::$codename == "arrow" || ATF::$codename == "solo"){
 			$this->RoundedRect(15,10,140,25,5);
 			$this->multicell(140,6,"Proposition locative ".$this->cleodis,0,'C');
 			$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
