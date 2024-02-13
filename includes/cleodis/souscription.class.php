@@ -333,7 +333,7 @@ class souscription_cleodis extends souscription {
     }
     ATF::db($this->db)->commit_transaction();
 
-
+    $affaires['id_societe'] =  $societe["id_societe"];
     return $affaires;
   }
 
