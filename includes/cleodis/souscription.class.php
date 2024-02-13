@@ -1170,6 +1170,32 @@ class souscription_cleodis extends souscription {
     return $r;
   }
 
+  public function _createComiteMeelo($get,$post) {
+    $societe = ATF::societe()->select($post["id_societe"]);
+
+    $pdf = null;
+    ATF::constante()->q->reset()->where("constante" ,"__API_MEELO_TOKEN__");
+    $apiKey = ATF::constante()->select_row();
+    $apiKey = $apiKey["valeur"];
+
+    ATF::constante()->q->reset()->where("constante" ,"__API_MEELO_TOOLBOX_BASEURL__");
+    $toolboxURL = ATF::constante()->select_row();
+    $toolboxURL = $toolboxURL["valeur"];
+
+
+    $pdf = ATF::meelo()->pdfSynthese($post["journeyId"], $toolboxURL, $apiKey);
+
+    foreach ($post['ids'] as $id_affaire) {
+      $etat = 'accepte';
+
+      if ($post["retourRules"]["result"]["globalDecision"] == false) $etat = 'refuse';
+      $id = $this->createComite($id_affaire, $societe, $etat, 'Comité Meelo');
+      if ($pdf) util::file_put_contents(ATF::comite()->filepath($id, 'pdf'),$pdf);
+    }
+
+    return 'OK';
+  }
+
   /**
    * Création d'un comité dans une affaire
    * @param  Integer $id_affaire      ID de l'affaire
