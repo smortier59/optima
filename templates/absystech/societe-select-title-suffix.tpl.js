@@ -1,8 +1,9 @@
 {$icone=$current_class->meteo_icone($infos.meteo)}
 {ATF::$html->assign('id',$infos.id_societe)}
 {$contactSociete = ATF::contact()->options_special('id_societe',$infos.id_societe)}
-{$dataGraphEcheancier = ATF::gestion_ticket()->stats(false,lol,true,$infos.id_societe)} 
+{$dataGraphEcheancier = ATF::gestion_ticket()->stats(false,lol,true,$infos.id_societe)}
 {$solde=ATF::societe()->getSolde($infos.id_societe)}
+{$isClientAutotask = ATF::societe()->select($infos.id_societe, "client_autotask")}
 
 
 {
@@ -10,9 +11,16 @@
 	cls: "labelCtn"
 }
 
+{if $isClientAutotask == 'oui'}
+,{
+	html:'<div class="label label-negative">ATTENTION: Ne pas créer de ticket dans Optima/Telescope. Le client doit être géré dans AUTOTASK</div>',
+	cls: "labelCtn"
+}
+{/if}
 
-{$tpl = ATF::$html->fetch('tooltip/societe-meteo.tpl.htm')}  
-,{ 
+
+{$tpl = ATF::$html->fetch('tooltip/societe-meteo.tpl.htm')}
+,{
 	html:'<img class="png" height="32" ext:qtip="{$tpl|addslashes}" width="32" alt="" src="{ATF::$staticserver}images/icones/meteo/{$icone.icone}.png"/>',
 	border: false,
 	style: {
@@ -33,9 +41,9 @@
 				'asterisk,createCall.ajax',
 				'id={classes::cryptId($id|default:$item["`$current_class->table`.id_`$current_class->table`"])}&table={$current_class->name()}&field=tel'
 			);
-		} ,	
+		} ,
 		style: {
-			
+
 			marginLeft: "5px",
 			float: 'left'
 		}
@@ -74,8 +82,8 @@
                 	items:[{
 							title:'{ATF::$usr->trans("boutons_rapide",$current_class->table)}',
 							id:'panelButtonHotlineInsert',
-							
-							
+
+
 						},{
 							title:'{ATF::$usr->trans("mail_lost_password",$current_class->table)}',
 							id:'panelIdentifiantHotline',
@@ -93,7 +101,7 @@
 									fields: [
 										'myId',
 										'displayText'
-									],			
+									],
 									data: [
 										{foreach from=$contactSociete key=k item=i}
 											['{$k}', '{$i|escape:javascript}']
@@ -122,7 +130,7 @@
 									border:false,
 									xtype:'panel'
 								},
-								
+
 								items:[{
 									columnWidth:0.2,
 									items: [{
@@ -144,12 +152,12 @@
 								},{
 									columnWidth:0.4,
 									items: [
-										{include file="generic-field-textfield.tpl.js" 
+										{include file="generic-field-textfield.tpl.js"
 													id="id_facture"
-													key="id_facture" 
-													condition_field="id_societe" 
-													condition_value="{$infos.id_societe}" 
-													est_nul=true 
+													key="id_facture"
+													condition_field="id_societe"
+													condition_value="{$infos.id_societe}"
+													est_nul=true
 													fieldLabel="{ATF::$usr->trans(id_facture,$current_class->table)|escape:javascript}"}
 									]
 								}]
@@ -182,7 +190,7 @@
 									        },
 									        xAxis: {
 									            categories: [
-									                {foreach $dataGraphEcheancier["categories"]["category"] as $cat}                    
+									                {foreach $dataGraphEcheancier["categories"]["category"] as $cat}
 									                    '{$cat["label"]}' {if !$cat@last},{/if}
 									                {/foreach}
 									                ]
@@ -190,10 +198,10 @@
 									        legend: {
 									            itemStyle: {
 									                fontSize:'9px',
-									                
+
 									            }
 									        },
-									        yAxis: {	            
+									        yAxis: {
 									            title: {
 									                text: null
 									            }
@@ -208,27 +216,27 @@
 									                    },
 									                    marker: {
 									                        enabled: true
-									                    }                    
+									                    }
 									                }
 									            },
-									        series: [ 
-									           {foreach $dataGraphEcheancier["dataset"] as $data2}          
+									        series: [
+									           {foreach $dataGraphEcheancier["dataset"] as $data2}
 									               {
-									                    name: '{$data2["params"]["seriesname"]|escape:javascript}'                    
-									                   ,data: [	                   			
-									                            {foreach $data2["set"] as $k=>$v}	                            	
-									                                {$v["value"]|number_format:2:'.':''}                                
+									                    name: '{$data2["params"]["seriesname"]|escape:javascript}'
+									                   ,data: [
+									                            {foreach $data2["set"] as $k=>$v}
+									                                {$v["value"]|number_format:2:'.':''}
 									                                {if !$v@last},{/if}
-									                            {/foreach}    
+									                            {/foreach}
 									                          ]
 									               }
 									               {if !$data2@last},{/if}
-									            {/foreach}            
-								           ]        
+									            {/foreach}
+								           ]
 									    });
 									}
 								}
-							},{ 
+							},{
 								fieldLabel: '{ATF::$usr->trans(date_debut_rapport,societe)|escape:javascript}'
 								,id: 'date_debut_rapport'
 								,name: 'date_debut_rapport'
@@ -239,9 +247,9 @@
 								,id: 'date_fin_rapport'
 								,name: 'date_fin_rapport'
 								,value: '{date(t)|escape:javascript}-{$smarty.now|date_format:'%m-%Y'|escape:javascript}'
-							},{ 
+							},{
 								xtype:'button'
-								,columnWidth:'0.2'	
+								,columnWidth:'0.2'
 							    ,text: '{ATF::$usr->trans(generer_rapport,societe)|escape:javascript}'
 							    ,handler:function(){
 									window.open('hotline_echeancier-{ATF::_r(id_societe)}.html2pdf,dl=1&date_debut='+Ext.getCmp('date_debut_rapport').getValue().dateFormat('Y-m-d')+'&date_fin='+Ext.getCmp('date_fin_rapport').getValue().dateFormat('Y-m-d'));
@@ -284,7 +292,7 @@
 							onclick: "ATF.__send_identifiants_hotline('{ATF::$usr->trans('mail_lost_password_confirm',$current_class->table)}','{$infos.id_societe}',Ext.getCmp('select_contact').getValue());"
 						};
 						buttonTpl.append(p2.body, data3);
-                		
+
 						var p3 = Ext.getCmp('panelCreditPlusHotline');
 						var data4 = {
 							id: "ButtonAddCredits",
@@ -294,7 +302,7 @@
 							onclick: "ATF.__update_tickets();"
 						};
 						buttonTpl.append(p3.body, data4);
-                		
+
 					}
 
 				}
@@ -302,9 +310,9 @@
 
 			ATF.currentWindow.show();
 
-		} ,	
+		} ,
 		style: {
-			
+
 			marginLeft: "5px",
 			float: 'left'
 		}
@@ -316,7 +324,7 @@
 		scale: 'medium',
 		tooltip:'{ATF::$usr->trans("geolocalisation")}',
 		style: {
-			 
+
 			marginLeft: "5px",
 			float: 'left'
 		},
@@ -330,10 +338,10 @@
 	            resizable: false,
 		        autoLoad:{ url: '{$current_class->name()},geolocalisation.ajax,id={$infos.id_societe}', scripts:true }
     		});
-    		
+
 			ATF.currentWindow.show();
 
-			
+
 		}
 	},{
 		xtype: 'button',
@@ -342,7 +350,7 @@
 		scale: 'medium',
 		tooltip:'{ATF::$usr->trans("atcard")}',
 		style: {
-			
+
 			marginLeft: "5px",
 			float: 'left'
 		},
@@ -381,7 +389,7 @@
 					marginLeft: "10px",
 					float: 'left'
 				}
-			}		
+			}
 		{else}
 			,{
 				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/new_install.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
@@ -390,7 +398,7 @@
 					marginLeft: "10px",
 					float: 'left'
 				}
-			}		
+			}
 		{/if}
 	{else}
 		,{
