@@ -54,4 +54,6 @@ class categorie_bdomplus extends categorie_cleodis {}
 class categorie_boulanger extends categorie_cleodis {}
 class categorie_assets extends categorie_cleodis {}
 class categorie_go_abonnement extends categorie_cleodis {}
+class categorie_solo extends categorie_cleodis {}
+class categorie_arrow extends categorie_cleodis {}
 ?>

@@ -77,7 +77,6 @@ class devis_cleodis extends devis {
 			"offre_partenaire"
 		);
 
-
 		$this->colonnes['panel']['facturation'] = array(
 			"RIB"=>array("custom"=>true,"null"=>true)
 			,"IBAN"=>array("custom"=>true,"null"=>true)
@@ -85,6 +84,8 @@ class devis_cleodis extends devis {
 			,"nom_banque"=>array("custom"=>true,"null"=>true)
 			,"ville_banque"=>array("custom"=>true,"null"=>true)
 		);
+
+
 
 		$this->colonnes['panel']['loyer_lignes'] = array(
 			"loyer"=>array("custom"=>true)
@@ -477,7 +478,7 @@ class devis_cleodis extends devis {
 		}
 
 		////////////////Devis
-		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
+		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["adresse_banque"],$infos["cp_banque"],$infos["province_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast
@@ -1153,6 +1154,9 @@ class devis_cleodis extends devis {
 				case "IBAN":
 				case "nom_banque":
 				case "ville_banque":
+				case 'adresse_banque':
+				case 'cp_banque':
+				case 'province_banque':
 					$return=ATF::affaire()->select($devis["id_affaire"],$field);
 					return $return;
 				case "prix_vente":
@@ -1218,6 +1222,9 @@ class devis_cleodis extends devis {
 				case "IBAN":
 				case "nom_banque":
 				case "ville_banque":
+				case 'adresse_banque':
+				case 'cp_banque':
+				case 'province_banque':
 					if(ATF::_r('id_societe')){
 						$return=ATF::societe()->select(ATF::_r('id_societe'),$field);
 					}else{
@@ -1925,7 +1932,30 @@ class devis_midas extends devis_cleodis {
 };
 
 class devis_cleodisbe extends devis_cleodis { };
-class devis_itrenting extends devis_cleodis { };
+class devis_itrenting extends devis_cleodis {
+	function __construct($table_or_id = null)
+	{
+		parent::__construct($table_or_id);
+
+		$this->colonnes['panel']['facturation'] = array(
+			"RIB" => array("custom" => true,"null" => true)
+			,"IBAN" => array("custom" => true,"null" => true)
+			,"BIC" => array("custom" => true,"null" => true)
+			,"nom_banque" => array("custom" => true,"null" => true)
+			,"adresse_banque" => array("custom" => true,"null" => true)
+			,"cp_banque" => array("custom" => true,"null" => true)
+			,"ville_banque" => array("custom" => true,"null" => true)
+			,"province_banque" => array("custom" => true,"null" => true)
+		);
+
+		$this->fieldstructure();
+	}
+
+
+};
+
+class devis_solo extends devis_cleodis { };
+class devis_arrow extends devis_cleodis { };
 
 class devis_bdomplus extends devis_cleodis {
 

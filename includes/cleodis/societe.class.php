@@ -360,93 +360,90 @@ class societe_cleodis extends societe {
     */
     public function export_atol($infos,$testUnitaire="false", $reset="true"){
 
-    if($testUnitaire == "true"){
-      $donnees = $infos;
-    }else{
-      $query_select = "SELECT societe.* FROM societe, bon_de_commande
-               WHERE societe.id_societe = bon_de_commande.id_societe
-               AND societe.divers_3 = 'Atol'
-               AND societe.id_societe IN (SELECT id_societe FROM bon_de_commande)
-               GROUP BY societe.id_societe";
+      if($testUnitaire == "true"){
+        $donnees = $infos;
+      }else{
+        $query_select = "SELECT societe.* FROM societe, bon_de_commande
+                WHERE societe.id_societe = bon_de_commande.id_societe
+                AND societe.divers_3 = 'Atol'
+                AND societe.id_societe IN (SELECT id_societe FROM bon_de_commande)
+                GROUP BY societe.id_societe";
 
-      $donnees = ATF::db()->sql2array($query_select);
-    }
+        $donnees = ATF::db()->sql2array($query_select);
+      }
 
-    require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
-    require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
-    $fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
-    $workbook = new PHPExcel;
+      require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+      require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+      $fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+      $workbook = new PHPExcel;
 
-    //premier onglet
-    $worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-    $worksheet_auto->sheet->setTitle('ATOL');
-    $sheets=array("auto"=>$worksheet_auto);
+      //premier onglet
+      $worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+      $worksheet_auto->sheet->setTitle('ATOL');
+      $sheets=array("auto"=>$worksheet_auto);
 
-    $row_data = array(
-                 "A" => 'Code magasin Atol'
-                ,"B" => "Raison Sociale"
-                ,"C" => "Civilité"
-                ,"D" => "Nom"
-                ,"E" => "Prénom"
-                ,"F" => "Adresse"
-                ,"G" => "Adresse 2"
-                ,"H" => "Adresse 3"
-                ,"I" => "Code Postal"
-                ,"J" => "Ville"
-                ,"K" => "Email"
-                ,"L" => "Téléphone"
-            );
-    $i=0;
+      $row_data = array(
+                  "A" => 'Code magasin Atol'
+                  ,"B" => "Raison Sociale"
+                  ,"C" => "Civilité"
+                  ,"D" => "Nom"
+                  ,"E" => "Prénom"
+                  ,"F" => "Adresse"
+                  ,"G" => "Adresse 2"
+                  ,"H" => "Adresse 3"
+                  ,"I" => "Code Postal"
+                  ,"J" => "Ville"
+                  ,"K" => "Email"
+                  ,"L" => "Téléphone"
+              );
+      $i=0;
 
-        foreach($row_data as $col=>$titre){
+      foreach($row_data as $col=>$titre){
         $sheets['auto']->write($col."1", $titre);
         $sheets["auto"]->sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        $row_data = array();
-    $k=0;
-       foreach ($donnees as $key => $value) {
-          $row_data[$k] = array(
-             "A" => $value["code_client"]." "
-            ,"B" => $value["societe"]
-            ,"C" => ATF::contact()->select($value["id_contact_signataire"], "civilite")
-            ,"D" => ATF::contact()->select($value["id_contact_signataire"], "nom")
-            ,"E" => ATF::contact()->select($value["id_contact_signataire"], "prenom")
-            ,"F" => $value["adresse"]
-            ,"G" => $value["adresse_2"]
-            ,"H" => $value["adresse_3"]
-            ,"I" => $value["cp"]." "
-            ,"K" => $value["ville"]
-            ,"J" => ATF::contact()->select($value["id_contact_signataire"], "email")
-            ,"L" => $value["tel"]." "
-      );
-      $k++;
-        }
-
-        if($row_data){
-          $row_auto=2;
-          foreach ($row_data as $k => $v) {
-            foreach($v as $col=>$valeur){
-          $sheets['auto']->write($col.$row_auto, $valeur);
-        }
-        $row_auto++;
       }
+
+      $row_data = array();
+      $k=0;
+      foreach ($donnees as $key => $value) {
+        $row_data[$k] = array(
+          "A" => $value["code_client"]." "
+          ,"B" => $value["societe"]
+          ,"C" => ATF::contact()->select($value["id_contact_signataire"], "civilite")
+          ,"D" => ATF::contact()->select($value["id_contact_signataire"], "nom")
+          ,"E" => ATF::contact()->select($value["id_contact_signataire"], "prenom")
+          ,"F" => $value["adresse"]
+          ,"G" => $value["adresse_2"]
+          ,"H" => $value["adresse_3"]
+          ,"I" => $value["cp"]." "
+          ,"K" => $value["ville"]
+          ,"J" => ATF::contact()->select($value["id_contact_signataire"], "email")
+          ,"L" => $value["tel"]." "
+        );
+        $k++;
+      }
+
+      if($row_data){
+        $row_auto=2;
+        foreach ($row_data as $k => $v) {
+          foreach($v as $col=>$valeur){
+            $sheets['auto']->write($col.$row_auto, $valeur);
+          }
+          $row_auto++;
         }
+      }
+      $writer = new PHPExcel_Writer_Excel5($workbook);
 
+      $writer->save($fname);
+      header('Content-type: application/vnd.ms-excel');
+      header('Content-Disposition:inline;filename=export_ATOL.xls');
+      header("Cache-Control: private");
+      $fh=fopen($fname, "rb");
+      fpassthru($fh);
+      unlink($fname);
+      PHPExcel_Calculation::getInstance()->__destruct();
 
-
-    $writer = new PHPExcel_Writer_Excel5($workbook);
-
-    $writer->save($fname);
-    header('Content-type: application/vnd.ms-excel');
-    header('Content-Disposition:inline;filename=export_ATOL.xls');
-    header("Cache-Control: private");
-    $fh=fopen($fname, "rb");
-    fpassthru($fh);
-    unlink($fname);
-    PHPExcel_Calculation::getInstance()->__destruct();
-
-  }
+    }
 
 
   /**
@@ -923,32 +920,6 @@ class societe_cleodis extends societe {
 
     return $return;
   }
-
-  /*
-  Fonction non utilisée dans OPTIMA
-
-  public function autocompleteFournisseurPrePaiement($infos,$reset=true,$count=false){
-    if($reset){
-      $this->q->reset();
-    }
-
-
-    $this->q->from("facture","id_commande","commande","id_commande")
-        ->from("commande","id_commande","commande_ligne","id_commande")
-        ->where("facture.id_commande",ATF::facture()->decryptId($infos["condition_value"]))
-        ->addField("societe.id_societe","id_societe")
-        ->addField("societe.societe","nom");
-    if($count){
-      $this->q->setCount();
-      $return = $this->select_all();
-    }else{
-      $return = parent::autocomplete($infos,false);
-    }
-
-    return $return;
-  }*/
-
-
 
   /**
   * Permet d'intégrer
@@ -1683,11 +1654,14 @@ class societe_cleodis extends societe {
 
                 if($res["langue"] !== $post["langue"]) $this->u(array("id_societe"=>$id_societe, "langue"=>$post["langue"]));
 
-                if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
+                if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"] || "date_creation" !== $data["date_creation"] ||
+                "cs_score" !== $data["cs_score"]){
                   ATF::societe()->u(array("id_societe"=>$id_societe,
                                           "adresse"=>$data["adresse"],
                                           "cp"=>$data["cp"],
-                                          "ville"=>$data["ville"]
+                                          "ville"=>$data["ville"],
+                                          "date_creation" => $data["date_creation"],
+                                          "cs_score" => $data["cs_score"]
                                        ));
                 }
 
@@ -1762,10 +1736,10 @@ class societe_cleodis extends societe {
             log::logger($e->getMessage(), "creditsafe");
             log::logger($data, "creditsafe");
             throw $e;
-        } catch (ATFerror $e) {
+        } catch (errorATF $e) {
             log::logger("====================================================================", "creditsafe");
             log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
-            log::logger($data, "creditsafe");
+            log::logger($e, "creditsafe");
             throw new errorATF("erreurCS inside",500);
         }
     } else{
@@ -1778,6 +1752,194 @@ class societe_cleodis extends societe {
     }
 
   }
+
+  public function _infosMeeloPartenaire($get, $post){
+    if (!$post["apporteur"]) {
+			$utilisateur  = ATF::$usr->get("contact");
+      $apporteur = $utilisateur["id_societe"];
+		} else {
+			$apporteur = $post["apporteur"];
+		}
+    $pays = null;
+    $registrationNumber = str_replace(" ","",$post['registrationNumber']);
+    if ($post["pays"]) $pays = $post["pays"];
+    if (ATF::$codename !== "itrenting" && ATF::$codename !== "cleodisbe") {
+      $siret = $registrationNumber;
+      $registrationNumber = substr($registrationNumber, 0, 9);
+    }
+
+    try {
+      $data = ATF::meelo()->getInfosCompanyByRegistrationNumber($registrationNumber, $pays);
+    } catch (errorATF $e) {
+      log::logger("====================================================================", "meelo");
+      log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+      log::logger($e->getMessage(), "meelo");
+      throw new errorATF($e->getMessage(),500);
+    }
+
+    try {
+      $scoring = ATF::meelo()->getScoring($registrationNumber, $pays);
+    } catch (errorATF $e) {
+
+      log::logger("====================================================================", "meelo");
+      log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+      log::logger($e->getMessage(), "meelo");
+    }
+
+    try {
+      if ($data) {
+        ATF::db()->begin_transaction();
+        if(ATF::$codename === "cleodisbe"){
+          ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string($registrationNumber),"OR","registrationNumber")
+                                    ->where("reference_tva",$data["reference_tva"],"OR","registrationNumber");
+        }elseif(ATF::$codename === "itrenting"){
+          ATF::societe()->q->reset()->where("CIF",ATF::db($this->db)->real_escape_string($registrationNumber));
+        }else {
+          ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($siret));
+        }
+        $res = ATF::societe()->select_row();
+
+        $company = $data->company;
+        $legalUnit = $company->legalUnit;
+        $gerants = array_merge($company->representatives, $company->shareHolders);
+
+        $commun = [
+          "societe" => $legalUnit->corporateName,
+          "id_pays" =>  $company->country,
+          "activite" => $legalUnit->activity,
+          "date_creation" => $legalUnit->registrationDate,
+          "langue" => $post["langue"],
+          "id_apporteur" => $apporteur ? $apporteur : null,
+          "id_fournisseur" => $apporteur ? $apporteur : null
+        ];
+
+        if ($scoring->score) $commun["cs_score"] = $scoring->score;
+
+        switch ($company->country) {
+          case 'FR':
+            foreach ($company->establishments as $etablissement) {
+              if ($etablissement->siret === $siret) {
+                $specifique = [
+                  "siren" => $legalUnit->registrationNumber,
+                  "siret" => $siret,
+                  "reference_tva" => $legalUnit->vatRegistrationNumber,
+                  "adresse" => $etablissement->address->address,
+                  "cp" => $etablissement->address->zipcode,
+                  "ville" => $etablissement->address->city,
+                  "activite" => $legalUnit->activity,
+                  "tel" => $legalUnit->phone,
+                  "structure" => $legalUnit->companyCategory,
+                  "capital" => $legalUnit->shareCapital,
+                ];
+              }
+            }
+          break;
+
+          case 'ES':
+            $specifique = [ "capital" => $legalUnit->shareCapital->value ];
+            if (ATF::$codename === "itrenting") {
+              $specifique["cif"] = $legalUnit->companyRegistrationNumber;
+            } else {
+              $specifique["siren"] = $legalUnit->registrationNumber;
+            }
+          break;
+
+          case 'BE':
+            # code...
+          break;
+        }
+        $data_soc = array_merge($commun, $specifique);
+
+        if ($res) {
+          $id_societe = $res["id_societe"];
+          $data_soc["id_societe"] = $id_societe;
+          $this->update($data_soc);
+        } else {
+          $id_societe = $this->insert(array("societe" => $data_soc));
+        }
+
+        $gerantsList = [];
+        $i = 0;
+        if($gerants){
+          foreach ($gerants as $gerant) {
+              if ($gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
+                $nom = $gerant->lastName;
+                $prenom = $gerant->firstNames;
+                if (!$nom && !$prenom) $nom = $gerant->names;
+
+                ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($nom)), "AND")
+                                        ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($prenom)), "AND")
+                                        ->where("id_societe", $id_societe, "AND");
+                $c = ATF::contact()->select_row();
+
+                $fonction = "GERANT";
+                if ($gerant->position) $fonction = $gerant->position;
+                if ($gerant->positions) $fonction = $gerant->positions[count($gerant->positions)]["positionName"];
+
+                //Si le contact n'exite pas dans optima, on l'insert
+                if(!$c) {
+                    $contact = array( "nom" => $nom,
+                                      "prenom" => $prenom,
+                                      "fonction" => $fonction,
+                                      "id_societe" => $id_societe,
+                                      "est_dirigeant" => "oui"
+                                    );
+                    $gerantsList[$i] = $contact;
+                    $gerantsList[$i]["id_contact"] = ATF::contact()->insert($contact);
+                    $i++;
+                } else {
+                  //Sinon on le met à jour
+                  $gerantsList[$i] = array("nom" => $c["nom"],
+                                          "prenom" => $c["prenom"],
+                                          "fonction" => $fonction,
+                                          "gsm" => $c["gsm"],
+                                          "id_societe" => $id_societe,
+                                          "id_contact" => $c["id_contact"]
+                                        );
+                  ATF::contact()->u(array("id_contact" => $c["id_contact"], "fonction" => $fonction, "est_dirigeant" => "oui"));
+                  $i++;
+                }
+              }
+          }
+        }else{
+          //Si Credit Safe n'a retourné aucun dirigeant, on en crée un en attendant
+          $contact = array( "nom"=>"GERANT",
+                            "id_societe"=> $id_societe
+                        );
+          $gerantsList[0] = $contact;
+          $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
+        }
+        ATF::db()->commit_transaction();
+
+        return array("result"=>true ,
+          "societe"=>ATF::societe()->select($id_societe),
+          "gerants"=>$gerantsList
+        );
+      } else{
+        log::logger("AUCUNE DATA" , "meelo");
+        log::logger("====================================================================", "meelo");
+        log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+        log::logger($data, "meelo");
+        log::logger($post, "meelo");
+
+        throw new errorATF("erreurCS : Il n'y a aucun retour de créditsafe",500);
+      }
+    } catch (errorSQL $e) {
+      ATF::db()->rollback_transaction();
+      log::logger("====================================================================", "meelo");
+      log::logger("ERREUR SQL : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+      log::logger($e->getMessage(), "meelo");
+      log::logger($data, "meelo");
+      throw new errorATF($e->getMessage(),500);
+    } catch (errorATF $e) {
+        ATF::db()->rollback_transaction();
+        log::logger("====================================================================", "meelo");
+        log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+        log::logger($e->getMessage(), "meelo");
+        throw new errorATF($e->getMessage(),500);
+    }
+  }
+
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
     $decisionAffaireEtat = $post['action'] == "valider" ? "comite_cleodis_valide" : "comite_cleodis_refuse"; // pareil pour la timeline
@@ -2205,6 +2367,33 @@ class societe_cap extends societe_cleodis {
 
 };
 
+class societe_solo extends societe_cleodis {
+  public function __construct() {
+    parent::__construct();
+    $this->table = "societe";
+
+    unset($this->colonnes['panel']['delai_rav'],
+        $this->colonnes['panel']['delai_fournisseur'],
+        $this->colonnes['panel']['deploiement']);
+
+
+    $this->fieldstructure();
+  }
+};
+
+class societe_arrow extends societe_cleodis {
+  public function __construct() {
+    parent::__construct();
+    $this->table = "societe";
+
+    unset($this->colonnes['panel']['delai_rav'],
+        $this->colonnes['panel']['delai_fournisseur'],
+        $this->colonnes['panel']['deploiement']);
+
+
+    $this->fieldstructure();
+  }
+};
 
 class societe_midas extends societe_cleodis {
   public function __construct() {

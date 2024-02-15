@@ -15,7 +15,7 @@ class commande_cleodis extends commande {
 		$this->colonnes['fields_column'] = array(
 			'commande.ref'
 			,'specificDate'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommande","width"=>330)
-//			,'specificDateRestitution'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommandeRestitution","width"=>290)
+			//,'specificDateRestitution'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommandeRestitution","width"=>290)
 			,'commande.id_affaire'
 			,'code_client'=>array("custom"=>true)
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
@@ -130,9 +130,9 @@ class commande_cleodis extends commande {
 		$this->addPrivilege("stopCommande","update");
 		$this->addPrivilege("reactiveCommande","update");
 		$this->addPrivilege("generateCourrierType");
-//		$this->addPrivilege("updateDateResiliation","update");
-//		$this->addPrivilege("updateDateRestitution","update");
-//		$this->addPrivilege("updateDateRestitution_effective","update");
+		//$this->addPrivilege("updateDateResiliation","update");
+		//$this->addPrivilege("updateDateRestitution","update");
+		//$this->addPrivilege("updateDateRestitution_effective","update");
 		$this->addPrivilege("export_loyer_assurance");
 		$this->addPrivilege("export_contrat_refinanceur_loyer");
 		$this->addPrivilege("getDateResti");
@@ -193,13 +193,13 @@ class commande_cleodis extends commande {
 								->where("affaire.affaire", "%".$get["search"]."%" , "OR", "search", "LIKE");
 			}
 			// filtre sur les dates
-			if ($get["filters"] && $get["filters"]["startdate"]){
-				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"], "AND", false, ">=");
-			}
+			if ($get["filters"] && $get["filters"]["startdate"]) ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"], "AND", false, ">=");
+			if ($get["filters"] && $get["filters"]["enddate"]) ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"], "AND", false, "<=");
 
-			if ($get["filters"] && $get["filters"]["enddate"]){
-				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"], "AND", false, "<=");
-			}
+			if ($get["filters"] && $get["filters"]["startdate_min"]) ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate_min"], "AND", false, ">=");
+			if ($get["filters"] && $get["filters"]["startdate_max"]) ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate_max"], "AND", false, "<=");
+			if ($get["filters"] && $get["filters"]["enddate_min"]) ATF::commande()->q->where("commande.date_evolution", $get["filters"]["enddate_min"], "AND", false, ">=");
+			if ($get["filters"] && $get["filters"]["enddate_max"]) ATF::commande()->q->where("commande.date_evolution", $get["filters"]["enddate_max"], "AND", false, "<=");
 
 			if ($get['limit']) {
 				$this->q->setLimit($get['limit']);
@@ -532,7 +532,7 @@ class commande_cleodis extends commande {
 		////////////////Affaire
 		ATF::affaire()->u(array("id_affaire"=>$devis['id_affaire'],"etat"=>"commande"));
 
-//*****************************************************************************
+		/*****************************************************************************/
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -932,7 +932,7 @@ class commande_cleodis extends commande {
 						$affaire->set("date_installation_reel",$commande->get("date_debut"));
 					}
 
-//					$affaire->majGarantieParc($affaire->get("date_garantie"));
+			//$affaire->majGarantieParc($affaire->get("date_garantie"));
 
 				} else {
 					// Suppression de la date de début de contrat
@@ -992,7 +992,7 @@ class commande_cleodis extends commande {
 						$commande->set("etat","mis_loyer");
 					}
 				}
-// @todo A vérifier, normalement les 3 dates contrat, prel, et PV ne doivent pas modifier l'état du contrat !
+				// @todo A vérifier, normalement les 3 dates contrat, prel, et PV ne doivent pas modifier l'état du contrat !
 				break;
 			case "date_demande_resiliation":
 				$this->checkEtat($commande);
@@ -1327,7 +1327,7 @@ class commande_cleodis extends commande {
 
 			//Commande
 			if($commande){
-//*****************************Transaction********************************
+				//*****************************Transaction********************************
 				ATF::db($this->db)->begin_transaction();
 				parent::delete($id,$s);
 
@@ -1357,7 +1357,7 @@ class commande_cleodis extends commande {
 				foreach (ATF::tache()->select_all() as $key => $value) { ATF::tache()->d(array("id_tache"=>$value["id_tache"])); }
 
 				ATF::db($this->db)->commit_transaction();
-	//*****************************************************************************
+			//*****************************************************************************
 
 				ATF::affaire()->redirection("select",$commande["id_affaire"]);
 
@@ -2944,9 +2944,8 @@ class commande_cleodis extends commande {
 						$totalPrec += $avg[$key]["value"];
 					}
 
-
 					foreach ($avg as $key => $value) {
-						$pourcentage = ($avg[$key]["value"]/$totalPrec)*100;
+						$pourcentage = $totalPrec != 0 ? ($avg[$key]["value"]/$totalPrec)*100 : 0;
 						$obj[$key]["value"] = round(($objectif/100)*$pourcentage);
 					}
 
@@ -2972,7 +2971,22 @@ class commande_cleodis extends commande {
 		}
 	}
 
+	public function _setModePaiement($get, $post) {
 
+		if (!$post["id_commande"] || !$post["key"] || !$post["value"]) throw new errorATF("MISSING PARAMS", 500);
+		try{
+			$commande = ATF::commande()->select($post["id_commande"]);
+			ATF::commande()->u(["id_commande" => $post["id_commande"], $post["key"] => $post["value"]]);
+
+			ATF::facturation()->q->reset()->where("id_affaire", $commande["id_affaire"])->whereIsNotNull("id_facture");
+			$facturation = ATF::facturation()->sa();
+			foreach($facturation as $l) {
+				ATF::facture()->u(["id_facture" => $l["id_facture"], "mode_paiement" => $post["value"]]);
+				ATF::facture()->generatePDF(array('id'=>$l["id_facture"]),ATF::_s());
+			}
+			return true;
+		} catch(errorATF $e) { throw $e; }
+	}
 
 };
 
@@ -3179,7 +3193,6 @@ class commande_cleodisbe extends commande_cleodis {
 	    }
     }
 
-
 };
 
 class commande_midas extends commande_cleodis {
@@ -3251,3 +3264,5 @@ class commande_boulanger extends commande_cleodis { };
 class commande_assets extends commande_cleodis { };
 
 class commande_go_abonnement extends commande_cleodis { };
+class commande_solo extends commande_cleodis { };
+class commande_arrow extends commande_cleodis { };

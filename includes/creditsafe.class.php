@@ -192,20 +192,11 @@ class creditsafe extends classes_optima {
 
         $directors = $data->report->directors->currentDirectors;
         foreach ($directors as $key => $value) {
-            $director = $value->name;
-            if ($value->gender){
-                if ($value->gender == "Male") $director = str_replace('M ', '', $director);
-                if ($value->gender == "Female") $director = str_replace('Mme ', '', $director);
-            }
-
-            $explodeNom = explode(" ", $director);
-            $nom = $explodeNom[0];
-            $prenom = str_replace($nom.' ', '', $director);
-
-			$return['gerant'][] = array("nom"=>$nom,
-								        "prenom"=>$prenom,
+            if ($value->surname && $value->firstNames) {
+                $return['gerant'][] = array("nom"=>$value->surname,
+								        "prenom"=>$value->firstNames,
 								        "fonction"=>$value->positions[0]->positionName);
-
+            }
 		}
 
         $companySummary = $data->report->companySummary;

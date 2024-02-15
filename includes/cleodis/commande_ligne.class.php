@@ -100,3 +100,6 @@ class commande_ligne_boulanger extends commande_ligne_cleodis { };
 class commande_ligne_assets extends commande_ligne_cleodis { };
 
 class commande_ligne_go_abonnement extends commande_ligne_cleodis { };
+
+class commande_ligne_solo extends commande_ligne_cleodis { };
+class commande_ligne_arrow extends commande_ligne_cleodis { };

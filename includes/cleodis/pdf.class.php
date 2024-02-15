@@ -35,9 +35,14 @@ class pdf_cleodis extends pdf {
 	public $pdf_devis = false;
 
 	//Couleur CLEODIS
+	// Fond des entete des tableaux
 	public $Rentete = 149;
 	public $Gentete = 193;
 	public $Bentete = 31;
+	// Couleur texte des entete des tableaux
+	public $REnteteTextColor = 0;
+	public $GEnteteTextColor = 0;
+	public $BEnteteTextColor = 0;
 
 	public $bgcolorTableau = "95C11F";
 	public $txtcolorTableau = "000000";
@@ -206,7 +211,12 @@ class pdf_cleodis extends pdf {
 
 					}
 
-					$this->image($this->logo,170,5,20);
+					if (ATF::$codename == "arrow") {
+						$this->image($this->logo,160,10,40);
+					} else {
+						$this->image($this->logo,170,5,20);
+					}
+
 				}
 
 				$this->sety(20);
@@ -256,7 +266,6 @@ class pdf_cleodis extends pdf {
 		//On récupère les documents complementaires à signer de cette affaire
 		ATF::document_complementaire_a_signer()->q->reset()->where("id_affaire", ATF::affaire()->decryptId($id_affaire));
 		$doc_complementaire_affaire = ATF::document_complementaire_a_signer()->sa();
-		log::logger($doc_complementaire_affaire, "mfleurquin");
 		foreach ($doc_complementaire_affaire as $key => $value) {
 			$doc = ATF::document_contrat()->select($value["id_document_contrat"]);
 			if($doc["etat"] == "actif") {
@@ -460,7 +469,12 @@ class pdf_cleodis extends pdf {
 			$this->SetLeftMargin(15);
 
 			$this->RoundedRect(15,50,180,70,5);
-			$this->image($this->logo,85,55,45);
+			if (ATF::$codename == 'arrow') {
+				$this->image($this->logo,65,55,85);
+			} else {
+				$this->image($this->logo,85,55,45);
+			}
+
 			$this->sety(90);
 			$this->setfont('arial','B',12);
 			$this->multicell(0,5,"",0,'C');
@@ -1105,7 +1119,7 @@ class pdf_cleodis extends pdf {
 
 		$this->sety(10);
 		$this->setfont('arial','B',14);
-		if(ATF::$codename == "cleodis"){
+		if(ATF::$codename == "cleodis" || ATF::$codename == "arrow" || ATF::$codename == "solo"){
 			$this->RoundedRect(15,10,140,25,5);
 			$this->multicell(140,6,"Proposition locative ".$this->cleodis,0,'C');
 			$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
@@ -1168,7 +1182,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"",0,1,'C');
 
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Les engagements Cléodis : ");
+		$this->multicell(0,5,"Les engagements ".$this->cleodis.": ");
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"Nous nous engageons à vous fournir :");
 		$this->setfont('arial','',8);
@@ -2388,7 +2402,7 @@ class pdf_cleodis extends pdf {
 
 
 		if ($this->lignes) {
-		  $this->setFillColor(239,239,239);
+		  $this->setFillColor($this->Rentete,$this->Gentete,$this->Bentete);
 		  // Groupe les lignes par affaire
 		  $lignes=$this->groupByAffaire($this->lignes);
 		  // Flag pour savoir si le tableau part en annexe ou pas
@@ -2452,8 +2466,6 @@ class pdf_cleodis extends pdf {
 			  );
 
 			}
-			log::logger($data, "mfleurquin");
-			log::logger($st, "mfleurquin");
 
 			$tableau[$k] = array(
 			  "head"=>$head
@@ -12108,6 +12120,7 @@ class pdf_itrenting extends pdf_cleodis {
 	public $logo = __PDF_PATH__."/".'itrenting/logo.jpg';
 	public $logo_site = __PDF_PATH__."/".'itrenting/logo.jpg';
 	public $cleodis = 'IT Renting';
+	public $footerWithBG = false;
 
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
@@ -12119,19 +12132,208 @@ class pdf_itrenting extends pdf_cleodis {
 	public $GEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
 
+	public function frequenceEspagnol($freq, $pluriel) {
+		switch($freq) {
+			case "jour":
+				if ($pluriel) return 'dias';
+				return 'día';
+			break;
+
+			case "mois":
+				if ($pluriel) return 'meses';
+				return 'mes';
+			break;
+			case "trimestre":
+				if ($pluriel) return 'cuartos';
+				return 'cuarto';
+			break;
+
+			case "semestre":
+				if ($pluriel) return 'semestres';
+				return 'semestre';
+			break;
+
+			case "an":
+				if ($pluriel) return 'años';
+				return 'año';
+			break;
+		}
+
+	}
+
+	public function devis($id,$s) {
+
+		$this->devis = ATF::devis()->select($id);
+		$this->loyer = ATF::loyer()->ss('id_affaire', $this->devis['id_affaire']);
+		ATF::devis_ligne()->q->reset()->where("visible", "oui")->where("id_devis", $this->devis['id_devis']);
+
+		$affaire = ATF::affaire()->select($this->devis['id_affaire']);
+
+		$this->lignes = ATF::devis_ligne()->sa();
+
+		$this->partenaire = $affaire['id_partenaire'] ?  ATF::societe()->select($affaire['id_partenaire']) : null;
+		$this->client = ATF::societe()->select($this->devis['id_societe']);
+		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
+		$this->agence = ATF::agence()->select($this->user['id_agence']);
+		$this->user = ATF::user()->select($this->affaire['id_commercial']);
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
+
+		$this->unsetHeader();
+		$this->footerWithBG = true;
+		$this->Addpage();
+		$this->image($this->logo,20,10,0,20);
+		// $this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',150,10,0,20);
+
+		$this->SetLeftMargin(15);
+		$this->setY(50);
+
+		$y = $this->getY();
+		if ($this->partenaire) {
+			$this->setfont('arial','B',8);
+			$this->MultiCell(85,4,$this->partenaire["societe"],0,'L');
+			$this->setfont('arial','',8);
+
+			if ($this->partenaire["id_contact_signataire"]) {
+				$contactPartenaire = ATF::contact()->select($this->partenaire["id_contact_signataire"]);
+				$this->cell(85,4,$contactPartenaire["prenom"].' '.$contactPartenaire["nom"],0,1);
+				$this->cell(85,4,$contactPartenaire["tel"],0,1);
+				$this->cell(85,4,$contactPartenaire["email"],0,1);
+			} else {
+				$this->cell(85,4,'',0,1);
+				$this->cell(85,4,$this->partenaire["tel"],0,1);
+				$this->cell(85,4,$this->partenaire["email"],0,1);
+			}
+
+		}
+
+
+		$this->setY($y);
+		$this->SetLeftMargin(100);
+		$this->setfont('arial','B',8);
+		$this->MultiCell(85,4,$this->societe["nom_commercial"],0,1);
+		$this->setfont('arial','',8);
+		$this->cell(85,4,$this->user["prenom"].' '.$this->user["nom"],0,1);
+		$this->cell(85,4,$this->societe["tel"],0,1);
+		$this->cell(85,4,$this->user["email"],0,1);
+
+		$this->SetLeftMargin(15);
+		$this->ln(15);
+		$this->setfont('arial','B',8);
+		$this->cell(200,4,'Cliente final: '.$this->client["societe"]. " - ".$this->client["CIF"],0,1);
+
+		$this->ln(5);
+		$date = getdate(strtotime($this->affaire["date"]));
+		$this->cell(200,4,'Fecha oferta: '. $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'],0,0);
+
+		$this->ln(5);
+
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "OFERTA DE RENTING SIMPEL ".$this->affaire["ref"],0,1,'C');
+
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(59,10, "IMPORTE OPERACIÓN",0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, "PLAZO",0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, "CUOTA MENSUAL",0,1,'C',1);
+
+		$duree = $this->loyer[0]["duree"];
+		$total = 0;
+		foreach($this->lignes as $l) {
+			if ($l["id_fournisseur"] == $affaire['id_partenaire']) {
+				$total += $l["prix_achat"];
+			}
+		}
+		$totMens = $this->loyer[0]["loyer"];
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+		$this->cell(59,10, number_format($total, 2, ',', ' ').'€ + IVA',0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, $duree . " ". strtoupper($this->frequenceEspagnol($this->loyer[0]["frequence_loyer"], ($duree > 1))),0,0,'C',1);
+		$this->cell(1,10, "",0,0,'C');
+		$this->cell(59,10, number_format($totMens, 2, ',', ' ').'€ + IVA',0,1,'C',1);
+
+		$this->ln(5);
+
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "Principales ventajas del renting:",0,1);
+		$this->ln(4);
+
+
+		$y=$this->getY();
+		$this->image(__PDF_PATH__.'itrenting/icone1.jpg',18,$this->getY()+4,5);
+		$this->image(__PDF_PATH__.'itrenting/icone2.jpg',18,$this->getY()+15,5);
+		$this->image(__PDF_PATH__.'itrenting/icone3.jpg',18,$this->getY()+27,5);
+
+		$this->SetDrawColor(153,204,51);
+		$this->SetLeftMargin(25);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',9);
+		$this->MultiCell(25,4, "\nContables\n\n\nFinancieras\n\n\nFiscales\n\n", 'R');
+
+
+		$this->SetLeftMargin(55);
+		$this->setY($y);
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',9);
+		$this->ln(4);
+		$this->MultiCell(140,4, "Al no adquirir en compra los equipos y servicios, la operación, no alteraría la composición del balance.");
+		$this->ln(4);
+		$this->MultiCell(140,4, "No consumiría vías naturales de financiación, al no aparecer la deuda en el pasivo del balance.");
+		$this->ln(4);
+		$this->MultiCell(140,4, "Gasto 100% deducible, adecuando totalmente la salida de tesorería a la deducción fiscal.");
+
+		$this->SetLeftMargin(15);
+		$this->ln(5);
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "Condiciones particulares:",0,1);
+		$this->SetLeftMargin(25);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+		$this->MultiCell(0,4, "- La operación queda supeditada a la aprobación de la oferta por parte del cliente.\n- Operación sujeta a evaluación del riesgo financiero.\n- La validez de esta oferta es de 15 días hábiles.");
+
+	}
 	public function Footer() {
 		if ($this->getFooter()) return false;
+		if ($this->footerWithBG) {
+			$this->ATFSetStyle(["color" => "fff"]);
+			$this->SetXY(10,-15);
+			$this->ln(-3);
+			$this->SetFillColor(0,51,102);
+			$this->SetLeftMargin(0);
+			$this->MultiCell(210, 18, "",0, 'C', 1);
+			$this->SetLeftMargin(15);
+			$this->settextcolor(255, 255, 255);
 
-		$this->ATFSetStyle($style);
-		$this->SetXY(10,-15);
-		$this->ln(-3);
-		$this->Cell(0,3,$this->PageNo(),0,0,'R');
+			$this->SetXY(10,-10);
+			$this->Cell(0,3,$this->PageNo(),0,0,'R');
+
+			$this->SetXY(15,-10);
+			$this->setfont('arial','B',8);
+			$this->Cell(60,3,"Renting Informático y Tecnológico S.A.",0,0,'C');
+			$this->Cell(60,3,"91 490 51 73 ",0,0,'C');
+			$this->Cell(60,3,"www.itrenting.com",0,0,'C');
+		}
+
+
+
+
 	}
 
 	public function contrat_BBVAA4Particulier($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
 	public function contrat_BBVAA4Societe($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
 	public function contrat_BBVA($id) {
 		$garants = ATF::affaire_garant()->ss("id_affaire", $this->devis['id_affaire']);
+
 		foreach($garants as $k => $v) {
 			if ($v["id_societe"]) {
 				$v["nom"] = ATF::societe()->select($v["id_societe"], "societe");
@@ -12144,7 +12346,7 @@ class pdf_itrenting extends pdf_cleodis {
 			}
 
 			if ($v["id_contact"]) {
-				$v["nom"] = ATF::contact()->select($v["id_contact"], "nom")." ".ATF::contact()->select($v["id_contact"], "prenom");
+				$v["nom"] = ATF::contact()->select($v["id_contact"], "prenom")." ".ATF::contact()->select($v["id_contact"], "nom");
 				$v["type"] = "physique";
 				$v["adresse"] = ATF::contact()->select($v["id_contact"], "adresse");
 				$v["cp"] = ATF::contact()->select($v["id_contact"], "cp");
@@ -12159,18 +12361,20 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->unsetHeader();
 
-		$this->contrat_BBVA_p1($notaire);
-		$this->contrat_BBVA_p2($notaire);
-		$this->contrat_BBVA_cg($notaire);
-		$this->contrat_BBVA_notification();
+		$ref = $this->affaire["ref_externe"] ? $this->affaire["ref_externe"] : $this->affaire["ref"];
+
+		$this->contrat_BBVA_p1($notaire, $ref);
+		$this->contrat_BBVA_p2($notaire, $ref);
+		$this->contrat_BBVA_cg($notaire, $ref);
+		$this->contrat_BBVA_notification($ref);
 
 		if ($this->garant) {
-			$this->contrat_BBVA_page_garant();
+			$this->contrat_BBVA_page_garant($ref);
 		}
 	}
 
-	function contrat_BBVA_p1($notaire) {
-		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO Nº ".$this->affaire["ref"],0,'C');
+	function contrat_BBVA_p1($notaire, $ref) {
+		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO Nº ".$ref,0,'C');
 
 		$this->ln(10);
 		$this->setfont('arial','',8);
@@ -12191,12 +12395,29 @@ class pdf_itrenting extends pdf_cleodis {
 		}
 
 		if ($this->garant) {
+			$this->ln(3);
+
 			if ($this->garant["type"] === "physique") {
-				$this->ln(3);
 				$garant = ATF::contact()->select($this->garant["id_contact"]);
 				$this->multicell(0,3,"Y DE OTRA, ".$this->garant["nom"].", con DNI nº".$garant["num_dni"]." y con domicilio en ".$garant["adresse"].", C.P. ".$garant["cp"]." de ".$garant["ville"]." (".$garant["province"]."), en adelante el Avalista.", 0 ,'L');
-			} else {
-				$this->texte_societe($this->garant["id_societe"]);
+			}
+
+			if ($this->garant["type"] === "morale") {
+				$societe_garant = ATF::societe()->select($this->garant["id_societe"]);
+				$signataires = ATF::societe_signataire()->ss("id_societe", $this->garant["id_societe"]);
+				$notaire = ATF::contact()->select($societe_garant["id_contact_notaire"]);
+				$signataire = "";
+				foreach($signataires as $k=>$v) {
+					if ($k > 0) $signataire .=" y";
+					$contact = ATF::contact()->select($v["id_contact"]);
+					$signataire .= " ".$contact["prenom"]." ".$contact["nom"].", con DNI nº".$contact["num_dni"];
+				}
+				$t = "Y DE OTRA, ".$societe_garant["societe"].", con CIF ".$societe_garant["CIF"]." y con domicilio social en ".$societe_garant["adresse"].", C.P. ".$societe_garant["cp"]." de ".$societe_garant["ville"]." (".$societe_garant["province"].")";
+				$t .= ", inscrita en el Registro Mercantil de ".$societe_garant["lieu_registre"].", Tomo ".$societe_garant["numero_tomo"].", Folio ".$societe_garant["numero_folio"].", Hoja ".$societe_garant["numero_hoja"].", Inscripción ".$societe_garant["numero_inscription"].", ";
+				$t .= "representada por".$signataire.",  ";
+				$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
+				$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["prenom"]." ".$notaire["nom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Avalista.";
+				$this->multicell(0,3, $t,0,"L");
 			}
 		}
 
@@ -12227,7 +12448,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->ln(3);
 		$this->Multicell(0,3,"El pago de la primera mensualidad (en adelante rentas) se iniciará el ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"])).".");
 		$this->ln(3);
-		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"]." sucursal sita en ".$this->affaire["adresse_banque"].", C.P. ".$this->affaire["cp_banque"]." de ".$this->affaire["ville_banque"].", (".$this->affaire["province_banque"]."), manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
+		$this->Multicell(0,3,"Las rentas y, en general, todas las obligaciones dinerarias dimanantes del presente contrato serán abonadas por el Arrendatario con cargo a la cuenta IBAN Nº ".$this->affaire["IBAN"].", abierta a nombre de ".$this->client["societe"].", en la entidad ".$this->affaire["nom_banque"].", manifestando que ha instruido a la citada entidad para que adeude las que le sean presentadas por el Arrendador.");
 
 		$this->setfont('arial','B',8);
 		$this->multicell(0,8,"CUARTA.- LUGAR DE LA ENTREGA");
@@ -12244,22 +12465,13 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->setfont('arial','',8);
 		$this->Multicell(0,3,"El Arrendatario se ratifica expresamente en lo dispuesto en la Condición General Séptima. No obstante, RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. quedará como único interlocutor para cualquier gestión comercial.",0,'L');
 
-		$this->setfont('arial','B',8);
-		$this->multicell(0,8,"SÉPTIMA.- FIN DE PERIODO CONTRATO");
-		$this->setfont('arial','',8);
-		$this->Multicell(0,3,"En el contexto de finalización del periodo de arrendamiento, el Arrendatario se obliga a devolver al Arrendador el material en el plazo de 48 horas desde la fecha de fin del contrato y se encarga de los gastos derivados de la devolución, incluyendo el desmontaje, embalaje y transporte del material.",0, "L");
-		$this->ln(3);
-		$this->Multicell(0,3,"Si el Arrendatario continuase en posesión de los bienes arrendados después de la fecha de finalización del contrato, estará obligado a abonar al Arrendador en concepto de pago por su uso y disfrute una cantidad igual al importe de las rentas estipuladas sin que esto perjudique a la resolución del contrato mismo durante un periodo de seis meses.",0, "L");
-		$this->ln(3);
-		$this->Multicell(0,3,"En el caso de que el material falte o este dañado, el Arrendador podrá abonar costes en función del estado del material.",0, "L");
-
 		$this->cadre_signature($notaire);
 	}
 
-	function contrat_BBVA_p2($notaire) {
+	function contrat_BBVA_p2($notaire, $ref) {
 		$this->addPage();
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº ".$this->affaire["ref"],0,'C');
+		$this->multicell(0,5,"ANEXO I AL CONTRATO DE ARRENDAMIENTO Nº ".$ref,0,'C');
 
 		$this->ln(5);
 		$this->setfont('arial','BU',8);
@@ -12272,30 +12484,25 @@ class pdf_itrenting extends pdf_cleodis {
 
 		foreach($this->lignes as $k => $v) {
 			$data[] = [ $v["quantite"], $v["ref"]." - ".$v["produit"] ];
+			$styles[] = [ ["align" => "C","size"=>9 ], ["align" => "L","size"=>9 ]];
 		}
 		$data[] = ["NOTA", "SALVO INDICACIÓN EXPRESA, LA GARANTÍA DE LOS BIENES RELACIONADOS EN ESTA DESCRIPCIÓN ES LA BÁSICA DE SUS RESPECTIVOS FABRICANTES"];
+		$styles[] = [ ["align" => "C","size"=>9 ], ["align" => "L","size"=>9 ]];
 
-
-		$this->tableauBigHead($head,$data, $w);
+		$this->tableauBigHead($head,$data,$w,5,$styles);
 
 		$this->ln(10);
 		$this->setfont('arial','BU',8);
-		$this->multicell(0,8,"ACTA DE ENTREGA Y CONFORMIDAD DE LOS BIENES DEL CONTRATO DE ARRENDAMIENTO Nº".$this->affaire["ref"],0,'C');
+		$this->multicell(0,8,"ACTA DE ENTREGA Y CONFORMIDAD DE LOS BIENES DEL CONTRATO DE ARRENDAMIENTO Nº".$ref,0,'C');
 
 		$this->setfont('arial','',8);
-		$this->multicell(0,3, "Por la presente, confirmamos nuestra aceptación de los Bienes relacionados en el Anexo número I del Contrato de Arrendamiento número ".$this->affaire["ref"]." firmado con fecha de inicio ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"]))." entre RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. y el Arrendatario.");
+		$this->multicell(0,3, "Por la presente, confirmamos nuestra aceptación de los Bienes relacionados en el Anexo número I del Contrato de Arrendamiento número ".$ref." firmado con fecha de inicio ".date("d/m/Y", strtotime($this->affaire["date_demarrage_previsionnel"]))." entre RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. y el Arrendatario.");
 		$this->ln();
 		$this->multicell(0,3, "Por lo cual aceptamos nos sean cargados los recibos correspondientes a las rentas del arrendamiento del citado contrato en el domicilio bancario descrito a continuación:");
 		$this->ln();
 
 		$this->cell(30,3,'Banco:');
 		$this->cell(160,3,$this->affaire["nom_banque"],0,1);
-
-		$this->cell(30,3,'Domicilio:');
-		$this->cell(160,3,$this->affaire["adresse_banque"],0,1);
-		$this->SetLeftMargin(40);
-		$this->cell(160,3,$this->affaire["cp_banque"]." - ". $this->affaire["ville_banque"]." (".$this->affaire["province_banque"].")",0,1);
-		$this->SetLeftMargin(10);
 
 		$this->cell(30,3,'IBAN:');
 		$this->cell(160,3,$this->affaire["IBAN"],0,1);
@@ -12304,12 +12511,12 @@ class pdf_itrenting extends pdf_cleodis {
 
 	}
 
-	function contrat_BBVA_cg($notaire) {
+	function contrat_BBVA_cg($notaire, $ref) {
 		$this->addPage();
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"CONDICIONES GENERALES",0,'C');
 		$this->ln(5);
-		$this->cell(0,5,"Nº DE CONTRATO: ".$this->affaire["ref"],1,1,'C');
+		$this->cell(0,5,"Nº DE CONTRATO: ".$ref,1,1,'C');
 
 		$articles = [
 			[
@@ -12395,20 +12602,20 @@ class pdf_itrenting extends pdf_cleodis {
 	}
 
 	function texte_societe($id_societe) {
-		$societe = ATF::societe()->select($id_societe);
+		$societe_client = ATF::societe()->select($id_societe);
 		$signataires = ATF::societe_signataire()->ss("id_societe", $id_societe);
-		$notaire = ATF::contact()->select($societe["id_contact_notaire"]);
+		$notaire = ATF::contact()->select($societe_client["id_contact_notaire"]);
 		$signataire = "";
 		foreach($signataires as $k=>$v) {
 			if ($k > 0) $signataire .=" y";
 			$contact = ATF::contact()->select($v["id_contact"]);
-			$signataire .= " ".$contact["nom"]." ".$contact["prenom"].", con DNI nº".$contact["num_dni"];
+			$signataire .= " ".$contact["prenom"]." ".$contact["nom"].", con DNI nº".$contact["num_dni"];
 		}
-		$t = "Y DE OTRA, ".$societe["societe"].", con CIF ".$societe["CIF"]." y con domicilio social en ".$societe["adresse"].", C.P. ".$societe["cp"]." de ".$societe["ville"]." (".$societe["province"].")";
-		$t .= ", inscrita en el Registro Mercantil de ".$societe["lieu_registre"].", Tomo ".$societe["numero_tomo"].", Folio ".$societe["numero_folio"].", Hoja ".$societe["numero_hoja"].", Inscripción ".$societe["numero_inscription"].", ";
+		$t = "Y DE OTRA, ".$societe_client["societe"].", con CIF ".$societe_client["CIF"]." y con domicilio social en ".$societe_client["adresse"].", C.P. ".$societe_client["cp"]." de ".$societe_client["ville"]." (".$societe_client["province"].")";
+		$t .= ", inscrita en el Registro Mercantil de ".$societe_client["lieu_registre"].", Tomo ".$societe_client["numero_tomo"].", Folio ".$societe_client["numero_folio"].", Hoja ".$societe_client["numero_hoja"].", Inscripción ".$societe_client["numero_inscription"].", ";
 		$t .= "representada por".$signataire.",  ";
 		$t .= "con poderes suficientes en virtud del poder otorgado en ".date("d/m/Y", strtotime($signataires[0]["date_autorisation_pouvoir"])).", ";
-		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["nom"]." ".$notaire["prenom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
+		$t.= "ante la Notaria ".$notaire["ville"].", ".$notaire["prenom"]." ".$notaire["nom"].", con el número ".$notaire["num_ordre_notaire"]." de orden de su protocolo, en adelante el Arrendatario.";
 		$this->ln();
 		$this->multicell(0,3, $t,0,"L");
 	}
@@ -12441,7 +12648,7 @@ class pdf_itrenting extends pdf_cleodis {
 			$this->SetLeftMargin(138);
 
 			$this->setfont('arial','',8);
-			$this->cell(64,5,"El Arrendatario",0,1);
+			$this->cell(64,5,"El Avalista",0,1);
 			$this->setfont('arial','B',6);
 			$this->MultiCell(64,3,$this->garant["nom"]."\nP.P.",0,'L');
 			$this->ln(10);
@@ -12455,8 +12662,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 
 	}
-
-	function contrat_BBVA_notification() {
+	function contrat_BBVA_notification($ref) {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
 		$this->setfont('arial','B',10);
@@ -12473,9 +12679,9 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->ln(10);
 
-		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
+		$this->cell(0,4,"Muy señores nuestros,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"]." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$ref." formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando BBVA, S.A. subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", lo que les notificamos a los efectos pertinentes y, especialmente en lo que respecta al abono de las rentas del mencionado contrato, que a partir de la fecha de hoy sólo tendrá efecto liberatorio cuando se realice directamente a BBVA, S.A.");
 		$this->ln(5);
@@ -12509,8 +12715,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->ATFSetStyle($style2);
 		$this->multicell(0,4,"Inscrita en el Registro ".$this->societe["lieu_registre"]." · Tomo ".$this->societe["numero_tomo"]." · Libro 0, Folio ".$this->societe["numero_folio"].", Sección 8, Hoja ".$this->societe["numero_hoja"].", Inscripción ".$this->societe["numero_inscription"]." · C.I.F. ".$this->societe["CIF"],0,'C');
 	}
-
-	function contrat_BBVA_page_garant() {
+	function contrat_BBVA_page_garant($ref) {
 		$this->addPage();
 		$this->image($this->logo,10,0,35);
 		$this->setfont('arial','B',10);
@@ -12527,9 +12732,9 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->ln(10);
 
-		$this->cell(0,4,"Muy señor nuestro, señora nuestra,",0,1);
+		$this->cell(0,4,"Muy señores nuestros,",0,1);
 		$this->ln(5);
-		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$this->affaire["ref"].", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
+		$this->multicell(0,4,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por RENTING INFORMÁTICO Y TECNOLÓGICO, S.A. a BBVA, S.A., con domicilio en Bilbao, Plaza San Nicolás, nº 4, C.P. 48005, el contrato de arrendamiento nº ".$ref.", formalizado el día ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"])).", a favor de ".$this->client["societe"]." como arrendatario y del que Ud./s es/son fiador/es solidario/s, así como los derechos, garantías y acciones derivados de dicho contrato de arrendamiento, quedando BBVA, S.A., subrogada en la posición arrendadora en dicho contrato.");
 		$this->ln(5);
 		$this->multicell(0,4, "Dicho contrato de cesión entrará en vigor y surtirá sus efectos a partir del día de hoy, ".date('d/m/Y', strtotime($this->affaire["date_demarrage_previsionnel"]))." lo que le/s notificamos a los efectos pertinentes");
 		$this->ln(5);
@@ -12560,6 +12765,188 @@ class pdf_itrenting extends pdf_cleodis {
 
 	}
 
+	/** Génère un Procès verbal
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 11-02-2011
+	*/
+	public function contratPV($id,$s,$previsu) {
+		$this->commandeInit($id,$s,$previsu);
+
+		$this->unsetHeader();
+		$this->Open();
+		$this->AddPage();
+
+		$this->image($this->logo,20,10,40);
+		$this->setfont('arial','B',10);
+
+		$this->SetLeftMargin(15);
+		$this->setY(40);
+
+		$date = getdate(strtotime(date('Y-m-d')));
+		$this->setX(125);
+		$this->cell(100,4,'Fecha: '. $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'],0,0);
+		$this->setX(15);
+		$this->ln(25);
+
+		$this->SetTextColor(0,51,102);
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "CERTIFICADO DE ENTREGA",0,1,'C');
+		$this->ln(25);
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',9);
+
+		$txt = "D. ............................................................................................................................ ";
+		$txt .= "certifica que todos los productos relacionados con el contrato ";
+		$txt .= $this->affaire["ref"]. " a nombre de ". $this->client["societe"].", han sido entregados en perfecto orden y estado el día .........................................";
+		$txt .= "en la dirección ................................................................................................ por la empresa ................................................................................................";
+		$this->MultiCell(0,5, $txt);
+
+		$this->ln(10);
+
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(60,10, "CANTIDAD",0,0,'C',1);
+		$this->cell(120,10, "DESCRIPCIÓN",0,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+
+		foreach($this->lignes as $l) {
+			$this->cell(60, 10, $l["quantite"], 0, 0, 'C', 1);
+			$this->cell(120, 10, $l["ref"]." ".$l["produit"], 0, 1, 'L', 1);
+		}
+
+		$this->setY(225);
+		$this->setfont('arial','',8);
+		$this->cell(120, 5, "Firma del personal de entrega");
+		$this->cell(120, 5, "Firma del cliente",0,1);
+
+		$this->cell(120, 5, "Nombre:");
+		$this->cell(120, 5, "Nombre:",0,1);
+		$this->cell(120, 5, "DNI:");
+		$this->cell(120, 5, "DNI:",0,1);
+		$this->cell(120, 5, "Fecha:");
+		$this->cell(120, 5, "Fecha:",0,1);
+
+		$this->ln(10);
+		$this->cell(180,5, "C/ La Granja, 82. Polígono Industrial Alcobendas. 28108 Alcobendas - Madrid.", 0, 0, 'C');
+
+	}
+
+	public function cession($id, $s) {
+		$this->commandeInit($id,$s,$previsu);
+		$montant_ht = $IVA = 0;
+
+		ATF::demande_refi()->q->reset()->where("id_affaire", $this->affaire["id_affaire"])
+									   ->where("etat", "valide")->setLimit(1);
+		$demande_refi = ATF::demande_refi()->select_row();
+
+		if ($demande_refi) {
+			$montant_ht = $demande_refi["prix"];
+			$IVA = $demande_refi["prix"] * ($this->commande["tva"] - 1);
+		}
+
+		$notaire = false;
+		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 30000) $notaire = true;
+
+		$this->unsetHeader();
+		$this->Open();
+		$this->AddPage();
+		$this->SetLeftMargin(15);
+
+		$this->image($this->logo,20,10,40);
+		$this->setfont('arial','B',10);
+		$this->setY(30);
+		$this->setX(125);
+		$date = getdate(strtotime($this->commande["date_debut"]));
+		$dateDebutEsp = $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'];
+		$this->cell(100,4,'En Madrid, a : '. $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'],0,1);
+		$this->setX(15);
+
+		$this->setfont('arial','B',10);
+		$this->cell(180,10, "REUNIDOS",0,1,'C');
+		$this->setfont('arial','B',8);
+		$this->cell(180,10, "DE UNA PARTE:",0,1);
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"BBVA, S.A., con C.I.F. A-48265169 y con domicilio en Bilbao, Plaza de San Nicolás, nº 4, inscrita en el Registro Mercantil de Vizcaya, folio 183, libro 1.545 de la sección 3ª de sociedades, tomo 2.083, hoja nº 14.741, inscripción 1ª, en cuanto a su constitución, folio 49, libro 1.657, sección 3ª de sociedades, tomo 2.227, hoja nº BI-17A, inscripción 256, representada en este acto por D.  Luis Carlos Ruano Tavares, mayor de edad, con NIF 50.861.357-P, en calidad de apoderado y en uso de las facultades que tiene conferidas en virtud de poder otorgado a su favor, el día 22 de Noviembre de 2018, ante el Notario del Ilustre Colegio de Madrid, D. Juan José de Palacio Rodriguez, con el número 4.255 de su protocolo.");
+		$this->ln(2);
+		$this->setfont('arial','B',8);
+		$this->cell(180,10, "Y DE OTRA PARTE:",0,1);
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"RENTING INFORMÁTICO Y TECNOLÓGICO, S.A., con C.I.F. A-83266106, con domicilio en Alcobendas, C/ La Granja 82, Polígono Industrial, 28108 Alcobendas (Madrid), inscrita en el Registro Mercantil de Madrid, al  tomo 17.495, libro 0, folio 165, Sección 8ª, hoja M-300.451, inscripción 1ª, representada en este acto por Dª Elena Pérez Dávila con D.N.I. 50.847.542-Q, con poderes suficientes en virtud de la escritura pública otorgada ante el Notario del Ilustre Colegio de Madrid, D. Valerio Pérez de Madrid Carreras, el día 15 de Noviembre de 2019, bajo el número 3.088 de su protocolo, que en adelante se denominará IT RENTING.");
+
+		$this->setfont('arial','B',10);
+		$this->ln(5);
+		$this->cell(180,10, "EXPONEN",0,1,'C');
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"I.- Que IT RENTING es propietario del bien que se relaciona en las Condiciones Particulares del contrato de arrendamiento que más adelante se detalla, encontrándose dicho bien libre de cargas y gravámenes.");
+		$this->ln(2);
+		$this->multicell(0,5,"II.-Que IT RENTING tiene cedido en arrendamiento el bien a que se hace referencia en el Expositivo I, de acuerdo a las condiciones estipuladas en el contrato mercantil de arrendamiento Nº".$this->affaire["ref"]." de fecha de inicio ".$dateDebutEsp." con ".$this->client["societe"].", cuyo original se adjunta a este documento como ANEXO A.");
+		$this->ln(2);
+		$this->multicell(0,5,"III.- Que es propósito de IT RENTING transmitir a BBVA, S.A. el bien que se detalla en el Expositivo I, así como todos los derechos que le corresponden como arrendadora en el contrato mercantil que se acompaña como ANEXO A, asumiendo BBVA, S.A. los derechos y obligaciones dimanantes del mismo, incluida la posición de propietario del bien cedido en arrendamiento, sin perjuicio de lo establecido en la cláusula novena.");
+		$this->ln(2);
+		$this->multicell(0,5,"IV.- Que IT RENTING, ha cumplido puntualmente hasta el día de hoy todas las obligaciones derivadas del contrato que se cede, y expresamente las relativas a la entrega y puesta a disposición del arrendatario del bien arrendado, así como todas las obligaciones de tipo fiscal que dimanan del mismo.");
+		$this->ln(2);
+		$this->multicell(0,5,"V.- Y expuesto cuanto antecede, las partes llevan a cabo la cesión del contrato de arrendamiento citado, con arreglo a las siguientes");
+
+
+		$this->setfont('arial','B',10);
+		$this->ln(5);
+		$this->cell(180,10, "ESTIPULACIONES",0,1,'C');
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"PRIMERA.- IT RENTING, por medio de sus representantes, transmite a BBVA, S.A., que acepta, por medio de sus representantes, el bien a que se refiere el Expositivo I, así como los derechos y obligaciones que le corresponden como arrendadora, derivados del contrato de arrendamiento descrito en el Expositivo II del presente documento, sin perjuicio de lo establecido en la cláusula novena.");
+		$this->ln(2);
+		$this->multicell(0,5,"SEGUNDA.- El precio de la transmisión de los bienes y de la cesión de los derechos inherentes al contrato citado es el de ".number_format($montant_ht,2, ',', ' ')."€  (".util::nb2texteespanol($montant_ht, true)."), más ".number_format($IVA,2, ',', ' ')."€  (".util::nb2texteespanol($IVA, true).") , en concepto de IVA, que se abonará mediante transferencia bancaria en la cuenta ES51 0182 2336 2902 0154 7827 que IT RENTING tiene abierta a su nombre en la entidad bancaria BBVA, S.A.");
+
+		$this->addPage();
+		$this->multicell(0,5,"TERCERA.- IT RENTING responde de la existencia y legitimidad del contrato de arrendamiento que se cede, así como de los derechos que de éste se derivan contra el arrendatario y sus garantes, caso de que los haya, aunque no de la solvencia de ninguno de ellos.");
+		$this->ln(2);
+		$this->multicell(0,5,"Serán de cuenta y cargo exclusivo de IT RENTING, la pérdida o daños que pudieran sufrir los bienes arrendados hasta el momento en que se produzca la cesión efectiva de los contratos. IT RENTING responderá de los daños, del deterioro, del menoscabo, de la sustracción, etc., que sufriera el material arrendado y, asimismo, de los daños y perjuicios ocasionados a un tercero aún cuando se deriven del uso correcto del material, y aunque se produzca por fuerza mayor o caso fortuito, hasta la fecha de entrada en vigor de la cesión del/los contrato/s de arrendamiento.");
+		$this->ln(2);
+		$this->multicell(0,5,"CUARTA.- La cesión del contrato citado se hace con todos los derechos inherentes al mismo, incluyendo los accesorios; tales como fianzas, hipotecas, prendas, privilegios, y cualesquiera otros que correspondieran al arrendador sobre el arrendatario y sus garantes.");
+		$this->ln(2);
+		$this->multicell(0,5,"QUINTA.- BBVA, S.A. queda subrogada en la posición del arrendador en el respectivo contrato de arrendamiento y asume los derechos y obligaciones que se deriven del mismo, y que hasta el día de hoy correspondieron a IT RENTING, con independencia de cual sea el momento de sus vencimientos, a excepción de las obligaciones derivadas de la entrega e instalación de los bienes arrendados que serán responsabilidad de IT RENTING así como las establecidas en la cláusula novena.");
+		$this->ln(2);
+		$this->multicell(0,5,"SEXTA.- Con independencia del momento en que haya de producir efecto el negocio jurídico celebrado entre IT RENTING y el arrendatario del contrato objeto de cesión, la subrogación efectuada solo produce plenos efectos respecto de este último a partir de la fecha de notificación al arrendatario de la presente cesión. IT RENTING se compromete a notificar al arrendatario mediante carta, cuyo modelo se adjunto como ANEXO B, por cualquier medio que asegure su recepción, la cesión en el domicilio que figura en el contrato de arrendamiento objeto de cesión, o en el domicilio que posteriormente le haya notificado el arrendatario. Para proceder al abono del precio de la cesión señalado en la cláusula segunda, será condición necesaria que se entregue a BBVA, S.A. justificante de haber efectuado la citada comunicación y de que ésta ha llegado al domicilio del arrendatario.  ");
+		$this->ln(2);
+		$this->multicell(0,5,"Dicha notificación se hará extensiva a los fiadores si los hubiere y que serán los que figuran en el correspondiente contrato objeto de cesión. Se acompaña como ANEXO C modelo de carta de notificación a los fiadores.");
+		$this->ln(2);
+		$this->multicell(0,5,"SÉPTIMA.- El presente contrato de transmisión de bienes y de cesión de derechos, entra en vigor y empieza a producir sus efectos de conformidad con lo dispuesto en la Estipulación SEXTA de este documento. En consecuencia, IT RENTING se compromete a abonar a BBVA, S.A. aquellas cantidades que pudiera recibir por el pago de rentas de arrendamiento de fecha posterior a la cesión del contrato de arrendamiento");
+		$this->ln(2);
+		$this->multicell(0,5,"OCTAVA.- IT RENTING responderá ante BBVA, S.A. de cualquier reclamación, así como de cualquier tipo de coste fiscal que ésta pudiere tener a causa de algún incumplimiento por parte de IT RENTING, de los descritos en el Expositivo IV, bastando en este caso para el abono por parte de IT RENTING a BBVA, S.A., la notificación de ésta acreditando, mediante fotocopia de la correspondiente reclamación, la cantidad resultante y que deberá ser abonada en un plazo máximo de 30 días a partir de la citada notificación.");
+		$this->ln(2);
+		$this->multicell(0,5,"NOVENA.- IT RENTING continuará siendo responsable frente al arrendatario, para aquellas cuestiones que en virtud de la cláusula séptima del contrato de arrendamiento, siga realizando IT RENTING frente al Arrendatario, pese a la cesión producida y en los términos en los que se hubiera comprometido en el contrato de arrendamiento. A tales efectos IT RENTING quedará como interlocutor frente al arrendatario para toda cuestión técnica o comercial concerniente a los equipos su ampliación, sustitución, devolución y los relativos al seguro de pérdida o daños de los equipos arrendados que en su caso hubiera suscrito IT RENTING, manteniendo indemne a BBVA, S.A. de cualquier reclamación presentada por el arrendatario por cualquiera de estas causas.");
+		$this->ln(2);
+		$this->multicell(0,5,"IT RENTING se responsabilizará del correcto funcionamiento de los equipos en los mismos términos en los que se hubiera comprometido en el contrato de arrendamiento suscrito con el Cliente. IT RENTING quedará como interlocutor frente al arrendatario para toda cuestión técnica o comercial concerniente a los equipos y asume todos los riesgos derivados del adecuado funcionamiento de los equipos, manteniendo indemne a BBVA, S.A. de cualquier impago o reclamación presentada por el arrendatario por cualquiera de estas causas. ");
+		$this->ln(2);
+		$this->multicell(0,5,"DÉCIMA.- IT RENTING garantiza la recompra al término del plazo pactado como duración de los contrato de arrendamiento (renting que hayan sido cedidos por IT RENTING a BBVA, S.A., de todos los derechos, incluido el dominical, sobre los equipos objeto de los contratos mencionados, con independencia del estado en que se encuentren, donde estén y en posesión de quien estén. La recompra se llevará a cabo en el plazo máximo de 30 (treinta) días desde el primer requerimiento escrito de BBVA, S.A. comunicándole el vencimiento del contrato, por el precio de 20 EUROS por la totalidad de los equipos objeto del contrato de arrendamiento más el IVA que corresponda o impuesto que lo sustituya. Tras el abono por IT RENTING a BBVA, S.A. de dicho precio, ésta cederá a aquella todos sus derechos sobre dicho equipo. La retirada, desinstalación y transporte de éstos se efectuará por IT RENTING con todos los costes a su cargo.");
+		$this->ln(2);
+		$this->multicell(0,5,"Esta garantía se mantendrá en vigor hasta que la obligación de recompra asumida por IT RENTING, en virtud del presente documento, haya sido totalmente cumplida respecto al contrato de arrendamiento cedido.");
+		$this->ln(2);
+		$this->multicell(0,5,"UNDECIMA.-  El presente contrato de cesión de bienes y derechos entrará en vigor y empezará a producir efectos, a partir de la fecha del presente documento");
+		$this->ln(2);
+		$this->multicell(0,5,"En todo lo no establecido expresamente en este documento le será de aplicación el Acuerdo de Colaboración formalizado entre IT RENTING y BBVA, S.A. el día 10 de Diciembre de 2008.");
+		$this->ln(2);
+		$this->multicell(0,5,"DUODÉCIMA.- IT RENTING y BBVA, S.A. se comprometen asimismo, a otorgar cuantos documentos fueran necesarios para aclarar o completar este contrato y se obligan expresamente a realizar cuantos actos de cualquier índole sean necesarios, en orden a la más eficaz gestión de los bienes y derechos que son objeto de este contrato");
+		$this->ln(2);
+		$this->multicell(0,5,"DECIMOTERCERA.- Para cualquier cuestión que pueda surgir en relación con la interpretación o cumplimiento del presente contrato, las partes se someten al fuero de los Juzgados y Tribunales de Madrid Capital, con renuncia expresa a cualquier otro que pudiera corresponderles.");
+		$this->ln(2);
+		$this->multicell(0,5,"Y en prueba de conformidad con lo que antecede, las partes lo ratifican y firman por duplicado, en el lugar y fecha que en el encabezamiento se indica.");
+		$this->ln(2);
+
+		if ($notaire) {
+			$this->multicell(0,5,"Y, en prueba de conformidad, lo suscriben en el lugar y fecha indicados, solicitando su intervención por el Notario que las partes designen.");
+		} else {
+			$this->multicell(0,5,"Firmado el ".$dateDebutEsp.".");
+		}
+		$this->ln(20);
+		$this->setfont('arial','B',8);
+		$this->cell(120, 5, "BBVA, S.A.");
+		$this->cell(120, 5, "RENTING INFORMÁTICO Y TECNOLÓGICO, S.A.",0,1);
+
+	}
 
 }
 
@@ -16476,1004 +16863,856 @@ class pdf_assets extends pdf_cleodis {
 
 };
 
-class pdf_go_abonnement extends pdf_cleodis {
-	public $logo = __PDF_PATH__."/".'go_abonnement/byMyCar.jpg';
-	// public $logo = 'bdomplus/logo.jpg';
-	public $heightLimitTableContratPV = 70;
-	public $langue = "FR";
+class pdf_solo extends pdf_cleodis
+{
+    public $logo = __PDF_PATH__ . "/solo/logo.jpg";
+    public $heightLimitTableContratPV = 70;
+    public $langue = "FR";
 
-	public $Rentete = 186;
-	public $Gentete = 152;
-	public $Bentete = 86;
+    public $Rentete = 28;
+    public $Gentete = 30;
+    public $Bentete = 60;
 
-	public $id_societe = 1;
+	public $REnteteTextColor = 254;
+	public $GEnteteTextColor = 202;
+	public $BEnteteTextColor = 25;
 
-	public $bgcolorTableau = "ba9856";
-	public $txtcolorTableau = "000000";
+    public $id_societe = 1;
 
-	public function factureClassiqueSociete($global=false) {
+    public $bgcolorTableau = "1c1e3c";
+    public $txtcolorTableau = "ffffff";
 
-		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
-		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
-			$this->bmcFacture($global, true);
-		} else {
-			parent::factureClassiqueSociete($global);
-		}
-	}
-
-	public function factureClassiqueParticulier($global=false) {
-
-		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
-
-		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
-			$this->bmcFacture($global, false);
-		} else {
-			parent::factureClassiqueParticulier($global);
-		}
-	}
-
-	public function bmcFacture($global=false, $btob=false) {
-		if(!$global){
-			$this->open();
-		}
-
-		$this->setHeader();
-		$this->addpage();
-		$this->setMargins(15,30);
-		$this->sety(15);
-
-
-		$this->setfont('arial','B',22);
-		if ($this->facture["prix"]>=0) {
-			if($this->facture["type_libre"] === "liberatoire"){
-				$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
-			}else{
-				$this->multicell(0,15,'FACTURE',0,'C');
-			}
-		} else {
-			$this->multicell(0,15,'AVOIR',0,'C');
-		}
-		$this->setfont('arial','',8);
-
-
-		$telSociete = $this->agence['tel'];
-		if (!$telSociete) $telSociete = $this->societe['tel'];
-
-		//CADRE Societe
-		$cadre = array(
-			$this->societe['societe']
-			,$this->societe['adresse']
-			,$this->societe['adresse_2']
-			,$this->societe['cp']." ".$this->societe['ville']
-			,"Tel : ".$telSociete
-			,"N° TVA intra : FR 91 ".$this->societe["siren"]
-			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
-		);
-		$this->cadre(20,35,80,35,$cadre,"Emetteur");
-
-
-		//CADRE Client
-		if($this->client['facturation_adresse']){
-			$cadre = array(
-				 $this->client['societe']
-				,$this->client['facturation_adresse']
-				,$this->client['facturation_adresse_2']
-				,$this->client['facturation_adresse_3']
-				,$this->client['facturation_cp']." ".$this->client['facturation_ville']
-			);
-			if ($this->client["id_famille"] == 9) {
-				$cadre[] = "Tel : ".$this->client['particulier_portable'];
-				$cadre[] = "Email : ".$this->client['particulier_email'];
-			} else {
-				$cadre[] = "Tel : ".$this->client['tel'];
-				$cadre[] = "Email : ".$this->client['email'];
-			}
-
-		}else{
-			$cadre = array(
-				 $this->client['societe']
-				,$this->client['adresse']
-				,$this->client['adresse_2']
-				,$this->client['adresse_3']
-				,$this->client['cp']." ".$this->client['ville']
-			);
-			if ($this->client["id_famille"] == 9) {
-				$cadre[] = "Tel : ".$this->client['particulier_portable'];
-				$cadre[] = "Email : ".$this->client['particulier_email'];
-			} else {
-				$cadre[] = "Tel : ".$this->client['tel'];
-				$cadre[] = "Email : ".$this->client['email'];
-			}
-		}
-
-		$this->cadre(110,35,80,35,$cadre,"Destinataire");
-
-		$this->multicell(0,5,"A l'attention de ".$this->client['societe'].",");
-		$this->ln(5);
-		$y = $this->gety();
-
-
-		//CADRE Date
-		$cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
-		$this->cadre(10,$y,60,13,$cadre);
-
-		//CADRE Client
-		if($this->client['nom_commercial'] && $this->client['nom_commercial'] != '-'){
-			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).' '.($this->client['ref']?"(".$this->client['ref'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
-		}else{
-			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).' '.($this->client['ref']?"(".$this->client['ref'].")":NULL),"align"=>"C"));
-		}
-
-		$this->cadre(75,$y,60,13,$cadre);
-
-		//CADRE Facture
-		if ($this->facture["ref_externe"]) {
-			$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref_externe'],"align"=>"C"));
-		} else {
-			$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["ref"]?"-".$this->client["ref"]:NULL),"align"=>"C"));
-		}
-		$this->cadre(140,$y,60,13,$cadre);
-
-		if ($this->lignes) {
-			if ($this->facture["prix_sans_tva"] == 0) {
-				$head = array("Quantité","Désignation","Montant HT", 'TVA', 'TOTAL TTC');
-				$w = array(20,85,30,20,30);
-			} else {
-				$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
-				$w = array(20,60,30,20,25,30);
-			}
-			$data = $styles = array();
-
-			$data[0][0] = "1";
-
-			if ($this->facture['designation']) {
-				$data[0][1] = $this->facture['designation'];
-			} else {
-				if($this->affaire['nature']=="vente"){
-					$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
-				} elseif($this->facture["redevance"] === "oui"){
-				    $data[0][1] = "Redevance Abonnement";
-				    $data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-				    $data[0][1] .= "\nContrat n°".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref'])."-".$this->client["ref"].' - '.$this->affaire["affaire"];
-                }
-			}
-
-			//Désignation L3
-			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
-			//Désignation L4
-			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
-			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
-			// Montant Facture
-			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
-
-			// On va chercher si la tva s'applique sur l'assurance loyer ou non
-			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
-			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
-				$data[0][3] = number_format(abs(round($this->facture["prix"] * ($this->facture['tva']-1),2)),2,'.',' ')." €";
-				$total = ($this->facture["prix"] * $this->facture['tva']) + $this->facture["prix_sans_tva"];
-				if ($this->facture["prix_sans_tva"] == 0) {
-					$data[0][4] = number_format(abs(round($total,2)),2,'.',' ')." €";
-				} else {
-					$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
-					$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
-				}
-			}
-
-			$styles[0][1] = array("align"=>"L");
-
-			$this->tableauBigHead($head,$data,$w,5,$styles);
-
-			if ($this->facture['commentaire']) {
-				$com = array(array("Commentaire : ".$this->facture['commentaire']));
-				$sCom = array(array($this->styleDetailsProduit));
-				$this->tableau(false,$com,180,5,$sCom);
-			}
-
-			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] == "contentieux"){
-					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
-					$sInfosTVA = array(array($this->styleDetailsProduit));
-					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
-				}
-			}
-		}
-
-
-
-		$this->ln(10);
-		$y = $this->getY();
-		$this->setfont('arial','U',8);
-		$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
-		$this->setfont('arial','',8);
-		if($this->facture["prix"]>0){
-			if($this->facture['mode_paiement']){
-				if ($this->facture['mode_paiement']=="pre-paiement") {
-					$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-				} elseif ($this->facture['mode_paiement']=="cb") {
-					$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-				} elseif ($this->facture['mode_paiement']=="cheque") {
-					$this->cell(0,5,"A réception de facture",0,1);
-				} elseif ($this->facture['mode_paiement']=="virement") {
-					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
-				} elseif($this->facture['mode_paiement'] !="mandat") {
-					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
-				}
-			}
-		}else{
-			$this->cell(0,5,"Par remboursement ou compensation",0,1);
-		}
-
-		if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
-			if(ATF::$codename !== "cleodisbe"){
-		      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-		      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
-		    }
-		}
-
-		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
-			$cadre = array();
-			$cadre[] = $this->societe["nom_banque"];
-			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
-			$cadre[] = "IBAN : ".$this->societe["IBAN"];
-			$cadre[] = "BIC : ".$this->societe["BIC"];
-			$this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
-		}
-
-		if ($btob) {
-			$this->setY(255);
-			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
-		}
-
-	}
-
-
-	/** PDF de l'échéancier d'une affaire
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @date 28-02-2011
-	*/
-	public function echeancierFacturation($id) {
-		$this->open();
+	public function conditionsGeneralesDeLocationA4($type)  {
 		$this->unsetHeader();
-		$this->addpage();
+		$this->unsetFooter();
 
-		$this->setfont('arial','B',10);
-		$this->image($this->logo,5,5,45);
+		$pageCount = $this->setSourceFile(__PDF_PATH__."solo/cgv-contrat.pdf");
 
-
-		$this->setxy(100,10);
-		$this->cell(0,5,"LE LOUEUR",0,1,'L');
-
-
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',7);
-		$this->cell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0,1);
-		$this->cell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0,1);
-		if($this->societe['id_pays'] =='FR'){
-			$this->cell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,1);
-		}else{
-			$this->cell(0,3,"Numéro de TVA  ".$this->societe['siret'],0,1);
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 		}
-
-		$this->setfont('arial','B',10);
-		$this->setxy(100,28);
-		if($this->client["id_famille"] != 9){
-			$this->cell(0,6,"LE LOCATAIRE",0,1,'L');
-		}else{
-			$this->cell(0,6,"L'ABONNE",0,1,'L');
-		}
-
-		$this->setLeftMargin(65);
-
-		if($this->client["id_famille"] != 9){
-			$this->setfont('arial','B',10);
-			$this->cell(30,5,"Raison sociale : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(0,5,$this->client['societe'],0,1);
-			$this->setfont('arial','B',10);
-			$this->cell(20,5,"Adresse : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(0,5,$this->client['adresse'],0,1);
-			$this->setfont('arial','B',10);
-			$this->cell(25,5,"Code Postal : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(15,5,$this->client['cp'],0,0);
-			$this->setfont('arial','B',10);
-			$this->cell(15,5,"Ville : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(40,5,$this->client['ville'],0,1);
-			$this->setfont('arial','B',10);
-			if($this->client['id_pays'] =='FR'){
-				$this->cell(15,5,"SIRET : ",0,0);
-			}else{
-				$this->cell(35,5,"NUMERO DE TVA : ",0,0);
-			}
-			$this->setfont('arial','',10);
-			$this->cell(30,5,$this->client['siret'],0,0);
-		}else{
-
-			$this->setfont('arial','',10);
-			$this->cell(0,5,$this->client['societe'],0,1);
-			$this->setfont('arial','B',10);
-			$this->cell(20,5,"Adresse : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(0,5,$this->client['adresse'],0,1);
-			$this->setfont('arial','B',10);
-			$this->cell(25,5,"Code Postal : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(15,5,$this->client['cp'],0,0);
-			$this->setfont('arial','B',10);
-			$this->cell(15,5,"Ville : ",0,0);
-			$this->setfont('arial','',10);
-			$this->cell(40,5,$this->client['ville'],0,1);
-		}
-
-
-		$this->setfont('arial','B',10);
-		$this->cell(10,5,"Tél. : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(15,5,$this->client['tel'],0,1);
-
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,60,220,60);
-		$this->setLeftMargin(10);
-		$this->sety(62);
-
-		$this->setfont('arial','B',10);
-		$this->cell(45,5,"Contrat ".(($this->client["id_famille"]==9)?"d'abonnement":(($this->devis['type_contrat']=="vente"?"de vente":"de location")))." : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(80,5,($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,0);
-		$this->setfont('arial','B',10);
-
-		$this->cell(45,5,"Date départ : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(80,5,$this->dateDebut,0,1);
-		$this->setfont('arial','B',10);
-		$this->cell(45,5,"Durée : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(80,5,$this->duree." Mois",0,0);
-		$this->setfont('arial','B',10);
-		$this->cell(45,5,"Date d'expiration : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(80,5,$this->dateExpiration,0,1);
-
-		$this->setfont('arial','B',10);
-
-		$this->setfont('arial','B',10);
-		$this->cell(45,5,"Terme : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(80,5,"Terme à échoir",0,1);
-
-		$this->setfont('arial','B',10);
-		$this->cell(45,5,"Mode de paiement : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(80,5,ATF::$usr->trans($this->commande['type'],'commande'),0,1);
-
-
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-
-		$this->line(0,60,220,60);
-		$this->setLeftMargin(10);
-		$this->sety(62);
-
-		$this->sety(95);
-		$this->setdrawcolor(0,0,0);
-		$this->SetFillColor(200,200,200);
-		$this->SetLineWidth(0.2);
-
-		if($this->client["id_famille"] != 9){
-
-			$this->cell(190,10,"CET ÉCHÉANCIER VAUT FACTURE (MONTANTS EN EUROS)",1,0,'C',true);
-
-			$this->sety(110);
-
-		}
-
-		$this->setfont('arial','',8);
-		$this->setTopMargin(30);
-		$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
-
-		$tva_sur_assurance = true;
-
-		if ($this->affaire["id_type_affaire"]) {
-			if (ATF::type_affaire()->select($this->affaire["id_type_affaire"], "assurance_sans_tva") == "oui") {
-				$tva_sur_assurance = false;
-			}
-		}
-		$totaux=ATF::facturation()->montant_total($this->affaire['id_affaire'],$this->type);
-
-		if ($this->lignes) {
-			foreach ($this->lignes as $k=>$i) {
-				//Si le montant est différent c'est qu'on a changé de loyer, on le signale par une ligne
-				if($montant!=$i["montant"]){
-				}
-
-				if($i["type"]==$this->type) {
-					$loyer_ht=$i["montant"];
-
-					if ($tva_sur_assurance == false) {
-						$tva=($i["montant"]+$i["frais_de_gestion"])*($this->commande['tva']-1);
-						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
-
-					} else {
-						$tva=($i["montant"]+$i["frais_de_gestion"]+$i["assurance"])*($this->commande['tva']-1);
-						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
-					}
-
-					$data[] = array(
-						date("d/m/Y",strtotime($i["date_periode_debut"]))
-						,number_format($loyer_ht,2,","," ")
-						,number_format($i["frais_de_gestion"],2,","," ")
-						,number_format($i["assurance"],2,","," ")
-						,number_format($tva,2,","," ")
-						,number_format($total,2,","," ")
-					);
-
-					//Conserver le montant pour vérifier si on a changé de loyer
-					$montant=$i["montant"];
-				}
-			}
-			$data[] = array("TOTAL"	,number_format($totaux["loyer"],2, ',', ' '),number_format($totaux["total_frais_de_gestion"],2, ',', ' '),number_format($totaux["total_assurance"],2, ',', ' '),number_format($totaux["tva"],2, ',', ' '),number_format($totaux["total"],2, ',', ' '));
-
-			$this->tableauBigHead($head,$data,190,5,false,270);
-
-		}
-
-		$this->ln(5);
-		$this->setfont('arial','',10);
-		$this->cell(45,5,"(1) Taux de TVA (loyers) :",0,0);
-		$this->cell(10,5,(($this->commande['tva']-1)*100)." %",0,1);
-		if($this->client["id_famille"]!=9){
-			$this->cell(10,5,"(2) Exonération de TVA article 261 C2 du CGI",0,1);
-
-
-			$this->ln(5);
-			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
-
-		}
-
 	}
 
-	public function mandatSepa() {
-		$this->addPage();
-		$this->initLogo($this->affaire["id_type_affaire"]);
-		$this->image($this->logo,10,10,40);
+}
 
-		$this->setY(35);
+class pdf_arrow extends pdf_cleodis
+{
+    public $logo = __PDF_PATH__ . "arrow/arrow_capital_solutions_logo.jpg";
+    public $heightLimitTableContratPV = 70;
+    public $langue = "FR";
 
-		$this->setfont('arial','B',12);
-		$this->MultiCell(185,10,'MANDAT DE PRELEVEMENT SEPA', 1, 'C',0, 1);
-		$this->SetTextColor(0,0,0);
-		$this->setfont('arial','',9);
-		$this->ln(10);
+    public $Rentete = 28;
+    public $Gentete = 30;
+    public $Bentete = 60;
 
-		$this->MultiCell(185,5, "REFERENCE UNIQUE DU MANDAT :    " . $this->affaire["RUM"]);
-		$this->setfont('arial','',7);
-		$this->MultiCell(185,5, "A compléter par le créancier (limité à 35 caractères alphanumériques)");
-		$this->setfont('arial','',9);
-		$this->ln(3);
+	public $REnteteTextColor = 254;
+	public $GEnteteTextColor = 202;
+	public $BEnteteTextColor = 25;
 
-		$this->MultiCell(185,5, "IDENTIFIANT CREANCIER SEPA (ICS) :    " . $this->societe["ics"]);
-		$this->ln(3);
+    public $id_societe = 1;
 
-		$this->MultiCell(185,5, "TYPE DE PAIEMENT :    Paiement récurrent / répétitif");
-		$this->ln(3);
+    public $bgcolorTableau = "1c1e3c";
+    public $txtcolorTableau = "ffffff";
 
-		$texte = "En signant ce formulaire de mandat, vous autorisez GO Abonnement à envoyer des instructions à votre banque pour débiter votre compte, et votre banque à débiter votre compte conformément aux instructions de GO Abonnement.";
-		$texte .= "\nVous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous avez passées avec elle. Une demande de remboursement doit être présentée :";
-		$texte .= "\n      -	Dans les 8 semaines suivant la date de votre compte pour un prélèvement autorisé.";
-		$texte .= "\n      -	Sans tarder et au plus tard dans les 13 mois en cas de prélèvement non autorisé.";
-		$this->MultiCell(185,5, $texte, 1, 'L');
 
-		$this->ln(10);
+	public function contrat_locationA4Particulier($id, $signature, $sellAndSign) { $this->contrat_location($id, "particulier"); }
+	public function contrat_locationA4Societe($id, $signature, $sellAndSign) { $this->contrat_location($id, "pro"); }
+	function contrat_location($id, $type) {
+		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->contact =  ATF::contact()->select($this->devis['id_contact']);
 
-		$this->MultiCell(185,5, "Nom ou dénomination sociale* :    " . $this->client["societe"]);
-		$this->ln(3);
+		$this->unsetFooter();
+		$this->image($this->logo,10,10,60);
 
-		$this->MultiCell(185,5, "Adresse* :    " . $this->client["adresse"]);
-		$this->ln(3);
-
-		$this->MultiCell(185,5, "Code postal et Ville* :    " .$this->client["cp"]. " ". $this->client["ville"]);
-		$this->ln(3);
-
-		$this->MultiCell(185,5, "Pays* :    " . ATF::pays()->select($this->client["id_pays"], "pays"));
-		$this->ln(3);
-
-		$this->MultiCell(185,5, "IBAN* :    " . $this->affaire["IBAN"]);
-		$this->ln(3);
-
-		$this->MultiCell(185,5, "BIC* :    " . $this->affaire["BIC"]);
-		$this->ln(3);
-
-		$contact_signataire = ATF::contact()->select($this->client["id_contact_signataire"]);
-		$this->MultiCell(185,5, "Nom du signataire* :    " . $contact_signataire["prenom"]." ".$contact_signataire["nom"]);
-		$this->ln(3);
-
-		$this->MultiCell(185,5, "Signé à* :   ....................................... Le* :    " . date("d/m/Y", strtotime($this->affaire["date"])));
-		$this->ln(3);
-
-		$this->cell(30,5, "Signature(s) : ");
-		$this->MultiCell(155,5,"\n\n\n\n",1);
-		$this->ln(3);
-
-		$this->setfont('arial','',6);
-		$this->MultiCell(185,3, "Les informations contenues dans le présent mandat, qui doit être complété, sont destinées à n'être utilisées par le créancier que pour la gestion de sa relation avec son client. Elles pourront donner lieu à l'exercice, par ce dernier, de ses droits d'oppositions, d'accès et de rectification tels que prévus aux articles 38 et suivants de la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés.");
-
-	}
-
-	public function contrat_goa_freeA4Particulier($id, $signature, $sellAndSign) { $this->contrat_goa_free($id, "particulier"); }
-	public function contrat_goa_freeA4Professionnel($id, $signature, $sellAndSign) { $this->contrat_goa_free($id, "pro"); }
-
-	public function contrat_goa_locationA4Particulier($id, $signature, $sellAndSign) { $this->contrat_goa_location($id, "particulier"); }
-	public function contrat_goa_locationA4Professionnel($id, $signature, $sellAndSign) { $this->contrat_goa_location($id, "pro"); }
-
-	public function headerContrat($title, $type_client) {
-		$this->setfont('arial','B',10);
-
-		$this->initLogo($this->affaire["id_type_affaire"]);
-		$this->image($this->logo,10,10,40);
-
-		$this->sety(10);
-		$this->multicell(0,5,"GO ABONNEMENT",0,'C');
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',7);
-		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
-		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
-		$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z",0);
-		$this->multicell(0,3,"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"], 0);
-
-		$this->setLeftMargin(15);
-		$this->ln(5);
-		$this->setfont('arial','B',10);
-		$this->multicell(0,6,"LE CLIENT",0,'C');
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',7);
-		if ($type_client === "pro") {
-			$this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
-		} else {
-			$this->multicell(0,3,$this->client['societe'],0);
-		}
-
-		$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
-		$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
-
-		if ($type_client === "pro") {
-			if($this->client['id_pays'] =='FR'){
-				$this->multicell(0,3,"SIRET : ".$this->client['siret']." Tél : ".$this->client['tel'],0);
-			}else{
-				$this->multicell(0,3,"NUMERO DE TVA : ".($this->client['siret']?$this->client['siret']:"-")." Tél : ".$this->client['tel'],0);
-			}
-		}
-
-		$this->multicell(0,3,"Tel : ".($type_client == "pro"?$this->contact_facturation['gsm'] : $this->contact_facturation['gsm_perso'])." Email : ". ($type_client == "pro"?$this->contact_facturation['email'] : $this->contact_facturation['email_perso']),0);
-
+		$this->setY(30);
+		$this->cell(0,4,"CONTRAT DE LOCATION FINANCIERE",0,1,'C');
 
 		$this->SetLineWidth(0.35);
 		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,60,220,60);
-		$this->setLeftMargin(15);
-		$this->setfont('arial','B',10);
-		$this->setY(62);
+		$this->line(10,38,200,38);
+		$this->ln(6);
 
-		$this->multicell(0,3,$title);
+		$this->entete("ARROW CAPITAL SOLUTIONS", "Le Locataire");
 
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,73,220,73);
+		$this->cell(0,4,"Il a été convenu ce qui suit",0,1);
+		$this->ln(6);
 
-		$this->setxy(15,75);
-		$this->setfont('arial','',7);
-	}
+		$this->setFont('Arial', 'B', 10);
+		$this->cell(0,4, "CONDITIONS GENERALES DU CONTRAT DE LOCATION", 0,1, 'C');
 
-	/**
-	 * PDF du contrat GOA FREE
-	 */
-	public function contrat_goa_free($id, $type_client) {
-
-		$this->colsProduit = array("border"=>"TB","size"=>9,"flag"=>"colsProduit");
-		$this->colsProduitFirst = array("border"=>"TLB","size"=>9,"flag"=>"colsProduitFirst");
-		$this->colsProduitLast = array("border"=>"TBR","size"=>9,"flag"=>"colsProduitLast");
-		$this->colsProduitAvecDetail = array("border"=>"T","size"=>9,"flag"=>"colsProduitAvecDetail");
-		$this->colsProduitAvecDetailFirst = array("border"=>"TL","size"=>9,"flag"=>"colsProduitAvecDetailFirst");
-		$this->colsProduitAvecDetailLast = array("border"=>"TR","size"=>9,"flag"=>"colsProduitAvecDetailLast");
-		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
-
-		$ref = $this->commande['ref'];
-		if ($this->affaire['ref_externe']) $ref = $this->affaire['ref_externe'];
-
-
-		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat d'abonnement n° : ".$ref, $type_client);
-
-		$this->multicell(0,3,"Les présentes conditions particulières au contrat d’abonnement automobile GOA FREE (ci-après les « Conditions Particulières d’Abonnement ») sont conclues entre la société Go Abonnement et le Client, tel que désigné ci-avant.");
-		$this->multicell(0,3,"\nLes Conditions Particulières d’Abonnement et les Conditions Générales d’Abonnement forment ensemble le Contrat d’Abonnement GOA FREE.\n");
-
-		$this->articleContrat("ARTICLE 1 : CONTENU DE L'ABONNEMENT");
-		$this->multicell(0,4,"Dans le cadre de l’abonnement au service GOA FREE, le Client a souhaité bénéficier de l’offre :",0,1);
-		$this->ln(3);
-
-		$head = array("SERVICE(S)","Taux de TVA sur le prix annuel",);
-		$w = array(150,35);
-		$styles = [];
-        if ($this->lignes) {
-            $this->tableauBigHead($head, [], $w, 5, $styles);
-            $this->tableauProduit();
-        }
-
-
-		$this->articleContrat("ARTICLE 2 : DUREE DU CONTRAT D’ABONNEMENT");
-		$duree = [];
-		foreach($this->loyer as $k => $v) {
-            if ($v['type'] === "engagement") {
-				if ($duree[$v["frequence_loyer"]]) {
-					$duree[$v["frequence_loyer"]] += $v["duree"];
-				} else {
-					$duree[$v["frequence_loyer"]] = $v["duree"];
-				}
-            }
-		}
-		$an = 0;
-		if ($duree["mois"]) { $an += ($duree['mois']/12); }
-		if ($duree["trimestre"]) { $an += ($duree['trimestre']/4); }
-		if ($duree["semestre"]) { $an += ($duree['semestre']/3); }
-		if ($duree["an"]) { $an += ($duree['an']); }
-
-		if ($an <= 1) {
-			$an = $an." an";
-		} else {
-			$an = $an." ans";
-		}
-
-		$this->multicell(0,4,"La durée de la période initiale de l’abonnement est fixée à ".$an.".",0,1);
-		$this->multicell(0,4,"Les modalités de tacite reconduction et de résiliation sont précisées dans les Conditions Générales d’Abonnement.",0,1);
-
-		$this->articleContrat("ARTICLE 3 : PRIX DE L’ABONNEMENT – MODALITES DE PAIEMENT");
-		$this->multicell(0,4,"Le prix de l’abonnement annuel au service GOA FREE est fixé comme suit",0,1);
-		$this->ln(3);
-
-		$head = array("Unité","Périodicité","Abonnement Hors Taxes", 'TVA', 'TOTAL TTC');
-		$w = array(37,37,37,37,37);
-		$styles = [];
-
-		$data = [];
-
-		foreach($this->loyer as $k => $v) {
-			if ($v['type'] === "engagement") {
-				$ligne[0] = $v["duree"];
-
-				switch ($v["frequence_loyer"]) {
-					case 'jour':
-						$ligne[1] = "HEBDOMADAIRE";
-					break;
-					case 'mois':
-						$ligne[1] = "MENSUEL";
-					break;
-					case 'trimestre':
-						$ligne[1] = "TRIMESTRIEL";
-					break;
-					case 'semestre':
-						$ligne[1] = "SEMESTRIEL";
-					break;
-					case 'an':
-						$ligne[1] = "ANNUEL";
-					break;
-				}
-
-				$ligne[2] = number_format($v["loyer"], 2, ',', '')." €";
-				$ligne[3] = number_format(($v["loyer"]* $this->commande["tva"]) - $v['loyer'], 2, ',', '')." €";
-				$ligne[4] = number_format(($v["loyer"]* $this->commande["tva"]), 2, ',', '')." €";
-
-				$data[] = $ligne;
-			}
-		}
-		$this->tableauBigHead($head,$data,$w,5,$styles);
-		$this->ln(5);
-
-
-		$this->multicell(0,4,"Le prix de l’abonnement au service GOA FREE est payable suivant les modalités détaillées dans les Conditions Générales d’Abonnement, en fonction de la modalité de souscription choisie par le Client.",0,1);
-
-		$this->articleContrat("ARTICLE 4 : GRILLE TARIFAIRE DE FRAIS");
-		$this->multicell(0,4,"Les frais suivants sont susceptibles d’être facturés par GoAb au Client en fonction des options choisies ou en cas de manquement à ses obligations, telle que stipulées au Contrat d’Abonnement. La grille tarifaire de frais est susceptible d’évoluer à tout moment, à la seule discrétion de GoAb. En cas de modification de la présente grille tarifaire, GoAb notifiera le Client et lui communiquera la grille modifiée ; laquelle entrera en vigueur suivant un délai de préavis de trente (30) jours suivant sa notification au Client.",0,1);
-		$this->ln(5);
-		$data = [
+		$pages = [
 			[
-				"Frais de changement de véhicule (swap)",
-				"Fixes",
-				"Ces frais sont dus en cas de changement de véhicule au cours de l’abonnement."
+				"left" => [
+					[
+						"titre" => "ARTICLE.1 - OBJET",
+						"texte" => "1.1 Le Locataire a choisi en une ou plusieurs fois auprès de fournisseurs pour ses besoins professionnels, un ou plusieurs Equipements (ci-après appelé les Equipements) dont la description figure aux Conditions Particulières.
+						\n1.2 Conformément aux Conditions Générales et Particulières stipulées ci-après, ARROW CAPITAL SOLUTIONS loue les Equipements au Locataire, qui accepte. Les Equipements seront livrés et installés à l'adresse du Locataire figurant aux Conditions Particulières.
+						\n1.3 L'engagement du Locataire est ferme et définitif dès sa signature des présentes. Le représentant signataire du Locataire est dûment mandaté à cet effet, sinon, le Locataire porte seul la responsabilité d’une défaillance interne à son organisation et ne peut l’invoquer pour se soustraire en tout ou partie aux obligations des présentes."
+					],
+					[
+						"titre" => "ARTICLE 2 - LIVRAISON-RECEPTION DES EQUIPEMENTS",
+						"texte" => "2.1 Le Locataire reconnaît être seul responsable du choix des Equipements, ainsi que du choix du fournisseur. Il reconnaît avoir préalablement pris connaissance des spécifications techniques et des modalités d'exploitation des Equipements.\nARROW CAPITAL SOLUTIONS ne saurait, en conséquence, être tenue à une obligation de résultat ni être tenue pour responsable de toute inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des matériels et ou logiciels entre eux ou de toute autre cause de non-conformité à la conception technique ou à la commande initiale du Locataire.
+						\n2.2 A réception du matériel, le locataire s’engage à signer et à remettre à ARROW CAPITAL SOLUTIONS un procès-verbal de livraison-réception constatant la conformité des Equipements à ses demandes. La signature apposée par le locataire sur le procès-verbal de livraison-réception vaut réception des Equipements sans réserve. Le Locataire ne pourra refuser la réception sans réserve des Equipements pour un motif autre que la non-conformité ou l'existence de vices apparents.
+						\n2.3 Lorsque des Equipements sont déjà livrés et installés dans les locaux du Locataire, les Equipements sont considérés comme acceptés sans réserve et la date de signature du présent contrat vaut date de réception.
+						\n2.4 En cas de livraisons partielles, le Locataire sera redevable d'une indemnité d’utilisation calculée au prorata du Matériel livré, entre la/les dates de livraisons partielles et la date d’effet du contrat tel que déterminé en l’article 3."
+					]
+				],
+				"right" => [
+					[
+						"titre" => "ARTICLE 3 Date d’Effet et DUREE",
+						"texte" => "La location prend effet à la livraison de tout ou partie des équipements sur le site désigné par le Locataire. Cette disposition ne fait pas obstacle à l’application des articles 4, 6 et 7 ci-dessous.\n Cette location est consentie pour une période irrévocable et non-réductible. La durée de la location est précisée aux Conditions Particulières ; elle ne commence à courir que le premier jour du mois ou trimestre suivant celui au cours duquel la location du dernier élément livré de l’équipement aura pris effet."
+					],
+					[
+						"titre" => "ARTICLE 4 - LOYERS",
+						"texte" => "4.1 Le montant du loyer est précisé aux Conditions Particulières. A ce montant s'ajoutera la TVA en vigueur à la date de facturation.\n Le Locataire est redevable de tous impôts et taxes présents et à venir liés aux Equipements, y compris ceux qui sont mis à la charge du Bailleur-Cessionnaire / propriétaire.
+						\n4.2 Les loyers sont exigibles d'avance le 1er jour de chaque période spécifiée aux Conditions Particulières.
+						\n4.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers prévus aux Conditions Particulières ou proportionnellement aux prix d'achat figurant sur le tarif du constructeur au jour de la signature du contrat. Si la prise d'effet telle que définie à l'article 3 intervient après le premier jour du mois ou du trimestre, le Locataire payera au loueur, pour ledit mois ou trimestre, une redevance de mise à disposition calculée prorata temporis au trentième pour un loyer mensuel et au quatre-vingt dixième pour un loyer trimestriel, sur la base du montant du loyer mensuel ou trimestriel
+						\n4.4 Les loyers sont portables selon tous moyens à Ia convenance de ARROW CAPITAL SOLUTIONS et non quérables. Leur paiement sera effectué par prélèvements bancaires. A cet effet lors de la signature du présent contrat le Locataire signera une autorisation permanente de prélèvements
+						\n4.5 Entre la date de signature du présent contrat et la date de livraison, les loyers mentionnés aux Conditions Particulières peuvent varier en cas de modification des Equipements.
+						\n4.6 Les loyers sont fermes et définitifs pendant toute la durée de location à l'exception des majorations ou diminutions susceptibles d'intervenir à la suite de la variation du taux de TVA ou, en général, du régime fiscal applicable au présent contrat."
+						]
+				]
+			],
+			[
+				"left" => [
+					[
+						"titre" => null, "texte" => "4.7 En cas de retard dans le paiement de toute somme due par le Locataire, les intérêts de retard sont fixés conventionnellement à 1,5 % par mois à compter du jour de son exigibilité jusqu'au paiement intégral, les intérêts étant capitalisés. En outre, le Locataire devra rembourser à ARROW CAPITAL SOLUTIONS les frais engagés par celui-ci pour tout rappel d'échéance sans qu'il ait à produire de justificatifs. L’ensemble de ces sommes sera dû de plein droit."
+					],
+					[
+						"titre" => "ARTICLE 5 - UTILISATION - ENTRETIEN DES EQUIPEMENTS",
+						"texte" => "5.1 Le Locataire s'engage à utiliser les Equipements dans des conditions normales et suivant les indications d'utilisation, d'entretien et de sécurité prévues dans la documentation technique relative aux Equipements.
+						\n5.2 Le déplacement éventuel des Equipements est soumis à l'autorisation préalable de ARROW CAPITAL SOLUTIONS. Il est réputé aux frais et risques du Locataire pendant le démontage, le transfert et la nouvelle (re-)installation. Ces dispositions ne concernent pas les micro-ordinateurs portables.
+						\n5.3 Par dérogation expresse aux dispositions des Articles 1719 et suivants du Code Civil, tous les frais nécessités par l'emploi, l'entretien et les réparations des Equipements, y compris le gros entretien et les réparations importantes, sont matériellement et financièrement à la charge du Locataire qui devra, à cet effet, passer tout contrat d'entretien ou de maintenance nécessaire avec une société tierce agréée par ARROW CAPITAL SOLUTIONS.
+						\nLe locataire communiquera immédiatement à ARROW CAPITAL SOLUTIONS ces contrats et les agents de ARROW CAPITAL SOLUTIONS pourront, à tout moment, pénétrer dans les locaux où sont installés les Equipements pour en contrôler l'utilisation et l'état de l’entretien.
+						\n5.4 Le Locataire s'engage à ne pas utiliser ou laisser utiliser les Equipements contrairement aux lois et règlements en vigueur. Il lui appartient de demander avec diligence et d’obtenir, le cas échéant, des organismes qualifiés, les autorisations relatives à l'utilisation des Equipements.\nLe Locataire doit en particulier s'assurer qu'il a obtenu toutes les licences nécessaires à l'utilisation de tout logiciel intégré dans les Equipements.\nLe locataire fait son affaire directement avec l'éditeur du respect des contrats de licences Les loyers du présent contrat restent redevables même en cas d’interdiction d’utilisation du (des) logiciel(s) en application de clauses de la licence et/ou de manquement à une de ces clauses.\nIl est entendu qu’en cas de contradiction, les dispositions du présent contrat prévalent sur celles qui régissent ou constituent la licence.
+						\n5.5 Par dérogation aux dispositions de l'Article 1724 du Code Civil, le Locataire renonce à toute indemnité et droit de résiliation vis-à-vis de ARROW CAPITAL SOLUTIONS, même dans le cas où les Equipements resteraient hors d’usage pendant plus de quarante jours, pour quelque cause que ce soit.
+						\n5.6 Tous les équipements et/ou accessoires incorporés par le Locataire aux Equipements pendant période de la location restent de plein droit et deviennent immédiatement la propriété de ARROW CAPITAL SOLUTIONS sans qu'il puisse lui être réclamé aucun remboursement ou indemnité compensatrice."
+					],
+					[
+						"titre" => "ARTICLE 6 - PROPRIETE DES EQUIPEMENTS",
+						"texte" => "6.1 ARROW CAPITAL SOLUTIONS conserve la propriété des Equipements, pendant toute la durée de la location, sauf application de l'Article 7 ci dessous.\nLe Locataire devra, si ARROW CAPITAL SOLUTIONS le lui demande, apposer une plaque de propriété.
+						\n6.2 En sa qualité de gardien détenteur, le Locataire s'interdit de sous-louer, de céder ou de se dessaisir de tout ou partie des Equipements ou de céder le bénéfice du présent contrat, à quelque titre et pour quelque motif que ce soit, ou de le grever d'un droit quelconque (nantissement,...) sans l'autorisation préalable et écrite de ARROW CAPITAL SOLUTIONS.
+						\n6.3 Le Locataire devra prendre toutes mesures pour faire connaître le droit de propriété de ARROW CAPITAL SOLUTIONS. Le Locataire s'engage en particulier:\na) A avertir le propriétaire du local où seront installés les Equipements que ceux-ci ne sont pas sa propriété,\nb) En cas de saisie ou d’une procédure imminente, à prévenir l'huissier que les Equipements ne sont pas sa propriété, à informer immédiatement ARROW CAPITAL SOLUTIONS de cette saisie, à obtenir mainlevée et généralement prendre toutes mesures de sauvegarde nécessaires.
+						\n6.4 Le Locataire s'engage à informer ARROW CAPITAL SOLUTIONS de toute vente de son fonds de commerce ou de toute intention de transfert de ce dernier en un lieu autre que celui où sont actuellement installés les Equipements. Le Locataire s'engage également à avertir ARROW CAPITAL SOLUTIONS de toute vente de l'immeuble où se trouvent les Equipements si le Locataire cesse d'en être propriétaire."
+					]
+					],
+				"right" => [
+					["titre" => null, "texte" => "\n6.5 En cas de résolution de la vente, le Locataire reste redevable envers ARROW CAPITAL SOLUTIONS sera redevable outre les loyers échus impayés d'une indemnité de résiliation égale au montant des loyers à échoir augmenté d'une somme forfaitaire égale à 5% du montant total des loyers prévus aux conditions particulières. Ce montant sera diminué des sommes reçues des fournisseurs par le ARROW CAPITAL SOLUTIONS au titre de la restitution de prix."],
+					[
+						"titre" => "ARTICLE 7 – CESSION DE L’EQUIPEMENT PAR ARROW CAPITAL SOLUTIONS",
+						"texte" => "ARROW CAPITAL SOLUTIONS se réserve le droit de céder les Equipements et de déléguer le présent contrat à une tierce-partie (« le Bailleur-Cessionnaire ») de son choix. Le Bailleur - Cessionnaire, intervenant à titre purement financier, ne prendra en charge que l'obligation de laisser au Locataire la jouissance paisible des Equipements. En conséquence, malgré cette cession, le suivi commercial et technique continuera à être assuré par ARROW CAPITAL SOLUTIONS qui reste dès lors l’interlocuteur du Locataire.\nLe présent acte sera à cet effet soumis par ARROW CAPITAL SOLUTIONS à l’acceptation et à la signature du Bailleur - Cessionnaire. Le Bailleur - Cessionnaire ne sera engagé qu’après acceptation du dossier matérialisée par sa signature du présent contrat. Jusqu’à l’apposition de cette signature il n’existe aucun engagement du Bailleur - Cessionnaire.\nLe Locataire accepte dès à présent et sans réserve cette substitution éventuelle de loueur et s’engage à signer à première demande une autorisation de prélèvement au nom du Bailleur - Cessionnaire. En cas d’acceptation par le Bailleur - Cessionnaire qui se substitue ainsi au loueur d’origine, le Locataire reconnaît donc comme loueur le Bailleur - Cessionnaire et s’engage notamment à lui verser directement ou à son ordre la totalité des loyers en principal, intérêts et accessoires. Le Bailleur - Cessionnaire intervenant à titre purement financier, le Locataire en acceptant cette intervention renonce à effectuer toute compensation, déduction, demande reconventionnelle en raison du droit qu’il pourrait faire valoir à l’encontre du loueur d’origine, ainsi qu’à tout recours contre le Bailleur - Cessionnaire du fait notamment de défaillance ou vice caché ou du fait de l'assurance , prestations de services , construction, livraison ou l’installation des Equipements , le Locataire conservant sur ces points tous les recours contre le fournisseur et ARROW CAPITAL SOLUTIONS . Si une action aboutit à une résolution judiciaire de la vente, objet du contrat, celui-ci est résilié à compter du jour où cette résolution sera devenue définitive. Le Locataire est alors redevable, des sommes stipulées en l’article 6.5. L’indemnité est exigible au jour de la résiliation. Le Bailleur - Cessionnaire imputera au paiement de cette indemnité les sommes effectivement reçues notamment du fournisseur du matériel en restitution du prix au titre de la résolution de la vente et ce, dans la limite du montant de l’indemnité. En outre, le Locataire reste garant solidaire avec ARROW CAPITAL SOLUTIONS, le fournisseur ou le constructeur pour les sommes dues par ceux-ci au Bailleur
+						\n- Cessionnaire
+						\nARROW CAPITAL SOLUTIONS et le Locataire déclarent, sous leur responsabilité :
+						\n-que pour la location des Equipements il n'existe aucun autre document ou convention que ceux signés par le Bailleur - Cessionnaire. En tout état de cause seuls seront opposables à ce dernier les documents ou convention signés par lui
+						\n-que les Equipements sont conformes aux lois , règlements , au choix du Locataire ,qu'il bénéficie de toutes les garanties légales ou conventionnelles et qu'ils peuvent les céder sans restriction ni réserve."
+					],
+					[
+						"titre" => "ARTICLE 8 - RESPONSABILITE - RISQUES - ASSURANCES",
+						"texte" => "8.1 - RESPONSABILITE: En aucun cas, ARROW CAPITAL SOLUTIONS ne pourra être tenue pour responsable d'un préjudice financier commercial ou d'une autre nature causé directement ou indirectement par l'utilisation ou le fonctionnement des Equipements. L’intervention de ARROW CAPITAL SOLUTIONS se faisant à titre purement financier, le locataire ne pourra se prévaloir d’un quelconque dysfonctionnement ou défaillance dans la performance des équipements, matériels et logiciels objets du contrat ou de la non-réalisation des solutions techniques attendues pour arrêter le paiement des loyers et il s’engage dès à présent à régler les loyers dans leur intégralité.
+						\n8.2 - RISQUES : De la livraison, reception jusqu'à la restitution de l'Equipement, le Locataire est tenu pour responsable de la perte, du vol, de la détériration ou de la destruction de l'Equipement, qu'elle qu'en soit la cause, même si celle-ci relève d'un cas fortuit ou de force majeure. Le risque afférant à une usure prématurée est également à la charge du Locataire. Le Locataire ne se considèrera pas libéré de ses obligations contractuelles lors de la survenance de tels évènements et doit en informer immédiatement ARROW CAPITAL SOLUTIONS."
+					]
+				]
+			],
+			[
+				"left" => [
+					[
+						"titre" => null,
+						"texte" => "8.3 – ASSURANCES : Le Locataire s'engage à assurer à ses frais les Equipements, notamment contre tous les risques et périls. Il peut s'assurer auprès de la compagnie d'assurance de son choix qui délivrera une attestation d'assurance au profit du ARROW CAPITAL SOLUTIONS. L'attestation d'assurance doit faire apparaître la couverture des risques visés ainsi que, le cas échéant, la franchise convenue.
+						\nLe Locataire cède et transporte au profit de ARROW CAPITAL SOLUTIONS ou de son substitué le montant de toute indemnité d’assurance relative aux matériels loués à concurrence du montant total des loyers à courir jusqu’au terme du présent contrat, ainsi que ses droits contre l'éventuel responsable du dommage causé aux Equipements. Aussi longtemps que ARROW CAPITAL SOLUTIONS n'aura pas informé le Locataire de son intention de faire valoir lui-même ses droits, celui-ci s'oblige, en cas de sinistre, à les faire valoir à ses frais au nom de ARROW CAPITAL SOLUTIONS et d'exiger un paiement au profit de ARROW CAPITAL SOLUTIONS.
+						\n8.4 FRANCHISE - Le Locataire supporte dans tous les cas la franchise prévue et la responsabilité de tous dommages causés par le matériel.
+						\nEn cas de sinistre total, le Locataire est redevable d'une indemnité égale aux loyers, éventuellement impayés plus ceux restant à échoir sur toute la durée du contrat de location majorée de la valeur vénale du bien détruit à la veille du sinistre, sous déduction de l’indemnité éventuellement versée par la compagnie d’assurance. Cette indemnité sera majorée de la TVA."
+					],
+					[
+						"titre" => "ARTICLE 9 - EXTENSION - ADDITION - SUBSTITUTION",
+						"texte" => "Sous réserve d'avoir respecté toutes les obligations résultant du présent contrat, le Locataire pourra durant la période de location demander à ARROW CAPITAL SOLUTIONS le remplacement total ou partiel des Equipements et/ou l'adjonction d'Equipements complémentaires.\n Ces évolutions entraîneront une modification des loyers et/ou de la durée de la location. Elles sont soumises à l'accord préalable de ARROW CAPITAL SOLUTIONS. En cas d'accord des parties sur les nouvelles conditions financières, un avenant constatant les conditions particulières sera signé par les parties."
+					],
+					[
+						"titre" => "ARTICLE 10 - FIN DE LOCATION - RECONDUCTION",
+						"texte" => "10.1 Quatre (4) mois avant l'expiration de la période de location telle que précisée à l’Art. 2 des Conditions Particulières, le Locataire devra informer ARROW CAPITAL SOLUTIONS, par lettre recommandée avec accusé de réception, son intention de ne pas poursuivre le contrat de location.
+						\n10.2 A défaut du Locataire d'avoir fait connaître son intention, la location se poursuivra en l’absence d’accord entre les parties, par tacite reconduction, aux conditions générales du présent contrat et sur la base du dernier loyer par période de douze (12) mois minimum; le Locataire ou ARROW CAPITAL SOLUTIONS pourra y mettre fin avec un préavis de quatre (4) mois avant le terme des douze (12) mois."
+					],
+					[
+						"titre" => "ARTICLE 11 - RESILIATION PAR ARROW CAPITAL SOLUTIONS",
+						"texte" => "11.1 ARROW CAPITAL SOLUTIONS pourra résilier de plein droit le présent contrat, avec effet immédiat, après mise en demeure préalable, sans intervention judiciaire et sans être redevable de quelque indemnité que ce soit, dans les cas suivants :\na) Si le Locataire manque au paiement à l'échéance d'un seul terme du loyer ou plus généralement à l'une quelconquede ses obligations dans le cadre du présent contrat.\nb) Si le Locataire cède à un tiers le présent contrat ou l'un quelconque des droits qui lui sont attachés (le terme céder devra être interprété au sens large et comprenant notamment la cession d'une participation majoritaire dans le capital social, la cession ou le transfert du fonds de commerce du Locataire).\nc) Si le manquement par le Locataire au respect de ses obligations précisées dans les contrats de licence des logiciels loués, conduisait l'éditeur à priver le Locataire de ses droits d'usage.
+						\n11.2 Le Locataire devra, dès la résiliation, restituer immédiatement et à ses frais les Equipements à ARROW CAPITAL SOLUTIONS dans les conditions prévues à l'Article 12 et lui verser:\n- les sommes dues au titre des loyers échus et impayés, fixée"
+					],
+
+				],
+				"right" => [
+					["titre" => null,
+					"texte" => "- une somme égale à dix pour cent (10 %) des loyers restant à échoir, à titre d'indemnité de résiliation.\nLes sommes citées ci-dessus porteront intérêt mensuel de 1.5 %.
+					\n11.3 En cas d'annulation de son engagement par le Locataire après sa signature, le Locataire sera redevable d'une indemnité forfaitaire et irréductible équivalente aux six (6) premiers mois de loyers TTC prévus aux conditions particulières"],
+					[
+						"titre" => "ARTICLE 12 - RESTlTUTION",
+						"texte" => "12.1 En cas de fin du présent contrat pour quelque cause que ce soit, le Locataire s'oblige à restituer à ses frais le matériel en bon état d'entretien au lieu qui sera désigné par ARROW CAPITAL SOLUTIONS. Si la restitution ne s’avère plus possible, le Locataire règlera à ARROW CAPITAL SOLUTIONS une indemnité forfaitaire équivalente à six mois de loyer.
+						\n12.2 Les frais de démontage, d'emballage et de remise en état ou de destruction ainsi que de transport seront à la charge exclusive du Locataire."
+					],
+					[
+						"titre" => "ARTICLE 13 – DIVERS",
+						"texte" => "13.1 Le présent contrat, qui se compose des conditions générales, particulières et des annexes aux conditions particulières, annule et remplace tous les accords antérieurs entre les parties, écrits ou verbaux, ayant le même objet.
+						\n13.2 Le présent contrat ainsi que toute modification, résiliation ou renonciation de/à l'une quelconque des dispositions des présentes ne pourra prendre effet qu’après avoir fait l’objet d’un accord écrit dûment signé par les parties aux présentes.
+						\n13.3 Sont à la charge du Locataire, tous frais et honoraires, toutes dépenses que ARROW CAPITAL SOLUTIONS devrait exposer pour recouvrer sa créance et/ou satisfaire l'obligation de restitution du Locataire défaillant.
+						\n13.4 Le présent contrat est régi par les lois françaises.\nTout litige relatif au présent contrat sera de la compétence exclusive des Tribunaux de Paris, y compris en cas de référé, d'appel en garantie ou de pluralité de défendeurs.
+						\n13.5 Le Locataire garantit à ARROW CAPITAL SOLUTIONS qu’il se conformera à toutes les lois et règlements applicables, y compris, sans limitation, toutes les lois anti-corruption applicables au Locataire et les lois régissant les transactions avec l’état, les administrations, les organismes publics et privés, les lois antitrust et de libre concurrence, les lois applicables aux les délits d'initiés, les lois financières et comptables. Le Locataire se conformera au Code de conduite des Partenaires Arrow, qui peut être consulté ici : http://www.arrow.com/about_arrow/BusinessPartnerCodeofConduct.pdf\n(tel que mis à jour occasionnellement) ou à un code de conduite au moins aussi contraignant que celui d’Arrow.
+						\n13.6 Les informations figurant dans les présentes ont un caractère obligatoire pour le traitement de la demande du Locataire. Ces informations ou celles recueillies ultérieurement ne seront utilisées et ne feront l’objet de communication aux destinataires déclarés à la CNIL - Commission Nationale de l’Informatique et des Libertés - que pour les seules nécessités de gestion du présent contrat ou d’actions commerciales. Ces informations pourront toutefois être communiquées aux entreprises extérieures liées contractuellement à ARROW CAPITAL SOLUTIONS pour la gestion et l’exécution des présentes dans la stricte limite de leurs attributions respectives ainsi qu’aux seuls Etablissements de Crédit soumis au secret professionnel bancaire en vertu des dispositions des articles L.511-33 et suivants du Code monétaire et financier, liés à ARROW CAPITAL SOLUTIONS en vue de la gestion de leurs financements. Elles pourront donner lieu à exercice du droit d’accès et de rectification auprès de ARROW CAPITAL SOLUTIONS dans les conditions prévues par la loi du 6 janvier 1978. En signant ce contrat, le Locataire accepte de recevoir des propositions commerciales de sociétés auxquelles ARROW CAPITAL SOLUTIONS peut communiquer ses nom et adresse."
+					]
+				]
 			]
-			];
-		$this->tableauBigHead(["Frais", "Fixes ou variables", "Montant / Methode de calcul"],$data,[40,40,105],5);
 
+		];
+		$this->affichageCG($pages, false);
 
-		$this->articleContrat("ARTICLE 5 : ABSENCE DE DROIT DE RETRACTATION");
-		$this->multicell(0,4,"CONFORMEMENT AUX DISPOSITIONS DE L’ARTICLE L. 221-28 DU CODE DE LA CONSOMMATION, LE CLIENT RECONNAIT EXPRESSEMENT QUE, DANS LE CADRE DE LA CONCLUSION DU CONTRAT D’ABONNEMENT, IL NE BENEFICIE D’AUCUN DROIT DE RETRACTATION",0,1);
+		$this->cell(0,4,"Le Locataire reconnaît avoir également pris connaissance des conditions particulières", 0, 1,'C');
+		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", "ARROW CAPITAL SOLUTIONS");
+		$this->conditionParContratLocation();
+		$this->SetLeftMargin(0);
+		$pageCount = $this->setSourceFile(__PDF_PATH__."arrow/mandatSepa.pdf");
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
 
-		$this->articleContrat("ARTICLE 6 : VALIDITE");
-		$this->multicell(0,4,"La conclusion du Contrat d’Abonnement GOA FREE est conditionnée à l’acceptation du Comité des Agréments de GoAb, en considération notamment des informations et documents communiqués par le Client. L’acceptation ou le refus sera notifié au Client dans un délai maximum de 7 jours suivant la signature des présentes.",0,1);
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx,-10,0, 0 ,0 , true);
+		}
+		$this->SetLeftMargin(15);
 
+		$this->pvReceptionEquipements();
+	}
+	function conditionParContratLocation() {
+		$this->AddPage();
+		$this->image($this->logo,10,10,60);
 
-		$this->setY(219);
-		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Fait en deux exemplaires",0,'C');
+		$this->setY(30);
+		$this->setFont('Arial','B', '10');
+		$this->cell(0,4,"CONDITIONS PARTICULIERES DU CONTRAT DE LOCATION N°".$this->commande["ref"],0,1,'C');
 
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,38,200,38);
+		$this->ln(6);
 
-		$this->SetDrawColor(0,0,0);
+		$this->titleContrat("Article 1: OBJET");
+
+		$this->multicell(0,4, "Les présentes Conditions Particulières s'appliquent aux Equipements suivants :");
+		$this->ln(4);
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,0,0);
+		$this->cell(50,10, "Réference",1,0,'C',1);
+		$this->cell(100,10, "Description",1,0,'C',1);
+		$this->cell(30,10, "Qté",1,1,'C',1);
 		$this->SetTextColor(0,0,0);
-		$this->setfont('arial','',9);
-		$this->setFillColor(255,255,0);
+		$this->setfont('arial','',8);
 
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
-		);
+		foreach($this->lignes as $l) {
+			$this->cell(50, 7, $l["ref"], 1, 0, 'L');
+			$this->cell(100, 7, $l["produit"], 1, 0, 'L');
+			$this->cell(30, 7, $l["quantite"], 1, 1, 'C');
+		}
 
-		$y = $this->gety()+2;
-		$t = "Le Client";
+		$this->ln(4);
+		$this->multicell(0,4, "L’Equipement sera installé à l'adresse suivante :");
+		$this->SetLeftMargin(45);
+		$this->cell(0,4,$this->client["livraison_adresse"],0, 1);
+		if ($this->client["livraison_adresse_2"]) $this->cell(0,4,$this->client["livraison_adresse_2"],0, 1);
+		if ($this->client["livraison_adresse_3"]) $this->cell(0,4,$this->client["livraison_adresse_3"],0, 1);
+		$this->cell(0,4,$this->client["livraison_cp"]." - ".$this->client["livraison_ville"],0, 1);
+		$this->SetLeftMargin(15);
 
-		$this->cadre(20,$y,80,48,$cadre,$t);
+		$this->ln(4);
+		$this->multicell(0,4,"A la date de réception des Equipements dans les locaux du Locataire, la réception étant validée par la signature du Procès-Verbal de Réception conformément à l’article 2.2 ou dans les conditions prévues à l'article 2.3 des Conditions Générales");
 
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,"Signature et cachet commercial : "
-		);
-		$this->cadre(110,$y,80,48,$cadre,"Go Abonnement");
 
-		$this->mandatSepa();
+		$this->titleContrat("Article 2: DUREE DE LA LOCATION");
+		$this->multicell(0,4, "La durée ferme et irrévocable de la location sera de ".$this->loyer[0]["duree"]." ".$this->loyer[0]["frequence_loyer"].", et prendra effet le premier jour du trimestre suivant la réception de la totalité des équipements conformément à l’article 3 des Conditions Générales.");
+
+		$this->titleContrat("Article 3: LOYERS et PERIODICITE");
+		$this->multicell(0,4, "Les loyers sont calculés sur la base du prix des Equipements convenu par le locataire avec ses fournisseurs.\nIls sont calculés hors assurances.
+		\nLoyers HT : ".$this->loyer[0]["loyer"]." EUR HT\nPériodicité : ".$this->loyer[0]["frequence_loyer"]."\nCes loyers s’entendent Terme à échoir, et le règlement s’effectuera par prélèvement automatique.");
+
+		$this->titleContrat("Article 4: INDEXATION");
+		$this->multicell(0,4,"Si l’indice de référence (défini ci-dessous) venait à s’écarter de plus de 0.5 points entre la date de signature du présent contrat et la date de livraison, le montant du loyer serait ajusté proportionnellement.
+		\nIndice de référence :\nEURIBOR 12 mois + THO / 2\nT.H.O. : Taux de Rendement Moyen Brut hebdomadaire des Obligations de première signature sur le marché secondaire. Moyenne arithmétique mensuelle des THO.
+		\nLe taux deviendra ferme à la date de départ de la Location.");
+
+		$this->AddPage();
+		$this->titleContrat("Article 5: CONDITIONS D'EVOLUTION");
+		$this->multicell(0,4,"5.1. Ajout de matériels complémentaires\nLe financement de commandes d'Equipements supplémentaires fera l'objet d'une annexe au contrat de Location initial. Les équipements complémentaires, mises à jour et matériels autonomes pourront être financés sur une durée autonome ou sur la durée résiduelle.");
+
+		$this->ln(6);
+		$this->cell(0,4,"Le Locataire reconnaît avoir également pris connaissance des conditions particulières", 0, 1,'C');
+		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", "ARROW CAPITAL SOLUTIONS");
+	}
+	function pvReceptionEquipements() {
+		$this->AddPage();
+		$this->image($this->logo,10,10,60);
+
+		$this->setY(30);
+		$this->setFont('Arial','B', '10');
+		$this->multicell(0,4,"CONTRAT DE LOCATION N°".$this->commande["ref"]."\nPROCES-VERBAL DE RECEPTION DES EQUIPEMENTS",0,'C');
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->ln(6);
+
+		$this->cell(0,4,"LOCATAIRE",0,1);
+		$this->ln(2);
+		$this->line(15,$this->getY(),195,$this->getY());
+		$this->ln(2);
+		$this->setFont('Arial','', 8);
+		$this->cell(0,4,"Société: ".$this->client["societe"], 0, 1);
+		$this->cell(0,4,"Adresse: ".$this->client["adresse"]." ".$this->client["cp"]." - ".$this->client["ville"], 0, 1);
+
+		$this->ln(4);
+		$this->setFont('Arial','B', '10');
+		$this->cell(0,4,"EQUIPEMENTS",0,1);
+		$this->ln(2);
+		$this->line(15,$this->getY(),195,$this->getY());
+		$this->ln(4);
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,0,0);
+		$this->cell(50,10, "Réference",1,0,'C',1);
+		$this->cell(100,10, "Description",1,0,'C',1);
+		$this->cell(30,10, "Qté",1,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+
+		foreach($this->lignes as $l) {
+			$this->cell(50, 7, $l["ref"], 1, 0, 'L');
+			$this->cell(100, 7, $l["produit"], 1, 0, 'L');
+			$this->cell(30, 7, $l["quantite"], 1, 1, 'C');
+		}
+
+
+		$this->ln(4);
+		$this->setFont('Arial','B', '10');
+		$this->cell(0,4,"LE LOCATAIRE",0,1);
+		$this->ln(2);
+		$this->setFont('Arial','', 8);
+		$this->multicell(0,4,"- atteste avoir réceptionné les équipements désignés ci-dessus livrés en bon état de marche sans vice ni défaut apparent et conforme à la commande passée par le Bailleur selon les prescriptions qui lui ont été fournies à cet effet et prévues dans les conditions particulières du contrat de location.\n- certifie que les équipements sont conformes aux dispositions du Code du Travail et aux prescriptions réglementaires en matière d’hygiène, d’environnement et de sécurité du travail qui lui sont applicables.\n- déclare accepter lesdits équipements sans réserve, ni restriction et autoriser le Bailleur à régler les fournisseurs, ou toute autre personne désignée par ce dernier.");
+		$this->ln(4);
+
+		$this->setFont('Arial', 'B', 8);
+		$this->cell(0,4,"Date de livraison des équipements : Le ".date("d/m/Y", strtotime($this->affaire["date_livraison_prevu"])), 0, 1);
+		$this->setFont('Arial', '', 8);
+		$this->ln(10);
+		$this->cell(0,4,"Fait à .................................................................., le ............................", 0, 1);
+
+		$this->ln(10);
+		$this->setFont('Arial', 'B', 8);
+		$this->cell(0,4,"Le Locataire :", 0, 1);
+		$this->setFont('Arial', '', 8);
+		$this->ln(4);
+		$lines = [
+
+			"Nom & Qualité" => $this->contact["prenom"]." ".$this->contact["nom"]." - ".$this->contact["fonction"],
+			"Cachet & Signature" => ""
+		];
+		foreach($lines as $k => $v) {
+			$this->cell(90, 4, $k.": ".$v, 0, 1);
+		}
+
 	}
 
-	public function contrat_goa_location($id, $type_client) {
-		$num_article = 1;
-		$this->colsProduit = array("border"=>"TB","size"=>9,"flag"=>"colsProduit");
-		$this->colsProduitFirst = array("border"=>"TLB","size"=>9,"flag"=>"colsProduitFirst");
-		$this->colsProduitLast = array("border"=>"TBR","size"=>9,"flag"=>"colsProduitLast");
-		$this->colsProduitAvecDetail = array("border"=>"T","size"=>9,"flag"=>"colsProduitAvecDetail");
-		$this->colsProduitAvecDetailFirst = array("border"=>"TL","size"=>9,"flag"=>"colsProduitAvecDetailFirst");
-		$this->colsProduitAvecDetailLast = array("border"=>"TR","size"=>9,"flag"=>"colsProduitAvecDetailLast");
-		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
+	public function contrat_mise_a_disposition_logicielA4Particulier($id, $signature, $sellAndSign) { $this->contrat_mise_a_disposition_logiciel($id, "particulier"); }
+	public function contrat_mise_a_disposition_logicielA4Societe($id, $signature, $sellAndSign) { $this->contrat_mise_a_disposition_logiciel($id, "pro"); }
+	function contrat_mise_a_disposition_logiciel($id, $type) {
+		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->contact =  ATF::contact()->select($this->devis['id_contact']);
 
-		$ref = $this->commande['ref'];
-		if ($this->affaire['ref_externe']) $ref = $this->affaire['ref_externe'];
+		$this->noPageNo = true;
+
+		$this->ctMiseADispoPage1();
+		$this->cg_ct_mise_a_disposition();
+		$this->signatureInfos($this->contact, 'LE BAILLEUR', 'LE CLIENT');
+		$this->annexeContratA();
+		$this->SetLeftMargin(0);
+		$pageCount = $this->setSourceFile(__PDF_PATH__."arrow/mandatSepa.pdf");
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx,-10,0, 0 ,0 , true);
+		}
+		$this->SetLeftMargin(15);
+		$this->pvDelivranceConforme();
+	}
+	function ctMiseADispoPage1(){
+		$this->unsetFooter();
+		$this->image($this->logo,10,10,60);
+
+		$this->setY(30);
+		$this->cell(0,4,"CONTRAT DE MISE A DISPOSITION DE LOGICIELS",0,1,'C');
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,38,200,38);
+		$this->ln(6);
+
+		$this->entete("Bailleur", "Client");
 
 
-		$this->headerContrat("CONDITIONS PARTICULIERES au Contrat de location n° : ".$ref, $type_client);
+	}
+	function cg_ct_mise_a_disposition() {
+		$this->setFont('Arial','B', 8);
+		$this->cell(0,4,"CONDITIONS GENERALES",0,1, 'C');
+		$this->ln(2);
+		$this->cell(0,4,"PREAMBULE",0,1, 'C');
+		$this->ln(2);
 
-		$this->articleContrat("ARTICLE ".$num_article." : CONTRAT DE LOCATION");
-		$num_article++;
-		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$ref.".",0,1);
-		$this->ln(3);
+		$this->setFont('Arial','', 7);
+		$this->multicell(0,3,"Le Client souhaite pouvoir louer un ensemble de LOGICIELS pour les besoins de ses activités.\nLe Client a pris connaissance des termes et conditions de l’ensemble des licences d’utilisation des LOGICIELS.\nSous réserve du respect par le Client des termes du présent contrat, le Bailleur accepte de mettre à la disposition du Client les LOGICIELS dans le cadre d’une location financière.\nA ce titre, il est rappelé que ACS n’intervient qu’en qualité de bailleur pour la mise à disposition temporaire des LOGICIELS. Le Client sera dans tous les cas lié par les termes et conditions de licence de chaque éditeur pour les LOGICIELS.");
 
-		$head = array("VEHICULE(S) ET SERVICES ASSOCIES","Taux de TVA sur les loyers",);
-		$w = array(150,35);
-		$styles = [];
-        if ($this->lignes) {
-            $this->tableauBigHead($head, [], $w, 5, $styles);
-            $this->tableauProduit();
-        }
-		$this->ln(3);
+		$y = $this->getY();
+
+		$this->ln(2);
+		$this->setFont('Arial','B', 7);
+		$this->cell(90,4,"ARTICLE 1. DEFINITIONS",0,1);
 
 
-		$this->articleContrat("ARTICLE ".$num_article." : DUREE DU CONTRAT DE LOCATION");
-		$num_article++;
-		$this->multicell(0,4,"L'objet du contrat est la mise à disposition d’un véhicule dont le détail figure ci-après ainsi que des services associés, dans le cadre du Contrat d’Abonnement ".$ref.".",0,1);
-		$this->ln(3);
+		$pages = [
+			[
+				"left" => [
+					["titre" => "ANNEXE A :", "texte" => "Document annexé au présent CONTRAT DE MISE A DISPOSITION sur lequel figurent la désignation des LOGICIELS, objet de la MISE A DISPOSITION, ainsi que les caractéristiques de l'opération et les éventuelles conditions particulières applicables."],
+					["titre" => "FOURNISSEUR :", "texte" => "Editeur ou distributeur auprès duquel L’Utilisateur a choisi les LOGICIELS objet du présent contrat."],
+					["titre" => "ÉDITEUR :", "texte" => "éditeur d’un LOGICIEL disposant des droits patrimoniaux relatifs à celui-ci et consentant à l’Utilisateur les droits d’utilisation dans le cadre de la licence."],
+					["titre" => "LOGICIELS :", "texte" => "Les exemplaires des LOGICIELS désignés en ANNEXE A, pour lesquels le Bailleur a obtenu de leur ÉDITEUR le droit de les mettre à disposition. Les conditions d'utilisation du logiciel ont été préalablement acceptées par l’Utilisateur."],
+					["titre" => "Délivrance conforme :", "texte" => "Ensemble des opérations effectuées par L’Utilisateur (et/ou un tiers désigné par l’Utilisateur) et le FOURNISSEUR, à l'issue desquelles il est attesté de l’absence de défaut de conformité des LOGICIELS livrés par rapport à leur documentation et de leur support. La DELIVRANCE CONFORME est attestée par la signature par Le Client d’un procès-verbal de réception conforme sans réserve. "],
+					["titre" => "LIVRAISON :", "texte" => "fourniture de la totalité des LOGICIELS sur leur support au Client."],
+					["titre" => null, "texte" => "Les termes ci-dessus définis sont indiqués en majuscules dans le présent document. Lorsque ces termes apparaissent en minuscules, ils retrouvent leur sens générique."]
+				],
+				"right" => [
+					["titre" => "ARTICLE 2. DOCUMENTS CONTRACTUELS", "texte" => "2.1. Les présentes conditions générales et l’ANNEXE A contiennent l'intégralité des engagements des Parties l'une à l'égard de l'autre, relatifs à la MISE A DISPOSITION des LOGICIELS. L'ensemble de ces documents forme le CONTRAT DE MISE A DISPOSITION.\n\n2.2. En cas de contradiction entre ces différents documents, les Parties conviennent expressément que les conditions générales prévaudront sur l’ANNEXE A (excepté lorsqu’une dérogation expresse aux conditions générales y est mentionnée)."],
+					["titre" => "ARTICLE 3. OBJET DU CONTRAT DE MISE A DISPOSITION", "texte" => "3.1. Le présent CONTRAT DE MISE A DISPOSITION prend effet à sa signature par les Parties, il a pour objet de fixer les modalités, notamment financières, de mise à disposition des LOGICIELS.\n\n3.2. Il n’emporte aucune modification aux conditions d’utilisation des LOGICIELS fixées par les EDITEURS à l’exception d’éventuelles dispositions relatives aux redevances."],
+					["titre" => "ARTICLE 4. CHOIX DES LOGICIELS - LIVRAISON - RÉCEPTION", "texte" => "4.1. Les LOGICIELS sont choisis auprès du FOURNISSEUR exclusivement par L’Utilisateur, tant pour son compte que celui du Bailleur. Le Client détermine librement avec le FOURNISSEUR, les conditions, délais, modalités et lieu de livraison. Pour le cas où des prestations complémentaires de Mise en OEuvre sont prévues en Annexe A, les conditions de leur réalisation sont déterminées exclusivement entre l’utilisateur et le fournisseur ou l’Editeur, sans remise en cause du Procès-Verbal de délivrance conforme signé par l’utilisateur.\n\n4.2. Le Bailleur sera présumé avoir rempli l’ensemble de ses obligations relatives aux LOGICIELS dès lors que le Client aura retourné signé le procès-verbal de DELIVRANCE CONFORME sans réserve."],
+				]
+				],
+			[
+				"left" => [
+					["titre" => "ARTICLE 5. GARANTIE DES LOGICIELS - RESPONSABILITE", "texte" => "5.1. Le Bailleur, dont l’intervention est de nature financière, n’engage pas sa responsabilité au regard des LOGICIELS choisis par Le Client auprès des EDITEURS.
+					\n5.2. Il est rappelé que le Bailleur ne se substitue pas à l'Editeur et que les garanties légales ou contractuelles ne lui sont pas opposables et ne lient que l'Editeur et Le Client.
+					\n5.3. Le Client fera son affaire personnelle de tout litige ou difficulté résultant d'un des motifs ci-dessus."],
+					["titre" => "ARTICLE 6. UTILISATION - SUPPORT – MAINTENANCE", "texte" => "6.1. Le Client s'engage à utiliser les LOGICIELS conformément aux termes de chaque licence d'utilisation applicable à chacun des LOGICIELS visés en ANNEXE A.
+					\n6.2. L'Editeur demeure propriétaire de l'intégralité des droits patrimoniaux de propriété intellectuelle afférents aux LOGICIELS et le bailleur demeure propriétaire des exemplaires. Le Client ne peut pas, sauf accord écrit de l'Editeur et du Bailleur, mettre à disposition d'un tiers, sous-louer, concéder ou nantir tout ou partie des LOGICIELS, céder ou modifier les droits de l'une quelconque des licences d'utilisation applicables aux LOGICIELS ou (sauf accord du Bailleur) résultant du présent CONTRAT DE MISE A DISPOSITION, ou remettre tout ou partie des LOGICIELS à un tiers.
+					\n6.3. Le Client devra conclure un contrat de support et de maintenance pour les LOGICIELS auprès du FOURNISSEUR, de L'EDITEUR des LOGICIELS ou de tout tiers de son choix. Excepté en cas de disposition expresse contraire prévue à l'ANNEXE A, ce contrat de support et de maintenance est indépendant du contrat de MISE A DISPOSITION. Il ne fait pas l'objet d'une quelconque facturation par le Bailleur.
+					\n6.4. Le Client pourra effectuer une copie de sauvegarde, conformément aux dispositions de l'article L. 122-6-1-II du Code de la Propriété Intellectuelle, et pourra faire assurer les risques générés par la MISE A DISPOSITION des LOGICIELS."],
+					["titre" => "ARTICLE 7. DATE DE PRISE D'EFFET – LOYERS", "texte" => "7.1. Pour l'ensemble des LOGICIELS mis à disposition, Le Client paiera au Bailleur les loyers de MISE A DISPOSITION indiqués à l'ANNEXE A, augmentés des taxes en vigueur au moment de l'exigibilité de chaque terme. Les loyers de MISE A DISPOSITION indiqués à l'ANNEXE A sont fermes et non révisables pendant toute la durée de la MISE A DISPOSITION telle que définie à l'article 13 ci-dessous, sauf adjonctions ou échanges de LOGICIELS tels que prévus à l'article 10.
+					\n7.2. La durée de la MISE A DISPOSITION prend effet dans les conditions définies à l'article 13 ci-dessous.
+					\n7.3. Les loyers relatifs à la MISE A DISPOSITION des LOGICIELS deviendront exigibles de plein droit à compter de la date de signature par Le Client du procès-verbal de DELIVRANCE CONFORME des LOGICIELS. Ils sont payables le premier jour de chaque période (telle que définie en ANNEXE A) par virement ou prélèvement bancaire. A cet effet, l'Utilisateur signera une autorisation de prélèvement lors de la signature du présent CONTRAT DE MISE A DISPOSITION et procédera aux formalités requises à cet effet.
+					\n7.4. Les loyers de MISE A DISPOSITION resteront dus en toute circonstance, même dans le cas où tout ou partie des LOGICIELS cessent de fonctionner ou ne peuvent être utilisés pour une durée et une cause quelconques, y compris en cas de résiliation de la licence d'utilisation de tout ou partie des LOGICIELS consécutive au non respect par l'Utilisateur des conditions d'utilisation. Si le CONTRAT DE MISE A DISPOSITION est résilié en raison d'un des évènements ci-dessus, Le Client sera alors redevable de l'indemnité de résiliation prévue à l'article 11 ci-après.
+					\n7.5. Si les LOGICIELS objet du CONTRAT DE MISE A DISPOSITION ne sont pas conformes à leur documentation ou contiennent des vices cachés, Le Client ne pourra adresser de réclamation à ce titre qu'au FOURNISSEUR et/ou à l'EDITEUR et renonce à mettre en cause, directement ou indirectement, la responsabilité du Bailleur ainsi que la validité ou la continuation du CONTRAT DE MISE A DISPOSITION. Les Parties conviennent expressément, par dérogation à l'article 1724 du Code Civil, que Le Client ne pourra demander aucune diminution du montant des redevances de MISE A DISPOSITION, même si les LOGICIELS sont inutilisables pendant plus de 40 jours.
+					\n7.6. En cas de retard dans le paiement de toute somme due par Le Client, les intérêts de retard seront calculés à compter du jour suivant la date d'échéance du loyer ou de la somme due concernée jusqu'à celle du paiement effectif, au taux fixé conventionnellement à trois (3) fois le taux d'intérêt légal auquel s'ajoutera le remboursement d'une indemnité forfaitaire pour les frais engagés pour tout rappel d'échéance d'un montant de 40 euros."]
+				],
+				"right" => [
+					["titre" => "ARTICLE 8. IMPOTS ET TAXES", "texte" => "Toute somme due au titre du présent CONTRAT DE MISE A DISPOSITION, notamment les loyers, à l'exception des intérêts de retard dus au titre de l'article 7.6 ci-dessus, sera majorée de la T.V.A. au taux en vigueur au moment du paiement de tous les droits, impôts ou taxes applicables."
+					],
+					["titre" => "ARTICLE 9. RESPONSABILITE", "texte" => "9.1. Le Bailleur n'est en aucun cas responsable :\n- des retards ou manquements à l'une des obligations mises à sa charge par le présent CONTRAT DE MISE A DISPOSITION dès lors que ce retard ou ce manquement est dû à un cas de force majeure, à un cas fortuit, au fait du Client, du Fournisseur, de l'Editeur et plus généralement de tout tiers ;
+					\n9.2. Le Client est, à l'égard du bailleur, seul responsable de l'utilisation des LOGICIELS objet du présent CONTRAT DE MISE A DISPOSITION et notamment de l'utilisation conforme aux conditions d'utilisation fixées par l'éditeur, et en est le seul gardien. Chaque LOGICIEL est utilisé sous la seule direction, le contrôle et la responsabilité du Client, qui en détermine notamment l'usage adéquat.
+					\n9.3. A l'exception de la livraison conforme des LOGICIELS laquelle constitue une obligation de résultat, le Bailleur ne sera tenu qu'à une obligation de moyens dans l'exécution de ses obligations. Le Bailleur ne pourra voir sa responsabilité recherchée que pour les dommages directs résultant de l'inexécution ou de l'exécution tardive de ses obligations. Les Parties conviennent que constituent des dommages indirects, n'ouvrant pas droit à indemnisation, tout préjudice financier, d'atteinte à l'image de marque, de perte de bénéfice ou d'économie escomptée, de préjudice commercial, des pertes de données, causé directement ou indirectement par l'utilisation ou le fonctionnement des LOGICIELS, leurs dysfonctionnements, erreurs ou indisponibilité.
+					\n9.4. En tout état de cause, les Parties conviennent que le montant total des dommages intérêts qui pourraient être réclamés par Le Client et auxquels le Bailleur pourrait être condamné, quels qu'en soient la cause et le fondement, ne pourra excéder le montant total des loyers H.T. de MISE A DISPOSITION dus par l'Utilisateur, conformément aux dispositions des articles 1151 et 1152 du Code Civil."
+					],
+					["titre" => "ARTICLE 10. ADJONCTION OU ECHANGE DE LOGICIELS", "texte" => "10.1. Le Client pourra demander au Bailleur, au cours de l'exécution du présent CONTRAT DE MISE A DISPOSITION :\n- d'inclure des LOGICIELS additionnels à ceux figurant à l'ANNEXE A. Les conditions financières et la durée de la MISE A DISPOSITION seront alors fixées pour ces nouveaux LOGICIELS, d'un commun accord entre le Bailleur et L'Utilisateur.\n- le remplacement total ou partiel des LOGICIELS mis à disposition.\nEn cas d'accord du Bailleur, les conditions financières et la durée de la MISE A DISPOSITION seront alors fixées pour ces nouveaux LOGICIELS et feront l'objet d'un avenant au présent CONTRAT DE MISE A DISPOSITION.
+					\n10.2. Il est précisé que le ou les contrats de maintenance des LOGICIELS qui devront être souscrits par l'Utilisateur pour les LOGICIELS sont totalement indépendants du présent CONTRAT DE MISE A DISPOSITION. En conséquence, la résiliation, la cessation ou la résolution de tout ou partie des contrats de maintenance n'aura aucun effet sur le présent CONTRAT DE MISE A DISPOSITION. Le Client garantit faire son affaire des conséquences liées à la continuation ou la résiliation des contrats de maintenance susvisés en cas de résiliation ou d'arrivée au terme du présent CONTRAT DE MISE A DISPOSITION.
+					\n10.3. En tout état de cause, toute adjonction ou échange de LOGICIELS sera conditionné à l'accord préalable de l'Editeur."
+					],
+					["titre" => "ARTICLE 11. RESILIATION DU CONTRAT DE MISE À DISPOSITION", "texte" => "11.1. Le présent CONTRAT DE MISE A DISPOSITION est conclu entre les Parties dès sa signature.
+					\n11.2. Le Client est fondé à résilier de plein droit le présent CONTRAT DE MISE A DISPOSITION en cas de manquement grave du Bailleur aux obligations prévues aux présentes, sans qu’il soit besoin de remplir aucune formalité judiciaire, trente (30) jours après l'envoi au Bailleur d’une mise en demeure de remédier au manquement, restée sans effet.
+					\n11.3. Le présent CONTRAT DE MISE A DISPOSITION pourra être résilié de plein droit par le Bailleur, sans qu’il soit besoin de remplir aucune formalité judiciaire, trente (30) jours après l'envoi par le Bailleur d’une mise en demeure restée sans effet, dans les cas suivants :\n- non paiement à l’échéance de l’un des loyers,\n- manquement grave par l’Utilisateur à ses obligations contractuelles au titre du présent CONTRAT DE MISE A DISPOSITION.
+					\n11.4. La résiliation du CONTRAT DE MISE A DISPOSITION dans l’un des cas visés au point 11.3 ci-dessus entraînera de plein droit la déchéance du terme de l’ensemble des loyers restant à devoir, indépendamment du droit pour le BAILLEUR de demander réparation de son entier préjudice."
+					]
+				]
+			],
+			[
+				"left" => [
+					["titre" => null, "texte" => "11.5. En conséquence de la résiliation du CONTRAT DE MISE A DISPOSITION, l'Utilisateur devra :\n- verser immédiatement au Bailleur la totalité des loyers échus et impayés ainsi que les loyers restant à échoir au jour de la résiliation,\n- honorer les obligations prévues à l’article 12 ci dessous.
+					\n11.6. Le présent CONTRAT DE MISE A DISPOSITION ne saurait être résilié, dénoncé ou annulé du fait de la résiliation, de la dénonciation, de l’annulation ou de l’impossibilité pour l’Utilisateur de souscrire à tout contrat portant sur du matériel informatique ou sur des prestations de maintenance des LOGICIELS. D’une manière générale, Le Client sera seul responsable des matériels informatiques et de leur adéquation aux spécifications techniques des LOGICIELS.",
+					],
+					["titre" => "ARTICLE 12. RESTITUTION", "texte" => "Sans préjudice des droits acquis par ailleurs par Le Client auprès de l’Editeur, en cas de résiliation du CONTRAT DE MISE A DISPOSITION, ou a l’échéance de son terme, l’utilisateur devra :\nRestituer au Bailleur ou toute personne désignée par lui les LOGICIELS objet du présent contrat.\nA défaut adresser au Bailleur les attestations confirmant qu’il a détruits ces LOGICIELS.",
+					],
+					["titre" => "ARTICLE 13. DUREE", "texte" => "La durée de la MISE A DISPOSITION prend effet à la signature du procès-verbal de DELIVRANCE CONFORME par l’Utilisateur qui rend exigible le paiement du premier loyer de MISE A DISPOSITION. La durée de la MISE A DISPOSITION , prévue à l’ ANNEXE A, est ferme et irrévocable.\nAu terme de la durée de MISE A DISPOSITION, le présent contrat cessera de produire ses effets. Toutefois, Le Client pourra continuer à utiliser les LOGICIELS dans le cadre de la licence qui lui a été consentie par ailleurs par l’Editeur, sans cout supplémentaire"
+					],
+					["titre" => "ARTICLE 14. CESSION - DELEGATION", "texte" => "14.1 Le Client reconnaît que le Bailleur l’a tenu informé de l’éventualité d’une cession des créances au profit d’une banque, d’un établissement financier. Le Client consent dès à présent et sans réserve à une telle opération et s’engage à signer à première demande du Bailleur tout document nécessaire à la régularisation de l’opération. Cette opération pourra lui être simplement et valablement signifiée par lettre recommandée avec accusé de réception.
+					\n14.2 En conséquence, le Cessionnaire sera substitué au Bailleur à la date de la cession, et acquerra tous les droits et obligations contre et envers Le Client, sous réserve de ce qui est dit à l’article 14.3. Le Client reconnaît expressément que le Cessionnaire deviendra le Bailleur et s’engage notamment à lui verser la totalité des redevances de mise à disposition, en principal, intérêts, accessoires et TVA à partir de la date de substitution.
+					\n14.3 Le Cessionnaire ne sera tenu à l’égard du Client d’aucune obligation, quelle qu’elle soit, à l’exception de laisser au Client la disposition des LOGICIELS conformément à l’article 13 ci-dessus. Toutes les autres obligations relatives au présent contrat et aux LOGICIELS resteront à la charge du Bailleur."
+					],
+					["titre" => "ARTICLE 15. ELECTION DE DOMICILE", "texte" => "Le Bailleur et Le Client élisent domicile à leur siège social indiqué ci-dessus. Sauf disposition contraire visée au présent contrat, toute notification afférente au CONTRAT DE MISE A DISPOSITION devra être donnée par lettre recommandée avec avis de réception. Toute modification des dispositions du CONTRAT DE MISE A DISPOSITION et de ses annexes ne pourra être effectuée que sous la forme d’un écrit sur support tangible signé des représentants légaux des Parties ou leur mandataire."
+					],
+					["titre" => "ARTICLE 16. DONNEES PERSONNELLES", "texte" => "16.1. Dans le cadre de leurs relations contractuelles, les parties s’engagent à respecter la réglementation en vigueur applicable au traitement de données à caractère personnel et, en particulier, le règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 . Les informations nominatives recueillies dans le cadre du présent CONTRAT DE MISE A DISPOSITION, à savoir les coordonnées du signataire du présent contrat et la copie de sa carte nationale d’identité, sont nécessaires pour le traitement de la demande du Client. Elles sont destinées au Bailleur pour les besoins de la gestion de l’opération. Il appartient au Client de fournir l’information aux personnes concernées par les opérations de traitement au moment de la collecte des données.
+					\n16.2. Elles pourront être communiquées par le Bailleur à l’établissement financier cessionnaire du présent contrat en cas de cession dans le cadre de l’article 14 des présentes, ce que le Client autorise expressément."
+					]
+				],
+				"right" => [
+					["titre" => null, "texte" => "16.3 Le Bailleur s'engage à :\n- traiter les données uniquement pour la ou les seule(s) finalité(s) exprimées au présent article ;\n- traiter les données conformément aux instructions documentées du Client. Si le Bailleur considère qu’une instruction constitue une violation du règlement européen sur la protection des données ou de toute autre disposition du droit de l’Union ou du droit des Etats membres relative à la protection des données, il en informe immédiatement le Client ;\n- garantir la confidentialité des données à caractère personnel traitées dans le cadre du présent contrat ;\n- veiller à ce que les personnes autorisées à traiter les données à caractère personnel en vertu du présent contrat (i) s’engagent à respecter la confidentialité ou soient soumises à une obligation légale appropriée de confidentialité, et (ii) reçoivent la formation nécessaire en matière de protection des données à caractère personnel ;\n- prendre en compte, s’agissant de ses outils, produits, applications ou services, les principes de protection des données dès la conception et de protection des données par défaut.
+					\nLe Bailleur notifiera au Client toute violation de données à caractère personnel dans un délai maximum de 48 heures après en avoir pris connaissance et par courriel. Cette notification est accompagnée de toute documentation utile afin de permettre au Client, si nécessaire, de notifier cette violation à l’autorité de contrôle compétente.
+					\nLe Bailleur s’engage à mettre en oeuvre les mesures de sécurité prévues par sa Charte Informatique.
+					\n16.4. Lorsque les personnes concernées exercent auprès du Bailleur des demandes d’exercice de leurs droits, le Bailleur adressera ces demandes dès réception par courrier électronique à la Direction Générale du Bailleur à l’adresse suivante : financing.acs.fr@arrow.com. Les droits d’accès, de rectification, ou d’opposition de l’Utilisateur peuvent être exercés auprès du secrétariat général du Bailleur à l'adresse du siège social. Le responsable du traitement est le Bailleur.
+					\n16.5 Au terme du contrat, le Bailleur s’engage à détruire toutes les données à caractère personnel du Client."
+					],
+					["titre" =>"ARTICLE 17. CLAUSE ATTRIBUTIVE DE COMPETENCE", "texte" => "Le présent CONTRAT DE MISE A DISPOSITION est soumis au droit français. Toutes difficultés relatives à la formation, l’exécution, la résiliation ou le terme du CONTRAT DE MISE A DISPOSITION seront soumises, à défaut d'accord amiable entre les Parties mettant fin à leur litige, à la compétence exclusive des Tribunaux dans le ressort de la Cour d’Appel de Paris. Cette clause d'élection de compétence, par accord exprès des Parties, s'applique même en cas de procédure en référé, de pluralité de défendeurs ou d'appel en garantie."],
+					["titre" =>"ARTICLE 18. SANCTIONS ET EMBARGOS", "texte" => "Le Locataire déclare qu’à la date de signature des présentes :\n(i) ni lui-même, ses sous-traitants, dirigeants, agents ou employés ;\n(ii) ni ses sociétés affiliées, leurs sous-traitants, dirigeants, agents ou employés ci-après dénommées les « Personnes Soumises », ne font l’objet ou ne sont menacées de Sanctions (y compris notamment, en raison du fait qu’elles sont:\n(a) détenues ou contrôlées directement ou indirectement par toute personne qui est visée par des Sanctions ou\n(b) constituées en vertu du droit d’un pays soumis à des Sanctions générales ou étendues à ce pays ou\n(c) citoyennes ou résidentes dudit pays).
+					\nLe Locataire s’engage pendant toute la durée du Contrat à ne pas contracter directement ou indirectement avec une personne morale ou physique (ci-après la « Personne sous sanction ») qui fait l’objet ou qui est menacée de Sanctions et se porte fort pour que les Personnes Soumises ne contractent pas avec la Personne sous sanction. Étant entendu que « Sanctions » désigne toutes sanctions économiques ou financières, embargos commerciaux ou mesures similaires adoptées, appliquées ou mises en oeuvre par l’une quelconque des autorités suivantes (ou par un de leurs organismes) :\n(A) les Nations-Unies; ou\n(B) les États-Unis d’Amérique; ou\n(C) l’Union européenne ou tout État membre de l’Union européenne actuel ou futur; ou\n(D) le Royaume Uni.
+					\nDans l’hypothèse où :\n(i) cette déclaration s’avérait fausse ou;\n(ii) le Locataire, ou les Personnes Soumises feraient l’objet ou seraient menacés de Sanctions au cours du Contrat ou;\n(iii) le Locataire ou les Personnes Soumises contracteraient avec la Personne sous sanction,\nle Contrat sera résilié de plein droit sans mise en demeure préalable aux conditions prévues à l’article 11."],
+				]
+			],
+			[
+				"left" => [
+					["titre" =>"ARTICLE 19. CODE DE CONDUITE – RESPECT DES LOIS", "texte" => "Le Client garantit au Bailleur qu’il se conformera à toutes les lois et règlements applicables, y compris, sans limitation, toutes les lois anti-corruption applicables au Client et les lois régissant les transactions avec l’état, les administrations, les organismes publics et privés, les lois antitrust et de libre concurrence, les lois applicables aux les délits d'initiés, les lois financières et comptables. Le Client se conformera au Code de conduite des Partenaires Arrow, qui peut être consulté ici : http://www.arrow.com/about_arrow/BusinessPartnerCodeofConduct.pdf (tel que mis à jour occasionnellement) ou à un code de conduite au moins aussi contraignant que celui d’Arrow."]
+				],
+			]
+		];
+		$this->affichageCG($pages, false);
+	}
+	function annexeContratA() {
+		$this->AddPage();
+		$this->image($this->logo,10,10,60);
 
-		$head = array("Nombre de loyers","Périodicité","Loyer hors assurance HT", "Loyer hors assurance TVA", "Assurance", 'TOTAL TTC');
-		$w = array(30,31,31,31,31,31);
-		$styles = [];
+		$this->setY(30);
+		$this->setFont('Arial','B', '10');
+		$this->cell(0,6, "ANNEXE A", 0, 1, 'C');
+		$this->setFont('Arial','', '10');
+		$this->cell(0,4,"CONDITIONS PARTICULIERES AU CONTRAT DE MISE A DISPOSITION DE LOGICIELS",0,1,'C');
 
-		$data = [];
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,42,200,42);
+		$this->ln(6);
 
-		foreach($this->loyer as $k => $v) {
-			if ($v['type'] === "engagement") {
-				$ligne[0] = $v["duree"];
-				$ligne[1] = strtoupper($v["frequence_loyer"]);
-				$ligne[2] = number_format($v["loyer"], 2, ',', '')." €";
-				$ligne[3] = number_format(($v["loyer"]* $this->commande["tva"]) - $v['loyer'], 2, ',', '')." €";
-				$ligne[4] = number_format($v["assurance"], 2, ',', '')." €";
-				$ligne[5] = number_format((($v["loyer"]* $this->commande["tva"]) + $v["assurance"]), 2, ',', '')." €";
+		$this->titleContrat("I - DESIGNATION DES LOGICIELS :");
 
-				$data[] = $ligne;
+		$this->ln(4);
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,0,0);
+		$this->cell(50,10, "Réference",1,0,'C',1);
+		$this->cell(100,10, "Description",1,0,'C',1);
+		$this->cell(30,10, "Qté",1,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+
+		foreach($this->lignes as $l) {
+			$this->cell(50, 7, $l["ref"], 1, 0, 'L');
+			$this->cell(100, 7, $l["produit"], 1, 0, 'L');
+			$this->cell(30, 7, $l["quantite"], 1, 1, 'C');
+		}
+
+
+		$this->titleContrat("II - MONTANT DES REDEVANCES :");
+
+		$total = 0;
+		foreach($this->loyer as $l) {
+			$total += ($l["duree"] * $l["loyer"]);
+		}
+		$this->setFont('arial', 'b', 10);
+		$this->cell(0, 4, ucfirst(util::nb2TextLanguage($total, true, 'fr')), 0, 1, 'C');
+		$this->setFont('arial', '', 8);
+		$this->cell(0, 4, "A ce montant doivent être ajoutées les taxes en vigueur (soit actuellement la TVA au taux de ".(($this->commande["tva"]-1) * 100 )."%).", 0, 1);
+
+		$this->titleContrat("III – TERME DE PAIEMENT :");
+		$this->cell(0, 4, "Les factures sont payables terme à échoir par ".$this->commande["type"], 0, 1);
+		$this->titleContrat("IV - DUREE DE LA MISE À DISPOSITION : ".$this->loyer[0]["duree"]." ".$this->loyer[0]["frequence_loyer"]);
+		$this->titleContrat("V - ADRESSE DE DELIVRANCE DES PRESTATIONS :");
+		$this->SetLeftMargin(45);
+		$this->cell(0,4,$this->client["livraison_adresse"],0, 1);
+		if ($this->client["livraison_adresse_2"]) $this->cell(0,4,$this->client["livraison_adresse_2"],0, 1);
+		if ($this->client["livraison_adresse_3"]) $this->cell(0,4,$this->client["livraison_adresse_3"],0, 1);
+		$this->cell(0,4,$this->client["livraison_cp"]." - ".$this->client["livraison_ville"],0, 1);
+		$this->SetLeftMargin(15);
+
+		$this->titleContrat("VI - ADRESSE DE FACTURATION :");
+		$this->SetLeftMargin(45);
+		$this->cell(0,4,$this->client["facturation_adresse"],0, 1);
+		if ($this->client["facturation_adresse_2"]) $this->cell(0,4,$this->client["facturation_adresse_2"],0, 1);
+		if ($this->client["facturation_adresse_3"]) $this->cell(0,4,$this->client["facturation_adresse_3"],0, 1);
+		$this->cell(0,4,$this->client["facturation_cp"]." - ".$this->client["facturation_ville"],0, 1);
+		$this->SetLeftMargin(15);
+		$this->titleContrat("VII - DATE DE DEPART DE LA MISE À DISPOSITION :");
+		$this->cell(0, 4, "D'un commun accord entre les parties, il est convenu d'une prise d'effet de la mise à disposition à compter de la date du ".date("d/m/Y", strtotime($this->commande["date_debut"])).".", 0, 1);
+		$this->titleContrat("VIII - CONDITIONS SPECIFIQUES :");
+
+		$this->signatureInfos();
+	}
+	function pvDelivranceConforme() {
+		$this->AddPage();
+		$this->image($this->logo,10,10,60);
+
+		$this->setY(30);
+		$this->setFont('Arial','B', '10');
+		$this->cell(0,4,"CONTRAT DE MISE A DISPOSITION DE LOGICIELS",0,1,'C');
+		$this->ln(4);
+		$this->cell(0,4,"PROCES VERBAL DE DELIVRANCE CONFORME",0,1,'C');
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,44,200,44);
+		$this->ln(6);
+
+		$this->setFont('Arial','B', '8');
+		$this->cell(0,4,'Client', 0, 1);
+
+		$this->setFont('Arial','', '8');
+		$client = [
+			"Nom" => $this->client["societe"],
+			"Forme et capital" => $this->client["structure"]." au capital de ".$this->client["capital"]." EUR",
+			"N° de RCS" => $this->client["siren"],
+			"Siège social" => $this->client["adresse"]." ".$this->client["cp"]." - ".$this->client["ville"],
+			"Représenté par" => $this->contact["prenom"]." ".$this->contact["nom"]
+		];
+		foreach($client as $k => $v) {
+			$this->cell(40,4, $k." :");
+			$this->cell(160,4, $v, 0, 1);
+		}
+		$this->ln(4);
+
+		$this->cell(0,4, 'Ci-après désigné "L’Utilisateur" déclare que',0, 1);
+		$this->ln(4);
+		$this->setLeftMargin(30);
+		$regles = [
+			"- Les logiciels décrits à l’annexe A du contrat référencé ci-dessus ont été réceptionnés et sont conformes à leur description,",
+			"- Les logiciels ont pu être installés et ne présentent pas de défaut apparent,",
+			"- La documentation relative aux logiciels lui est accessible,",
+			"- Le Fournisseur a rempli ses obligations de livraison conforme ,",
+			"- Qu’en conséquence, la réception est effective à compter du .........................................",
+		];
+		foreach($regles as $r) {
+			$this->cell(0,4, $r,0, 1);
+		}
+
+		$this->setLeftMargin(15);
+		$this->ln(10);
+		$this->setFont('Arial', 'B', 8);
+		$this->cell(0,4,"LE CLIENT", 0, 1 ,'C');
+		$this->setFont('Arial', '', 8);
+		$this->ln(4);
+		$lines = [
+			"Représentée par" => $this->contact["prenom"]." ".$this->contact["nom"],
+			"Qualité" => $this->contact["fonction"],
+			"Cachet de la société" => "",
+			"Signature" => ""
+		];
+		foreach($lines as $k => $v) {
+			$this->cell(90, 4, $k.": ".$v, 0, 1);
+		}
+
+	}
+
+	public function cession($id, $s) {
+
+		$contrat = ATF::commande()->select(ATF::commande()->decryptId($id));
+		$client = ATF::societe()->select($contrat["id_societe"]);
+
+		ATF::demande_refi()->q->reset()->where("demande_refi.id_affaire", $contrat["id_affaire"])->where("demande_refi.etat", "valide")->setLimit(1);
+		$demande_refi = ATF::demande_refi()->select_row();
+		$refinanceur = ATF::refinanceur()->select($demande_refi["id_refinanceur"]);
+
+		$this->unsetFooter();
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->image($this->logo,74,10,60);
+
+		$this->setY(30);
+		$this->setFont('Arial','B', '14');
+		$this->cell(0,4,"Fiche Financière - Acte de Cession",0,1,'C');
+		$this->setFont('Arial','', '9');
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,38,200,38);
+		$this->ln(6);
+
+		$this->multicell(0,4, "En vertu de la Convention de Coopération signée, la société ARROW CAPITAL SOLUTIONS SAS (ci-après dénommée « ARROW CAPITAL SOLUTIONS ») cède à ".$refinanceur["refinanceur"]." (ci-après dénommée «".$refinanceur["refinanceur"]."») divers matériels ayant fait l’objet d’un Contrat de Location N°".$contrat["ref"]." négocié et conclu le ".date('d/m/Y', strtotime($contrat["date"]))." entre ARROW CAPITAL SOLUTIONS et ".$client["societe"]." Siren ".$client["siren"].". (ci-après dénommé « le Locataire »), dont les caractéristiques sont décrites ci-après.");
+		$this->ln(2);
+
+		$this->multicell(0,4, "La présente vente est faite à la date et au prix indiqué ci-dessous.");
+		$this->ln(2);
+
+		$this->multicell(0,4, "Par ailleurs, ARROW CAPITAL SOLUTIONS s’engage à racheter les matériels à ".$refinanceur["refinanceur"]." au terme du Contrat de Location, et ce en vertu de l’article VIII de ladite Convention, au prix fixé ci-après.");
+		$this->ln(2);
+
+		$this->titleContrat("CONTRAT DE LOCATION :");
+		ATF::loyer()->q->reset()->where("id_affaire", $contrat["id_affaire"]);
+		$duree = 0;
+		$periodicite = "mois";
+		foreach(ATF::loyer()->select_all() as $l) {
+			$duree += $l["duree"];
+			$periodicite = $l["frequence_loyer"];
+		}
+		$this->cell(0,4, "Durée du contrat : ".$duree." ".$periodicite,0, 1);
+		$this->cell(0,4, "Périodicité et Terme : ...........................................",0, 1);
+		$this->cell(0,4, "Echeancier : ...........................................",0, 1);
+		$this->cell(0,4, "Valeur résiduelle : ...........................................",0, 1);
+		$this->cell(0,4, "Désignation du matériel : ...........................................",0, 1);
+
+		$this->cell(0,4, "L’adresse de facturation est la suivante  :",0, 1);
+
+
+		$this->titleContrat("ASSURANCE DOMMAGE SOUSCRIPTEUR :");
+
+		$this->titleContrat("VENTE DU MATERIEL :");
+		$this->cell(0,4, "Date de la vente : ...........................................",0, 1);
+		$this->cell(0,4, "Date de cession : ...........................................",0, 1);
+		$this->cell(0,4, "Prix de vente : ............ H.T. Euros – ............ TTC Euros.",0, 1);
+		$this->cell(0,4, "La date d’effet est fixée au : ...........................................",0, 1);
+
+		$this->titleContrat("RACHAT DU MATERIEL :");
+		$this->cell(0,4, ".............................. HT Euros",0, 1);
+
+		$this->ln(10);
+		$this->signatureInfos(null, "ARROW CAPITAL SOLUTIONS", $refinanceur["refinanceur"]);
+
+
+	}
+
+
+	/*
+		UTILS POUR ARROW PDF
+	*/
+
+	function signatureInfos($contact, $denominationArrow, $denominationClient, $bailleur = null, $client=null) {
+		$nomSignataire = ATF::constante()->getConstante("__NOM_SIGNATAIRE__");
+        $fonctionSignataire = ATF::constante()->getConstante("__FONCTION_SIGNATAIRE__");
+
+		$this->ln(5);
+		$this->cell(0,4,"Fait en deux exemplaires à Paris, le ".date("d/m/Y"),0, 1);
+		$this->ln(5);
+
+		$this->setFont('Arial','B', '8');
+		$this->cell(90, 4, $denominationArrow, 0, 0, 'C');
+		$this->cell(90, 4, $denominationClient, 0, 1, 'C');
+
+		$this->setFont('Arial','', '8');
+		$lines = [
+			"Représentée par" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE",
+			"Qualité" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Directeur Commercial",
+			"Cachet de la société" => "",
+			"Signature" => ""
+		];
+		$y = $this->getY();
+		if ($bailleur) $this->cell(90, 4, $bailleur, 0, 1, 'C');
+		foreach($lines as $k => $v) {
+			$this->cell(90, 4, $k.": ".$v, 0, 1);
+		}
+
+		if ($contact) {
+			$this->setY($y);
+			$this->setLeftMargin(105);
+			if ($bailleur) {
+				$this->cell(90, 4, $client ? $client : '', 0, 1, 'C');
+			}
+			$lines = [
+				"Représentée par" => $this->contact["prenom"]." ".$this->contact["nom"],
+				"Qualité" => $this->contact["fonction"],
+				"Cachet de la société" => "",
+				"Signature" => ""
+			];
+			foreach($lines as $k => $v) {
+				$this->cell(90, 4, $k.": ".$v, 0, 1);
+			}
+			$this->setLeftMargin(15);
+		}
+
+	}
+
+	function affichageCG($pages, $addFirstPage=true) {
+		$i = 0;
+		foreach($pages as $page){
+			$i++;
+			if ($i === 1) {
+				if ($addFirstPage) $this->addPage();
+			} else {
+				$this->addPage();
+			}
+			$this->setLeftMargin(10);
+			$y = $this->getY();
+
+			foreach($page["left"] as $art) {
+				$this->ln(2);
+				if ($art["titre"]) {
+					$this->setFont('Arial','B', 7);
+					$this->cell(90,4,$art["titre"],0,1);
+				}
+				$this->setFont('Arial','', 7);
+				$this->MultiCell(90,3, $art["texte"]);
+			}
+
+			if ($page["right"]) {
+				$this->setY($y);
+				$this->setLeftMargin(100);
+				foreach($page["right"] as $art) {
+					$this->ln(2);
+					if ($art["titre"]) {
+						$this->setFont('Arial','B', 7);
+						$this->cell(90,4,$art["titre"],0,1);
+					}
+					$this->setFont('Arial','', 7);
+					$this->MultiCell(90,3, $art["texte"]);
+				}
 			}
 		}
-		$this->tableauBigHead($head,$data,$w,10,$styles);
+		$this->setLeftMargin(10);
+	}
+
+	function entete($denominationLoueur, $denominationClient) {
+		$nomSignataire = ATF::constante()->getConstante("__NOM_SIGNATAIRE__");
+        $fonctionSignataire = ATF::constante()->getConstante("__FONCTION_SIGNATAIRE__");
 
 
-		$this->articleContrat("ARTICLE ".$num_article." : PRIX DU CONTRAT DE LOCATION");
-		$num_article++;
-		$this->multicell(0,4,"Le loyer mensuel du Client au titre de la location du véhicule est fixé comme suit :",0,1);
-		$this->ln(3);
+		$this->setFont('Arial','B', 8);
+		$this->cell(0,4,"Entre les soussignées :",0,1);
 
-		$this->multicell(0,4,"Le loyer est payable terme à échoir par prélèvement automatique. Toute période mensuelle de location commencée est due.",0,1);
-		$this->multicell(0,4,"Le premier loyer sera prélevé dans les jours suivants la date de livraison effective du véhicule.",0,1);
-		$this->multicell(0,4,"Le jour des prélèvements suivants (en cas de reconduction du Contrat de Location) est déterminé en fonction de la date de livraison effective du véhicule :",0,1);
-		$this->multicell(0,4,"       -	Si la livraison a lieu entre le 1er et le 10 du mois, les prélèvements auront lieu à partir du 1er du mois",0,1);
-		$this->multicell(0,4,"       -	Si la livraison a lieu entre le 11 et le 20 du mois, les prélèvements auront lieu à partir du 11 du mois",0,1);
-		$this->multicell(0,4,"       -	Si la livraison a lieu entre le 21 et le dernier jour du mois, les prélèvements auront lieu à partir du 21 du mois",0,1);
-		$this->ln(3);
-
-
-		$this->articleContrat("ARTICLE ".$num_article." : KILOMETRAGE");
-		$num_article++;
-		$this->multicell(0,4,"Le kilométrage de référence sera indiqué lors de la livraison effective du véhicule.",0,1);
-
-
-		$this->multicell(0,4,"Kilométrage maximum : ".$this->affaire["kilometrage_max"]." km par mois.",0,1);
-		$this->multicell(0,4,"En cas de dépassement du forfait kilométrique, chaque tranche commencée de 250 km sera facturée ".$this->affaire["montant_kilometrage_max_depasse"]." € les 250 kilomètres",0,1);
-		$this->ln(3);
-
-
-		$this->articleContrat("ARTICLE ".$num_article." : CONDUCTEUR(S) AUTORISE(S)");
-		$num_article++;
-		$this->multicell(0,4,"Les conducteurs âgés de plus de 21 ans et ayant plus de deux ans révolus de permis de conduire peuvent utiliser le véhicule, conformément aux termes et conditions du Contrat de Location, et sous la seule responsabilité du Client.",0,1);
-		$this->ln(3);
-
-		$this->articleContrat("ARTICLE ".$num_article." : MISE A DISPOSITION");
-		$num_article++;
-		$this->multicell(0,4,"Le Client a souhaité souscrire cette offre de location et a librement choisi les équipements objets de la location.\n\nLe Client reconnait louer les équipements en parfait état de fonctionnement.",0,1);
-		$this->ln(3);
-
-		$this->articleContrat("ARTICLE ".$num_article." : GRILLE TARIFAIRE DE FRAIS");
-		$num_article++;
-		$this->multicell(0,4,"Les frais suivants sont susceptibles d’être facturés par GoAb au Client, en fonction des options choisies ou en cas de manquement à ses obligations, telle que stipulées au Contrat d’Abonnement et dans les Conditions Générales de Location. La grille tarifaire de frais est susceptible d’évoluer à tout moment, à la seule discrétion de GoAb. En cas de modification de la présente grille tarifaire, GoAb notifiera le Client et lui communiquera la grille modifiée ; laquelle entrera en vigueur suivant un délai de préavis de trente (30) jours suivant sa notification au Client.",0,1);
-		$this->ln(3);
-
-		$head = array("Frais","Fixes ou variables","Montant / Méthode de calcul");
-		$w = array(35,35,105);
-		$styles = [];
-		$lignes_frais = [
-			["Frais de livraison du véhicule (domicile du Client ou tout autre lieu convenu)", "Variables", "Le tarif de livraison dépend de la grille disponible auprès du Partenaire de GoAb.\n\nLe tarif sera indiqué au Client avant la livraison." ]
-			,["Frais de ravitaillement en carburant*", "Variables", "Le Client paiera à GoAb les coûts relatifs aux éventuels manques de carburant en regard du niveau de carburant contenu dans le Véhicule au moment du retour du Véhicule à GoAb.\nAu montant du différentiel, s’ajoutera, 30 € TTC au titre des frais de gestion."]
-			,["Frais de remplacement de la Clé, documents administratifs ou accessoires *","Variables","Le Client sera facturé pour le coût de remplacement de toute clé, de tout document ou accessoire manquant." ]
-			,["Frais fumeur","Fixes","Si le Conducteur ou n’importe quelle autre personne fume(nt) à l’intérieur du Véhicule pendant la durée du Contrat de Location, le Client sera redevable d’une pénalité de 500 € TTC de frais de nettoyage approfondi." ]
-			,["Frais de « remise en état* »","Variables","Au moment du retour du Véhicule à GoAb, le Client est responsable de tous les frais engagés pour remettre le Véhicule dans l’état dans lequel il était à la Date de Début du Contrat de Location.\nCes frais sont établis après la restitution du véhicule et devront être payés par le Client." ]
-			,["Réparations*", "Variables", "Le Client sera responsable des réparations (qui doivent être effectuées par un centre de réparation agréé par GoAb) et de tous les frais :\n
-				i.	après la découverte de dommages à la suite d’une réinspection du Véhicule lors de son retour par le Client à GoAb ;
-				ii.	si le Véhicule a besoin d’un service de voiturier (nettoyage) plus approfondi que le service de nettoyage standard de GoAb lors de la remise du Véhicule à GoAb ; et/ou
-				iii.	si le Véhicule a été endommagé à l’intérieur ou à l’extérieur
-				(que le Client soit responsable ou non des dégâts) à tout moment lorsque ces dommages sont découverts ou signalés.
-				Ces frais sont établis après la restitution du véhicule et devront être payés par le Client." ]
-			,["Frais de kilométrage excédentaire*","Variables" , "Le Client accepte de respecter le kilométrage mensuel choisi et s’engage à payer le supplément si le kilométrage mensuel est dépassé\nFrais de kilométrage excédentaire : indiqués dans l’Article 4 des Conditions Particulières de Location." ]
-			,["Frais de restitution de véhicule", "Fixes","Gratuit" ]
-			,["Frais administratifs (changement d’adresse, changement d’informations de paiement ...)", "Fixes", "10 € HT" ]
-			,["Frais administratifs (résiliation anticipée aux torts du Client)", "Fixes", "100 € HT" ]
-			,["Frais de gestion d’amendes", "Fixes", "En cas de réception par GoAb d'un procès-verbal ou d'une demande d'information par l'Officier du Ministère Public, les frais de traitement administratif s’élèvent à 20 € HT ou 50 € HT s’il y en a plus de trois dans le mois." ]
-			,["Frais d’envoi de recommandé", "Fixes", "Tout envoi de lettre en recommandé (Désignation par exemple) sera facturé 10 € HT." ]
-			,["Frais de recouvrement", "Variables", "A détailler." ]
+		$this->setFont('Arial',null, 8);
+		$loueur = [
+			["label" => "Dénomination",	"valeur" => "ARROW CAPITAL SOLUTIONS",	"style" => 'B'],
+			["label" => "Forme et capital",	"valeur" => "SAS au capital de 40 000 EUR",	"style" => null],
+			["label" => "N° unique d’identification",	"valeur" => "RCS n° 453 738 551",	"style" => null],
+			["label" => "Siège social",	"valeur" => "Immeuble CANOPY – 6, Rue du général Audran 6 – 92400 COURBEVOIE",	"style" => null],
+			["label" => "Représentée par",	"valeur" => (ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE")." en qualité de ".(ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial"),	"style" => null],
 		];
-
-		foreach($lignes_frais as $k=>$l){
-			$styles[] = [
-				[], [], ["align" => "L"]
-			];
+		foreach($loueur as $v) {
+			$this->setFont('Arial',null, 8);
+			$this->cell(50,4,$v["label"]." :",0,0);
+			$this->setFont('Arial',$v["style"], 8);
+			$this->cell(160,4,$v["valeur"],0,1);
 		}
-        $this->tableauBigHead($head, $lignes_frais, $w, 5, $styles);
+		$this->setFont('Arial',null, 8);
+		$this->cell(0,4,"Ayant tous les pouvoirs à l’effet des présentes",0,1);
+		$this->cell(0,4,"Ci-après désignée « ".$denominationLoueur." »",0,1);
+		$this->cell(0,4,"D'une part,",0,1);
+		$this->ln(2);
+		$this->setFont('Arial','B', 8);
+		$this->cell(0,4,"Et",0,1);
+		$this->setFont('Arial',null, 8);
+		$this->ln(2);
 
-
-
-		$this->articleContrat("ARTICLE ".$num_article." : ASSURANCE ET FRANCHISES");
-		$num_article++;
-		$this->multicell(0,4,"Pour précision des termes de la police d’assurance, la franchise d’assurance est de ".$this->affaire["franchise"]." € TTC.",0,1);
-		$this->ln(3);
-
-		$this->articleContrat("ARTICLE ".$num_article." : ABSENCE DE DROIT DE RETRACTATION");
-		$num_article++;
-		$this->multicell(0,4,"CONFORMEMENT AUX DISPOSITIONS DE L’ARTICLE L. 221-28 DU CODE DE LA CONSOMMATION, LE CLIENT RECONNAIT EXPRESSEMENT QUE, DANS LE CADRE DE LA CONCLUSION DU CONTRAT DE LOCATION CONCLU A DISTANCE, IL NE BENEFICIE D’AUCUN DROIT DE RETRACTATION.",0,1);
-		$this->ln(3);
-
-		$this->articleContrat("ARTICLE ".$num_article." : VALIDITE");
-		$num_article++;
-		$this->multicell(0,4,"La conclusion du Contrat de Location est conditionnée à l’acceptation du Comité des Agréments de GoAb, en considération notamment des informations et documents communiqués par le Client. L’acceptation ou le refus sera notifié au Client dans un délai maximum de 7 jours suivant la signature des présentes.",0,1);
-		$this->ln(3);
-
-		$this->setY(219);
-		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Fait en deux exemplaires",0,'C');
-
-
-		$this->SetDrawColor(0,0,0);
-		$this->SetTextColor(0,0,0);
-		$this->setfont('arial','',9);
-		$this->setFillColor(255,255,0);
-
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
-		);
-
-		$y = $this->gety()+2;
-		$t = "Le Client";
-
-		$this->cadre(20,$y,80,48,$cadre,$t);
-
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,"Signature et cachet commercial : "
-		);
-		$this->cadre(110,$y,80,48,$cadre,"Go Abonnement");
-
-		$this->mandatSepa();
-
-	}
-
-	public function articleContrat($titre) {
-		$this->ln(5);
-		$this->setfont('arial','B',8);
-		$this->cell(0,5,"$titre",0,1);
-		$this->ln(3);
-		$this->setfont('arial','',8);
-	}
-
-	public function tableauProduit() {
-
-		foreach($this->lignes as $kl => $vl) {
-
-			$details = $this->details_produit($vl);
-			$data = [];
-			$data[] = array(
-				$details[0]
-				,$details[1]
-				,$details[2]
-				,"details"=>$details[3]
-				,$details[4]
-			);
-
-			$styles[] = [
-				($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
-				,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-				,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-				,"details"=>$this->styleDetailsProduit
-				,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
-			];
-
-			$this->tableau(
-				[],
-				$data,
-				[
-				10,20,120,35],
-				5,
-				$styles
-			);
-
-
-			if ($kl == count($this->lignes) - 1) { $this->tableau([],[[""]],[185],1,[[$this->colsProduitAvecDetail]]); }
-		}
-
-	}
-
-	public function details_produit($ligne) {
-		if (strtoupper($ligne["categorie"]) === "VEHICULE" && $this->affaire["num_chassis"]) {
-			$commentaire = "Immatriculation : " . $this->affaire["num_chassis"] . ", N° de châssis: ".$ligne['serial'];
-		}
-
-		if ($commentaire || $ligne['commentaire_produit']) {
-			$commentaire = 'Commentaire: '. $commentaire. ' '.$ligne['commentaire_produit'];
-		}
-
-		$tva = ATF::tva()->select(ATF::produit()->select($ligne['id_produit'], 'id_tva'));
-
-		return [
-			$ligne['quantite'],
-			strtoupper($ligne["categorie"]),
-			$ligne['produit'],
-			$commentaire,
-			$tva["text"]
+		$bailleur = [
+			["label" => "Dénomination",	"valeur" => $this->client["societe"],	"style" => 'B'],
+			["label" => "Forme et capital",	"valeur" => $this->client["structure"]." au capital de ".number_format($this->client["capital"],0,',',' ')." EUR",	"style" => null],
+			["label" => "N° unique d’identification",	"valeur" => "RCS n° ".$this->client["siren"],	"style" => null],
+			["label" => "Siège social",	"valeur" => $this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"],	"style" => null],
+			["label" => "Représentée par",	"valeur" => $this->contact["prenom"]." ".$this->contact["nom"]." en qualité de ".$this->contact["fonction"],	"style" => null],
 		];
+		foreach($bailleur as $v) {
+			$this->setFont('Arial',null, 8);
+			$this->cell(50,4,$v["label"]." :",0,0);
+			$this->setFont('Arial',$v["style"], 8);
+			$this->cell(160,4,$v["valeur"],0,1);
+		}
+		$this->setFont('Arial',null, 8);
+		$this->cell(0,4,"Ayant tous les pouvoirs à l’effet des présentes",0,1);
+		$this->cell(0,4,"Ci-après désignée « ".$denominationClient." »",0,1);
+		$this->cell(0,4,"D'autre part,",0,1);
+		$this->cell(0,4,"Ci-après désignées ensemble « les Parties »,",0,1);
+		$this->ln(2);
 	}
 
- };
+	function titleContrat($texte){
+		$this->ln(4);
+		$this->setFont('Arial','B', '8');
+		$this->cell(0,4,$texte,0, 1);
+		$this->setFont('Arial','', '8');
+	}
+}

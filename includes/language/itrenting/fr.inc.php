@@ -1,0 +1,1 @@
+<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("etat"=>"estado"));?>

@@ -1,17 +1,3 @@
--- TH 28889 - Optima / Gestion de PDF complémentaire au niveau de l'affaire
-CREATE TABLE `document_complementaire_a_signer` (
-    `id_document_complementaire_a_signer` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
-    `id_affaire` MEDIUMINT UNSIGNED NOT NULL ,
-    `id_document_contrat` MEDIUMINT UNSIGNED NOT NULL ,
-    PRIMARY KEY (`id_document_complementaire_a_signer`),
-    INDEX (`id_affaire`),
-    INDEX (`id_document_contrat`)
-) ENGINE = InnoDB;
-
-ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat`(`id_document_contrat`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `document_complementaire_a_signer` ADD FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
     -- Affaire de vente
 ALTER TABLE `panier` ADD `nature` ENUM('location','vente') NOT NULL DEFAULT 'location' AFTER `date`;
 ALTER TABLE `produit` ADD `prix_vente` FLOAT(8,2) NULL DEFAULT NULL AFTER `support`;
@@ -72,3 +58,7 @@ where
     `affaire`.`etat` not in ('demande_refi', 'facture_refi')
     and (`commande`.`etat` in ('non_loyer', 'mis_loyer', 'prolongation', 'restitution', 'mis_loyer_contentieux', 'prolongation_contentieux', 'restitution_contentieux', 'AR', 'arreter')
         or `affaire`.`nature` = 'vente');
+
+
+-- TH 30409 - Export Vente - Num Facture
+ALTER TABLE `facture` ADD `numero` VARCHAR(12) NULL DEFAULT NULL AFTER `ref`;

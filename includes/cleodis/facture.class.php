@@ -24,6 +24,7 @@ class facture_cleodis extends facture {
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","width"=>50,"align"=>"center")
             ,'facture.rejet'=>array("renderer"=>"updateEnumFactureRejetCledodis","width"=>200)
             ,'relance'=>array("custom"=>true,"nosort"=>true,"renderer"=>"relanceFacture","width"=>70)
+			,'createAvoir'=>array("custom"=>true,"nosort"=>true,"renderer"=>"createAvoir","width"=>70)
             ,'facture.date_rejet'=>array("renderer"=>"updateDate","width"=>170)
             ,'facture.date_regularisation'=>array("renderer"=>"updateDate","width"=>170)
             ,'facture.nature'
@@ -44,7 +45,7 @@ class facture_cleodis extends facture {
 			,"id_fournisseur_prepaiement"=>array("autocomplete"=>array(
    				"function"=>"autocompleteFournisseurs"
      		))
-			,"date"
+			,"date"=>array("disabled"=>true)
 			,"date_previsionnelle"
 			,"date_envoi"
 			,"designation"=>array("xtype"=>"textarea")
@@ -140,10 +141,10 @@ class facture_cleodis extends facture {
 
 		$this->addPrivilege("aPrelever");
 		$this->addPrivilege("aPreleverEchec");
+		$this->addPrivilege("createAvoir");
+		$this->addPrivilege("canCreateAvoir");
 
 		$this->addPrivilege("massPrelevementSlimpay");
-
-
 
 
 		$this->field_nom="ref";
@@ -152,6 +153,38 @@ class facture_cleodis extends facture {
 		$this->selectAllExtjs=true;
 
 
+	}
+
+
+	public function createAvoir($data, &$s) {
+
+
+		if ($this->canCreateAvoir($data["id_facture"])) {
+			$f = ATF::facture()->select($this->decryptId($data["id_facture"]));
+			ATF::facture_ligne()->q->reset()->where("id_facture", $f["id_facture"]);
+			$lignes = ATF::facture_ligne()->sa();
+			unset($f["id_facture"]);
+			$f["prix"] = $f["prix"] * -1;
+			$f["prix_sans_tva"] = $f["prix_sans_tva"] * -1;
+			$f["envoye"] = 'non';
+			$f["exporte"] = 'non';
+			$f["ref"] = $f["ref"]."-AV";
+			$f["numero"] = null;
+			$f["date"] = date("Y-m-d");
+
+			$id = ATF::facture()->i($f);
+			foreach ($lignes as $value) {
+				$l = $value;
+				unset($l["id_facture_ligne"]);
+				$l["id_facture"] = $id;
+				ATF::facture_ligne()->i($l);
+			}
+			$this->move_files($id,$s);
+
+			ATF::affaire()->redirection("select",$f["id_affaire"]);
+		} else {
+			throw new errorATF('Impossible de créer un avoir, car il existe déja un avoir pour cette facture');
+		}
 	}
 
 	/**
@@ -469,6 +502,51 @@ class facture_cleodis extends facture {
 		return false;
 	}
 
+	function setNumero($jour) {
+		$prefix = date("Ym", strtotime($jour));
+		$nb = $this->getMaxNumero($prefix);
+		$max = $nb ? $nb["max_numero"] : null;
+		ATF::facture()->q->reset()->whereIsNull("numero")->where("date", $jour);
+		$factures = ATF::facture()->sa();
+		foreach ($factures as $facture) {
+			$numero = $this->getNumero($prefix, $max);
+			ATF::facture()->u(["id_facture" => $facture["id_facture"], "numero" => $numero]);
+			$max++;
+		}
+	}
+
+	function getMaxNumero($prefix){
+		$this->q->reset()
+				->addCondition("numero",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`numero`,7)+1',"max_numero")
+				->addOrder('numero',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+		$nb=$this->sa();
+
+		return $nb;
+	}
+
+	function getNumero($prefix, $max) {
+		if($max){
+			if($max<10){
+				$suffix="00000".$max;
+			}elseif($max<100){
+				$suffix="0000".$max;
+			}elseif($max<1000){
+				$suffix="000".$max;
+			}elseif($max<10000){
+				$suffix="00".$max;
+			}elseif($max<100000){
+				$suffix="0".$max;
+			}else{
+				$suffix=$max;
+			}
+		}else{
+			$suffix="000001";
+		}
+		return $prefix.$suffix;
+	}
 
 
 	/**
@@ -745,6 +823,7 @@ class facture_cleodis extends facture {
 		$this->infoCollapse($infos);
 
 		$commande=ATF::commande()->select($infos["id_commande"]);
+		$infos["date"]=date('Y-m-d');
 		$infos["id_affaire"]=$commande["id_affaire"];
 		$infos["tva"]=$commande["tva"];
 		$infos["ref"]=$this->getRef($commande["id_affaire"],$infos["type_facture"]);
@@ -1259,10 +1338,10 @@ class facture_cleodis extends facture {
 	* @return boolean
 	*/
 	public function can_delete($id){
-		if($this->select($id,"etat")=="impayee"){
+		if ($this->select($id, 'exporte') === 'oui' || $this->select($id, 'numero') !== null) {
+			throw new errorATF("Impossible de supprimer cette facture car elle est validée (En comptabilité)",879);
+		} else {
 			return true;
-		}else{
-			throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
 		}
 	}
 
@@ -1395,9 +1474,24 @@ class facture_cleodis extends facture {
             if ($idr2 = ATF::relance()->getIdRelance($i['facture.id_facture'],"seconde")) $return['data'][$k]['id_relance_seconde'] = ATF::relance()->cryptId($idr2);
             if ($idr3 = ATF::relance()->getIdRelance($i['facture.id_facture'],"mise_en_demeure")) $return['data'][$k]['id_relance_mise_en_demeure'] = ATF::relance()->cryptId($idr3);
             $return['data'][$k]['allowRelance'] = $i['facture.etat']=="payee"?false:true;
+
+			$return['data'][$k]['allowAvoir'] = $i['facture.prix'] < 0 ? false : true;
         }
 
         return $return;
+	}
+
+	public function canCreateAvoir($idFacture) {
+		$f = ATF::facture()->select($idFacture);
+
+		if ($f["prix"] < 0) {
+			return false;
+		} else {
+			ATF::facture()->q->reset()->where("facture.ref", $f["ref"]."-AV");
+			$exist = ATF::facture()->sa();
+			if ($exist) return false;
+		}
+		return true;
 	}
 
      /** Mise en place du contenu
@@ -1479,16 +1573,22 @@ class facture_cleodis extends facture {
 						// avoir
 						if( $item["facture.prix"] < 0 ) {
 							if ($item["facture.date_periode_debut"] && $item["facture.date_periode_fin"]) {
-								// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
-								ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
-														  ->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
-														  ->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
-								$facture_avoir = ATF::facture()->select_row();
-								if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
-									$choix = "avoir_sur_prolongation";
-								} elseif ( in_array($infos_commande['etat'], ['mis_loyer', 'mis_loyer_contentieux']) ) {
-									// Avoir sur un contrat en cours
-									$choix = "avoir_affaire_en_cours";
+
+								if (strrpos($item['facture.ref'], '-RE') != false) {
+									$choix = "avoir_facture_refi";
+								} else {
+									// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
+									ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
+										->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
+										->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
+									$facture_avoir = ATF::facture()->select_row();
+
+									if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
+										$choix = "avoir_sur_prolongation";
+									} elseif ( in_array($infos_commande['etat'], ['mis_loyer', 'mis_loyer_contentieux']) ) {
+										// Avoir sur un contrat en cours
+										$choix = "avoir_affaire_en_cours";
+									}
 								}
 							}
 						}
@@ -1498,13 +1598,15 @@ class facture_cleodis extends facture {
 							$choix = "prolongation";
 						}
 						// Pro rata
-						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "LIXXBAIL"){
-							$choix = "affaire_refi_lixxbail";
-						} elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
-							  || ($item["facture.nature"] === "prorata")){
+						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
+								|| ($item["facture.nature"] === "prorata")){
 							$choix = "pro_rata";
 						}
-						else{
+						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "LIXXBAIL"){
+							$choix = "affaire_refi_lixxbail";
+						} elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])) && $refinancement == "BNP PARIBAS LEASE MANDATE") {
+							$choix = 'refi_refinanceur_BNP_PARIBAS_LEASE_MANDATE';
+						} else{
 							if($item['facture.date_periode_debut']) {
 								//Si le contrat est en cours pendant la période de la facture, pas d'analytique
 								if(strtotime($infos_commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) && strtotime($infos_commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
@@ -1514,12 +1616,14 @@ class facture_cleodis extends facture {
 								if( ATF::$codename == "cleodisbe") {
 									$choix = "affaire_en_cours_cleodisbe";
 								} else {
-									log::logger("EN COURS ??? ". $en_cours, "mfleurquin");
 									//Affaire non refi ou refinancée par CLEODIS
 									if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
 										$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
 									//Affaire en cours et refinancée par BMF
-									}elseif(!$ResRefinancement || ($ResRefinancement && $refinancement == "LIXXBAIL") && $en_cours){
+									}elseif(!$ResRefinancement || ($ResRefinancement && $refinancement == "BNP PARIBAS LEASE MANDATE") && $en_cours){
+										$choix = "refi_refinanceur_BNP_PARIBAS_LEASE_MANDATE";
+									//Affaire en cours et refinancée par BMF
+									} elseif(!$ResRefinancement || ($ResRefinancement && $refinancement == "LIXXBAIL") && $en_cours){
 										$choix = "affaire_refi_lixxbail";
 									//Affaire en cours et refinancée par BMF
 									}elseif($ResRefinancement && $refinancement == "BMF"){
@@ -1584,6 +1688,14 @@ class facture_cleodis extends facture {
 						$ligne[4]["H"] = $h;
 					break;
 
+					case 'refi_refinanceur_BNP_PARIBAS_LEASE_MANDATE':
+						$libelle = $refinanceur["code_refi"];
+						$ligne[1]["D"] =  "411300";
+						$ligne[2]["D"] =  "707110";
+						$ligne[3]["D"] =  "707110";
+						$ligne[4]["H"] = $h;
+					break;
+
 					case 'refi_autre':
 						$libelle = $refinanceur["code_refi"];
 						$ligne[1]["D"] =  "411300";
@@ -1599,6 +1711,20 @@ class facture_cleodis extends facture {
 					case 'avoir_affaire_vente':
 						$ligne[2]["D"] =  "707110";
 						$ligne[3]["D"] =  "707110";
+						$ligne[4]["F"] ="D";
+					break;
+
+					case 'avoir_cout_copie':
+						$ligne[2]["D"] = "706220";
+						$ligne[3]["D"] = "706220";
+						$ligne[4]["D"] = "445712";
+						$ligne[4]["F"] ="D";
+					break;
+
+					case 'avoir_facture_refi':
+						$ligne[2]["D"] = "707110";
+						$ligne[3]["D"] = "707110";
+						$ligne[4]["D"] = "445712";
 						$ligne[4]["F"] ="D";
 					break;
 
@@ -1627,10 +1753,16 @@ class facture_cleodis extends facture {
 					break;
 
 					case 'affaire_refi_lixxbail':
-						$libelle = "CLIXXB";
-						$ligne[2]["D"] ="467810";
-						unset($ligne[3]);
-						unset($ligne[4]);
+						if ($item['facture.nature'] === 'prorata') {
+							$ligne[1]["D"] ="411000";
+							$ligne[2]["D"] ="706300";
+							$ligne[3]["D"] ="706300";
+							$ligne[4]["D"] ="445660";
+						} else {
+							$ligne[2]["D"] ="467810";
+							unset($ligne[3]);
+							unset($ligne[4]);
+						}
 					break;
 					case 'pro_rata':
 						$ligne[2]["D"] = "706300";
@@ -1656,8 +1788,6 @@ class facture_cleodis extends facture {
 							unset($ligne[4]);
 							$ligne[2]["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						}
-
-
 					break;
 
 					case 'affaire_en_cours_refi_bmf':
@@ -1717,7 +1847,7 @@ class facture_cleodis extends facture {
 						}else{
 							$row_data["F"] = 'C';
 						}
-						if ($choix === 'affaire_refi_lixxbail') {
+						if ($choix === 'affaire_refi_lixxbail' && ($item["facture.type_facture"] === "facture_refi" || count($ligne) == 2)) {
 							$row_data["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						} else {
 							$row_data["G"] = $ligne[$i]["G"] ? $ligne[$i]["G"] : abs($item['facture.prix']);
@@ -3877,6 +4007,9 @@ class facture_boulanger extends facture_cleodis {
 };
 
 class facture_assets extends facture_cleodis { };
+
+class facture_solo extends facture_cleodis { };
+class facture_arrow extends facture_cleodis { };
 
 class facture_go_abonnement extends facture_cleodis {
 

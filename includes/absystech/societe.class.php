@@ -129,8 +129,13 @@ class societe_absystech extends societe {
 		$this->addPrivilege("autocompleteOnlyActive");
 		$this->addPrivilege("add_ticket","insert");
 
+		$this->addPrivilege("isClientAutotask");
 
 		$this->selectExtjs=true;
+	}
+
+	public function isClientAutotask($infos) {
+		return $this->select($infos["id_societe"], "client_autotask");
 	}
 
 	/**
@@ -1045,6 +1050,7 @@ class societe_absystech extends societe {
 		$this->q->where("societe.etat", "actif");
 		// Entourloupe habituelle à l'autojoin
 		return parent::autocomplete($infos,false);
+
 	}
 
 
@@ -1512,6 +1518,30 @@ class societe_absystech extends societe {
     );
     return $return;
   }
+
+  /** Fonction qui génère les résultat pour les champs d'auto complétion société
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+		$length = 25;
+		$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("id_societe")->addField("societe")->addField("ref")->addField("nom_commercial")->addField("client_autotask");
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		// Clause globale
+		$this->q->where("etat","actif");
+
+		$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
 
 };
 

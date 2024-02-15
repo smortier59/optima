@@ -240,6 +240,7 @@ class souscription_cleodis extends souscription {
 
         if($post["facture"]) ATF::facture_magasin()->i(array("id_affaire"=> $id_affaire, "ref_facture"=> strtoupper($post["facture"])));
 
+
         // On stock le JSON du pack complet au cas où.
         if ($post['id_pack_produit']) {
           foreach ($post['id_pack_produit'] as $id_pack_produit) {
@@ -256,8 +257,6 @@ class souscription_cleodis extends souscription {
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
-
-
 
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
@@ -284,8 +283,13 @@ class souscription_cleodis extends souscription {
           case 'hippopotamus':
           case 'instore':
           case 'inovshop':
+          case 'laboutiquedunet':
+          case 'mps':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
+          break;
+          case 'solo':
+            $this->createComite($id_affaire, $societe, "accepte", "Comité SOLO", date("Y-m-d"), date("Y-m-d"));
           break;
 
           case 'bdomplus':
@@ -299,6 +303,18 @@ class souscription_cleodis extends souscription {
         }
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
+
+        // On check si on a un montant de frais de dossier sur les packs
+        $fraisDossier = 0;
+        foreach ($post['id_pack_produit'] as $v) {
+          $frais = ATF::pack_produit()->select($v, "frais_dossier");
+          if ($frais) $fraisDossier += $frais;
+        }
+        if ($fraisDossier) {
+          // Créer une facture libre de frais de dossier
+          $this->createFactureFraisDossier($id_affaire, $id_contrat, $frais);
+        }
+
 
         if ($post['nature'] == 'vente') {
           // On crée les BDC
@@ -669,6 +685,31 @@ class souscription_cleodis extends souscription {
     return ATF::commande()->decryptId($id_commande);
   }
 
+  private function createFactureFraisDossier($id_affaire, $id_commande, $prix) {
+    $affaire = ATF::affaire()->select($id_affaire);
+    $commande = ATF::commande()->select($id_commande);
+
+    if ($prix > 0) {
+      $facture["facture"] = array(
+        "id_societe" => $affaire["id_societe"],
+        "type_facture" => "libre",
+        "mode_paiement" => "cb",
+        "id_affaire" => $id_affaire,
+        "type_libre" => "normale",
+        "date" => date("d-m-Y"),
+        "id_commande" => $id_commande,
+        "date_previsionnelle" => date("d-m-Y"),
+        "prix" => round($prix, 2),
+        "prix_libre" => round($prix, 2),
+        "nature" => "contrat",
+        "designation" => "Frais de dossier"
+      );
+      $facture["values_facture"]["produits"] = json_encode([]);
+
+      ATF::facture()->insert($facture);
+    }
+  }
+
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -828,6 +869,9 @@ class souscription_cleodis extends souscription {
       case 'hippopotamus':
       case 'instore':
       case 'inovshop':
+      case 'laboutiquedunet':
+      case 'solo':
+      case 'mps':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1110,6 +1154,15 @@ class souscription_cleodis extends souscription {
       case 'inovshop':
         $r = "LO";
       break;
+      case 'solo':
+        $r = "SO";
+      break;
+      case 'laboutiquedunet':
+        $r = "BN";
+      break;
+      case 'mps':
+        $r = "MP";
+      break;
       default:
         $r = substr($site_associe, 0, 2);
       break;
@@ -1269,6 +1322,24 @@ class souscription_cleodis extends souscription {
       log::logger($e->getCode()." - ".$e->getMessage(), "qjanon");
       throw new errorATF("BAD REQUEST",500);
     }
+    return true;
+  }
+
+
+  /**
+   * Exposition API de la fonction payFactureFraisDossier
+   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function _payFactureFraisDossier($get, $post) {
+    $id_affaire = $post['id_affaire'];
+
+    ATF::facture()->q->reset()->where('facture.id_affaire', $post["id_affaire"], "AND")->where("facture.designation", "Frais de dossier");
+    $factures = ATF::facture()->select_all();
+
+    foreach ($factures as $key => $value) {
+      ATF::facture()->u(["id_facture" => $value["facture.id_facture"], "etat" => "payee"]);
+    }
+
     return true;
   }
 
@@ -2087,5 +2158,13 @@ class souscription_boulanger extends souscription_cleodis {
 
 class souscription_itrenting extends souscription_cleodis { };
 class souscription_assets extends souscription_cleodis { };
+class souscription_solo extends souscription_cleodis {
+
+  public $id_user = 1; // ID Du user qui sera en créateur des éléments
+  public $fournisseur = 2; // ID Du fournisseur par défaut qui sera attaché aux éléments DEFAULT : cléodis
+  public $codename = "solo"; // Utile pour le stockage des fichiers lors de la récuperation des fichiers signés
+
+};
+class souscription_arrow extends souscription_cleodis { };
 
 class souscription_go_abonnement extends souscription_cleodis { };

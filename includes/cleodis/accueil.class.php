@@ -23,11 +23,6 @@ class accueil_cleodis extends accueil {
 
 		$w = array();
 
-		$paysCS = ATF::creditsafe()->getSolde(false);
-		foreach ($paysCS as $key => $v) {
-			$w[] =  array('module'=>'creditsafe','type'=>'getSoldeCS_'.$key, 'index' => $key, 'id_agence'=>$id_agence);
-		}
-
 		if(ATF::user()->select(ATF::$usr->get('id_user'), "graphe_reseau") == "oui"){
 			if(ATF::agence()->select($id_agence , "objectif_devis_reseaux")>0) $w[] =  array('module'=>'devis','type'=>'reseau','id_agence'=>$id_agence);
 			if(ATF::agence()->select($id_agence , "objectif_mep_reseaux")>0) $w[] =  array('module'=>'commande','type'=>'reseau','id_agence'=>$id_agence);
@@ -38,6 +33,12 @@ class accueil_cleodis extends accueil {
 		if(ATF::user()->select(ATF::$usr->get('id_user'), "graphe_autre") == "oui"){
 			if(ATF::agence()->select($id_agence , "objectif_devis_autre")>0) $w[] =  array('module'=>'commande','type'=>'autre','id_agence'=>$id_agence);
 			if(ATF::agence()->select($id_agence , "objectif_mep_autre")>0)   $w[] =  array('module'=>'devis','type'=>'autre','id_agence'=>$id_agence);
+		}
+
+		$paysCS = ATF::creditsafe()->getSolde(false);
+		log::logger($paysCS, "mfleurquin");
+		foreach ($paysCS as $key => $v) {
+			$w[] =  array('module'=>'creditsafe','type'=>'getSoldeCS_'.$key, 'index' => $key, 'id_agence'=>$id_agence);
 		}
 
 		return $w;
@@ -71,10 +72,23 @@ class accueil_itrenting extends accueil_cleodis {
 		return array();
 	}
 };
+
 class accueil_cap extends accueil_cleodis {
 	public $onglets = array(
 		"societe"=>array("opened"=>true)
 	);
+};
+
+class accueil_solo extends accueil_cleodis {
+	public function getWidgets(){
+		return array();
+	}
+};
+
+class accueil_arrow extends accueil_cleodis {
+	public function getWidgets(){
+		return array();
+	}
 };
 
 
