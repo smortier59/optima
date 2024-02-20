@@ -1186,9 +1186,9 @@ class souscription_cleodis extends souscription {
     $pdf = ATF::meelo()->pdfSynthese($post["journeyId"], $toolboxURL, $apiKey);
 
     foreach ($post['ids'] as $id_affaire) {
-      $etat = 'accepte';
+      $etat = 'refuse';
 
-      if ($post["retourRules"]["result"]["globalDecision"] == false) $etat = 'refuse';
+      if ($post["retourRules"]["result"]["globalDecision"]) $etat = 'accepte';
       $id = $this->createComite($id_affaire, $societe, $etat, 'Comité Meelo');
       if ($pdf) util::file_put_contents(ATF::comite()->filepath($id, 'pdf'),$pdf);
     }
