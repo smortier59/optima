@@ -254,6 +254,45 @@ class meelo extends classes_optima {
             break;
         }
     }
+
+    function pdfSynthese($journeyId, $toolboxURL, $apiKey) {
+        log::logger("-- GET PDF SYNTHESE" , $this->logFile);
+        $url = $toolboxURL.'/v1/pdf/generate/SYNTHESE/1/fr?journeyId='.$journeyId;
+
+
+        log::logger("-- URL : ".$url , $this->logFile);
+        log::logger("-- TOKEN : ".$apiKey , $this->logFile);
+        log::logger("-- METHOD : POST" , $this->logFile);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_ENCODING, '');
+        curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json', 'Authorization: Bearer '.$apiKey) );
+
+
+
+        $response = curl_exec($ch);
+        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_status === 200) {
+            log::logger("PDF Récupéré" , $this->logFile);
+            return $response;
+        }else{
+            log::logger($response , $this->logFile);
+            $response = json_decode($response);
+            if ($response->details) {
+                throw new errorATF("MEELO ERROR : ".$response->message." ".$response->details);
+            } else {
+                throw new errorATF("MEELO ERROR : ".$response->message);
+            }
+        }
+    }
 };
 
 ?>
