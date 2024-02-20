@@ -7121,13 +7121,13 @@ class pdf_cleodis extends pdf {
 		$this->cell(90,6,"Nom, Prénom du signataire :",0,1);
 
 		$this->cell(90,6,"____________________________________________",0,0);
-		$this->cell(90,6,"Christophe Loison",0,1);
+		$this->cell(90,6,"Jérome Loison",0,1);
 
 		$this->cell(90,6,"Qualité :",0,0);
 		$this->cell(90,6,"Qualité :",0,1);
 
 		$this->cell(90,6,"____________________________________________",0,0);
-		$this->cell(90,6,"PRESIDENT",0,1);
+		$this->cell(90,6,"DIRECTEUR GENERAL",0,1);
 	}
 
 
