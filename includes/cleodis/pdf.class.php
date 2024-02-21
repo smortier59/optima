@@ -2513,8 +2513,6 @@ class pdf_cleodis extends pdf {
 		  $this->setfont('arial','',8);
 		  $this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
 
-
-
 		} else {
 		  //$this->sety(167);
 		  $this->setfont('arial','B',8);
@@ -2586,6 +2584,16 @@ class pdf_cleodis extends pdf {
 		$numArticle++;
 		$this->setfont('arial','',8);
 		$this->cell(0,6,"La présente proposition ne deviendra une offre ferme qu'après acceptation du Comité des Agréments de CLEODIS.",0,1);
+
+		if ($this->affaire['nature']=="vente") {
+			ATF::facture()->q->reset()->where('type_facture', 'refi', 'AND')
+									  ->where('id_affaire', $this->affaire['id_affaire']);
+			$factureRefi = ATF::facture()->sa();
+			if ($factureRefi) {
+				$this->multicell(0,5,"Date de Substitution ". date('d/m/Y', strtotime($factureRefi[0]["date"])));
+			}
+		}
+
 
 		if ($this->commande["clause_logicielle"]=="oui") {
 		  $this->setfont('arial','B',8);
