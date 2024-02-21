@@ -3176,7 +3176,7 @@ class pdf_cleodis extends pdf {
 		$this->setLeftMargin(15);
 		$this->ln(5);
 		$this->setfont('arial','B',10);
-		$this->multicell(0,6,"Le Partenaire",0,'C');
+		$this->multicell(0,6,"Le Bénéficiaire",0,'C');
 		$this->setLeftMargin(65);
 		$this->setfont('arial','B',7);
 		$this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
@@ -3198,14 +3198,14 @@ class pdf_cleodis extends pdf {
 		$this->setY(62);
 
 		if($this->affaire["nature"]=="avenant"){
-			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU Contrat Partenariat N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat partenariat n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
+			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU Contrat N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
 			$this->ln(5);
 		}else{
 			if($this->devis["type_contrat"] == "presta"){
-				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat Partenariat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 			}else{
-				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat Partenariat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
 			}
 			if($this->lignes && $this->affaire["nature"]=="AR"){
@@ -3215,7 +3215,7 @@ class pdf_cleodis extends pdf {
 				}
 				$this->ln(2);
 				$this->setfont('arial','BI',7.5);
-				$this->multicell(0,2,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
+				$this->multicell(0,2,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des services) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
 			} else {
 				$this->ln(5);
 			}
@@ -3242,7 +3242,7 @@ class pdf_cleodis extends pdf {
 
 		$w = array(20,30,30,105);
 
-		$eq = "EQUIPEMENT(S)";
+		$eq = "SERVICE(S)";
 
 		if ($this->lignes) {
 			$this->setFillColor(239,239,239);
@@ -3253,7 +3253,7 @@ class pdf_cleodis extends pdf {
 			$this->setfont('arial','B',10);
 			if (!$k) {
 				if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
-				else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
+				else{ $title = "NOUVEAU(X) SERVICES(S)"; }
 
 			} else {
 				$affaire_provenance=ATF::affaire()->select($k);
@@ -3413,7 +3413,7 @@ class pdf_cleodis extends pdf {
 
 
 	  $y = $this->gety()+2;
-	  $t = "Le Partenaire";
+	  $t = "Le Bénéficiaire";
 
 	  $this->cadre(20,$y,80,48,$cadre,$t);
 
