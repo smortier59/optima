@@ -23,6 +23,7 @@ class comite extends classes_optima {
 			,'decision'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteDecision","width"=>50)
 			,"decisionComite"
 			,'envoi_mail_demandeRefi'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"envoi_mail_demandeRefi","width"=>50)
+			,'fichier'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 		);
 
 		$this->colonnes['primary'] = array(
@@ -124,6 +125,7 @@ class comite extends classes_optima {
 
 		$this->noTruncateSA = true;
 		$this->files["pdf"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true);
+		$this->files["fichier"] = array("type"=>"pdf","preview"=>false,"no_generate"=>true);
 		$this->panels['loyer_lignes'] = array('nbCols'=>1);
 		$this->panels['chiffres'] = array("visible"=>true, 'nbCols'=>4);
 		$this->panels['dates'] = array("visible"=>true, 'nbCols'=>3);
