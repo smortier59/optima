@@ -17359,6 +17359,185 @@ class pdf_arrow extends pdf_cleodis
     public $bgcolorTableau = "1c1e3c";
     public $txtcolorTableau = "ffffff";
 
+	public function devisClassique() {
+		if (!$this->devis) return false;
+
+
+		/*	PAGE 7	*/
+		$this->AddPage();
+
+		$this->sety(10);
+		$this->setfont('arial','B',14);
+
+		$this->RoundedRect(15,10,140,20,5);
+		$this->multicell(140,6,"Proposition locative \n".$this->cleodis." pour ",0,'C');
+		$this->multicell(140,6,$this->client['societe'],0,'C');
+		$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
+		$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+
+		$this->image($this->logo,158,10,40);
+
+
+		$this->sety(35);
+
+		$this->setfont('arial','',8);
+
+		$this->cell(0,5,"N° d'affaire : ".$this->affaire["ref"],0,1);
+		$societe = ATF::societe()->select($this->devis['id_societe']);
+		if($societe["code_client"]){$this->cell(0,5,"Code client : ".$societe["code_client"],0,1); }
+
+		$duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
+		$frequence=ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer");
+		if($this->devis['loyer_unique']=='oui'){
+			$this->setfont('arial','B',12);
+			$this->multicell(0,10,"La durée de la location est identique à celle du contrat principal.",0,'L');
+		}elseif($this->devis['type_contrat'] == 'lrp') {
+			if ($duree==39 || $duree==27 || $duree==51) {
+				$this->multicell(0,5,ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." sur ".($duree-3)." (+3) ".$frequence,0,'L');
+			} else {
+				$this->multicell(0,5,ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." sur ".($duree)."  ".$frequence,0,'L');
+			}
+		}
+		$this->setfont('arial','',10);
+
+		$this->multicell(0,5,"TABLEAU DE SYNTHESE DE L'OFFRE : MATERIEL / LOGICIEL / PRESTATION",0,'C');
+
+		if ($this->lignes) {
+			// Groupe les lignes par affaire
+			$lignes=$this->groupByAffaire($this->lignes);
+			// Flag pour savoir si le tableau part en annexe ou pas
+			$flagOnlyPrixInvisible = true;
+			foreach ($lignes as $k => $i) {
+				if (!$k) {
+					$title = "NOUVEAU(X) EQUIPEMENT(S)";
+				} else {
+					$affaire_provenance=ATF::affaire()->select($k);
+					if($this->affaire["nature"]=="AR"){
+						$title = "EQUIPEMENT(S) PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+					}
+				}
+
+				$head = array("Qté","Fournisseur","Désignation","Prix ".$this->texteHT);
+				$w = array(12,40,111,22);
+				unset($data,$st);
+				foreach ($i as $k_ => $i_) {
+					if($i_["visible_pdf"] == "oui"){
+						if ($i_['visibilite_prix']=="visible") {
+							$flagOnlyPrixInvisible = false;
+						}
+						$produit = ATF::produit()->select($i_['id_produit']);
+
+
+						//On prépare le détail de la ligne
+
+						//ici si on surcharge les details il y'aura une duplicata des commentaires alors que la fonction detailProduct le fait
+						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+
+
+
+						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+
+						if ($details == "") unset($details);
+
+						$etat = "";
+						if($i_["neuf"] == "non"){
+							$etat = "( OCCASION )";
+						}
+
+						//Si c'est une prestation, on affiche pas l'etat
+						if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){	$etat = "";		}
+
+						if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+						$data[] = array(
+							round($i_['quantite'])
+							,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
+							,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat.$details
+							,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
+
+						);
+
+
+					}
+
+				}
+				$tableau[$k] = array(
+					"head"=>$head
+					,"data"=>$data
+					,"w"=>$w
+					,"styles"=>$st
+					,"title"=>$title
+				);
+
+
+
+			}
+
+		}
+
+		foreach ($tableau as $k=>$i) {
+			$this->setFillColor(239,239,239);
+			$this->setfont('arial','B',10);
+			$this->multicell(0,5,$i['title'],1,'C',1);
+			$this->setfont('arial','',8);
+			if ($flagOnlyPrixInvisible) {
+				array_pop($i['head']);
+				$i['w'][1] += array_pop($i['w']);
+				array_pop($i['styles']);
+				foreach ($i['data'] as $k_=>$i_) {
+					array_pop($i['data'][$k_]);
+				}
+			}
+			if ($h>$this->heightLimitTableDevisClassique) {
+				$this->multicellAnnexe();
+				$annexes[$k] = $i;
+			} else {
+				$this->tableauBigHead($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+		}
+
+		$this->sety(130);
+		if($this->devis['loyer_unique']=='non'){
+			$this->tableauLoyer();
+		}
+
+		$this->setfont('arial','',8);
+		$this->cell(0,5,"",0,1,'C');
+
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"Les engagements ".$this->cleodis.": ");
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"Nous nous engageons à vous fournir :");
+		$this->setfont('arial','',8);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>Un conseil indépendant en renouvellement de matériels",0,1);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>La possibilité d'évoluer à tout moment, et d'incorporer des budgets non prévus tout en lissant la charge budgétaire",0,1);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>Un service de reprise des équipements au terme ou en cours de contrat",0,1);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>La gestion de parc des matériels loués",0,1);
+
+		$this->sety(235);
+		$this->cell(0,40,"",1,1);
+		$this->sety(235);
+		$this->setFontDecoration('B');
+		if ($this->totalAssurance) {
+			$this->multicell(0,5,"Option assurance remplacement : oui ou non");
+		}
+		$this->unsetFontDecoration();
+		$this->multicell(0,5,"« Bon pour accord »");
+		$this->multicell(0,5,"Cachet commercial+ Signature");
+
+		$this->setfont('arial','I',6);
+		$this->sety(270);
+		$this->multicell(0,5,"Cette offre, valable jusqu'au ".ATF::$usr->trans($this->devis['validite']).", reste soumise à notre comité des engagements.",0,'C');
+		if ($annexes) {
+			$this->annexes($annexes);
+		}
+	}
+
 
 	public function contrat_locationA4Particulier($id, $signature, $sellAndSign) { $this->contrat_location($id, "particulier"); }
 	public function contrat_locationA4Societe($id, $signature, $sellAndSign) { $this->contrat_location($id, "pro"); }
