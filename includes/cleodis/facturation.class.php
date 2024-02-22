@@ -135,7 +135,7 @@ class facturation extends classes_optima {
 						->addCondition("date_periode_debut",$facture_parente_qui_chevauche_le_debut_du_contrat_enfant["date_periode_debut"],"AND",false,"<=")
 						->addCondition("date_periode_fin",$facture_parente_qui_chevauche_le_debut_du_contrat_enfant["date_periode_fin"],"AND",false,">=")
 						->addCondition("id_affaire",$facture_parente_qui_chevauche_le_debut_du_contrat_enfant["id_affaire"],"AND")
-						->addCondition("type_facture","libre","AND")
+						// ->addCondition("type_facture","libre","AND")
 						->addCondition("prix",0,"AND",false,"<")
 						->setDimension("row");
 
@@ -178,7 +178,7 @@ class facturation extends classes_optima {
 									ATF::facture()->q->reset()->addCondition("date_periode_debut",$facture["date_periode_debut"],"AND",false,"<=")
 															  ->addCondition("date_periode_fin",$facture["date_periode_fin"],"AND",false,">=")
 															  ->addCondition("id_affaire",$facture["id_affaire"],"AND")
-															  ->addCondition("type_facture","libre","AND")
+															  // ->addCondition("type_facture","libre","AND")
 															  ->addCondition("prix",0,"AND",false,"<");
 
 									if(!($factureAvoir=ATF::facture()->sa())){
