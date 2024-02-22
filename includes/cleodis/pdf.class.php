@@ -5566,12 +5566,13 @@ class pdf_cleodis extends pdf {
 		$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),"align"=>"C"));
 		$this->cadre(140,$y,60,13,$cadre);
 
+		$head = array("Quantité","Désignation","Montant");
+		$w = array(20,120,40);
+		$data = $styles = array();
+		//Quantite
+		$data[0][0] = "1";
+
 		if ($this->lignes) {
-			$head = array("Quantité","Désignation","Montant");
-			$w = array(20,120,40);
-			$data = $styles = array();
-			//Quantite
-			$data[0][0] = "1";
 
 			if ($this->facture['designation']) {
 				$data[0][1] = $this->facture['designation'];
@@ -5611,25 +5612,59 @@ class pdf_cleodis extends pdf {
 
 			//Désignation L3
 			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
-			//Désignation L4
-			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
-			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
-			// Montant Facture
-			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+		} else {
+			if ($this->facture['designation']) {
+				$data[0][1] = $this->facture['designation'];
+			}
+		}
 
 
-			if($this->lignes_visibles) {
+		//Désignation L4
+		list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+		//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+		// Montant Facture
+		$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
 
-				if($this->facture['type_facture'] !== "libre"){
+
+		if($this->lignes_visibles) {
+
+			if($this->facture['type_facture'] !== "libre"){
+				//Préparation du détail
+				if($this->affaire['nature']=="vente"){
+					$data[0]['details'] = "Equipements objets de la vente";
+				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
+				}else{	$data[0]['details'] = "Matériels objets de la location"; }
+				foreach ($this->lignes_visibles as $k => $i) {
+					$produit = ATF::produit()->select($i["id_produit"]);
+					$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+					$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+					$detail = "\n".round($i['quantite'])." ";
+					if($sous_categorie) $detail .= $sous_categorie." ";
+					if($fabriquant) $detail .= $fabriquant." ";
+					$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+					$data[0]['details'] .= $detail;
+				}
+				$styles[0] = array(
+					""
+					,$this->colsProduitAlignLeft
+					,""
+					,"details"=>$this->styleDetailsProduit
+				);
+
+			}else{
+				if($this->facture['type_libre'] === "normale"){
 					//Préparation du détail
 					if($this->affaire['nature']=="vente"){
 						$data[0]['details'] = "Equipements objets de la vente";
-					}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-					}else{	$data[0]['details'] = "Matériels objets de la location"; }
+					}else{
+						$data[0]['details'] = "Matériels objets de la location";
+					}
+
+
 					foreach ($this->lignes_visibles as $k => $i) {
-						$produit = ATF::produit()->select($i["id_produit"]);
-						$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-						$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
 
 						$detail = "\n".round($i['quantite'])." ";
 						if($sous_categorie) $detail .= $sous_categorie." ";
@@ -5638,98 +5673,44 @@ class pdf_cleodis extends pdf {
 
 						$data[0]['details'] .= $detail;
 					}
+
 					$styles[0] = array(
 						""
 						,$this->colsProduitAlignLeft
 						,""
 						,"details"=>$this->styleDetailsProduit
 					);
-
-				}else{
-					if($this->facture['type_libre'] === "normale"){
-						//Préparation du détail
-						if($this->affaire['nature']=="vente"){
-							$data[0]['details'] = "Equipements objets de la vente";
-						}else{
-							$data[0]['details'] = "Matériels objets de la location";
-						}
-
-
-						foreach ($this->lignes_visibles as $k => $i) {
-
-
-							$detail = "\n".round($i['quantite'])." ";
-							if($sous_categorie) $detail .= $sous_categorie." ";
-							if($fabriquant) $detail .= $fabriquant." ";
-							$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
-
-							$data[0]['details'] .= $detail;
-						}
-
-						$styles[0] = array(
-							""
-							,$this->colsProduitAlignLeft
-							,""
-							,"details"=>$this->styleDetailsProduit
-						);
-					}
 				}
 			}
+		}
 
 
-			$this->tableauBigHead($head,$data,$w,5,$styles);
+		$this->tableauBigHead($head,$data,$w,5,$styles);
 
-			if ($this->facture['commentaire']) {
-				$com = array(array("Commentaire : ".$this->facture['commentaire']));
-				$sCom = array(array($this->styleDetailsProduit));
-				$this->tableau(false,$com,180,5,$sCom);
+		if ($this->facture['commentaire']) {
+			$com = array(array("Commentaire : ".$this->facture['commentaire']));
+			$sCom = array(array($this->styleDetailsProduit));
+			$this->tableau(false,$com,180,5,$sCom);
+		}
+
+		if($this->facture['type_facture'] === "libre"){
+			if($this->facture['type_libre'] == "contentieux"){
+				$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
+				$sInfosTVA = array(array($this->styleDetailsProduit));
+				$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
 			}
+		}
 
-			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] == "contentieux"){
-					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
-					$sInfosTVA = array(array($this->styleDetailsProduit));
-					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
-				}
-			}
+		$this->ln(5);
+		$total = $this->facture['prix'];
+		$totalTTC = $total*$this->facture['tva'];
 
-			$this->ln(5);
-			$total = $this->facture['prix'];
-			$totalTTC = $total*$this->facture['tva'];
-
-			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
 
 
 
-			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] !== 1){
-					if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
-						$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
-					} else {
-						$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-					}
-
-					$data = array(
-						array(
-							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-							,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
-							,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
-							,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
-						)
-					);
-				}else{
-					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
-					$data = array(
-						array(
-							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-							,number_format(abs((1-1)*100),2,'.',' ')."%"
-							,number_format(abs(round(($this->facture["prix"]*0),2)),2,'.',' ')." €"
-							,number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-						)
-					);
-				}
-			}else{
-
+		if($this->facture['type_facture'] === "libre"){
+			if($this->facture['type_libre'] !== 1){
 				if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
 					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
 				} else {
@@ -5744,29 +5725,55 @@ class pdf_cleodis extends pdf {
 						,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
 					)
 				);
+			}else{
+				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
+				$data = array(
+					array(
+						number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+						,number_format(abs((1-1)*100),2,'.',' ')."%"
+						,number_format(abs(round(($this->facture["prix"]*0),2)),2,'.',' ')." €"
+						,number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+					)
+				);
 			}
-
+		}else{
 
 			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
-
-				$data[] = array(
-					number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
-					,"0.00%"
-					,""
-					,number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
-				);
-
-				$ttc = ($this->facture["prix"]* $this->facture["tva"]) + $this->facture["prix_sans_tva"];
-
-				$data[] = array(
-					"",
-					"",
-					"",
-					number_format(abs(round($ttc,2)),2,'.',' ')." €"
-				);
+				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
+			} else {
+				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 			}
-			$this->tableau($head,$data);
+
+			$data = array(
+				array(
+					number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+					,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+					,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+					,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+				)
+			);
 		}
+
+
+		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
+
+			$data[] = array(
+				number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
+				,"0.00%"
+				,""
+				,number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
+			);
+
+			$ttc = ($this->facture["prix"]* $this->facture["tva"]) + $this->facture["prix_sans_tva"];
+
+			$data[] = array(
+				"",
+				"",
+				"",
+				number_format(abs(round($ttc,2)),2,'.',' ')." €"
+			);
+		}
+		$this->tableau($head,$data);
 
 		$this->ln(10);
 		$y = $this->getY();
