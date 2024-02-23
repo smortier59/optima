@@ -702,7 +702,7 @@ class souscription_cleodis extends souscription {
         "prix" => round($prix, 2),
         "prix_libre" => round($prix, 2),
         "nature" => "contrat",
-        "designation" => "Frais de dossier"
+        "designation" => "Frais de dossier - ".$affaire["affaire"]
       );
       $facture["values_facture"]["produits"] = json_encode([]);
 
