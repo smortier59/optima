@@ -2585,14 +2585,6 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',8);
 		$this->cell(0,6,"La présente proposition ne deviendra une offre ferme qu'après acceptation du Comité des Agréments de CLEODIS.",0,1);
 
-		if ($this->affaire['nature']=="vente") {
-			ATF::facture()->q->reset()->where('type_facture', 'refi', 'AND')
-									  ->where('id_affaire', $this->affaire['id_affaire']);
-			$factureRefi = ATF::facture()->sa();
-			if ($factureRefi) {
-				$this->multicell(0,5,"Date de Substitution ". date('d/m/Y', strtotime($factureRefi[0]["date"])));
-			}
-		}
 
 
 		if ($this->commande["clause_logicielle"]=="oui") {
@@ -7104,7 +7096,15 @@ class pdf_cleodis extends pdf {
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
 		$this->multicell(0,5,"Désignation de l’Equipement : ".$this->affaire["affaire"]."\nPrix de Vente : ".number_format($this->demande_refi["loyer_actualise"], 2, " ", "," )." euros H.T. à majorer de la TVA au taux en vigueur.");
+
+		ATF::facture()->q->reset()->where('type_facture', 'refi', 'AND')
+									->where('id_affaire', $this->affaire['id_affaire']);
+		$factureRefi = ATF::facture()->sa();
+		if ($factureRefi) {
+			$this->multicell(0,5,"Date de Substitution : ". date('d/m/Y', strtotime($factureRefi[0]["date"])));
+		}
 		$this->ln(5);
+
 
 		$this->setfont('arial',"B",8);
 		$this->setleftMargin(25);
