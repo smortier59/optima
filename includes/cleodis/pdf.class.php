@@ -470,7 +470,7 @@ class pdf_cleodis extends pdf {
 
 			$this->RoundedRect(15,50,180,70,5);
 			if (ATF::$codename == 'arrow') {
-				$this->image($this->logo,65,55,85);
+				$this->image($this->logo,90,75,40);
 			} else {
 				$this->image($this->logo,85,55,45);
 			}
@@ -17373,7 +17373,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->multicell(140,6,"Proposition locative \n".$this->cleodis." pour ",0,'C');
 		$this->multicell(140,6,$this->client['societe'],0,'C');
 		$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
-		$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+
 
 		$this->image($this->logo,158,10,40);
 
@@ -17381,7 +17381,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->sety(35);
 
 		$this->setfont('arial','',8);
-
+		$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->devis['date'])),0, 1);
 		$this->cell(0,5,"N° d'affaire : ".$this->affaire["ref"],0,1);
 		$societe = ATF::societe()->select($this->devis['id_societe']);
 		if($societe["code_client"]){$this->cell(0,5,"Code client : ".$societe["code_client"],0,1); }
@@ -17399,9 +17399,9 @@ class pdf_arrow extends pdf_cleodis
 			}
 		}
 		$this->setfont('arial','',10);
-
+		$this->ln(5);
 		$this->multicell(0,5,"TABLEAU DE SYNTHESE DE L'OFFRE : MATERIEL / LOGICIEL / PRESTATION",0,'C');
-
+		$this->ln(5);
 		if ($this->lignes) {
 			// Groupe les lignes par affaire
 			$lignes=$this->groupByAffaire($this->lignes);
