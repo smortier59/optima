@@ -18270,7 +18270,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->setFont('Arial','', '8');
 		$lines = [
 			"Représentée par" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE",
-			"Qualité" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Directeur Commercial",
+			"Qualité" => ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial",
 			"Cachet de la société" => "",
 			"Signature" => ""
 		];
