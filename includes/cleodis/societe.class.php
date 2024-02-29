@@ -1211,7 +1211,7 @@ class societe_cleodis extends societe {
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
       "email"=>$contact["email"],
-      "tel"=> self::internationalToNationalPhoneNumber($contact["gsm"]),
+      "tel"=> $contact["gsm"],
       "company_name"=>$societe["societe"],
       "ref"=>ATF::$codename.$societe["code_client"],
       "IBAN"=>$societe["IBAN"] ? $societe["IBAN"] : $affaire["IBAN"],
@@ -1219,24 +1219,6 @@ class societe_cleodis extends societe {
     );
     return $return;
   }
-
-  function internationalToNationalPhoneNumber($internationalNumber) {
-    if ($internationalNumber) {
-      // Supprimer les caractères non numériques
-      $internationalNumber = preg_replace('/\D/', '', $internationalNumber);
-
-      // Si le numéro commence par le code pays, le supprimer
-      // Exemple : +33 6 12 34 56 78 devient 6 12 34 56 78
-      if (strpos($internationalNumber, '+33') === 0) {
-          $internationalNumber = str_replace("+33", "0", $internationalNumber);
-      }
-
-      // Extraire le numéro national (supposer que le numéro national est les 9 derniers chiffres)
-      $nationalNumber = $internationalNumber;
-    }
-
-    return $nationalNumber;
-}
 
   public function getCodeClient($site_associe, $prefixe = "TO"){
     //Recherche du max en base
