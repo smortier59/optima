@@ -1198,7 +1198,9 @@ class societe_cleodis extends societe {
     if (strlen($post["id"])!=32) {
       throw new Exception('Identifiant non valide.', 500);
     }
-    $id_societe = ATF::affaire()->select($post["id"],"id_societe");
+    $affaire =  ATF::affaire()->select($post["id"]);
+    $id_societe = $affaire["id_societe"];
+
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
@@ -1209,13 +1211,37 @@ class societe_cleodis extends societe {
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
       "email"=>$contact["email"],
-      "tel"=>$contact["gsm"],
+      "tel"=> self::internationalToNational($contact["gsm"]),
       "company_name"=>$societe["societe"],
       "ref"=>ATF::$codename.$societe["code_client"],
-      "IBAN"=>$societe["IBAN"],
-      "BIC"=>$societe["BIC"]
+      "IBAN"=>$societe["IBAN"] ? $societe["IBAN"] : $affaire["IBAN"],
+      "BIC"=>$societe["BIC"] ? $societe["BIC"] : $affaire["BIC"]
     );
     return $return;
+  }
+
+  function internationalToNational($internationalNumber) {
+    // Supprimer les caractères non numériques
+    $internationalNumber = preg_replace('/\D/', '', $internationalNumber);
+
+    // Si le numéro commence par le code pays, le supprimer
+    // Exemple : +33 6 12 34 56 78 devient 6 12 34 56 78
+    if (strpos($internationalNumber, '+') === 0) {
+        $internationalNumber = substr($internationalNumber, 1);
+    }
+
+    // Extraire le numéro national (supposer que le numéro national est les 9 derniers chiffres)
+    $nationalNumber = substr($internationalNumber, -9);
+
+    // S'assurer que le numéro national commence par un zéro
+    if (strpos($nationalNumber, '0') !== 0) {
+        $nationalNumber = '0' . $nationalNumber;
+    }
+
+    // Si le numéro national n'est pas sur 10 caractères, ajouter des zéros à gauche
+    $nationalNumber = str_pad($nationalNumber, 10, '0', STR_PAD_LEFT);
+
+    return $nationalNumber;
   }
 
   public function getCodeClient($site_associe, $prefixe = "TO"){
