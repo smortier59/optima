@@ -289,7 +289,7 @@ class souscription_cleodis extends souscription {
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
           case 'solo':
-            $this->createComite($id_affaire, $societe, "accepte", "Comité SOLO", date("Y-m-d"), date("Y-m-d"));
+            $this->createComite($id_affaire, $societe, "en_attente", "Comité SOLO", date("Y-m-d"), date("Y-m-d"));
           break;
 
           case 'bdomplus':
@@ -1182,13 +1182,13 @@ class souscription_cleodis extends souscription {
     $toolboxURL = ATF::constante()->select_row();
     $toolboxURL = $toolboxURL["valeur"];
 
-
     $pdf = ATF::meelo()->pdfSynthese($post["journeyId"], $toolboxURL, $apiKey);
 
     foreach ($post['ids'] as $id_affaire) {
-      $etat = 'refuse';
+      $etat = 'en_attente';
 
-      if ($post["retourRules"]["result"]["globalDecision"]) $etat = 'accepte';
+      if ($post["retourRules"]["result"]["globalDecision"] == "true") $etat = 'accepte';
+      if ($post["retourRules"]["result"]["globalDecision"] == "false") $etat = 'refuse';
       $id = $this->createComite($id_affaire, $societe, $etat, 'Comité Meelo');
       if ($pdf) util::file_put_contents(ATF::comite()->filepath($id, 'pdf'),$pdf);
     }
