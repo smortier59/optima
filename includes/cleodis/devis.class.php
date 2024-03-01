@@ -1368,6 +1368,7 @@ class devis_cleodis extends devis {
     */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 		$this->q->addJointure("devis","id_societe","societe","id_societe");
+		$this->q->addJointure("devis","id_affaire","affaire","id_affaire");
 		return parent::select_all($order_by,$asc,$page,$count);
 	}
 
