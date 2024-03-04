@@ -1226,7 +1226,7 @@ class affaire_lm extends affaire {
 						$ref_produits = $ids_produits[1];
 
 
-						ATF::devis()->q->reset()->where("id_affaire" , $affaire["id_affaire"]);
+						ATF::devis()->q->reset()->where("devis.id_affaire" , $affaire["id_affaire"]);
 						$devis = ATF::devis()->select_row();
 						ATF::devis_ligne()->q->reset()->where("id_devis" , $devis["id_devis"]);
 						$lignes = ATF::devis_ligne()->select_all();

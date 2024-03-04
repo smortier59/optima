@@ -1460,7 +1460,7 @@ class societe_absystech extends societe {
 
     // $this->checkIBAN($iban);
 
-	ATF::devis()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_devis", "desc");
+	ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire)->addOrder("id_devis", "desc");
 	$devis_list = ATF::devis()->sa();
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);

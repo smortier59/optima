@@ -790,7 +790,7 @@ class facture_absystech extends facture {
 
 
 			if(ATF::affaire()->select($infos["id_affaire"] , "nature") == "consommable"){
-				ATF::devis()->q->reset()->where("id_affaire", $infos["id_affaire"])
+				ATF::devis()->q->reset()->where("devis.id_affaire", $infos["id_affaire"])
 										->where("etat", "gagne");
 				$devis = ATF::devis()->select_row();
 
