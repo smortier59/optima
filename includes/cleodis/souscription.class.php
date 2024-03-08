@@ -1187,8 +1187,8 @@ class souscription_cleodis extends souscription {
     foreach ($post['ids'] as $id_affaire) {
       $etat = 'en_attente';
 
-      if ($post["retourRules"]["result"]["globalDecision"] == "true") $etat = 'accepte';
-      if ($post["retourRules"]["result"]["globalDecision"] == "false") $etat = 'refuse';
+      if ($post["retourRules"]["result"]["globalDecision"] == "true" || $post["retourRules"]["result"]["globalDecision"] == true) $etat = 'accepte';
+      if ($post["retourRules"]["result"]["globalDecision"] == "false" || $post["retourRules"]["result"]["globalDecision"] == false) $etat = 'refuse';
       $id = $this->createComite($id_affaire, $societe, $etat, 'Comité Meelo');
       if ($pdf) util::file_put_contents(ATF::comite()->filepath($id, 'pdf'),$pdf);
     }
