@@ -1357,13 +1357,13 @@ class souscription_cleodis extends souscription {
    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function _payFactureFraisDossier($get, $post) {
-    $id_affaire = $post['id_affaire'];
-
-    ATF::facture()->q->reset()->where('facture.id_affaire', $post["id_affaire"], "AND")->where("facture.designation", "Frais de dossier%", "AND", false, "LIKE");
+    ATF::facture()->q->reset()
+      ->where('facture.id_affaire', $post["id_affaire"], "AND")
+      ->where("facture.designation", "Frais de dossier%", "AND", false, "LIKE");
     $factures = ATF::facture()->select_all();
 
     foreach ($factures as $key => $value) {
-      ATF::facture()->u(["id_facture" => $value["facture.id_facture"], "etat" => "payee"]);
+      ATF::facture()->u(["id_facture" => $value["facture.id_facture"], "etat" => "payee", "date_paiement" => date("Y-m-d")]);
     }
 
     return true;
