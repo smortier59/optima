@@ -1359,7 +1359,7 @@ class souscription_cleodis extends souscription {
   public function _payFactureFraisDossier($get, $post) {
     $id_affaire = $post['id_affaire'];
 
-    ATF::facture()->q->reset()->where('facture.id_affaire', $post["id_affaire"], "AND")->where("facture.designation", "Frais de dossier");
+    ATF::facture()->q->reset()->where('facture.id_affaire', $post["id_affaire"], "AND")->where("facture.designation", "Frais de dossier%", "AND", false, "LIKE");
     $factures = ATF::facture()->select_all();
 
     foreach ($factures as $key => $value) {
