@@ -1836,7 +1836,7 @@ class societe_cleodis extends societe {
           "date_creation" => $legalUnit->registrationDate,
           "langue" => $post["langue"],
           "id_apporteur" => $apporteur ? $apporteur : null,
-          "id_fournisseur" => $apporteur ? $apporteur : null
+          "id_fournisseur" => $apporteur ? $apporteur : null,
         ];
 
         if ($scoring->score) $commun["cs_score"] = $scoring->score;
@@ -1849,20 +1849,28 @@ class societe_cleodis extends societe {
                   "siren" => $legalUnit->registrationNumber,
                   "siret" => $siret,
                   "reference_tva" => $legalUnit->vatRegistrationNumber,
-                  "adresse" => $etablissement->address->address,
-                  "cp" => $etablissement->address->zipcode,
-                  "ville" => $etablissement->address->city,
                   "activite" => $legalUnit->activity,
                   "tel" => $legalUnit->phone,
                   "structure" => $legalUnit->companyCategory,
                   "capital" => $legalUnit->shareCapital,
+                  "adresse" => $etablissement->address->address,
+                  "cp" => $etablissement->address->zipcode,
+                  "ville" => $etablissement->address->city,
+                  "id_pays" => $etablissement->address->country,
                 ];
               }
             }
           break;
 
           case 'ES':
-            $specifique = [ "capital" => $legalUnit->shareCapital->value ];
+            $specifique = [
+              "capital" => $legalUnit->shareCapital->value,
+              "adresse" =>$company->establishments[0]->address->address,
+              "cp" =>$company->establishments[0]->address->zipcode,
+              "ville" =>$company->establishments[0]->address->city,
+              "province" =>$company->establishments[0]->address->province,
+              "id_pays" =>$company->establishments[0]->address->country,
+            ];
             if (ATF::$codename === "itrenting") {
               $specifique["cif"] = $legalUnit->companyRegistrationNumber;
             } else {
@@ -1871,7 +1879,14 @@ class societe_cleodis extends societe {
           break;
 
           case 'BE':
-            # code...
+            $specifique = [
+              "num_ident" => $legalUnit->companyRegistrationNumber,
+              "capital" => $legalUnit->shareCapital->value,
+              "adresse" =>$company->establishments[0]->address->address,
+              "cp" =>$company->establishments[0]->address->zipcode,
+              "ville" =>$company->establishments[0]->address->city,
+              "id_pays" =>$company->establishments[0]->address->country,
+            ];
           break;
         }
         $data_soc = array_merge($commun, $specifique);
