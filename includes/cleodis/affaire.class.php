@@ -2837,13 +2837,20 @@ class affaire_cleodis extends affaire {
 			$notifie = [];
 			if ($constantNotifie) $notifie = $constantNotifie;
 			if ($responsableSociete) $notifie[] = $responsableSociete;
+			$redacteur = $utilisateur["prenom"]." ".$utilisateur["nom"];
+			$redacteur_societe = ATF::societe()->select($utilisateur["id_societe"], "societe");
+
+			if ($post["redacteur"]) {
+				$redacteur = $post["redacteur"];
+				$redacteur_societe = ATF::societe()->select($id_partenaire, "societe");
+			}
 
 			$suivi = array(
 				 "id_societe"=>$id_societe
 				,"id_affaire"=>$devis["id_affaire"]
 				,"id_contact"=>$utilisateur["id_contact"]
 				,"type_suivi"=>'devis'
-				,"texte"=>"Création de l'affaire par :\n".$utilisateur["prenom"]." ".$utilisateur["nom"]."\nSociete ".ATF::societe()->select($utilisateur["id_societe"], "societe")
+				,"texte"=>"Création de l'affaire par :\n".$redacteur."\nSociete ".$redacteur_societe
 				,'public'=>'oui'
 				,'suivi_societe'=>NULL
 				,'suivi_notifie'=>$notifie
@@ -2883,7 +2890,7 @@ class affaire_cleodis extends affaire {
 					,"id_affaire"=>$devis["id_affaire"]
 					,"id_contact"=>$utilisateur["id_contact"]
 					,"type_suivi"=>'devis'
-					,"texte"=>"Commentaire depuis l'espace partenaire : <br />".$post["commentaire"]."\n".$utilisateur["prenom"]." ".$utilisateur["nom"]."\nSociete ".ATF::societe()->select($utilisateur["id_societe"], "societe")
+					,"texte"=>"Commentaire depuis l'espace partenaire : <br />".$post["commentaire"]."\n".$redacteur."\nSociete ".$redacteur_societe
 					,'public'=>'oui'
 					,'suivi_societe'=>NULL
 					,'suivi_notifie'=>$notifie
