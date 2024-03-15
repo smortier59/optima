@@ -17356,6 +17356,7 @@ class pdf_solo extends pdf_cleodis
 class pdf_arrow extends pdf_cleodis
 {
     public $logo = __PDF_PATH__ . "arrow/arrow_capital_solutions_logo.jpg";
+	public $logo2 = __PDF_PATH__ . "arrow/arrow_capital_solutions_logo_2.jpg";
     public $heightLimitTableContratPV = 70;
     public $langue = "FR";
 
@@ -18139,8 +18140,12 @@ class pdf_arrow extends pdf_cleodis
 	}
 
 	public function cession($id, $s) {
-
+		$arrow = ATF::societe()->select(1);
 		$contrat = ATF::commande()->select(ATF::commande()->decryptId($id));
+		ATF::commande_ligne()->q->reset()->where("visible","oui")->where("id_commande",$contrat['id_commande']);
+		if(ATF::$codename == "cleodis") ATF::commande_ligne()->q->where("visible_pdf","oui");
+		$lignes = ATF::commande_ligne()->sa();
+		$affaire = ATF::affaire()->select($contrat["id_affaire"]);
 		$client = ATF::societe()->select($contrat["id_societe"]);
 
 		ATF::demande_refi()->q->reset()->where("demande_refi.id_affaire", $contrat["id_affaire"])->where("demande_refi.etat", "valide")->setLimit(1);
@@ -18150,7 +18155,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->unsetFooter();
 		$this->unsetHeader();
 		$this->AddPage();
-		$this->image($this->logo,74,10,60);
+		$this->image($this->logo2,74,10,60);
 
 		$this->setY(30);
 		$this->setFont('Arial','B', '14');
@@ -18162,45 +18167,91 @@ class pdf_arrow extends pdf_cleodis
 		$this->line(10,38,200,38);
 		$this->ln(6);
 
-		$this->multicell(0,4, "En vertu de la Convention de Coopération signée, la société ".$this->societe["societe"]." (ci-après dénommée « ".$this->societe["societe"]." ») cède à ".$refinanceur["refinanceur"]." (ci-après dénommée «".$refinanceur["refinanceur"]."») divers matériels ayant fait l’objet d’un Contrat de Location N°".$contrat["ref"]." négocié et conclu le ".date('d/m/Y', strtotime($contrat["date"]))." entre ".$this->societe["societe"]." et ".$client["societe"]." Siren ".$client["siren"].". (ci-après dénommé « le Locataire »), dont les caractéristiques sont décrites ci-après.");
+		$this->multicell(0,4, "En vertu de la Convention de Coopération signée, la société ".$arrow["societe"]." (ci-après dénommée « ".$arrow["societe"]." ») cède à ".$refinanceur["refinanceur"]." (ci-après dénommée «".$refinanceur["refinanceur"]."») divers matériels ayant fait l’objet d’un Contrat de Location N°".$contrat["ref"]." négocié et conclu le ".date('d/m/Y', strtotime($contrat["date"]))." entre ".$arrow["societe"]." et ".$client["societe"]." Siren ".$client["siren"].". (ci-après dénommé « le Locataire »), dont les caractéristiques sont décrites ci-après.");
 		$this->ln(2);
 
 		$this->multicell(0,4, "La présente vente est faite à la date et au prix indiqué ci-dessous.");
 		$this->ln(2);
 
-		$this->multicell(0,4, "Par ailleurs, ".$this->societe["societe"]." s’engage à racheter les matériels à ".$refinanceur["refinanceur"]." au terme du Contrat de Location, et ce en vertu de l’article VIII de ladite Convention, au prix fixé ci-après.");
+		$this->multicell(0,4, "Par ailleurs, ".$arrow["societe"]." s’engage à racheter les matériels à ".$refinanceur["refinanceur"]." au terme du Contrat de Location, et ce en vertu de l’article VIII de ladite Convention, au prix fixé ci-après.");
 		$this->ln(2);
 
 		$this->titleContrat("CONTRAT DE LOCATION :");
 		ATF::loyer()->q->reset()->where("id_affaire", $contrat["id_affaire"]);
 		$duree = 0;
 		$periodicite = "mois";
-		foreach(ATF::loyer()->select_all() as $l) {
+		$periodiciteEtTerme = "mensuelles ";
+		$echeance = "";
+		foreach(ATF::loyer()->select_all() as $k => $l) {
 			$duree += $l["duree"];
 			$periodicite = $l["frequence_loyer"];
-		}
-		$this->cell(0,4, "Durée du contrat : ".$duree." ".$periodicite,0, 1);
-		$this->cell(0,4, "Périodicité et Terme : ...........................................",0, 1);
-		$this->cell(0,4, "Echeancier : ...........................................",0, 1);
-		$this->cell(0,4, "Valeur résiduelle : ...........................................",0, 1);
-		$this->cell(0,4, "Désignation du matériel : ...........................................",0, 1);
 
-		$this->cell(0,4, "L’adresse de facturation est la suivante  :",0, 1);
+			if ($echeance != "") $echeance .= ", ";
+			$echeance .= $l["duree"]." redevances ";
+			if($l["frequence_loyer"] == "mois") $echeance .= "mensuelles ";
+			if($l["frequence_loyer"] == "trimestre") $echeance .= "trimestrielles ";
+			if($l["frequence_loyer"] == "semestre")$echeance .= "semestrielles ";
+			if($l["frequence_loyer"] == "an") $echeance .= "annuelles ";
+
+			if ($k == 0) {
+				if($l["frequence_loyer"] == "mois") $periodiciteEtTerme = "mensuel";
+				if($l["frequence_loyer"] == "trimestre") $periodiciteEtTerme = "trimestriel";
+				if($l["frequence_loyer"] == "semestre")$periodiciteEtTerme = "semestriel";
+				if($l["frequence_loyer"] == "an") $periodiciteEtTerme = "annuel";
+			}
+			$echeance .= "de ".$l["loyer"]."€ HT ";
+		}
+
+		$this->cell(0,4, "Durée du contrat : ".$duree." ".$periodicite,0, 1);
+		$this->cell(0,4, "Périodicité et Terme : ".$periodiciteEtTerme." terme à échoir",0, 1);
+		$this->cell(0,4, "Echeancier : ".$echeance,0, 1);
+		$this->cell(0,4, "Valeur résiduelle : ".$demande_refi["valeur_residuelle"]." HT Euros",0, 1);
+		$this->cell(0,4, "Désignation du matériel :",0, 1);
+
+		$this->ln(4);
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,0,0);
+		$this->cell(50,10, "Réference",1,0,'C',1);
+		$this->cell(100,10, "Description",1,0,'C',1);
+		$this->cell(30,10, "Qté",1,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+
+		foreach($lignes as $l) {
+			$this->cell(50, 7, $l["ref"], 1, 0, 'L');
+			$this->cell(100, 7, $l["produit"], 1, 0, 'L');
+			$this->cell(30, 7, $l["quantite"], 1, 1, 'C');
+		}
+
+		$this->ln(5);
+
+
+		$this->cell(0,4, "L’adresse de facturation est la suivante  : ",0, 1);
+		$this->multicell(0,3,"Raison sociale : ".$client['societe'],0);
+		$this->multicell(0,3,"Adresse : ".$client['adresse'],0);
+		$this->multicell(0,3,"Code Postal : ".$client['cp']." Ville : ".$client['ville'],0);
+
+		if($client['id_pays'] =='FR'){
+			$this->multicell(0,3,"SIRET : ".$client['siret']." Tél : ".$client['tel'],0);
+		}else{
+			$this->multicell(0,3,"NUMERO DE TVA : ".($client['siret']?$client['siret']:"-")." Tél : ".$client['tel'],0);
+		}
 
 
 		$this->titleContrat("ASSURANCE DOMMAGE SOUSCRIPTEUR :");
 
 		$this->titleContrat("VENTE DU MATERIEL :");
-		$this->cell(0,4, "Date de la vente : ...........................................",0, 1);
-		$this->cell(0,4, "Date de cession : ...........................................",0, 1);
-		$this->cell(0,4, "Prix de vente : ............ H.T. Euros – ............ TTC Euros.",0, 1);
-		$this->cell(0,4, "La date d’effet est fixée au : ...........................................",0, 1);
+		$this->cell(0,4, "Date de la vente : ".date("d/m/Y", strtotime($affaire["date_installation_reel"])),0, 1);
+		$this->cell(0,4, "Date de cession : ".date("d/m/Y", strtotime($contrat["date_debut"])),0, 1);
+		$this->cell(0,4, "Prix de vente : ".number_format($demande_refi["prix"],2,'.',' ')." H.T. Euros – ".number_format(($demande_refi["prix"]*$contrat["tva"]),2,'.',' ')." TTC Euros.",0, 1);
+		$this->cell(0,4, "La date d’effet est fixée au : ".date("d/m/Y", strtotime($contrat["date_debut"])),0, 1);
 
 		$this->titleContrat("RACHAT DU MATERIEL :");
-		$this->cell(0,4, ".............................. HT Euros",0, 1);
+		$this->cell(0,4, $demande_refi["valeur_residuelle"]." HT Euros",0, 1);
 
 		$this->ln(10);
-		$this->signatureInfos(null, $this->societe["societe"], $refinanceur["refinanceur"]);
+		$this->signatureInfos(null, $arrow["societe"], $refinanceur["refinanceur"]);
 
 
 	}
@@ -18225,7 +18276,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->setFont('Arial','', '8');
 		$lines = [
 			"Représentée par" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE",
-			"Qualité" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Directeur Commercial",
+			"Qualité" => ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial",
 			"Cachet de la société" => "",
 			"Signature" => ""
 		];
