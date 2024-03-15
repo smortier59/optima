@@ -1836,7 +1836,9 @@ class societe_cleodis extends societe {
           "date_creation" => $legalUnit->registrationDate,
           "langue" => $post["langue"],
           "id_apporteur" => $apporteur ? $apporteur : null,
-          "id_fournisseur" => $apporteur ? $apporteur : null
+          "id_fournisseur" => $apporteur ? $apporteur : null,
+          "capital" => $legalUnit->shareCapital,
+          "activite" => $legalUnit->activity,
         ];
 
         if ($scoring->score) $commun["cs_score"] = $scoring->score;
@@ -1852,10 +1854,8 @@ class societe_cleodis extends societe {
                   "adresse" => $etablissement->address->address,
                   "cp" => $etablissement->address->zipcode,
                   "ville" => $etablissement->address->city,
-                  "activite" => $legalUnit->activity,
                   "tel" => $legalUnit->phone,
                   "structure" => $legalUnit->companyCategory,
-                  "capital" => $legalUnit->shareCapital,
                 ];
               }
             }
