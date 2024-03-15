@@ -470,7 +470,7 @@ class pdf_cleodis extends pdf {
 
 			$this->RoundedRect(15,50,180,70,5);
 			if (ATF::$codename == 'arrow') {
-				$this->image($this->logo,65,55,85);
+				$this->image($this->logo,90,75,40);
 			} else {
 				$this->image($this->logo,85,55,45);
 			}
@@ -822,7 +822,7 @@ class pdf_cleodis extends pdf {
 
 		$this->sety(160);
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"2 – La Location Longue Durée selon ".$this->cleodis."");
+		$this->multicell(0,5,"2 – La Location Longue Durée selon ".$this->cleodis);
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -6561,7 +6561,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
@@ -6651,7 +6651,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
@@ -6733,7 +6733,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
@@ -6746,7 +6746,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
 		$this->ln(5);
 
-		$this->multicell(0,5,"Suite à la réception du bon de commande ".$s["bdc"].", j'ai le plaisir de vous transmettre l'avenant à votre contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Suite à la réception du bon de commande ".$s["bdc"].", j'ai le plaisir de vous transmettre l'avenant à votre contrat de location ".$this->societe["societe"]);
 		$this->ln(5);
 		$t = "Je vous remercie de bien vouloir retourner ";
 		$this->cell(81    ,5,$t);
@@ -6794,7 +6794,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
@@ -6808,7 +6808,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 
 
-		$this->multicell(0,5,"Pour faire suite à la reprise ".$s["reprise_magasin"].", j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Pour faire suite à la reprise ".$s["reprise_magasin"].", j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]);
 		$this->ln(5);
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Vous trouverez ci-joints les éléments suivants :");
@@ -6874,7 +6874,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
@@ -7511,7 +7511,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
@@ -8967,7 +8967,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->unsetFontDecoration("B");
 			$this->multicell(200,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
 			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
-			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
+			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"],0,'C');
 
 			$this->SetLeftMargin(220);
 			$this->SetY(-13);
@@ -8976,7 +8976,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->unsetFontDecoration("B");
 			$this->multicell(200,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
 			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
-			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
+			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"],0,'C');
 
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
@@ -8990,7 +8990,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->unsetFontDecoration("B");
 			$this->multicell(0,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
 			$this->multicell(0,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
-			$this->multicell(0,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
+			$this->multicell(0,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"],0,'C');
 
 
 			$this->SetX(10);
@@ -10972,7 +10972,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 
 		 if($s["date"]){
@@ -11035,7 +11035,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-		$this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]."");
+		$this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]);
 		$this->setFont("arial","I",10);
 		if($s["date"]){
 			$s['date'] = date("d", strtotime($s['date']))." ".$this->moisNL(date("m", strtotime($s['date'])))." ".date("Y", strtotime($s['date']));
@@ -17366,12 +17366,192 @@ class pdf_arrow extends pdf_cleodis
     public $bgcolorTableau = "1c1e3c";
     public $txtcolorTableau = "ffffff";
 
+	public function devisClassique() {
+		if (!$this->devis) return false;
+
+
+		/*	PAGE 7	*/
+		$this->AddPage();
+
+		$this->sety(10);
+		$this->setfont('arial','B',14);
+
+		$this->RoundedRect(15,10,140,20,5);
+		$this->multicell(140,6,"Proposition locative \n".$this->cleodis." pour ",0,'C');
+		$this->multicell(140,6,$this->client['societe'],0,'C');
+		$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
+
+
+		$this->image($this->logo,158,10,40);
+
+
+		$this->sety(35);
+
+		$this->setfont('arial','',8);
+		$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->devis['date'])),0, 1);
+		$this->cell(0,5,"N° d'affaire : ".$this->affaire["ref"],0,1);
+		$societe = ATF::societe()->select($this->devis['id_societe']);
+		if($societe["code_client"]){$this->cell(0,5,"Code client : ".$societe["code_client"],0,1); }
+
+		$duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
+		$frequence=ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer");
+		if($this->devis['loyer_unique']=='oui'){
+			$this->setfont('arial','B',12);
+			$this->multicell(0,10,"La durée de la location est identique à celle du contrat principal.",0,'L');
+		}elseif($this->devis['type_contrat'] == 'lrp') {
+			if ($duree==39 || $duree==27 || $duree==51) {
+				$this->multicell(0,5,ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." sur ".($duree-3)." (+3) ".$frequence,0,'L');
+			} else {
+				$this->multicell(0,5,ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." sur ".($duree)."  ".$frequence,0,'L');
+			}
+		}
+		$this->setfont('arial','',10);
+		$this->ln(5);
+		$this->multicell(0,5,"TABLEAU DE SYNTHESE DE L'OFFRE : MATERIEL / LOGICIEL / PRESTATION",0,'C');
+		$this->ln(5);
+		if ($this->lignes) {
+			// Groupe les lignes par affaire
+			$lignes=$this->groupByAffaire($this->lignes);
+			// Flag pour savoir si le tableau part en annexe ou pas
+			$flagOnlyPrixInvisible = true;
+			foreach ($lignes as $k => $i) {
+				if (!$k) {
+					$title = "NOUVEAU(X) EQUIPEMENT(S)";
+				} else {
+					$affaire_provenance=ATF::affaire()->select($k);
+					if($this->affaire["nature"]=="AR"){
+						$title = "EQUIPEMENT(S) PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+					}
+				}
+
+				$head = array("Qté","Fournisseur","Désignation","Prix ".$this->texteHT);
+				$w = array(12,40,111,22);
+				unset($data,$st);
+				foreach ($i as $k_ => $i_) {
+					if($i_["visible_pdf"] == "oui"){
+						if ($i_['visibilite_prix']=="visible") {
+							$flagOnlyPrixInvisible = false;
+						}
+						$produit = ATF::produit()->select($i_['id_produit']);
+
+
+						//On prépare le détail de la ligne
+
+						//ici si on surcharge les details il y'aura une duplicata des commentaires alors que la fonction detailProduct le fait
+						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+
+
+
+						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+
+						if ($details == "") unset($details);
+
+						$etat = "";
+						if($i_["neuf"] == "non"){
+							$etat = "( OCCASION )";
+						}
+
+						//Si c'est une prestation, on affiche pas l'etat
+						if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){	$etat = "";		}
+
+						if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+						$data[] = array(
+							round($i_['quantite'])
+							,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
+							,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat.$details
+							,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
+
+						);
+
+
+					}
+
+				}
+				$tableau[$k] = array(
+					"head"=>$head
+					,"data"=>$data
+					,"w"=>$w
+					,"styles"=>$st
+					,"title"=>$title
+				);
+
+
+
+			}
+
+		}
+
+		foreach ($tableau as $k=>$i) {
+			$this->setFillColor(239,239,239);
+			$this->setfont('arial','B',10);
+			$this->multicell(0,5,$i['title'],1,'C',1);
+			$this->setfont('arial','',8);
+			if ($flagOnlyPrixInvisible) {
+				array_pop($i['head']);
+				$i['w'][1] += array_pop($i['w']);
+				array_pop($i['styles']);
+				foreach ($i['data'] as $k_=>$i_) {
+					array_pop($i['data'][$k_]);
+				}
+			}
+			if ($h>$this->heightLimitTableDevisClassique) {
+				$this->multicellAnnexe();
+				$annexes[$k] = $i;
+			} else {
+				$this->tableauBigHead($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+		}
+
+		$this->sety(130);
+		if($this->devis['loyer_unique']=='non'){
+			$this->tableauLoyer();
+		}
+
+		$this->setfont('arial','',8);
+		$this->cell(0,5,"",0,1,'C');
+
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"Les engagements ".$this->cleodis.": ");
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"Nous nous engageons à vous fournir :");
+		$this->setfont('arial','',8);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>Un conseil indépendant en renouvellement de matériels",0,1);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>La possibilité d'évoluer à tout moment, et d'incorporer des budgets non prévus tout en lissant la charge budgétaire",0,1);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>Un service de reprise des équipements au terme ou en cours de contrat",0,1);
+		$this->cell(30,5,"",0,0);
+		$this->cell(0,5,"=>La gestion de parc des matériels loués",0,1);
+
+		$this->sety(235);
+		$this->cell(0,40,"",1,1);
+		$this->sety(235);
+		$this->setFontDecoration('B');
+		if ($this->totalAssurance) {
+			$this->multicell(0,5,"Option assurance remplacement : oui ou non");
+		}
+		$this->unsetFontDecoration();
+		$this->multicell(0,5,"« Bon pour accord »");
+		$this->multicell(0,5,"Cachet commercial+ Signature");
+
+		$this->setfont('arial','I',6);
+		$this->sety(270);
+		$this->multicell(0,5,"Cette offre, valable jusqu'au ".ATF::$usr->trans($this->devis['validite']).", reste soumise à notre comité des engagements.",0,'C');
+		if ($annexes) {
+			$this->annexes($annexes);
+		}
+	}
+
 
 	public function contrat_locationA4Particulier($id, $signature, $sellAndSign) { $this->contrat_location($id, "particulier"); }
 	public function contrat_locationA4Societe($id, $signature, $sellAndSign) { $this->contrat_location($id, "pro"); }
 	function contrat_location($id, $type) {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->contact =  ATF::contact()->select($this->devis['id_contact']);
+		$this->societe = ATF::societe()->select($this->id_societe);
 
 		$this->unsetFooter();
 		$this->image($this->logo,10,10,60);
@@ -17384,7 +17564,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->line(10,38,200,38);
 		$this->ln(6);
 
-		$this->entete("ARROW CAPITAL SOLUTIONS", "Le Locataire");
+		$this->entete($this->societe["societe"], "Le Locataire");
 
 		$this->cell(0,4,"Il a été convenu ce qui suit",0,1);
 		$this->ln(6);
@@ -17398,13 +17578,13 @@ class pdf_arrow extends pdf_cleodis
 					[
 						"titre" => "ARTICLE.1 - OBJET",
 						"texte" => "1.1 Le Locataire a choisi en une ou plusieurs fois auprès de fournisseurs pour ses besoins professionnels, un ou plusieurs Equipements (ci-après appelé les Equipements) dont la description figure aux Conditions Particulières.
-						\n1.2 Conformément aux Conditions Générales et Particulières stipulées ci-après, ARROW CAPITAL SOLUTIONS loue les Equipements au Locataire, qui accepte. Les Equipements seront livrés et installés à l'adresse du Locataire figurant aux Conditions Particulières.
+						\n1.2 Conformément aux Conditions Générales et Particulières stipulées ci-après, ".$this->societe["societe"]." loue les Equipements au Locataire, qui accepte. Les Equipements seront livrés et installés à l'adresse du Locataire figurant aux Conditions Particulières.
 						\n1.3 L'engagement du Locataire est ferme et définitif dès sa signature des présentes. Le représentant signataire du Locataire est dûment mandaté à cet effet, sinon, le Locataire porte seul la responsabilité d’une défaillance interne à son organisation et ne peut l’invoquer pour se soustraire en tout ou partie aux obligations des présentes."
 					],
 					[
 						"titre" => "ARTICLE 2 - LIVRAISON-RECEPTION DES EQUIPEMENTS",
-						"texte" => "2.1 Le Locataire reconnaît être seul responsable du choix des Equipements, ainsi que du choix du fournisseur. Il reconnaît avoir préalablement pris connaissance des spécifications techniques et des modalités d'exploitation des Equipements.\nARROW CAPITAL SOLUTIONS ne saurait, en conséquence, être tenue à une obligation de résultat ni être tenue pour responsable de toute inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des matériels et ou logiciels entre eux ou de toute autre cause de non-conformité à la conception technique ou à la commande initiale du Locataire.
-						\n2.2 A réception du matériel, le locataire s’engage à signer et à remettre à ARROW CAPITAL SOLUTIONS un procès-verbal de livraison-réception constatant la conformité des Equipements à ses demandes. La signature apposée par le locataire sur le procès-verbal de livraison-réception vaut réception des Equipements sans réserve. Le Locataire ne pourra refuser la réception sans réserve des Equipements pour un motif autre que la non-conformité ou l'existence de vices apparents.
+						"texte" => "2.1 Le Locataire reconnaît être seul responsable du choix des Equipements, ainsi que du choix du fournisseur. Il reconnaît avoir préalablement pris connaissance des spécifications techniques et des modalités d'exploitation des Equipements.\n".$this->societe["societe"]." ne saurait, en conséquence, être tenue à une obligation de résultat ni être tenue pour responsable de toute inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des matériels et ou logiciels entre eux ou de toute autre cause de non-conformité à la conception technique ou à la commande initiale du Locataire.
+						\n2.2 A réception du matériel, le locataire s’engage à signer et à remettre à ".$this->societe["societe"]." un procès-verbal de livraison-réception constatant la conformité des Equipements à ses demandes. La signature apposée par le locataire sur le procès-verbal de livraison-réception vaut réception des Equipements sans réserve. Le Locataire ne pourra refuser la réception sans réserve des Equipements pour un motif autre que la non-conformité ou l'existence de vices apparents.
 						\n2.3 Lorsque des Equipements sont déjà livrés et installés dans les locaux du Locataire, les Equipements sont considérés comme acceptés sans réserve et la date de signature du présent contrat vaut date de réception.
 						\n2.4 En cas de livraisons partielles, le Locataire sera redevable d'une indemnité d’utilisation calculée au prorata du Matériel livré, entre la/les dates de livraisons partielles et la date d’effet du contrat tel que déterminé en l’article 3."
 					]
@@ -17419,7 +17599,7 @@ class pdf_arrow extends pdf_cleodis
 						"texte" => "4.1 Le montant du loyer est précisé aux Conditions Particulières. A ce montant s'ajoutera la TVA en vigueur à la date de facturation.\n Le Locataire est redevable de tous impôts et taxes présents et à venir liés aux Equipements, y compris ceux qui sont mis à la charge du Bailleur-Cessionnaire / propriétaire.
 						\n4.2 Les loyers sont exigibles d'avance le 1er jour de chaque période spécifiée aux Conditions Particulières.
 						\n4.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers prévus aux Conditions Particulières ou proportionnellement aux prix d'achat figurant sur le tarif du constructeur au jour de la signature du contrat. Si la prise d'effet telle que définie à l'article 3 intervient après le premier jour du mois ou du trimestre, le Locataire payera au loueur, pour ledit mois ou trimestre, une redevance de mise à disposition calculée prorata temporis au trentième pour un loyer mensuel et au quatre-vingt dixième pour un loyer trimestriel, sur la base du montant du loyer mensuel ou trimestriel
-						\n4.4 Les loyers sont portables selon tous moyens à Ia convenance de ARROW CAPITAL SOLUTIONS et non quérables. Leur paiement sera effectué par prélèvements bancaires. A cet effet lors de la signature du présent contrat le Locataire signera une autorisation permanente de prélèvements
+						\n4.4 Les loyers sont portables selon tous moyens à Ia convenance de ".$this->societe["societe"]." et non quérables. Leur paiement sera effectué par prélèvements bancaires. A cet effet lors de la signature du présent contrat le Locataire signera une autorisation permanente de prélèvements
 						\n4.5 Entre la date de signature du présent contrat et la date de livraison, les loyers mentionnés aux Conditions Particulières peuvent varier en cas de modification des Equipements.
 						\n4.6 Les loyers sont fermes et définitifs pendant toute la durée de location à l'exception des majorations ou diminutions susceptibles d'intervenir à la suite de la variation du taux de TVA ou, en général, du régime fiscal applicable au présent contrat."
 						]
@@ -17428,40 +17608,40 @@ class pdf_arrow extends pdf_cleodis
 			[
 				"left" => [
 					[
-						"titre" => null, "texte" => "4.7 En cas de retard dans le paiement de toute somme due par le Locataire, les intérêts de retard sont fixés conventionnellement à 1,5 % par mois à compter du jour de son exigibilité jusqu'au paiement intégral, les intérêts étant capitalisés. En outre, le Locataire devra rembourser à ARROW CAPITAL SOLUTIONS les frais engagés par celui-ci pour tout rappel d'échéance sans qu'il ait à produire de justificatifs. L’ensemble de ces sommes sera dû de plein droit."
+						"titre" => null, "texte" => "4.7 En cas de retard dans le paiement de toute somme due par le Locataire, les intérêts de retard sont fixés conventionnellement à 1,5 % par mois à compter du jour de son exigibilité jusqu'au paiement intégral, les intérêts étant capitalisés. En outre, le Locataire devra rembourser à ".$this->societe["societe"]." les frais engagés par celui-ci pour tout rappel d'échéance sans qu'il ait à produire de justificatifs. L’ensemble de ces sommes sera dû de plein droit."
 					],
 					[
 						"titre" => "ARTICLE 5 - UTILISATION - ENTRETIEN DES EQUIPEMENTS",
 						"texte" => "5.1 Le Locataire s'engage à utiliser les Equipements dans des conditions normales et suivant les indications d'utilisation, d'entretien et de sécurité prévues dans la documentation technique relative aux Equipements.
-						\n5.2 Le déplacement éventuel des Equipements est soumis à l'autorisation préalable de ARROW CAPITAL SOLUTIONS. Il est réputé aux frais et risques du Locataire pendant le démontage, le transfert et la nouvelle (re-)installation. Ces dispositions ne concernent pas les micro-ordinateurs portables.
-						\n5.3 Par dérogation expresse aux dispositions des Articles 1719 et suivants du Code Civil, tous les frais nécessités par l'emploi, l'entretien et les réparations des Equipements, y compris le gros entretien et les réparations importantes, sont matériellement et financièrement à la charge du Locataire qui devra, à cet effet, passer tout contrat d'entretien ou de maintenance nécessaire avec une société tierce agréée par ARROW CAPITAL SOLUTIONS.
-						\nLe locataire communiquera immédiatement à ARROW CAPITAL SOLUTIONS ces contrats et les agents de ARROW CAPITAL SOLUTIONS pourront, à tout moment, pénétrer dans les locaux où sont installés les Equipements pour en contrôler l'utilisation et l'état de l’entretien.
+						\n5.2 Le déplacement éventuel des Equipements est soumis à l'autorisation préalable de ".$this->societe["societe"].". Il est réputé aux frais et risques du Locataire pendant le démontage, le transfert et la nouvelle (re-)installation. Ces dispositions ne concernent pas les micro-ordinateurs portables.
+						\n5.3 Par dérogation expresse aux dispositions des Articles 1719 et suivants du Code Civil, tous les frais nécessités par l'emploi, l'entretien et les réparations des Equipements, y compris le gros entretien et les réparations importantes, sont matériellement et financièrement à la charge du Locataire qui devra, à cet effet, passer tout contrat d'entretien ou de maintenance nécessaire avec une société tierce agréée par ".$this->societe["societe"].".
+						\nLe locataire communiquera immédiatement à ".$this->societe["societe"]." ces contrats et les agents de ".$this->societe["societe"]." pourront, à tout moment, pénétrer dans les locaux où sont installés les Equipements pour en contrôler l'utilisation et l'état de l’entretien.
 						\n5.4 Le Locataire s'engage à ne pas utiliser ou laisser utiliser les Equipements contrairement aux lois et règlements en vigueur. Il lui appartient de demander avec diligence et d’obtenir, le cas échéant, des organismes qualifiés, les autorisations relatives à l'utilisation des Equipements.\nLe Locataire doit en particulier s'assurer qu'il a obtenu toutes les licences nécessaires à l'utilisation de tout logiciel intégré dans les Equipements.\nLe locataire fait son affaire directement avec l'éditeur du respect des contrats de licences Les loyers du présent contrat restent redevables même en cas d’interdiction d’utilisation du (des) logiciel(s) en application de clauses de la licence et/ou de manquement à une de ces clauses.\nIl est entendu qu’en cas de contradiction, les dispositions du présent contrat prévalent sur celles qui régissent ou constituent la licence.
-						\n5.5 Par dérogation aux dispositions de l'Article 1724 du Code Civil, le Locataire renonce à toute indemnité et droit de résiliation vis-à-vis de ARROW CAPITAL SOLUTIONS, même dans le cas où les Equipements resteraient hors d’usage pendant plus de quarante jours, pour quelque cause que ce soit.
-						\n5.6 Tous les équipements et/ou accessoires incorporés par le Locataire aux Equipements pendant période de la location restent de plein droit et deviennent immédiatement la propriété de ARROW CAPITAL SOLUTIONS sans qu'il puisse lui être réclamé aucun remboursement ou indemnité compensatrice."
+						\n5.5 Par dérogation aux dispositions de l'Article 1724 du Code Civil, le Locataire renonce à toute indemnité et droit de résiliation vis-à-vis de ".$this->societe["societe"].", même dans le cas où les Equipements resteraient hors d’usage pendant plus de quarante jours, pour quelque cause que ce soit.
+						\n5.6 Tous les équipements et/ou accessoires incorporés par le Locataire aux Equipements pendant période de la location restent de plein droit et deviennent immédiatement la propriété de ".$this->societe["societe"]." sans qu'il puisse lui être réclamé aucun remboursement ou indemnité compensatrice."
 					],
 					[
 						"titre" => "ARTICLE 6 - PROPRIETE DES EQUIPEMENTS",
-						"texte" => "6.1 ARROW CAPITAL SOLUTIONS conserve la propriété des Equipements, pendant toute la durée de la location, sauf application de l'Article 7 ci dessous.\nLe Locataire devra, si ARROW CAPITAL SOLUTIONS le lui demande, apposer une plaque de propriété.
-						\n6.2 En sa qualité de gardien détenteur, le Locataire s'interdit de sous-louer, de céder ou de se dessaisir de tout ou partie des Equipements ou de céder le bénéfice du présent contrat, à quelque titre et pour quelque motif que ce soit, ou de le grever d'un droit quelconque (nantissement,...) sans l'autorisation préalable et écrite de ARROW CAPITAL SOLUTIONS.
-						\n6.3 Le Locataire devra prendre toutes mesures pour faire connaître le droit de propriété de ARROW CAPITAL SOLUTIONS. Le Locataire s'engage en particulier:\na) A avertir le propriétaire du local où seront installés les Equipements que ceux-ci ne sont pas sa propriété,\nb) En cas de saisie ou d’une procédure imminente, à prévenir l'huissier que les Equipements ne sont pas sa propriété, à informer immédiatement ARROW CAPITAL SOLUTIONS de cette saisie, à obtenir mainlevée et généralement prendre toutes mesures de sauvegarde nécessaires.
-						\n6.4 Le Locataire s'engage à informer ARROW CAPITAL SOLUTIONS de toute vente de son fonds de commerce ou de toute intention de transfert de ce dernier en un lieu autre que celui où sont actuellement installés les Equipements. Le Locataire s'engage également à avertir ARROW CAPITAL SOLUTIONS de toute vente de l'immeuble où se trouvent les Equipements si le Locataire cesse d'en être propriétaire."
+						"texte" => "6.1 ".$this->societe["societe"]." conserve la propriété des Equipements, pendant toute la durée de la location, sauf application de l'Article 7 ci dessous.\nLe Locataire devra, si ".$this->societe["societe"]." le lui demande, apposer une plaque de propriété.
+						\n6.2 En sa qualité de gardien détenteur, le Locataire s'interdit de sous-louer, de céder ou de se dessaisir de tout ou partie des Equipements ou de céder le bénéfice du présent contrat, à quelque titre et pour quelque motif que ce soit, ou de le grever d'un droit quelconque (nantissement,...) sans l'autorisation préalable et écrite de ".$this->societe["societe"].".
+						\n6.3 Le Locataire devra prendre toutes mesures pour faire connaître le droit de propriété de ".$this->societe["societe"].". Le Locataire s'engage en particulier:\na) A avertir le propriétaire du local où seront installés les Equipements que ceux-ci ne sont pas sa propriété,\nb) En cas de saisie ou d’une procédure imminente, à prévenir l'huissier que les Equipements ne sont pas sa propriété, à informer immédiatement ".$this->societe["societe"]." de cette saisie, à obtenir mainlevée et généralement prendre toutes mesures de sauvegarde nécessaires.
+						\n6.4 Le Locataire s'engage à informer ".$this->societe["societe"]." de toute vente de son fonds de commerce ou de toute intention de transfert de ce dernier en un lieu autre que celui où sont actuellement installés les Equipements. Le Locataire s'engage également à avertir ".$this->societe["societe"]." de toute vente de l'immeuble où se trouvent les Equipements si le Locataire cesse d'en être propriétaire."
 					]
 					],
 				"right" => [
-					["titre" => null, "texte" => "\n6.5 En cas de résolution de la vente, le Locataire reste redevable envers ARROW CAPITAL SOLUTIONS sera redevable outre les loyers échus impayés d'une indemnité de résiliation égale au montant des loyers à échoir augmenté d'une somme forfaitaire égale à 5% du montant total des loyers prévus aux conditions particulières. Ce montant sera diminué des sommes reçues des fournisseurs par le ARROW CAPITAL SOLUTIONS au titre de la restitution de prix."],
+					["titre" => null, "texte" => "\n6.5 En cas de résolution de la vente, le Locataire reste redevable envers ".$this->societe["societe"]." sera redevable outre les loyers échus impayés d'une indemnité de résiliation égale au montant des loyers à échoir augmenté d'une somme forfaitaire égale à 5% du montant total des loyers prévus aux conditions particulières. Ce montant sera diminué des sommes reçues des fournisseurs par le ".$this->societe["societe"]." au titre de la restitution de prix."],
 					[
-						"titre" => "ARTICLE 7 – CESSION DE L’EQUIPEMENT PAR ARROW CAPITAL SOLUTIONS",
-						"texte" => "ARROW CAPITAL SOLUTIONS se réserve le droit de céder les Equipements et de déléguer le présent contrat à une tierce-partie (« le Bailleur-Cessionnaire ») de son choix. Le Bailleur - Cessionnaire, intervenant à titre purement financier, ne prendra en charge que l'obligation de laisser au Locataire la jouissance paisible des Equipements. En conséquence, malgré cette cession, le suivi commercial et technique continuera à être assuré par ARROW CAPITAL SOLUTIONS qui reste dès lors l’interlocuteur du Locataire.\nLe présent acte sera à cet effet soumis par ARROW CAPITAL SOLUTIONS à l’acceptation et à la signature du Bailleur - Cessionnaire. Le Bailleur - Cessionnaire ne sera engagé qu’après acceptation du dossier matérialisée par sa signature du présent contrat. Jusqu’à l’apposition de cette signature il n’existe aucun engagement du Bailleur - Cessionnaire.\nLe Locataire accepte dès à présent et sans réserve cette substitution éventuelle de loueur et s’engage à signer à première demande une autorisation de prélèvement au nom du Bailleur - Cessionnaire. En cas d’acceptation par le Bailleur - Cessionnaire qui se substitue ainsi au loueur d’origine, le Locataire reconnaît donc comme loueur le Bailleur - Cessionnaire et s’engage notamment à lui verser directement ou à son ordre la totalité des loyers en principal, intérêts et accessoires. Le Bailleur - Cessionnaire intervenant à titre purement financier, le Locataire en acceptant cette intervention renonce à effectuer toute compensation, déduction, demande reconventionnelle en raison du droit qu’il pourrait faire valoir à l’encontre du loueur d’origine, ainsi qu’à tout recours contre le Bailleur - Cessionnaire du fait notamment de défaillance ou vice caché ou du fait de l'assurance , prestations de services , construction, livraison ou l’installation des Equipements , le Locataire conservant sur ces points tous les recours contre le fournisseur et ARROW CAPITAL SOLUTIONS . Si une action aboutit à une résolution judiciaire de la vente, objet du contrat, celui-ci est résilié à compter du jour où cette résolution sera devenue définitive. Le Locataire est alors redevable, des sommes stipulées en l’article 6.5. L’indemnité est exigible au jour de la résiliation. Le Bailleur - Cessionnaire imputera au paiement de cette indemnité les sommes effectivement reçues notamment du fournisseur du matériel en restitution du prix au titre de la résolution de la vente et ce, dans la limite du montant de l’indemnité. En outre, le Locataire reste garant solidaire avec ARROW CAPITAL SOLUTIONS, le fournisseur ou le constructeur pour les sommes dues par ceux-ci au Bailleur
+						"titre" => "ARTICLE 7 – CESSION DE L’EQUIPEMENT PAR ".$this->societe["societe"],
+						"texte" => $this->societe["societe"]." se réserve le droit de céder les Equipements et de déléguer le présent contrat à une tierce-partie (« le Bailleur-Cessionnaire ») de son choix. Le Bailleur - Cessionnaire, intervenant à titre purement financier, ne prendra en charge que l'obligation de laisser au Locataire la jouissance paisible des Equipements. En conséquence, malgré cette cession, le suivi commercial et technique continuera à être assuré par ".$this->societe["societe"]." qui reste dès lors l’interlocuteur du Locataire.\nLe présent acte sera à cet effet soumis par ".$this->societe["societe"]." à l’acceptation et à la signature du Bailleur - Cessionnaire. Le Bailleur - Cessionnaire ne sera engagé qu’après acceptation du dossier matérialisée par sa signature du présent contrat. Jusqu’à l’apposition de cette signature il n’existe aucun engagement du Bailleur - Cessionnaire.\nLe Locataire accepte dès à présent et sans réserve cette substitution éventuelle de loueur et s’engage à signer à première demande une autorisation de prélèvement au nom du Bailleur - Cessionnaire. En cas d’acceptation par le Bailleur - Cessionnaire qui se substitue ainsi au loueur d’origine, le Locataire reconnaît donc comme loueur le Bailleur - Cessionnaire et s’engage notamment à lui verser directement ou à son ordre la totalité des loyers en principal, intérêts et accessoires. Le Bailleur - Cessionnaire intervenant à titre purement financier, le Locataire en acceptant cette intervention renonce à effectuer toute compensation, déduction, demande reconventionnelle en raison du droit qu’il pourrait faire valoir à l’encontre du loueur d’origine, ainsi qu’à tout recours contre le Bailleur - Cessionnaire du fait notamment de défaillance ou vice caché ou du fait de l'assurance , prestations de services , construction, livraison ou l’installation des Equipements , le Locataire conservant sur ces points tous les recours contre le fournisseur et ".$this->societe["societe"]." . Si une action aboutit à une résolution judiciaire de la vente, objet du contrat, celui-ci est résilié à compter du jour où cette résolution sera devenue définitive. Le Locataire est alors redevable, des sommes stipulées en l’article 6.5. L’indemnité est exigible au jour de la résiliation. Le Bailleur - Cessionnaire imputera au paiement de cette indemnité les sommes effectivement reçues notamment du fournisseur du matériel en restitution du prix au titre de la résolution de la vente et ce, dans la limite du montant de l’indemnité. En outre, le Locataire reste garant solidaire avec ".$this->societe["societe"].", le fournisseur ou le constructeur pour les sommes dues par ceux-ci au Bailleur
 						\n- Cessionnaire
-						\nARROW CAPITAL SOLUTIONS et le Locataire déclarent, sous leur responsabilité :
+						\n".$this->societe["societe"]." et le Locataire déclarent, sous leur responsabilité :
 						\n-que pour la location des Equipements il n'existe aucun autre document ou convention que ceux signés par le Bailleur - Cessionnaire. En tout état de cause seuls seront opposables à ce dernier les documents ou convention signés par lui
 						\n-que les Equipements sont conformes aux lois , règlements , au choix du Locataire ,qu'il bénéficie de toutes les garanties légales ou conventionnelles et qu'ils peuvent les céder sans restriction ni réserve."
 					],
 					[
 						"titre" => "ARTICLE 8 - RESPONSABILITE - RISQUES - ASSURANCES",
-						"texte" => "8.1 - RESPONSABILITE: En aucun cas, ARROW CAPITAL SOLUTIONS ne pourra être tenue pour responsable d'un préjudice financier commercial ou d'une autre nature causé directement ou indirectement par l'utilisation ou le fonctionnement des Equipements. L’intervention de ARROW CAPITAL SOLUTIONS se faisant à titre purement financier, le locataire ne pourra se prévaloir d’un quelconque dysfonctionnement ou défaillance dans la performance des équipements, matériels et logiciels objets du contrat ou de la non-réalisation des solutions techniques attendues pour arrêter le paiement des loyers et il s’engage dès à présent à régler les loyers dans leur intégralité.
-						\n8.2 - RISQUES : De la livraison, reception jusqu'à la restitution de l'Equipement, le Locataire est tenu pour responsable de la perte, du vol, de la détériration ou de la destruction de l'Equipement, qu'elle qu'en soit la cause, même si celle-ci relève d'un cas fortuit ou de force majeure. Le risque afférant à une usure prématurée est également à la charge du Locataire. Le Locataire ne se considèrera pas libéré de ses obligations contractuelles lors de la survenance de tels évènements et doit en informer immédiatement ARROW CAPITAL SOLUTIONS."
+						"texte" => "8.1 - RESPONSABILITE: En aucun cas, ".$this->societe["societe"]." ne pourra être tenue pour responsable d'un préjudice financier commercial ou d'une autre nature causé directement ou indirectement par l'utilisation ou le fonctionnement des Equipements. L’intervention de ".$this->societe["societe"]." se faisant à titre purement financier, le locataire ne pourra se prévaloir d’un quelconque dysfonctionnement ou défaillance dans la performance des équipements, matériels et logiciels objets du contrat ou de la non-réalisation des solutions techniques attendues pour arrêter le paiement des loyers et il s’engage dès à présent à régler les loyers dans leur intégralité.
+						\n8.2 - RISQUES : De la livraison, reception jusqu'à la restitution de l'Equipement, le Locataire est tenu pour responsable de la perte, du vol, de la détériration ou de la destruction de l'Equipement, qu'elle qu'en soit la cause, même si celle-ci relève d'un cas fortuit ou de force majeure. Le risque afférant à une usure prématurée est également à la charge du Locataire. Le Locataire ne se considèrera pas libéré de ses obligations contractuelles lors de la survenance de tels évènements et doit en informer immédiatement ".$this->societe["societe"]."."
 					]
 				]
 			],
@@ -17469,24 +17649,24 @@ class pdf_arrow extends pdf_cleodis
 				"left" => [
 					[
 						"titre" => null,
-						"texte" => "8.3 – ASSURANCES : Le Locataire s'engage à assurer à ses frais les Equipements, notamment contre tous les risques et périls. Il peut s'assurer auprès de la compagnie d'assurance de son choix qui délivrera une attestation d'assurance au profit du ARROW CAPITAL SOLUTIONS. L'attestation d'assurance doit faire apparaître la couverture des risques visés ainsi que, le cas échéant, la franchise convenue.
-						\nLe Locataire cède et transporte au profit de ARROW CAPITAL SOLUTIONS ou de son substitué le montant de toute indemnité d’assurance relative aux matériels loués à concurrence du montant total des loyers à courir jusqu’au terme du présent contrat, ainsi que ses droits contre l'éventuel responsable du dommage causé aux Equipements. Aussi longtemps que ARROW CAPITAL SOLUTIONS n'aura pas informé le Locataire de son intention de faire valoir lui-même ses droits, celui-ci s'oblige, en cas de sinistre, à les faire valoir à ses frais au nom de ARROW CAPITAL SOLUTIONS et d'exiger un paiement au profit de ARROW CAPITAL SOLUTIONS.
+						"texte" => "8.3 – ASSURANCES : Le Locataire s'engage à assurer à ses frais les Equipements, notamment contre tous les risques et périls. Il peut s'assurer auprès de la compagnie d'assurance de son choix qui délivrera une attestation d'assurance au profit du ".$this->societe["societe"].". L'attestation d'assurance doit faire apparaître la couverture des risques visés ainsi que, le cas échéant, la franchise convenue.
+						\nLe Locataire cède et transporte au profit de ".$this->societe["societe"]." ou de son substitué le montant de toute indemnité d’assurance relative aux matériels loués à concurrence du montant total des loyers à courir jusqu’au terme du présent contrat, ainsi que ses droits contre l'éventuel responsable du dommage causé aux Equipements. Aussi longtemps que ".$this->societe["societe"]." n'aura pas informé le Locataire de son intention de faire valoir lui-même ses droits, celui-ci s'oblige, en cas de sinistre, à les faire valoir à ses frais au nom de ".$this->societe["societe"]." et d'exiger un paiement au profit de ".$this->societe["societe"].".
 						\n8.4 FRANCHISE - Le Locataire supporte dans tous les cas la franchise prévue et la responsabilité de tous dommages causés par le matériel.
 						\nEn cas de sinistre total, le Locataire est redevable d'une indemnité égale aux loyers, éventuellement impayés plus ceux restant à échoir sur toute la durée du contrat de location majorée de la valeur vénale du bien détruit à la veille du sinistre, sous déduction de l’indemnité éventuellement versée par la compagnie d’assurance. Cette indemnité sera majorée de la TVA."
 					],
 					[
 						"titre" => "ARTICLE 9 - EXTENSION - ADDITION - SUBSTITUTION",
-						"texte" => "Sous réserve d'avoir respecté toutes les obligations résultant du présent contrat, le Locataire pourra durant la période de location demander à ARROW CAPITAL SOLUTIONS le remplacement total ou partiel des Equipements et/ou l'adjonction d'Equipements complémentaires.\n Ces évolutions entraîneront une modification des loyers et/ou de la durée de la location. Elles sont soumises à l'accord préalable de ARROW CAPITAL SOLUTIONS. En cas d'accord des parties sur les nouvelles conditions financières, un avenant constatant les conditions particulières sera signé par les parties."
+						"texte" => "Sous réserve d'avoir respecté toutes les obligations résultant du présent contrat, le Locataire pourra durant la période de location demander à ".$this->societe["societe"]." le remplacement total ou partiel des Equipements et/ou l'adjonction d'Equipements complémentaires.\n Ces évolutions entraîneront une modification des loyers et/ou de la durée de la location. Elles sont soumises à l'accord préalable de ".$this->societe["societe"].". En cas d'accord des parties sur les nouvelles conditions financières, un avenant constatant les conditions particulières sera signé par les parties."
 					],
 					[
 						"titre" => "ARTICLE 10 - FIN DE LOCATION - RECONDUCTION",
-						"texte" => "10.1 Quatre (4) mois avant l'expiration de la période de location telle que précisée à l’Art. 2 des Conditions Particulières, le Locataire devra informer ARROW CAPITAL SOLUTIONS, par lettre recommandée avec accusé de réception, son intention de ne pas poursuivre le contrat de location.
-						\n10.2 A défaut du Locataire d'avoir fait connaître son intention, la location se poursuivra en l’absence d’accord entre les parties, par tacite reconduction, aux conditions générales du présent contrat et sur la base du dernier loyer par période de douze (12) mois minimum; le Locataire ou ARROW CAPITAL SOLUTIONS pourra y mettre fin avec un préavis de quatre (4) mois avant le terme des douze (12) mois."
+						"texte" => "10.1 Quatre (4) mois avant l'expiration de la période de location telle que précisée à l’Art. 2 des Conditions Particulières, le Locataire devra informer ".$this->societe["societe"].", par lettre recommandée avec accusé de réception, son intention de ne pas poursuivre le contrat de location.
+						\n10.2 A défaut du Locataire d'avoir fait connaître son intention, la location se poursuivra en l’absence d’accord entre les parties, par tacite reconduction, aux conditions générales du présent contrat et sur la base du dernier loyer par période de douze (12) mois minimum; le Locataire ou ".$this->societe["societe"]." pourra y mettre fin avec un préavis de quatre (4) mois avant le terme des douze (12) mois."
 					],
 					[
-						"titre" => "ARTICLE 11 - RESILIATION PAR ARROW CAPITAL SOLUTIONS",
-						"texte" => "11.1 ARROW CAPITAL SOLUTIONS pourra résilier de plein droit le présent contrat, avec effet immédiat, après mise en demeure préalable, sans intervention judiciaire et sans être redevable de quelque indemnité que ce soit, dans les cas suivants :\na) Si le Locataire manque au paiement à l'échéance d'un seul terme du loyer ou plus généralement à l'une quelconquede ses obligations dans le cadre du présent contrat.\nb) Si le Locataire cède à un tiers le présent contrat ou l'un quelconque des droits qui lui sont attachés (le terme céder devra être interprété au sens large et comprenant notamment la cession d'une participation majoritaire dans le capital social, la cession ou le transfert du fonds de commerce du Locataire).\nc) Si le manquement par le Locataire au respect de ses obligations précisées dans les contrats de licence des logiciels loués, conduisait l'éditeur à priver le Locataire de ses droits d'usage.
-						\n11.2 Le Locataire devra, dès la résiliation, restituer immédiatement et à ses frais les Equipements à ARROW CAPITAL SOLUTIONS dans les conditions prévues à l'Article 12 et lui verser:\n- les sommes dues au titre des loyers échus et impayés, fixée"
+						"titre" => "ARTICLE 11 - RESILIATION PAR ".$this->societe["societe"],
+						"texte" => "11.1 ".$this->societe["societe"]." pourra résilier de plein droit le présent contrat, avec effet immédiat, après mise en demeure préalable, sans intervention judiciaire et sans être redevable de quelque indemnité que ce soit, dans les cas suivants :\na) Si le Locataire manque au paiement à l'échéance d'un seul terme du loyer ou plus généralement à l'une quelconquede ses obligations dans le cadre du présent contrat.\nb) Si le Locataire cède à un tiers le présent contrat ou l'un quelconque des droits qui lui sont attachés (le terme céder devra être interprété au sens large et comprenant notamment la cession d'une participation majoritaire dans le capital social, la cession ou le transfert du fonds de commerce du Locataire).\nc) Si le manquement par le Locataire au respect de ses obligations précisées dans les contrats de licence des logiciels loués, conduisait l'éditeur à priver le Locataire de ses droits d'usage.
+						\n11.2 Le Locataire devra, dès la résiliation, restituer immédiatement et à ses frais les Equipements à ".$this->societe["societe"]." dans les conditions prévues à l'Article 12 et lui verser:\n- les sommes dues au titre des loyers échus et impayés, fixée"
 					],
 
 				],
@@ -17496,17 +17676,21 @@ class pdf_arrow extends pdf_cleodis
 					\n11.3 En cas d'annulation de son engagement par le Locataire après sa signature, le Locataire sera redevable d'une indemnité forfaitaire et irréductible équivalente aux six (6) premiers mois de loyers TTC prévus aux conditions particulières"],
 					[
 						"titre" => "ARTICLE 12 - RESTlTUTION",
-						"texte" => "12.1 En cas de fin du présent contrat pour quelque cause que ce soit, le Locataire s'oblige à restituer à ses frais le matériel en bon état d'entretien au lieu qui sera désigné par ARROW CAPITAL SOLUTIONS. Si la restitution ne s’avère plus possible, le Locataire règlera à ARROW CAPITAL SOLUTIONS une indemnité forfaitaire équivalente à six mois de loyer.
+						"texte" => "12.1 En cas de fin du présent contrat pour quelque cause que ce soit, le Locataire s'oblige à restituer à ses frais le matériel en bon état d'entretien au lieu qui sera désigné par ".$this->societe["societe"].". Si la restitution ne s’avère plus possible, le Locataire règlera à ".$this->societe["societe"]." une indemnité forfaitaire équivalente à six mois de loyer.
 						\n12.2 Les frais de démontage, d'emballage et de remise en état ou de destruction ainsi que de transport seront à la charge exclusive du Locataire."
 					],
 					[
 						"titre" => "ARTICLE 13 – DIVERS",
 						"texte" => "13.1 Le présent contrat, qui se compose des conditions générales, particulières et des annexes aux conditions particulières, annule et remplace tous les accords antérieurs entre les parties, écrits ou verbaux, ayant le même objet.
 						\n13.2 Le présent contrat ainsi que toute modification, résiliation ou renonciation de/à l'une quelconque des dispositions des présentes ne pourra prendre effet qu’après avoir fait l’objet d’un accord écrit dûment signé par les parties aux présentes.
-						\n13.3 Sont à la charge du Locataire, tous frais et honoraires, toutes dépenses que ARROW CAPITAL SOLUTIONS devrait exposer pour recouvrer sa créance et/ou satisfaire l'obligation de restitution du Locataire défaillant.
+						\n13.3 Sont à la charge du Locataire, tous frais et honoraires, toutes dépenses que ".$this->societe["societe"]." devrait exposer pour recouvrer sa créance et/ou satisfaire l'obligation de restitution du Locataire défaillant.
 						\n13.4 Le présent contrat est régi par les lois françaises.\nTout litige relatif au présent contrat sera de la compétence exclusive des Tribunaux de Paris, y compris en cas de référé, d'appel en garantie ou de pluralité de défendeurs.
-						\n13.5 Le Locataire garantit à ARROW CAPITAL SOLUTIONS qu’il se conformera à toutes les lois et règlements applicables, y compris, sans limitation, toutes les lois anti-corruption applicables au Locataire et les lois régissant les transactions avec l’état, les administrations, les organismes publics et privés, les lois antitrust et de libre concurrence, les lois applicables aux les délits d'initiés, les lois financières et comptables. Le Locataire se conformera au Code de conduite des Partenaires Arrow, qui peut être consulté ici : http://www.arrow.com/about_arrow/BusinessPartnerCodeofConduct.pdf\n(tel que mis à jour occasionnellement) ou à un code de conduite au moins aussi contraignant que celui d’Arrow.
-						\n13.6 Les informations figurant dans les présentes ont un caractère obligatoire pour le traitement de la demande du Locataire. Ces informations ou celles recueillies ultérieurement ne seront utilisées et ne feront l’objet de communication aux destinataires déclarés à la CNIL - Commission Nationale de l’Informatique et des Libertés - que pour les seules nécessités de gestion du présent contrat ou d’actions commerciales. Ces informations pourront toutefois être communiquées aux entreprises extérieures liées contractuellement à ARROW CAPITAL SOLUTIONS pour la gestion et l’exécution des présentes dans la stricte limite de leurs attributions respectives ainsi qu’aux seuls Etablissements de Crédit soumis au secret professionnel bancaire en vertu des dispositions des articles L.511-33 et suivants du Code monétaire et financier, liés à ARROW CAPITAL SOLUTIONS en vue de la gestion de leurs financements. Elles pourront donner lieu à exercice du droit d’accès et de rectification auprès de ARROW CAPITAL SOLUTIONS dans les conditions prévues par la loi du 6 janvier 1978. En signant ce contrat, le Locataire accepte de recevoir des propositions commerciales de sociétés auxquelles ARROW CAPITAL SOLUTIONS peut communiquer ses nom et adresse."
+						\n13.5 Le Locataire garantit à ".$this->societe["societe"]." qu’il se conformera à toutes les lois et règlements applicables, y compris, sans limitation, toutes les lois anti-corruption applicables au Locataire et les lois régissant les transactions avec l’état, les administrations, les organismes publics et privés, les lois antitrust et de libre concurrence, les lois applicables aux les délits d'initiés, les lois financières et comptables. Le Locataire se conformera au Code de conduite des Partenaires Arrow, qui peut être consulté ici : http://www.arrow.com/about_arrow/BusinessPartnerCodeofConduct.pdf\n(tel que mis à jour occasionnellement) ou à un code de conduite au moins aussi contraignant que celui d’Arrow.
+						\n13.6 Les informations figurant dans les présentes ont un caractère obligatoire pour le traitement de la demande du Locataire. Ces informations ou celles recueillies ultérieurement ne seront utilisées et ne feront l’objet de communication aux destinataires déclarés à la CNIL - Commission Nationale de l’Informatique et des Libertés - que pour les seules nécessités de gestion du présent contrat ou d’actions commerciales. Ces informations pourront toutefois être communiquées aux entreprises extérieures liées contractuellement à ".$this->societe["societe"]." pour la gestion et l’exécution des présentes dans la stricte limite de leurs attributions respectives ainsi qu’aux seuls Etablissements de Crédit soumis au secret professionnel bancaire en vertu des dispositions des articles L.511-33 et suivants du Code monétaire et financier, liés à ".$this->societe["societe"]." en vue de la gestion de leurs financements. Elles pourront donner lieu à exercice du droit d’accès et de rectification auprès de ".$this->societe["societe"]." dans les conditions prévues par la loi du 6 janvier 1978. En signant ce contrat, le Locataire accepte de recevoir des propositions commerciales de sociétés auxquelles ".$this->societe["societe"]." peut communiquer ses nom et adresse."
+					],
+					[
+						"titre" => null,
+						"texte" => "Le Locataire reconnaît avoir également pris connaissance des conditions particulières"
 					]
 				]
 			]
@@ -17514,8 +17698,7 @@ class pdf_arrow extends pdf_cleodis
 		];
 		$this->affichageCG($pages, false);
 
-		$this->cell(0,4,"Le Locataire reconnaît avoir également pris connaissance des conditions particulières", 0, 1,'C');
-		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", "ARROW CAPITAL SOLUTIONS");
+		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", $this->societe["societe"]);
 		$this->conditionParContratLocation();
 		$this->SetLeftMargin(0);
 		$pageCount = $this->setSourceFile(__PDF_PATH__."arrow/mandatSepa.pdf");
@@ -17593,7 +17776,7 @@ class pdf_arrow extends pdf_cleodis
 
 		$this->ln(6);
 		$this->cell(0,4,"Le Locataire reconnaît avoir également pris connaissance des conditions particulières", 0, 1,'C');
-		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", "ARROW CAPITAL SOLUTIONS");
+		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", $this->societe["societe"]);
 	}
 	function pvReceptionEquipements() {
 		$this->AddPage();
@@ -17973,13 +18156,13 @@ class pdf_arrow extends pdf_cleodis
 		$this->line(10,38,200,38);
 		$this->ln(6);
 
-		$this->multicell(0,4, "En vertu de la Convention de Coopération signée, la société ARROW CAPITAL SOLUTIONS SAS (ci-après dénommée « ARROW CAPITAL SOLUTIONS ») cède à ".$refinanceur["refinanceur"]." (ci-après dénommée «".$refinanceur["refinanceur"]."») divers matériels ayant fait l’objet d’un Contrat de Location N°".$contrat["ref"]." négocié et conclu le ".date('d/m/Y', strtotime($contrat["date"]))." entre ARROW CAPITAL SOLUTIONS et ".$client["societe"]." Siren ".$client["siren"].". (ci-après dénommé « le Locataire »), dont les caractéristiques sont décrites ci-après.");
+		$this->multicell(0,4, "En vertu de la Convention de Coopération signée, la société ".$this->societe["societe"]." (ci-après dénommée « ".$this->societe["societe"]." ») cède à ".$refinanceur["refinanceur"]." (ci-après dénommée «".$refinanceur["refinanceur"]."») divers matériels ayant fait l’objet d’un Contrat de Location N°".$contrat["ref"]." négocié et conclu le ".date('d/m/Y', strtotime($contrat["date"]))." entre ".$this->societe["societe"]." et ".$client["societe"]." Siren ".$client["siren"].". (ci-après dénommé « le Locataire »), dont les caractéristiques sont décrites ci-après.");
 		$this->ln(2);
 
 		$this->multicell(0,4, "La présente vente est faite à la date et au prix indiqué ci-dessous.");
 		$this->ln(2);
 
-		$this->multicell(0,4, "Par ailleurs, ARROW CAPITAL SOLUTIONS s’engage à racheter les matériels à ".$refinanceur["refinanceur"]." au terme du Contrat de Location, et ce en vertu de l’article VIII de ladite Convention, au prix fixé ci-après.");
+		$this->multicell(0,4, "Par ailleurs, ".$this->societe["societe"]." s’engage à racheter les matériels à ".$refinanceur["refinanceur"]." au terme du Contrat de Location, et ce en vertu de l’article VIII de ladite Convention, au prix fixé ci-après.");
 		$this->ln(2);
 
 		$this->titleContrat("CONTRAT DE LOCATION :");
@@ -18011,7 +18194,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->cell(0,4, ".............................. HT Euros",0, 1);
 
 		$this->ln(10);
-		$this->signatureInfos(null, "ARROW CAPITAL SOLUTIONS", $refinanceur["refinanceur"]);
+		$this->signatureInfos(null, $this->societe["societe"], $refinanceur["refinanceur"]);
 
 
 	}
@@ -18115,9 +18298,9 @@ class pdf_arrow extends pdf_cleodis
 
 		$this->setFont('Arial',null, 8);
 		$loueur = [
-			["label" => "Dénomination",	"valeur" => "ARROW CAPITAL SOLUTIONS",	"style" => 'B'],
-			["label" => "Forme et capital",	"valeur" => "SAS au capital de 40 000 EUR",	"style" => null],
-			["label" => "N° unique d’identification",	"valeur" => "RCS n° 453 738 551",	"style" => null],
+			["label" => "Dénomination",	"valeur" => $this->societe["societe"],	"style" => 'B'],
+			["label" => "Forme et capital",	"valeur" => $this->societe["structure"]." au capital de ".$this->societe["capital"]." EUR",	"style" => null],
+			["label" => "N° unique d’identification",	"valeur" => "RCS n° ".$this->societe["siren"],	"style" => null],
 			["label" => "Siège social",	"valeur" => "Immeuble CANOPY – 6, Rue du général Audran 6 – 92400 COURBEVOIE",	"style" => null],
 			["label" => "Représentée par",	"valeur" => (ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE")." en qualité de ".(ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial"),	"style" => null],
 		];
