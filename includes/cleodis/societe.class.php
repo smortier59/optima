@@ -1847,6 +1847,10 @@ class societe_cleodis extends societe {
           case 'FR':
             foreach ($company->establishments as $etablissement) {
               if ($etablissement->siret === $siret) {
+                ATF::pays()->q->reset()->where("id_pays", $etablissement->address->country, "OR")->where("pays", $etablissement->address->country, "OR");
+                $pays = ATF::pays()->select_row();
+
+
                 $specifique = [
                   "siren" => $legalUnit->registrationNumber,
                   "siret" => $siret,
@@ -1856,13 +1860,24 @@ class societe_cleodis extends societe {
                   "ville" => $etablissement->address->city,
                   "tel" => $legalUnit->phone,
                   "structure" => $legalUnit->companyCategory,
+                  "id_pays" => ($pays ? $pays["id_pays"]: null),
                 ];
               }
             }
           break;
 
           case 'ES':
-            $specifique = [ "capital" => $legalUnit->shareCapital->value ];
+            ATF::pays()->q->reset()->where("id_pays", $company->establishments[0]->address->country, "OR")->where("pays", $company->establishments[0]->address->country, "OR");
+            $pays = ATF::pays()->select_row();
+
+            $specifique = [
+              "capital" => $legalUnit->shareCapital->value,
+              "adresse" =>$company->establishments[0]->address->address,
+              "cp" =>$company->establishments[0]->address->zipcode,
+              "ville" =>$company->establishments[0]->address->city,
+              "province" =>$company->establishments[0]->address->province,
+              "id_pays" => ($pays ? $pays["id_pays"]: null)
+            ];
             if (ATF::$codename === "itrenting") {
               $specifique["cif"] = $legalUnit->companyRegistrationNumber;
             } else {
@@ -1871,7 +1886,14 @@ class societe_cleodis extends societe {
           break;
 
           case 'BE':
-            # code...
+            $specifique = [
+              "num_ident" => $legalUnit->companyRegistrationNumber,
+              "capital" => $legalUnit->shareCapital->value,
+              "adresse" =>$company->establishments[0]->address->address,
+              "cp" =>$company->establishments[0]->address->zipcode,
+              "ville" =>$company->establishments[0]->address->city,
+              "id_pays" =>$company->establishments[0]->address->country,
+            ];
           break;
         }
         $data_soc = array_merge($commun, $specifique);
