@@ -334,7 +334,7 @@ class pdf_cleodis extends pdf {
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
-		ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
+		ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire);
 		$this->devis = ATF::devis()->select_row();
 		$this->user = ATF::user()->select($this->devis['id_user']);
 		ATF::societe()->q->reset()->where("siret", $siretSociete);
@@ -4408,11 +4408,9 @@ class pdf_cleodis extends pdf {
 	public function comite($id,$s) {
 		$this->comite = ATF::comite()->select($id);
 		$this->affaire = ATF::affaire()->select($this->comite['id_affaire']);
-		ATF::devis()->q->reset()->where("id_affaire", $this->comite['id_affaire']);
+		ATF::devis()->q->reset()->where("devis.id_affaire", $this->comite['id_affaire']);
 		$this->devis = ATF::devis()->select_row();
 		$this->client = ATF::societe()->select($this->affaire['id_societe']);
-
-
 
 
 		$this->open();

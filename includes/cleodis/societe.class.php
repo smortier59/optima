@@ -2033,7 +2033,7 @@ class societe_cleodis extends societe {
     $id_affaire = ATF::affaire()->decryptId($post["id_affaire"]);
 
 
-    ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
+    ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire);
     $devis = ATF::devis()->select_row();
 
 

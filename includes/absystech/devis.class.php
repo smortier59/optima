@@ -1732,7 +1732,7 @@ class devis_absystech extends devis {
   }
 
   public function devis_already_sign($id_affaire) {
-	ATF::devis()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_devis", "desc");
+	ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire)->addOrder("id_devis", "desc");
 	$d = ATF::devis()->sa();
 
 	if ($d[0]["date_signature"]) {

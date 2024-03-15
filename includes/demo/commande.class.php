@@ -397,7 +397,7 @@ class commande_absystech extends commande {
 				//Affaire
 				$this->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
 				$tab_commande = $this->sa();
-				ATF::devis()->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
+				ATF::devis()->q->reset()->where("devis.id_affaire",$commande["id_affaire"])->end();
 				$tab_devis = ATF::devis()->sa();
 				ATF::facture()->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
 				$tab_facture = ATF::facture()->sa();
