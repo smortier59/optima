@@ -1508,7 +1508,7 @@ class facture_cleodis extends facture {
 			$increment++;
 			if($item){
 				//initialisation des données
-				$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);
+				$devis=ATF::devis()->select_special("affaire.id_affaire",$item['facture.id_affaire_fk']);
 				$infos_commande=ATF::commande()->select($this->select($item['facture.id_facture_fk'], "id_commande"));
 				$societe = ATF::societe()->select($item['facture.id_societe_fk']);
 				if($id_refinanceur = ATF::demande_refi()->id_refinanceur($item['facture.id_affaire_fk'])){
@@ -2042,7 +2042,7 @@ class facture_cleodis extends facture {
 			$increment++;
 			if($item){
 				//initialisation des données
-				$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);
+				$devis=ATF::devis()->select_special("devis.id_affaire",$item['facture.id_affaire_fk']);
 				ATF::commande()->q->reset()->addField("commande.etat")->where("commande.id_affaire",$item['facture.id_affaire_fk']);
 				$commande = ATF::commande()->select_row();
 
@@ -2406,7 +2406,7 @@ class facture_cleodis extends facture {
 				}
 
 				if($afficher){
-					$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);
+					$devis=ATF::devis()->select_special("devis.id_affaire",$item['facture.id_affaire_fk']);
 					$societe = ATF::societe()->select($item['facture.id_societe_fk']);
 					ATF::loyer()->q->reset()->where("loyer.id_affaire",$item["facture.id_affaire_fk"]);
 					$loyers = ATF::loyer()->select_all();
