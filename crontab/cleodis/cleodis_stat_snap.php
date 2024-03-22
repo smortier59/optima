@@ -13,6 +13,10 @@ foreach ($agences as $key => $value) {
 	$date = date("Y-m-01");
 	$dateMoisPrec = date("Y-m-01" , strtotime($date." -1 month"));
 
+	log::logger($date, "mfleurquin");
+	log::logger($dateMoisPrec, "mfleurquin");
+
+/*
 	ATF::db()->begin_transaction();
 	try{
 
@@ -110,7 +114,7 @@ foreach ($agences as $key => $value) {
 		echo $e->getMessage();
 	}
 
-
+*/
 	ATF::db()->begin_transaction();
 	try{
 
@@ -145,8 +149,8 @@ foreach ($agences as $key => $value) {
 			->addGroup("year")->addGroup("month")
 			->addOrder("year")->addOrder("month")
 
-			->addCondition("`commande`.`mise_en_place`",$date."-01-01","AND",false,">")
-			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=");
+			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=")
+			->addCondition("`commande`.`mise_en_place`",$date,"AND",false,"<");
 
 
 		$result= ATF::commande()->select_row();
@@ -197,8 +201,8 @@ foreach ($agences as $key => $value) {
 			->addGroup("year")->addGroup("month")
 			->addOrder("year")->addOrder("month")
 
-			->addCondition("`commande`.`mise_en_place`",$date."-01-01","AND",false,">")
-			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=");
+			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=")
+			->addCondition("`commande`.`mise_en_place`",$date,"AND",false,"<");
 
 		$result= ATF::commande()->select_row();
 		if(empty($result)){
@@ -212,7 +216,3 @@ foreach ($agences as $key => $value) {
 		echo $e->getMessage();
 	}
 }
-
-
-
-?>
