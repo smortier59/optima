@@ -16,7 +16,7 @@ foreach ($agences as $key => $value) {
 	log::logger($date, "mfleurquin");
 	log::logger($dateMoisPrec, "mfleurquin");
 
-/*
+
 	ATF::db()->begin_transaction();
 	try{
 
@@ -114,7 +114,6 @@ foreach ($agences as $key => $value) {
 		echo $e->getMessage();
 	}
 
-*/
 	ATF::db()->begin_transaction();
 	try{
 
