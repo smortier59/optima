@@ -13,10 +13,6 @@ foreach ($agences as $key => $value) {
 	$date = date("Y-m-01");
 	$dateMoisPrec = date("Y-m-01" , strtotime($date." -1 month"));
 
-	log::logger($date, "mfleurquin");
-	log::logger($dateMoisPrec, "mfleurquin");
-
-
 	ATF::db()->begin_transaction();
 	try{
 
