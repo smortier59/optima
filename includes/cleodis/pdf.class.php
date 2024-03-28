@@ -18150,7 +18150,23 @@ class pdf_arrow extends pdf_cleodis
 
 		ATF::demande_refi()->q->reset()->where("demande_refi.id_affaire", $contrat["id_affaire"])->where("demande_refi.etat", "valide")->setLimit(1);
 		$demande_refi = ATF::demande_refi()->select_row();
-		$refinanceur = ATF::refinanceur()->select($demande_refi["id_refinanceur"]);
+		$facture_refi = null;
+		$refinanceur = null;
+
+		if($demande_refi) {
+			ATF::facture()->q->reset()->where("facture.id_affaire", $contrat["id_affaire"])
+								  ->where("type_facture", "refi")
+								  ->where("facture.id_demande_refi", $demande_refi["id_demande_refi"]);
+
+			$fr = ATF::facture()->select_row();
+			if ($fr) {
+				$facture_refi = ATF::facture()->select($fr["facture.id_facture"]);
+			}
+			$refinanceur = ATF::refinanceur()->select($demande_refi["id_refinanceur"]);
+		}
+
+
+
 
 		$this->unsetFooter();
 		$this->unsetHeader();
@@ -18244,7 +18260,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->titleContrat("VENTE DU MATERIEL :");
 		$this->cell(0,4, "Date de la vente : ".date("d/m/Y", strtotime($affaire["date_installation_reel"])),0, 1);
 		$this->cell(0,4, "Date de cession : ".date("d/m/Y", strtotime($contrat["date_debut"])),0, 1);
-		$this->cell(0,4, "Prix de vente : ".number_format($demande_refi["prix"],2,'.',' ')." H.T. Euros – ".number_format(($demande_refi["prix"]*$contrat["tva"]),2,'.',' ')." TTC Euros.",0, 1);
+		$this->cell(0,4, "Prix de vente : ".($facture_refi ? number_format($facture_refi["prix"],2,'.',' ') : '')." H.T. Euros – ".($facture_refi ? number_format(($facture_refi["prix"]*$contrat["tva"]),2,'.',' '): '')." TTC Euros.",0, 1);
 		$this->cell(0,4, "La date d’effet est fixée au : ".date("d/m/Y", strtotime($contrat["date_debut"])),0, 1);
 
 		$this->titleContrat("RACHAT DU MATERIEL :");
