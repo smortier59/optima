@@ -823,7 +823,7 @@ class facture_cleodis extends facture {
 		$this->infoCollapse($infos);
 
 		$commande=ATF::commande()->select($infos["id_commande"]);
-		$infos["date"]=date('Y-m-d');
+		if (!isset($infos["date"])) $infos["date"]=date('Y-m-d');
 		$infos["id_affaire"]=$commande["id_affaire"];
 		$infos["tva"]=$commande["tva"];
 		$infos["ref"]=$this->getRef($commande["id_affaire"],$infos["type_facture"]);
