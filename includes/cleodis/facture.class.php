@@ -824,7 +824,7 @@ class facture_cleodis extends facture {
 
 		$commande=ATF::commande()->select($infos["id_commande"]);
 		if (!isset($infos["date"])) $infos["date"]=date('Y-m-d');
-		if (!isset($infos["date_previsionnelle"])) $infos["date_previsionnelle"] = $infos["date_periode_debut"];
+		if (!isset($infos["date_previsionnelle"])) $infos["date_previsionnelle"] = $infos["date"];
 
 		$infos["id_affaire"]=$commande["id_affaire"];
 		$infos["tva"]=$commande["tva"];
