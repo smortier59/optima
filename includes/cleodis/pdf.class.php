@@ -225,6 +225,12 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
+	public function _getBase64($get, $post) {
+		$pdf = $this->generic($post["fonction"],$post["id"], true);
+
+        return base64_encode($pdf);
+
+	}
 
 	public function noticeAssurance() {
 		$this->Open();
