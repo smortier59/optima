@@ -2853,7 +2853,7 @@ class affaire_cleodis extends affaire {
 				,"texte"=>"Création de l'affaire par :\n".$redacteur."\nSociete ".$redacteur_societe
 				,'public'=>'oui'
 				,'suivi_societe'=>NULL
-				,'suivi_notifie'=>$notifie
+				,'suivi_notifie'=> array_unique($notifie)
 				,'id_user' => $partenaireUser["id_user"]
 			);
 			$suivi["no_redirect"] = true;
