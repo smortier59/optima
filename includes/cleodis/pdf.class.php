@@ -16878,6 +16878,58 @@ class pdf_boulanger extends pdf_cleodis {
 class pdf_assets extends pdf_cleodis {
 	public $logo = __PDF_PATH__."/".'assets/assets.jpg';
 
+
+	public function contrat_simpel_customA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL CUSTOM");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"assets/annexe_simpel/CG_Simpel.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simpel_customA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL CUSTOM");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"assets/annexe_simpel/CG_Simpe.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
 };
 
 class pdf_solo extends pdf_cleodis
