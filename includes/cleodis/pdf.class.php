@@ -16915,7 +16915,7 @@ class pdf_assets extends pdf_cleodis {
 		$this->datamandatSepa($id,$s);
 
 		$annexes = [
-			"assets/annexe_simpel/CG_Simpe.pdf"
+			"assets/annexe_simpel/CG_Simpel.pdf"
 		];
 
 		foreach($annexes as $annexe) {
