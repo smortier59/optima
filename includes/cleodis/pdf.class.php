@@ -3051,7 +3051,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
@@ -3080,7 +3080,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
@@ -3109,7 +3109,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
@@ -3139,7 +3139,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
