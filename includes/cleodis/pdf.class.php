@@ -3127,6 +3127,63 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
+	public function contrat_simpel_startBoschA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->unsetHeader();
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simpel_startBoschA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->unsetHeader();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
 	public function contrat_simpel_startA4Particulier($id, $signature,$sellsign) {
 		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
 		$this->unsetHeader();
@@ -3156,6 +3213,8 @@ class pdf_cleodis extends pdf {
 			}
 		}
 	}
+
+
 
   	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat) {
 
