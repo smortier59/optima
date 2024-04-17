@@ -3139,6 +3139,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
 			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
 		];
 
@@ -3167,6 +3168,7 @@ class pdf_cleodis extends pdf {
 
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
 			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
 		];
 
