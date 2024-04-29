@@ -62,3 +62,29 @@ where
 
 -- TH 30409 - Export Vente - Num Facture
 ALTER TABLE `facture` ADD `numero` VARCHAR(12) NULL DEFAULT NULL AFTER `ref`;
+
+
+-- TH 30592 - Grille tarifaire - Calcul de loyer automatisé
+CREATE TABLE grille_tarifaire (
+    `id_grille_tarifaire` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+    `nom` VARCHAR(50) NOT NULL ,
+    `description` TEXT NOT NULL ,
+    `id_type_affaire` INT NULL,
+    `etat` ENUM('ACTIF','INACTIF') NOT NULL DEFAULT 'ACTIF' ,
+    `date_creation` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    PRIMARY KEY (`id_grille_tarifaire`),
+    INDEX (`id_type_affaire`))
+ENGINE = InnoDB;
+ALTER TABLE `grille_tarifaire` ADD FOREIGN KEY (`id_type_affaire`) REFERENCES `type_affaire`(`id_type_affaire`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE TABLE grille_tarifaire_ligne (
+    `id_grille_tarifaire_ligne` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id_grille_tarifaire` MEDIUMINT UNSIGNED NOT NULL ,
+    `montant_max` MEDIUMINT NOT NULL ,
+    `duree` SMALLINT NOT NULL ,
+    `periodicite` ENUM('MOIS','TRIMESTRE','SEMESTRE','AN') NOT NULL DEFAULT 'MOIS' ,
+    `taux` DECIMAL(6,3) NOT NULL ,
+    PRIMARY KEY (`id_grille_tarifaire_ligne`),
+    INDEX (`id_grille_tarifaire`))
+ENGINE = InnoDB;
+ALTER TABLE `grille_tarifaire_ligne` ADD FOREIGN KEY (`id_grille_tarifaire`) REFERENCES `grille_tarifaire`(`id_grille_tarifaire`) ON DELETE CASCADE ON UPDATE CASCADE;

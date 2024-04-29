@@ -2628,7 +2628,12 @@ class affaire_cleodis extends affaire {
 		ATF::user()->q->reset()->where('login', 'partenaire')->setLimit(1);
 		$user_partenaire = ATF::user()->select_row();
 
-		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($id_partenaire);
+		if ($post["idGrille"]) {
+			$grille = ATF::grille_tarifaire()->select($post["idGrille"]);
+			$id_type_affaire = $grille["id_type_affaire"];
+		} else {
+			$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($id_partenaire);
+		}
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2673,7 +2678,7 @@ class affaire_cleodis extends affaire {
 			$loyer = array();
 			$produits = array();
 			$loyer[0] = array(
-				"loyer__dot__loyer"=>0,
+				"loyer__dot__loyer"=>$post["loyer"],
 				"loyer__dot__duree"=>$post["duree"],
 				"loyer__dot__type"=>"engagement",
 				"loyer__dot__assurance"=>"",
@@ -2699,7 +2704,7 @@ class affaire_cleodis extends affaire {
 			  "devis_ligne__dot__quantite"=>1,
 			  "devis_ligne__dot__type"=>"sans_objet",
 			  "devis_ligne__dot__ref"=>"",
-			  "devis_ligne__dot__prix_achat"=>$post["loyer"],
+			  "devis_ligne__dot__prix_achat"=>$post["prixVente"],
 			  "devis_ligne__dot__id_produit"=>"",
 			  "devis_ligne__dot__id_fournisseur"=>"",
 			  "devis_ligne__dot__visibilite_prix"=>"invisible",
