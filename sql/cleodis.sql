@@ -88,3 +88,20 @@ CREATE TABLE grille_tarifaire_ligne (
     INDEX (`id_grille_tarifaire`))
 ENGINE = InnoDB;
 ALTER TABLE `grille_tarifaire_ligne` ADD FOREIGN KEY (`id_grille_tarifaire`) REFERENCES `grille_tarifaire`(`id_grille_tarifaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE `pack_produit_partenaire` ( `id_pack_produit_partenaire` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+ `id_pack_produit` MEDIUMINT UNSIGNED NOT NULL ,
+ `id_partenaire` MEDIUMINT UNSIGNED NOT NULL ,
+ `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' ,
+PRIMARY KEY (`id_pack_produit_partenaire`)) ENGINE = InnoDB;
+
+
+ALTER TABLE `pack_produit_partenaire` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit`(`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `pack_produit_partenaire` ADD FOREIGN KEY (`id_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT SELECT ON `optima_arrow`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_assets`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_cleodis`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_cleodisbe`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_itrenting`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_solo`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
