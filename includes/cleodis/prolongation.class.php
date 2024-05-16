@@ -24,7 +24,7 @@ class prolongation extends classes_optima {
 			"id_societe"=>array("disabled"=>true),
 			"id_affaire"=>array("disabled"=>true),
 			"id_refinanceur",
-			"date_debut"=>array("disabled"=>true),
+			"date_debut",
 			"date_arret"
 		);
 
