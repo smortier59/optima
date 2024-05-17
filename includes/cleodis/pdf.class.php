@@ -2168,7 +2168,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function conditionsGeneralesDeLocationA3()  {
 		$this->unsetHeader();
-		$this->AddPage();
 		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA3.pdf");
@@ -2188,7 +2187,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function conditionsGeneralesDeLocationA4($type)  {
 		$this->unsetHeader();
-		$this->AddPage();
 		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA4.pdf");
