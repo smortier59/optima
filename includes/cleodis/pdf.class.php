@@ -2037,7 +2037,7 @@ class pdf_cleodis extends pdf {
 			$cadreLoueur[] = array("txt"=>$this->societe["structure"]." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." €","align"=>"C","h"=>3);
 			$cadreLoueur[] = array("txt"=>"SIREN ".$this->societe['siren']." – APE 7739Z","align"=>"C","h"=>3);
 			$cadreLoueur[] = array("txt"=>"N° de TVA intracommunautaire :","align"=>"C","h"=>3);
-			$cadreLoueur[] = array("txt"=>"FR 91 ".$this->societe["siren"],"align"=>"C","h"=>3);
+			$cadreLoueur[] = array("txt"=> $this->societe["reference_tva"],"align"=>"C","h"=>3);
 		}else {
 			$cadreLoueur[] = array("txt"=>"NUMERO DE TVA ".$this->societe['siret'],"align"=>"C");
 		}
@@ -2307,7 +2307,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
 		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
 		if($this->societe['id_pays'] =='FR'){
-		  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+		  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0);
 		}else{
 		  $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
 		}
@@ -3169,7 +3169,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
 		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
 		if($this->societe['id_pays'] =='FR'){
-			$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+			$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0);
 		}else{
 			$this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
 		}
@@ -3491,7 +3491,7 @@ class pdf_cleodis extends pdf {
 			0,4,
 			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
 			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
-			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
+			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : ".$this->societe["reference_tva"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['reference_tva']."\n")
 		);
 		$this->cell(30,12,"L'ABONNÉ",'T',0,'C');
 		$this->multicell(
@@ -3676,7 +3676,7 @@ class pdf_cleodis extends pdf {
 			0,4,
 			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
 			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
-			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
+			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : ".$this->societe["reference_tva"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['reference_tva']."\n")
 			,1
 		);
 		$this->cell(30,12,"LE LOCATAIRE",1,0,'C');
@@ -4918,7 +4918,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"TVA : BE 0 ".$this->societe["siren"]
+				,"TVA : ".$this->societe["reference_tva"]
 				," "
 			);
 			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -4930,7 +4930,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"N° TVA intra : FR 91 ".$this->societe["siren"]
+				,"N° TVA intra : ".$this->societe["reference_tva"]
 				,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 			);
 			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5073,7 +5073,7 @@ class pdf_cleodis extends pdf {
 			,$this->societe['adresse_2']
 			,$this->societe['cp']." ".$this->societe['ville']
 			,"Tel : ".$this->agence['tel']
-			,"N° TVA intra : FR 91 ".$this->societe["siren"]
+			,"N° TVA intra : ".$this->societe["reference_tva"]
 			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 		);
 		$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5195,7 +5195,7 @@ class pdf_cleodis extends pdf {
 		,$this->societe['adresse_2']
 		,$this->societe['cp']." ".$this->societe['ville']
 		,"Tel : ".$this->agence['tel']
-		,"TVA : BE 0 ".$this->societe["siren"]
+		,"TVA : ".$this->societe["reference_tva"]
 		," "
 	  );
 	  $this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5207,7 +5207,7 @@ class pdf_cleodis extends pdf {
 		,$this->societe['adresse_2']
 		,$this->societe['cp']." ".$this->societe['ville']
 		,"Tel : ".$this->agence['tel']
-		,"N° TVA intra : FR 91 ".$this->societe["siren"]
+		,"N° TVA intra : ".$this->societe["reference_tva"]
 		,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 	  );
 	  $this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
@@ -5500,7 +5500,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"TVA : BE 0 ".$this->societe["siren"]
+				,"TVA : ".$this->societe["reference_tva"]
 				," "
 			);
 			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5512,7 +5512,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"N° TVA intra : FR 91 ".$this->societe["siren"]
+				,"N° TVA intra : ".$this->societe["reference_tva"]
 				,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 			);
 			$this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
@@ -5981,7 +5981,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0,1);
 		$this->cell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0,1);
 		if($this->societe['id_pays'] =='FR'){
-			$this->cell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,1);
+			$this->cell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0,1);
 		}else{
 			$this->cell(0,3,"Numéro de TVA  ".$this->societe['siret'],0,1);
 		}
@@ -8504,7 +8504,7 @@ class pdf_cleodis extends pdf {
 			,$this->societe['adresse_2']
 			,$this->societe['cp']." ".$this->societe['ville']
 			,"Tel : ".$this->agence['tel']
-			,"N° TVA intra : FR 91 ".$this->societe["siren"]
+			,"N° TVA intra : ".$this->societe["reference_tva"]
 			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 		);
 		$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -8868,7 +8868,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
 			if ($this->societe['tel']) $this->multicell(65,3,"Tel : +32 (0)2 588 52 90",0,"C");
 			if ($this->societe['id_pays'] =='FR') {
-				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
+				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0,"C");
 			} else {
 
 				if(substr($this->societe['siret'],0,2) === "BE"){
