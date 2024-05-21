@@ -3136,6 +3136,65 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
+	public function contrat_simpel_startBoschA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START", "Le Partenaire", "de Prestation ");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->unsetHeader();
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simpel_startBoschA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START", "Le Partenaire", "de Prestation ");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->unsetHeader();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
 	public function contrat_simpel_startA4Particulier($id, $signature,$sellsign) {
 		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START");
 		$this->unsetHeader();
@@ -3166,7 +3225,9 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-  	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat) {
+
+
+  	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat, $denominationClient="Le Bénéficiaire", $typeContrat="") {
 
 		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->image($this->logo,10,10,40);
@@ -3185,7 +3246,7 @@ class pdf_cleodis extends pdf {
 		$this->setLeftMargin(15);
 		$this->ln(5);
 		$this->setfont('arial','B',10);
-		$this->multicell(0,6,"Le Bénéficiaire",0,'C');
+		$this->multicell(0,6,$denominationClient,0,'C');
 		$this->setLeftMargin(65);
 		$this->setfont('arial','B',7);
 		$this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
@@ -3208,13 +3269,13 @@ class pdf_cleodis extends pdf {
 
 		if($this->affaire["nature"]=="avenant"){
 			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU Contrat N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
+			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat ".$typeContrat."n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
 			$this->ln(5);
 		}else{
 			if($this->devis["type_contrat"] == "presta"){
-				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat ".$typeContrat."n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 			}else{
-				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat ".$typeContrat."n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
 			}
 			if($this->lignes && $this->affaire["nature"]=="AR"){
@@ -3422,7 +3483,7 @@ class pdf_cleodis extends pdf {
 
 
 	  $y = $this->gety()+2;
-	  $t = "Le Bénéficiaire";
+	  $t = $denominationClient;
 
 	  $this->cadre(20,$y,80,48,$cadre,$t);
 
