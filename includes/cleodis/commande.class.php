@@ -2558,7 +2558,7 @@ class commande_cleodis extends commande {
 		$data = array();
 
 		foreach ($donnees as $key => $value) {
-			if($value["affaire.nature"] !== "avenant" && $value["affaire.nature"] !== "vente"){
+			if($value["affaire.nature"] !== "vente"){
 				$societe = ATF::societe()->select($value["commande.id_societe_fk"]);
 
 				$value["code_client"] = $societe["code_client"];
@@ -3041,7 +3041,7 @@ class commande_cleodisbe extends commande_cleodis {
 		$data = array();
 
 		foreach ($donnees as $key => $value) {
-			if($value["affaire.nature"] !== "avenant" && $value["affaire.nature"] !== "vente"){
+			if($value["affaire.nature"] !== "vente"){
 				$societe = ATF::societe()->select($value["commande.id_societe_fk"]);
 
 				foreach ($feuilles as $kf => $vf) {
