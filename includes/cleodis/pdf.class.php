@@ -2037,7 +2037,7 @@ class pdf_cleodis extends pdf {
 			$cadreLoueur[] = array("txt"=>$this->societe["structure"]." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." €","align"=>"C","h"=>3);
 			$cadreLoueur[] = array("txt"=>"SIREN ".$this->societe['siren']." – APE 7739Z","align"=>"C","h"=>3);
 			$cadreLoueur[] = array("txt"=>"N° de TVA intracommunautaire :","align"=>"C","h"=>3);
-			$cadreLoueur[] = array("txt"=>"FR 91 ".$this->societe["siren"],"align"=>"C","h"=>3);
+			$cadreLoueur[] = array("txt"=> $this->societe["reference_tva"],"align"=>"C","h"=>3);
 		}else {
 			$cadreLoueur[] = array("txt"=>"NUMERO DE TVA ".$this->societe['siret'],"align"=>"C");
 		}
@@ -2168,12 +2168,17 @@ class pdf_cleodis extends pdf {
 	*/
 	public function conditionsGeneralesDeLocationA3()  {
 		$this->unsetHeader();
-		$this->AddPage();
 		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA3.pdf");
-		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 0,0,0,0, true);
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		}
+
 	}
 
 	/** CGL d'un PDF d'un contrat en A4
@@ -2182,12 +2187,16 @@ class pdf_cleodis extends pdf {
 	*/
 	public function conditionsGeneralesDeLocationA4($type)  {
 		$this->unsetHeader();
-		$this->AddPage();
 		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA4.pdf");
-		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 0,0,0,0, true);
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		}
 	}
 
 
@@ -2307,7 +2316,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
 		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
 		if($this->societe['id_pays'] =='FR'){
-		  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+		  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0);
 		}else{
 		  $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
 		}
@@ -3051,7 +3060,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
@@ -3080,7 +3089,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelFlux.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelFlux.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelFlux.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelFlux.pdf"
 		];
 
@@ -3109,8 +3118,67 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->AddPage();
+				$this->unsetHeader();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simpel_startBoschA4Particulier($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START", "Le Partenaire", "de Prestation ");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
+		];
+
+		foreach($annexes as $annexe) {
+			$pageCount = $this->setSourceFile(__PDF_PATH__.$annexe);
+
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				$tplIdx = $this->importPage($pageNo);
+
+				// add a page
+				$this->unsetHeader();
+				$this->AddPage();
+				$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+			}
+		}
+	}
+
+	public function contrat_simpel_startBoschA4Societe($id, $signature,$sellsign) {
+		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START", "Le Partenaire", "de Prestation ");
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$this->open();
+		$this->SetTopMargin(10);
+		$this->datamandatSepa($id,$s);
+
+		$annexes = [
+			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
+			"cleodis/annexe_simpel/annexe_simple_bosch.pdf"
 		];
 
 		foreach($annexes as $annexe) {
@@ -3139,7 +3207,7 @@ class pdf_cleodis extends pdf {
 		$annexes = [
 			"cleodis/annexe_simpel/CG_SimpelStart.pdf",
 			"cleodis/annexe_simpel/Annexe1_SimpelStart.pdf",
-			"cleodis/annexe_simpel/Annexe23_SimpelStart.pdf",
+			"cleodis/annexe_simpel/Annexe23_Simpel.pdf",
 			"cleodis/annexe_simpel/Annexe4_SimpelStart.pdf"
 		];
 
@@ -3157,7 +3225,9 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-  	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat) {
+
+
+  	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat, $denominationClient="Le Bénéficiaire", $typeContrat="") {
 
 		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->image($this->logo,10,10,40);
@@ -3169,14 +3239,14 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
 		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
 		if($this->societe['id_pays'] =='FR'){
-			$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+			$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0);
 		}else{
 			$this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
 		}
 		$this->setLeftMargin(15);
 		$this->ln(5);
 		$this->setfont('arial','B',10);
-		$this->multicell(0,6,"Le Bénéficiaire",0,'C');
+		$this->multicell(0,6,$denominationClient,0,'C');
 		$this->setLeftMargin(65);
 		$this->setfont('arial','B',7);
 		$this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
@@ -3199,13 +3269,13 @@ class pdf_cleodis extends pdf {
 
 		if($this->affaire["nature"]=="avenant"){
 			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU Contrat N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
+			}else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." au Contrat ".$typeContrat."n°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
 			$this->ln(5);
 		}else{
 			if($this->devis["type_contrat"] == "presta"){
-				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat ".$typeContrat."n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 			}else{
-				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+				$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat ".$typeContrat."n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
 			}
 			if($this->lignes && $this->affaire["nature"]=="AR"){
@@ -3413,7 +3483,7 @@ class pdf_cleodis extends pdf {
 
 
 	  $y = $this->gety()+2;
-	  $t = "Le Bénéficiaire";
+	  $t = $denominationClient;
 
 	  $this->cadre(20,$y,80,48,$cadre,$t);
 
@@ -3491,7 +3561,7 @@ class pdf_cleodis extends pdf {
 			0,4,
 			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
 			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
-			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
+			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : ".$this->societe["reference_tva"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['reference_tva']."\n")
 		);
 		$this->cell(30,12,"L'ABONNÉ",'T',0,'C');
 		$this->multicell(
@@ -3676,7 +3746,7 @@ class pdf_cleodis extends pdf {
 			0,4,
 			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
 			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
-			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
+			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : ".$this->societe["reference_tva"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['reference_tva']."\n")
 			,1
 		);
 		$this->cell(30,12,"LE LOCATAIRE",1,0,'C');
@@ -4918,7 +4988,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"TVA : BE 0 ".$this->societe["siren"]
+				,"TVA : ".$this->societe["reference_tva"]
 				," "
 			);
 			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -4930,7 +5000,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"N° TVA intra : FR 91 ".$this->societe["siren"]
+				,"N° TVA intra : ".$this->societe["reference_tva"]
 				,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 			);
 			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5073,7 +5143,7 @@ class pdf_cleodis extends pdf {
 			,$this->societe['adresse_2']
 			,$this->societe['cp']." ".$this->societe['ville']
 			,"Tel : ".$this->agence['tel']
-			,"N° TVA intra : FR 91 ".$this->societe["siren"]
+			,"N° TVA intra : ".$this->societe["reference_tva"]
 			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 		);
 		$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5195,7 +5265,7 @@ class pdf_cleodis extends pdf {
 		,$this->societe['adresse_2']
 		,$this->societe['cp']." ".$this->societe['ville']
 		,"Tel : ".$this->agence['tel']
-		,"TVA : BE 0 ".$this->societe["siren"]
+		,"TVA : ".$this->societe["reference_tva"]
 		," "
 	  );
 	  $this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5207,7 +5277,7 @@ class pdf_cleodis extends pdf {
 		,$this->societe['adresse_2']
 		,$this->societe['cp']." ".$this->societe['ville']
 		,"Tel : ".$this->agence['tel']
-		,"N° TVA intra : FR 91 ".$this->societe["siren"]
+		,"N° TVA intra : ".$this->societe["reference_tva"]
 		,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 	  );
 	  $this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
@@ -5500,7 +5570,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"TVA : BE 0 ".$this->societe["siren"]
+				,"TVA : ".$this->societe["reference_tva"]
 				," "
 			);
 			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -5512,7 +5582,7 @@ class pdf_cleodis extends pdf {
 				,$this->societe['adresse_2']
 				,$this->societe['cp']." ".$this->societe['ville']
 				,"Tel : ".$this->agence['tel']
-				,"N° TVA intra : FR 91 ".$this->societe["siren"]
+				,"N° TVA intra : ".$this->societe["reference_tva"]
 				,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 			);
 			$this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
@@ -5981,7 +6051,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0,1);
 		$this->cell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0,1);
 		if($this->societe['id_pays'] =='FR'){
-			$this->cell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,1);
+			$this->cell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0,1);
 		}else{
 			$this->cell(0,3,"Numéro de TVA  ".$this->societe['siret'],0,1);
 		}
@@ -8504,7 +8574,7 @@ class pdf_cleodis extends pdf {
 			,$this->societe['adresse_2']
 			,$this->societe['cp']." ".$this->societe['ville']
 			,"Tel : ".$this->agence['tel']
-			,"N° TVA intra : FR 91 ".$this->societe["siren"]
+			,"N° TVA intra : ".$this->societe["reference_tva"]
 			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 		);
 		$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
@@ -8868,7 +8938,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
 			if ($this->societe['tel']) $this->multicell(65,3,"Tel : +32 (0)2 588 52 90",0,"C");
 			if ($this->societe['id_pays'] =='FR') {
-				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
+				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : ".$this->societe["reference_tva"],0,"C");
 			} else {
 
 				if(substr($this->societe['siret'],0,2) === "BE"){
