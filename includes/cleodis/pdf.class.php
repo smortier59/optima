@@ -16949,6 +16949,43 @@ class pdf_assets extends pdf_cleodis {
 	public $logo = __PDF_PATH__."/".'assets/assets.jpg';
 
 
+	/** CGL d'un PDF d'un contrat en A3
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @date 18-10-2017
+	*/
+	public function conditionsGeneralesDeLocationA3()  {
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."assets/cgv-contratA3.pdf");
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		}
+
+	}
+
+	/** CGL d'un PDF d'un contrat en A4
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @date 18-10-2017
+	*/
+	public function conditionsGeneralesDeLocationA4($type)  {
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."assets/cgv-contratA4.pdf");
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		}
+	}
+
 	public function contrat_simpel_customA4Societe($id, $signature,$sellsign) {
 		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL CUSTOM");
 		$this->unsetHeader();
