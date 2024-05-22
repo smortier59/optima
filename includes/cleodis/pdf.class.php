@@ -17732,218 +17732,35 @@ class pdf_arrow extends pdf_cleodis
 
 		$this->entete($this->societe["societe"], "Le Locataire");
 
+
 		$this->cell(0,4,"Il a été convenu ce qui suit",0,1);
-		$this->ln(6);
-
-		$this->setFont('Arial', 'B', 10);
-		$this->cell(0,4, "CONDITIONS GENERALES DU CONTRAT DE LOCATION", 0,1, 'C');
-
-		$pages = [
-			[
-				"left" => [
-					[
-						"titre" => "ARTICLE.1 - OBJET",
-						"texte" => "1.1 Le Locataire a choisi en une ou plusieurs fois auprès de fournisseurs pour ses besoins professionnels, un ou plusieurs Equipements (ci-après appelé les Equipements) dont la description figure aux Conditions Particulières.
-						\n1.2 Conformément aux Conditions Générales et Particulières stipulées ci-après, ".$this->societe["societe"]." loue les Equipements au Locataire, qui accepte. Les Equipements seront livrés et installés à l'adresse du Locataire figurant aux Conditions Particulières.
-						\n1.3 L'engagement du Locataire est ferme et définitif dès sa signature des présentes. Le représentant signataire du Locataire est dûment mandaté à cet effet, sinon, le Locataire porte seul la responsabilité d’une défaillance interne à son organisation et ne peut l’invoquer pour se soustraire en tout ou partie aux obligations des présentes."
-					],
-					[
-						"titre" => "ARTICLE 2 - LIVRAISON-RECEPTION DES EQUIPEMENTS",
-						"texte" => "2.1 Le Locataire reconnaît être seul responsable du choix des Equipements, ainsi que du choix du fournisseur. Il reconnaît avoir préalablement pris connaissance des spécifications techniques et des modalités d'exploitation des Equipements.\n".$this->societe["societe"]." ne saurait, en conséquence, être tenue à une obligation de résultat ni être tenue pour responsable de toute inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des matériels et ou logiciels entre eux ou de toute autre cause de non-conformité à la conception technique ou à la commande initiale du Locataire.
-						\n2.2 A réception du matériel, le locataire s’engage à signer et à remettre à ".$this->societe["societe"]." un procès-verbal de livraison-réception constatant la conformité des Equipements à ses demandes. La signature apposée par le locataire sur le procès-verbal de livraison-réception vaut réception des Equipements sans réserve. Le Locataire ne pourra refuser la réception sans réserve des Equipements pour un motif autre que la non-conformité ou l'existence de vices apparents.
-						\n2.3 Lorsque des Equipements sont déjà livrés et installés dans les locaux du Locataire, les Equipements sont considérés comme acceptés sans réserve et la date de signature du présent contrat vaut date de réception.
-						\n2.4 En cas de livraisons partielles, le Locataire sera redevable d'une indemnité d’utilisation calculée au prorata du Matériel livré, entre la/les dates de livraisons partielles et la date d’effet du contrat tel que déterminé en l’article 3."
-					]
-				],
-				"right" => [
-					[
-						"titre" => "ARTICLE 3 Date d’Effet et DUREE",
-						"texte" => "La location prend effet à la livraison de tout ou partie des équipements sur le site désigné par le Locataire. Cette disposition ne fait pas obstacle à l’application des articles 4, 6 et 7 ci-dessous.\n Cette location est consentie pour une période irrévocable et non-réductible. La durée de la location est précisée aux Conditions Particulières ; elle ne commence à courir que le premier jour du mois ou trimestre suivant celui au cours duquel la location du dernier élément livré de l’équipement aura pris effet."
-					],
-					[
-						"titre" => "ARTICLE 4 - LOYERS",
-						"texte" => "4.1 Le montant du loyer est précisé aux Conditions Particulières. A ce montant s'ajoutera la TVA en vigueur à la date de facturation.\n Le Locataire est redevable de tous impôts et taxes présents et à venir liés aux Equipements, y compris ceux qui sont mis à la charge du Bailleur-Cessionnaire / propriétaire.
-						\n4.2 Les loyers sont exigibles d'avance le 1er jour de chaque période spécifiée aux Conditions Particulières.
-						\n4.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers prévus aux Conditions Particulières ou proportionnellement aux prix d'achat figurant sur le tarif du constructeur au jour de la signature du contrat. Si la prise d'effet telle que définie à l'article 3 intervient après le premier jour du mois ou du trimestre, le Locataire payera au loueur, pour ledit mois ou trimestre, une redevance de mise à disposition calculée prorata temporis au trentième pour un loyer mensuel et au quatre-vingt dixième pour un loyer trimestriel, sur la base du montant du loyer mensuel ou trimestriel
-						\n4.4 Les loyers sont portables selon tous moyens à Ia convenance de ".$this->societe["societe"]." et non quérables. Leur paiement sera effectué par prélèvements bancaires. A cet effet lors de la signature du présent contrat le Locataire signera une autorisation permanente de prélèvements
-						\n4.5 Entre la date de signature du présent contrat et la date de livraison, les loyers mentionnés aux Conditions Particulières peuvent varier en cas de modification des Equipements.
-						\n4.6 Les loyers sont fermes et définitifs pendant toute la durée de location à l'exception des majorations ou diminutions susceptibles d'intervenir à la suite de la variation du taux de TVA ou, en général, du régime fiscal applicable au présent contrat."
-						]
-				]
-			],
-			[
-				"left" => [
-					[
-						"titre" => null, "texte" => "4.7 En cas de retard dans le paiement de toute somme due par le Locataire, les intérêts de retard sont fixés conventionnellement à 1,5 % par mois à compter du jour de son exigibilité jusqu'au paiement intégral, les intérêts étant capitalisés. En outre, le Locataire devra rembourser à ".$this->societe["societe"]." les frais engagés par celui-ci pour tout rappel d'échéance sans qu'il ait à produire de justificatifs. L’ensemble de ces sommes sera dû de plein droit."
-					],
-					[
-						"titre" => "ARTICLE 5 - UTILISATION - ENTRETIEN DES EQUIPEMENTS",
-						"texte" => "5.1 Le Locataire s'engage à utiliser les Equipements dans des conditions normales et suivant les indications d'utilisation, d'entretien et de sécurité prévues dans la documentation technique relative aux Equipements.
-						\n5.2 Le déplacement éventuel des Equipements est soumis à l'autorisation préalable de ".$this->societe["societe"].". Il est réputé aux frais et risques du Locataire pendant le démontage, le transfert et la nouvelle (re-)installation. Ces dispositions ne concernent pas les micro-ordinateurs portables.
-						\n5.3 Par dérogation expresse aux dispositions des Articles 1719 et suivants du Code Civil, tous les frais nécessités par l'emploi, l'entretien et les réparations des Equipements, y compris le gros entretien et les réparations importantes, sont matériellement et financièrement à la charge du Locataire qui devra, à cet effet, passer tout contrat d'entretien ou de maintenance nécessaire avec une société tierce agréée par ".$this->societe["societe"].".
-						\nLe locataire communiquera immédiatement à ".$this->societe["societe"]." ces contrats et les agents de ".$this->societe["societe"]." pourront, à tout moment, pénétrer dans les locaux où sont installés les Equipements pour en contrôler l'utilisation et l'état de l’entretien.
-						\n5.4 Le Locataire s'engage à ne pas utiliser ou laisser utiliser les Equipements contrairement aux lois et règlements en vigueur. Il lui appartient de demander avec diligence et d’obtenir, le cas échéant, des organismes qualifiés, les autorisations relatives à l'utilisation des Equipements.\nLe Locataire doit en particulier s'assurer qu'il a obtenu toutes les licences nécessaires à l'utilisation de tout logiciel intégré dans les Equipements.\nLe locataire fait son affaire directement avec l'éditeur du respect des contrats de licences Les loyers du présent contrat restent redevables même en cas d’interdiction d’utilisation du (des) logiciel(s) en application de clauses de la licence et/ou de manquement à une de ces clauses.\nIl est entendu qu’en cas de contradiction, les dispositions du présent contrat prévalent sur celles qui régissent ou constituent la licence.
-						\n5.5 Par dérogation aux dispositions de l'Article 1724 du Code Civil, le Locataire renonce à toute indemnité et droit de résiliation vis-à-vis de ".$this->societe["societe"].", même dans le cas où les Equipements resteraient hors d’usage pendant plus de quarante jours, pour quelque cause que ce soit.
-						\n5.6 Tous les équipements et/ou accessoires incorporés par le Locataire aux Equipements pendant période de la location restent de plein droit et deviennent immédiatement la propriété de ".$this->societe["societe"]." sans qu'il puisse lui être réclamé aucun remboursement ou indemnité compensatrice."
-					],
-					[
-						"titre" => "ARTICLE 6 - PROPRIETE DES EQUIPEMENTS",
-						"texte" => "6.1 ".$this->societe["societe"]." conserve la propriété des Equipements, pendant toute la durée de la location, sauf application de l'Article 7 ci dessous.\nLe Locataire devra, si ".$this->societe["societe"]." le lui demande, apposer une plaque de propriété.
-						\n6.2 En sa qualité de gardien détenteur, le Locataire s'interdit de sous-louer, de céder ou de se dessaisir de tout ou partie des Equipements ou de céder le bénéfice du présent contrat, à quelque titre et pour quelque motif que ce soit, ou de le grever d'un droit quelconque (nantissement,...) sans l'autorisation préalable et écrite de ".$this->societe["societe"].".
-						\n6.3 Le Locataire devra prendre toutes mesures pour faire connaître le droit de propriété de ".$this->societe["societe"].". Le Locataire s'engage en particulier:\na) A avertir le propriétaire du local où seront installés les Equipements que ceux-ci ne sont pas sa propriété,\nb) En cas de saisie ou d’une procédure imminente, à prévenir l'huissier que les Equipements ne sont pas sa propriété, à informer immédiatement ".$this->societe["societe"]." de cette saisie, à obtenir mainlevée et généralement prendre toutes mesures de sauvegarde nécessaires.
-						\n6.4 Le Locataire s'engage à informer ".$this->societe["societe"]." de toute vente de son fonds de commerce ou de toute intention de transfert de ce dernier en un lieu autre que celui où sont actuellement installés les Equipements. Le Locataire s'engage également à avertir ".$this->societe["societe"]." de toute vente de l'immeuble où se trouvent les Equipements si le Locataire cesse d'en être propriétaire."
-					]
-					],
-				"right" => [
-					["titre" => null, "texte" => "\n6.5 En cas de résolution de la vente, le Locataire reste redevable envers ".$this->societe["societe"]." sera redevable outre les loyers échus impayés d'une indemnité de résiliation égale au montant des loyers à échoir augmenté d'une somme forfaitaire égale à 5% du montant total des loyers prévus aux conditions particulières. Ce montant sera diminué des sommes reçues des fournisseurs par le ".$this->societe["societe"]." au titre de la restitution de prix."],
-					[
-						"titre" => "ARTICLE 7 – CESSION DE L’EQUIPEMENT PAR ".$this->societe["societe"],
-						"texte" => $this->societe["societe"]." se réserve le droit de céder les Equipements et de déléguer le présent contrat à une tierce-partie (« le Bailleur-Cessionnaire ») de son choix. Le Bailleur - Cessionnaire, intervenant à titre purement financier, ne prendra en charge que l'obligation de laisser au Locataire la jouissance paisible des Equipements. En conséquence, malgré cette cession, le suivi commercial et technique continuera à être assuré par ".$this->societe["societe"]." qui reste dès lors l’interlocuteur du Locataire.\nLe présent acte sera à cet effet soumis par ".$this->societe["societe"]." à l’acceptation et à la signature du Bailleur - Cessionnaire. Le Bailleur - Cessionnaire ne sera engagé qu’après acceptation du dossier matérialisée par sa signature du présent contrat. Jusqu’à l’apposition de cette signature il n’existe aucun engagement du Bailleur - Cessionnaire.\nLe Locataire accepte dès à présent et sans réserve cette substitution éventuelle de loueur et s’engage à signer à première demande une autorisation de prélèvement au nom du Bailleur - Cessionnaire. En cas d’acceptation par le Bailleur - Cessionnaire qui se substitue ainsi au loueur d’origine, le Locataire reconnaît donc comme loueur le Bailleur - Cessionnaire et s’engage notamment à lui verser directement ou à son ordre la totalité des loyers en principal, intérêts et accessoires. Le Bailleur - Cessionnaire intervenant à titre purement financier, le Locataire en acceptant cette intervention renonce à effectuer toute compensation, déduction, demande reconventionnelle en raison du droit qu’il pourrait faire valoir à l’encontre du loueur d’origine, ainsi qu’à tout recours contre le Bailleur - Cessionnaire du fait notamment de défaillance ou vice caché ou du fait de l'assurance , prestations de services , construction, livraison ou l’installation des Equipements , le Locataire conservant sur ces points tous les recours contre le fournisseur et ".$this->societe["societe"]." . Si une action aboutit à une résolution judiciaire de la vente, objet du contrat, celui-ci est résilié à compter du jour où cette résolution sera devenue définitive. Le Locataire est alors redevable, des sommes stipulées en l’article 6.5. L’indemnité est exigible au jour de la résiliation. Le Bailleur - Cessionnaire imputera au paiement de cette indemnité les sommes effectivement reçues notamment du fournisseur du matériel en restitution du prix au titre de la résolution de la vente et ce, dans la limite du montant de l’indemnité. En outre, le Locataire reste garant solidaire avec ".$this->societe["societe"].", le fournisseur ou le constructeur pour les sommes dues par ceux-ci au Bailleur
-						\n- Cessionnaire
-						\n".$this->societe["societe"]." et le Locataire déclarent, sous leur responsabilité :
-						\n-que pour la location des Equipements il n'existe aucun autre document ou convention que ceux signés par le Bailleur - Cessionnaire. En tout état de cause seuls seront opposables à ce dernier les documents ou convention signés par lui
-						\n-que les Equipements sont conformes aux lois , règlements , au choix du Locataire ,qu'il bénéficie de toutes les garanties légales ou conventionnelles et qu'ils peuvent les céder sans restriction ni réserve."
-					],
-					[
-						"titre" => "ARTICLE 8 - RESPONSABILITE - RISQUES - ASSURANCES",
-						"texte" => "8.1 - RESPONSABILITE: En aucun cas, ".$this->societe["societe"]." ne pourra être tenue pour responsable d'un préjudice financier commercial ou d'une autre nature causé directement ou indirectement par l'utilisation ou le fonctionnement des Equipements. L’intervention de ".$this->societe["societe"]." se faisant à titre purement financier, le locataire ne pourra se prévaloir d’un quelconque dysfonctionnement ou défaillance dans la performance des équipements, matériels et logiciels objets du contrat ou de la non-réalisation des solutions techniques attendues pour arrêter le paiement des loyers et il s’engage dès à présent à régler les loyers dans leur intégralité.
-						\n8.2 - RISQUES : De la livraison, reception jusqu'à la restitution de l'Equipement, le Locataire est tenu pour responsable de la perte, du vol, de la détériration ou de la destruction de l'Equipement, qu'elle qu'en soit la cause, même si celle-ci relève d'un cas fortuit ou de force majeure. Le risque afférant à une usure prématurée est également à la charge du Locataire. Le Locataire ne se considèrera pas libéré de ses obligations contractuelles lors de la survenance de tels évènements et doit en informer immédiatement ".$this->societe["societe"]."."
-					]
-				]
-			],
-			[
-				"left" => [
-					[
-						"titre" => null,
-						"texte" => "8.3 – ASSURANCES : Le Locataire s'engage à assurer à ses frais les Equipements, notamment contre tous les risques et périls. Il peut s'assurer auprès de la compagnie d'assurance de son choix qui délivrera une attestation d'assurance au profit du ".$this->societe["societe"].". L'attestation d'assurance doit faire apparaître la couverture des risques visés ainsi que, le cas échéant, la franchise convenue.
-						\nLe Locataire cède et transporte au profit de ".$this->societe["societe"]." ou de son substitué le montant de toute indemnité d’assurance relative aux matériels loués à concurrence du montant total des loyers à courir jusqu’au terme du présent contrat, ainsi que ses droits contre l'éventuel responsable du dommage causé aux Equipements. Aussi longtemps que ".$this->societe["societe"]." n'aura pas informé le Locataire de son intention de faire valoir lui-même ses droits, celui-ci s'oblige, en cas de sinistre, à les faire valoir à ses frais au nom de ".$this->societe["societe"]." et d'exiger un paiement au profit de ".$this->societe["societe"].".
-						\n8.4 FRANCHISE - Le Locataire supporte dans tous les cas la franchise prévue et la responsabilité de tous dommages causés par le matériel.
-						\nEn cas de sinistre total, le Locataire est redevable d'une indemnité égale aux loyers, éventuellement impayés plus ceux restant à échoir sur toute la durée du contrat de location majorée de la valeur vénale du bien détruit à la veille du sinistre, sous déduction de l’indemnité éventuellement versée par la compagnie d’assurance. Cette indemnité sera majorée de la TVA."
-					],
-					[
-						"titre" => "ARTICLE 9 - EXTENSION - ADDITION - SUBSTITUTION",
-						"texte" => "Sous réserve d'avoir respecté toutes les obligations résultant du présent contrat, le Locataire pourra durant la période de location demander à ".$this->societe["societe"]." le remplacement total ou partiel des Equipements et/ou l'adjonction d'Equipements complémentaires.\n Ces évolutions entraîneront une modification des loyers et/ou de la durée de la location. Elles sont soumises à l'accord préalable de ".$this->societe["societe"].". En cas d'accord des parties sur les nouvelles conditions financières, un avenant constatant les conditions particulières sera signé par les parties."
-					],
-					[
-						"titre" => "ARTICLE 10 - FIN DE LOCATION - RECONDUCTION",
-						"texte" => "10.1 Quatre (4) mois avant l'expiration de la période de location telle que précisée à l’Art. 2 des Conditions Particulières, le Locataire devra informer ".$this->societe["societe"].", par lettre recommandée avec accusé de réception, son intention de ne pas poursuivre le contrat de location.
-						\n10.2 A défaut du Locataire d'avoir fait connaître son intention, la location se poursuivra en l’absence d’accord entre les parties, par tacite reconduction, aux conditions générales du présent contrat et sur la base du dernier loyer par période de douze (12) mois minimum; le Locataire ou ".$this->societe["societe"]." pourra y mettre fin avec un préavis de quatre (4) mois avant le terme des douze (12) mois."
-					],
-					[
-						"titre" => "ARTICLE 11 - RESILIATION PAR ".$this->societe["societe"],
-						"texte" => "11.1 ".$this->societe["societe"]." pourra résilier de plein droit le présent contrat, avec effet immédiat, après mise en demeure préalable, sans intervention judiciaire et sans être redevable de quelque indemnité que ce soit, dans les cas suivants :\na) Si le Locataire manque au paiement à l'échéance d'un seul terme du loyer ou plus généralement à l'une quelconquede ses obligations dans le cadre du présent contrat.\nb) Si le Locataire cède à un tiers le présent contrat ou l'un quelconque des droits qui lui sont attachés (le terme céder devra être interprété au sens large et comprenant notamment la cession d'une participation majoritaire dans le capital social, la cession ou le transfert du fonds de commerce du Locataire).\nc) Si le manquement par le Locataire au respect de ses obligations précisées dans les contrats de licence des logiciels loués, conduisait l'éditeur à priver le Locataire de ses droits d'usage.
-						\n11.2 Le Locataire devra, dès la résiliation, restituer immédiatement et à ses frais les Equipements à ".$this->societe["societe"]." dans les conditions prévues à l'Article 12 et lui verser:\n- les sommes dues au titre des loyers échus et impayés, fixée"
-					],
-
-				],
-				"right" => [
-					["titre" => null,
-					"texte" => "- une somme égale à dix pour cent (10 %) des loyers restant à échoir, à titre d'indemnité de résiliation.\nLes sommes citées ci-dessus porteront intérêt mensuel de 1.5 %.
-					\n11.3 En cas d'annulation de son engagement par le Locataire après sa signature, le Locataire sera redevable d'une indemnité forfaitaire et irréductible équivalente aux six (6) premiers mois de loyers TTC prévus aux conditions particulières"],
-					[
-						"titre" => "ARTICLE 12 - RESTlTUTION",
-						"texte" => "12.1 En cas de fin du présent contrat pour quelque cause que ce soit, le Locataire s'oblige à restituer à ses frais le matériel en bon état d'entretien au lieu qui sera désigné par ".$this->societe["societe"].". Si la restitution ne s’avère plus possible, le Locataire règlera à ".$this->societe["societe"]." une indemnité forfaitaire équivalente à six mois de loyer.
-						\n12.2 Les frais de démontage, d'emballage et de remise en état ou de destruction ainsi que de transport seront à la charge exclusive du Locataire."
-					],
-					[
-						"titre" => "ARTICLE 13 – DIVERS",
-						"texte" => "13.1 Le présent contrat, qui se compose des conditions générales, particulières et des annexes aux conditions particulières, annule et remplace tous les accords antérieurs entre les parties, écrits ou verbaux, ayant le même objet.
-						\n13.2 Le présent contrat ainsi que toute modification, résiliation ou renonciation de/à l'une quelconque des dispositions des présentes ne pourra prendre effet qu’après avoir fait l’objet d’un accord écrit dûment signé par les parties aux présentes.
-						\n13.3 Sont à la charge du Locataire, tous frais et honoraires, toutes dépenses que ".$this->societe["societe"]." devrait exposer pour recouvrer sa créance et/ou satisfaire l'obligation de restitution du Locataire défaillant.
-						\n13.4 Le présent contrat est régi par les lois françaises.\nTout litige relatif au présent contrat sera de la compétence exclusive des Tribunaux de Paris, y compris en cas de référé, d'appel en garantie ou de pluralité de défendeurs.
-						\n13.5 Le Locataire garantit à ".$this->societe["societe"]." qu’il se conformera à toutes les lois et règlements applicables, y compris, sans limitation, toutes les lois anti-corruption applicables au Locataire et les lois régissant les transactions avec l’état, les administrations, les organismes publics et privés, les lois antitrust et de libre concurrence, les lois applicables aux les délits d'initiés, les lois financières et comptables. Le Locataire se conformera au Code de conduite des Partenaires Arrow, qui peut être consulté ici : http://www.arrow.com/about_arrow/BusinessPartnerCodeofConduct.pdf\n(tel que mis à jour occasionnellement) ou à un code de conduite au moins aussi contraignant que celui d’Arrow.
-						\n13.6 Les informations figurant dans les présentes ont un caractère obligatoire pour le traitement de la demande du Locataire. Ces informations ou celles recueillies ultérieurement ne seront utilisées et ne feront l’objet de communication aux destinataires déclarés à la CNIL - Commission Nationale de l’Informatique et des Libertés - que pour les seules nécessités de gestion du présent contrat ou d’actions commerciales. Ces informations pourront toutefois être communiquées aux entreprises extérieures liées contractuellement à ".$this->societe["societe"]." pour la gestion et l’exécution des présentes dans la stricte limite de leurs attributions respectives ainsi qu’aux seuls Etablissements de Crédit soumis au secret professionnel bancaire en vertu des dispositions des articles L.511-33 et suivants du Code monétaire et financier, liés à ".$this->societe["societe"]." en vue de la gestion de leurs financements. Elles pourront donner lieu à exercice du droit d’accès et de rectification auprès de ".$this->societe["societe"]." dans les conditions prévues par la loi du 6 janvier 1978. En signant ce contrat, le Locataire accepte de recevoir des propositions commerciales de sociétés auxquelles ".$this->societe["societe"]." peut communiquer ses nom et adresse."
-					],
-					[
-						"titre" => null,
-						"texte" => "Le Locataire reconnaît avoir également pris connaissance des conditions particulières"
-					]
-				]
-			]
-
-		];
-		$this->affichageCG($pages, false);
+		$this->ln(12);
 
 		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", $this->societe["societe"]);
-		$this->conditionParContratLocation();
+
 		$this->SetLeftMargin(0);
+		$pageCount = $this->setSourceFile(__PDF_PATH__."arrow/cgl-contratA4.pdf");
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			$this->AddPage();
+			$this->useTemplate($tplIdx,0,0, 0 ,0 , true);
+		}
+
 		$pageCount = $this->setSourceFile(__PDF_PATH__."arrow/mandatSepa.pdf");
 		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 			$tplIdx = $this->importPage($pageNo);
 
 			// add a page
 			$this->AddPage();
-			$this->useTemplate($tplIdx,-10,0, 0 ,0 , true);
+			$this->useTemplate($tplIdx,0,0, 0 ,0 , true);
 		}
 		$this->SetLeftMargin(15);
 
 		$this->pvReceptionEquipements();
 	}
-	function conditionParContratLocation() {
-		$this->AddPage();
-		$this->image($this->logo,10,10,60);
 
-		$this->setY(30);
-		$this->setFont('Arial','B', '10');
-		$this->cell(0,4,"CONDITIONS PARTICULIERES DU CONTRAT DE LOCATION N°".$this->commande["ref"],0,1,'C');
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(10,38,200,38);
-		$this->ln(6);
-
-		$this->titleContrat("Article 1: OBJET");
-
-		$this->multicell(0,4, "Les présentes Conditions Particulières s'appliquent aux Equipements suivants :");
-		$this->ln(4);
-		$this->SetTextColor(255,255,255);
-		$this->setfont('arial','B',8);
-		$this->SetFillColor(0,0,0);
-		$this->cell(50,10, "Réference",1,0,'C',1);
-		$this->cell(100,10, "Description",1,0,'C',1);
-		$this->cell(30,10, "Qté",1,1,'C',1);
-		$this->SetTextColor(0,0,0);
-		$this->setfont('arial','',8);
-
-		foreach($this->lignes as $l) {
-			$this->cell(50, 7, $l["ref"], 1, 0, 'L');
-			$this->cell(100, 7, $l["produit"], 1, 0, 'L');
-			$this->cell(30, 7, $l["quantite"], 1, 1, 'C');
-		}
-
-		$this->ln(4);
-		$this->multicell(0,4, "L’Equipement sera installé à l'adresse suivante :");
-		$this->SetLeftMargin(45);
-		$this->cell(0,4,$this->client["livraison_adresse"],0, 1);
-		if ($this->client["livraison_adresse_2"]) $this->cell(0,4,$this->client["livraison_adresse_2"],0, 1);
-		if ($this->client["livraison_adresse_3"]) $this->cell(0,4,$this->client["livraison_adresse_3"],0, 1);
-		$this->cell(0,4,$this->client["livraison_cp"]." - ".$this->client["livraison_ville"],0, 1);
-		$this->SetLeftMargin(15);
-
-		$this->ln(4);
-		$this->multicell(0,4,"A la date de réception des Equipements dans les locaux du Locataire, la réception étant validée par la signature du Procès-Verbal de Réception conformément à l’article 2.2 ou dans les conditions prévues à l'article 2.3 des Conditions Générales");
-
-
-		$this->titleContrat("Article 2: DUREE DE LA LOCATION");
-		$this->multicell(0,4, "La durée ferme et irrévocable de la location sera de ".$this->loyer[0]["duree"]." ".$this->loyer[0]["frequence_loyer"].", et prendra effet le premier jour du trimestre suivant la réception de la totalité des équipements conformément à l’article 3 des Conditions Générales.");
-
-		$this->titleContrat("Article 3: LOYERS et PERIODICITE");
-		$this->multicell(0,4, "Les loyers sont calculés sur la base du prix des Equipements convenu par le locataire avec ses fournisseurs.\nIls sont calculés hors assurances.
-		\nLoyers HT : ".$this->loyer[0]["loyer"]." EUR HT\nPériodicité : ".$this->loyer[0]["frequence_loyer"]."\nCes loyers s’entendent Terme à échoir, et le règlement s’effectuera par prélèvement automatique.");
-
-		$this->titleContrat("Article 4: INDEXATION");
-		$this->multicell(0,4,"Si l’indice de référence (défini ci-dessous) venait à s’écarter de plus de 0.5 points entre la date de signature du présent contrat et la date de livraison, le montant du loyer serait ajusté proportionnellement.
-		\nIndice de référence :\nEURIBOR 12 mois + THO / 2\nT.H.O. : Taux de Rendement Moyen Brut hebdomadaire des Obligations de première signature sur le marché secondaire. Moyenne arithmétique mensuelle des THO.
-		\nLe taux deviendra ferme à la date de départ de la Location.");
-
-		$this->AddPage();
-		$this->titleContrat("Article 5: CONDITIONS D'EVOLUTION");
-		$this->multicell(0,4,"5.1. Ajout de matériels complémentaires\nLe financement de commandes d'Equipements supplémentaires fera l'objet d'une annexe au contrat de Location initial. Les équipements complémentaires, mises à jour et matériels autonomes pourront être financés sur une durée autonome ou sur la durée résiduelle.");
-
-		$this->ln(6);
-		$this->cell(0,4,"Le Locataire reconnaît avoir également pris connaissance des conditions particulières", 0, 1,'C');
-		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", $this->societe["societe"]);
-	}
 	function pvReceptionEquipements() {
 		$this->AddPage();
 		$this->image($this->logo,10,10,60);
