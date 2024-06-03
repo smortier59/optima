@@ -254,7 +254,7 @@ class pdf_cleodis extends pdf {
 		$societe = "31497580600063";
 		$this->templateMandat($id_affaire, $societe);
 		$this->ln(5);
-		$societe = "63201751302165";
+		$societe = "63201751303551";
 		$this->templateMandat($id_affaire, $societe, true);
 
 
