@@ -247,16 +247,25 @@ class pdf_cleodis extends pdf {
 		$this->unsetHeader();
 		$this->unsetFooter();
 
-		$this->AddPage();
-		$societe = "45307981600055";
-		$this->templateMandat($id_affaire, $societe, false, true);
-		$this->ln(5);
-		$societe = "31497580600063";
-		$this->templateMandat($id_affaire, $societe);
-		$this->ln(5);
-		$societe = "63201751303551";
-		$this->templateMandat($id_affaire, $societe, true);
+		$mandataires = [];
+		if (ATF::constante()->getConstante("__PDF_MANDAT_SOCIETE__")) {
+			$m = ATF::constante()->getValue('__PDF_MANDAT_SOCIETE__');
+			$mandataires = explode(",", $m);
+		}
 
+		if ($mandataires) {
+			$this->AddPage();
+			foreach($mandataires as $k => $v) {
+				$siret = ATF::societe()->select($v, "siret");
+				$last = false;
+
+				if ($k == 0) $displayRum = true;
+				if ($k == count($mandataires)) $last = true;
+
+				$this->templateMandat($id_affaire, $siret, $last, $displayRum);
+				$this->ln(5);
+			}
+		}
 
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
