@@ -7,134 +7,125 @@ ATF::$usr->set('id_user',1);
 
 echo "========= DEBUT DE SCRIPT =========\n";
 
-echo "CREATION DES SOCIETES \n";
-createSocietes();
+$fichier = $path == '' ? "./fichier.csv" : $path;
+$f = fopen($fichier, 'rb');
+$entete = fgetcsv($f);
+$societes = [];
+$lines_count = 0;
+$processed_lines = 0;
 
+$partenaires = [];
+$clients = [];
 
-echo "CREATION DES AFFAIRES \n";
-createAffaires();
+$produit = [
+    "ref" => "LB",
+    "produit" => "los bienes",
+    "prix_achat" => 0,
+    "id_fabriquant" => 281,
+    "id_sous_categorie" => 1
+];
+ATF::produit()->q->reset()->where("ref", "LB");
+$p = ATF::produit()->select_row();
 
-echo "========= FIN DE SCRIPT =========\n";
+if ($p) {
+    $id_produit = $p["id_produit"];
+} else {
+    $id_produit = ATF::produit()->i($produit);
+}
 
+$produit["id_produit"] = $id_produit;
 
-function createSocietes() {
-    $fichier = $path == '' ? "./societes.csv" : $path;
-    $f = fopen($fichier, 'rb');
-    $entete = fgetcsv($f);
-    $lines_count = 0;
-    $processed_lines = 0;
-    $doublons = 0;
+while (($ligne = fgetcsv($f, 0, ';'))) {
+    try{
+        ATF::db()->begin_transaction();
 
-    while (($ligne = fgetcsv($f, 0, ';'))) {
         $lines_count++;
+        if (!$ligne[1]) continue; // pas d'ID pas de chocolat
 
-        try{
+        ATF::affaire()->q->reset()->where("ref_externe", $ligne[4]);
+
+        if (!$a = ATF::affaire()->select_row()) {
+
             ATF::db()->begin_transaction();
 
             // CREATION / RECUPERATION PARTENAIRE
-            $cif = cleanCIF($ligne[0]);
-            // if ($lines_count === 13 || $lines_count === 15) $cifPartenaire = "B23602956";
-            $societeExist = findSociete($cif);
+            $cifPartenaire = cleanCIF($ligne[2]);
+            // $cifPartenaire = "B23602956";
+            $societeExist = findSociete($cifPartenaire);
             if ($societeExist) {
-                $societes[$cif] = $societeExist;
-                $doublons++;
+                $partenaires[$cifPartenaire] = $societeExist;
             } else {
-                insertSociete($ligne);
-                $processed_lines++;
+                if (!isset($partenaires[$cifPartenaire])) {
+                    $data = null;
+                    try{
+                        $data = ATF::meelo()->getInfosCompanyByRegistrationNumber($cifPartenaire, "ES");
+                        echo "DATA Recu pour ".$cifPartenaire."\n";
+                    } catch(errorATF $e) {
+                        echo "PARTENAIRE CIF: ".$cifPartenaire." introuvable - Ligne ".$lines_count." \n";
+                        continue;
+                    }
+                    if ($data) {
+                        try{
+                            $id_societe = insertSociete($data);
+                            $partenaires[$cifPartenaire] = $id_societe;
+                        } catch(errorATF $e) {
+                            echo $e->getMessage();
+                        }
+                    }
+                }
             }
 
-            ATF::db()->commit_transaction();
-        } catch(errorATF $e) {
-            ATF::db()->rollback_transaction();
-            echo $e->getMessage()."\n";
+            // CREATION / RECUPERATION CLIENT
+            $cifClient = cleanCIF($ligne[3]);
+            // $cifClient = "G08266298";
+            $societeExist = findSociete($cifClient);
+            if ($societeExist) {
+                $clients[$cifClient] = $societeExist;
+            } else {
+                if (!isset($clients[$cifClient])) {
+                    $data = null;
+                    try{
+                        $data = ATF::meelo()->getInfosCompanyByRegistrationNumber($cifClient, "ES");
+                    } catch(errorATF $e) {
+                        echo "CLIENT CIF: ".$cifClient." introuvable - Ligne ".$lines_count." \n";
+                        continue;
+                    }
+                    if ($data) {
+                        try{
+                            $id_societe = insertSociete($data);
+                            $clients[$cifClient] = $id_societe;
+                        } catch(errorATF $e) {
+                            echo $e->getMessage();
+                        }
+                    }
+                }
+            }
+            // Création de l'affaire
+            $infos = creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifClient, $id_produit);
+            $idAffaire = $infos["idAffaire"];
+            $idDevis = $infos["idDevis"];
+
+            // Création du contrat
+            $idContrat = createContrat($idDevis, $idAffaire, $clients[$cifClient]);
+            ATF::commande()->updateDate(["id_commande" => $idContrat, "key" => "date_debut", "value" => str_replace("/", "-", $ligne[7])]);
+
+
+            if ($ligne[12]) createProlongation($idAffaire, $clients[$cifClient], $idContrat, $ligne);
+        } else {
+            echo "Affaire ".$ligne[4]." déja présente \n";
         }
+        ATF::db()->commit_transaction();
+    } catch(errorATF $e) {
+        throw $e;
+        ATF::db()->rollback_transaction();
     }
-    echo "Sociétés créées : ".$processed_lines." Doublons :".$doublons." Total lignes: ".$lines_count."\n";
 }
 
 
-function createAffaires() {
-    $fichier = $path == '' ? "./fichier.csv" : $path;
-    $f = fopen($fichier, 'rb');
-    $entete = fgetcsv($f);
-    $societes = [];
-    $lines_count = 1;
-    $processed_lines = 0;
-
-    $partenaires = [];
-    $clients = [];
-
-    $produit = [
-        "ref" => "LB",
-        "produit" => "los bienes",
-        "prix_achat" => 0,
-        "id_fabriquant" => 281,
-        "id_sous_categorie" => 1
-    ];
-    ATF::produit()->q->reset()->where("ref", "LB");
-    $p = ATF::produit()->select_row();
-
-    if ($p) {
-        $id_produit = $p["id_produit"];
-    } else {
-        $id_produit = ATF::produit()->i($produit);
-    }
-
-    $produit["id_produit"] = $id_produit;
-
-    while (($ligne = fgetcsv($f, 0, ';'))) {
-        $lines_count++;
-
-        // if ($lines_count === 1) {
-        try{
-            if (!$ligne[1]) continue;
-            ATF::db()->begin_transaction();
-
-            ATF::affaire()->q->reset()->where("ref_externe", $ligne[4]);
-
-            if (!$a = ATF::affaire()->select_row()) {
-
-                // CREATION / RECUPERATION PARTENAIRE
-                $cifPartenaire = cleanCIF($ligne[2]);
-                // if ($lines_count === 13 || $lines_count === 15) $cifPartenaire = "B23602956";
-                $societeExist = findSociete($cifPartenaire);
-                if ($societeExist) {
-                    $partenaires[$cifPartenaire] = $societeExist;
-                } else {
-                    throw new errorATF("PARTENAIRE CIF: ".$cifPartenaire." introuvable - Ligne ".$lines_count, 404);
-                }
-
-                // CREATION / RECUPERATION CLIENT
-                $cifClient = cleanCIF($ligne[3]);
-                // if ($lines_count === 13 || $lines_count === 15) $cifClient = "G08266298";
-                $societeExist = findSociete($cifClient);
-                if ($societeExist) {
-                    $clients[$cifClient] = $societeExist;
-                } else {
-                    throw new errorATF("CLIENT CIF: ".$cifClient." introuvable - Ligne ".$lines_count, 404);
-                }
-                // Création de l'affaire
-                $infos = creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifClient, $id_produit);
-                $idAffaire = $infos["idAffaire"];
-                $idDevis = $infos["idDevis"];
-
-                // Création du contrat
-                $idContrat = createContrat($idDevis, $idAffaire, $clients[$cifClient]);
-                ATF::commande()->updateDate(["id_commande" => $idContrat, "key" => "date_debut", "value" => str_replace("/", "-", $ligne[7])]);
-
-                if ($ligne[12]) createProlongation($idAffaire, $clients[$cifClient], $idContrat, $ligne);
-                $processed_lines++;
-            }
-            ATF::db()->commit_transaction();
-        } catch(errorATF $e) {
-            ATF::db()->rollback_transaction();
-            echo $e->getMessage()."\n";
-        }
-        // }
-    }
-
-    echo "Nouvelles affaires: ".$processed_lines." sur ".$lines_count."\n";
-}
+// Rollback la transaction
+// ATF::db()->rollback_transaction();
+//ATF::db()->commit_transaction();
+echo "========= FIN DE SCRIPT =========\n";
 
 
 function cleanCIF($cif) {
@@ -152,27 +143,66 @@ function findSociete($cif) {
     return null;
 }
 
-
 function insertSociete($data) {
     try{
         if ($data) {
+            $company = $data->company;
+            $legalUnit = $company->legalUnit;
+            $gerants = array_merge($company->representatives, $company->shareHolders);
+
+            log::logger($gerants, "mfleurquin");
+
             $data_soc = [
-                "societe" => $data[2],
-                "id_pays" =>  $data[1],
-                "cif" => cleanCIF($data[0]),
-                "capital" => $data[9],
-                "adresse" => $data[3],
-                "adresse_2" => $data[4],
-                "adresse_3" => $data[5],
-                "cp" =>$data[7],
-                "ville" =>$data[6],
-                "province" =>$data[3]
+                "societe" => $legalUnit->corporateName,
+                "id_pays" =>  $company->country,
+                "activite" => $legalUnit->activity,
+                "date_creation" => $legalUnit->registrationDate,
+                "capital" => $legalUnit->shareCapital,
+                "activite" => $legalUnit->activity,
+                "cif" => $legalUnit->companyRegistrationNumber,
+                "capital" => $legalUnit->shareCapital->value,
+                "adresse" =>$company->establishments[0]->address->address,
+                "cp" =>$company->establishments[0]->address->zipcode,
+                "ville" =>$company->establishments[0]->address->city,
+                "province" =>$company->establishments[0]->address->province,
+                "id_pays" => "ES"
             ];
 
             $idSociete = ATF::societe()->insert(array("societe" => $data_soc));
 
-            $contact = array( "nom"=>"GERANT", "id_societe"=> $idSociete);
-            ATF::contact()->insert( $contact );
+            if($gerants){
+                foreach ($gerants as $gerant) {
+                    if ($gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
+                      $nom = $gerant->lastName;
+                      $prenom = $gerant->firstNames;
+                      if (!$nom && !$prenom) $nom = $gerant->names;
+
+                      ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($nom)), "AND")
+                                              ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($prenom)), "AND")
+                                              ->where("id_societe", $idSociete, "AND");
+                      $c = ATF::contact()->select_row();
+
+                      $fonction = "GERANT";
+                      if ($gerant->position) $fonction = $gerant->position;
+                      if ($gerant->positions) $fonction = $gerant->positions[count($gerant->positions)]["positionName"];
+
+                      //Si le contact n'exite pas dans optima, on l'insert
+                      if(!$c) {
+                          $contact = array( "nom" => $nom,
+                                            "prenom" => $prenom,
+                                            "fonction" => $fonction,
+                                            "id_societe" => $idSociete,
+                                            "est_dirigeant" => "oui"
+                                          );
+                          ATF::contact()->insert($contact);
+                      }
+                    }
+                }
+              }else{
+                //Si Credit Safe n'a retourné aucun dirigeant, on en crée un en attendant
+                $contact = array( "nom"=>"GERANT", "id_societe"=> $idSociete);
+                ATF::contact()->insert( $contact );
+              }
 
             return $idSociete;
         }
@@ -230,14 +260,6 @@ function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifCli
     ATF::contact()->q->reset()->where('id_societe', $clients[$cifClient]);
     $contacts = ATF::contact()->sa();
 
-    if (!$contacts) {
-        $contact = array( "nom"=>"GERANT", "id_societe"=> $clients[$cifClient]);
-        ATF::contact()->insert( $contact );
-
-        ATF::contact()->q->reset()->where('id_societe', $clients[$cifClient]);
-        $contacts = ATF::contact()->sa();
-    }
-
     $devis = [
         "devis" => [
             "id_societe" => $clients[$cifClient],
@@ -264,6 +286,7 @@ function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifCli
     try{
         $idDevis = ATF::devis()->insert($devis);
         $idAffaire = ATF::devis()->select($idDevis, "id_affaire");
+        echo "ID DEVIS : ".$idDevis." ID AFFAIRE : ".$idAffaire."\n";
         return ["idAffaire" => $idAffaire, "idDevis" => $idDevis];
     }catch(errorATF $e) {
         throw $e;
@@ -369,5 +392,7 @@ function createProlongation($idAffaire, $idSociete, $idCommande, $ligne) {
         throw $e;
     }
 }
+
+
 
 ?>
