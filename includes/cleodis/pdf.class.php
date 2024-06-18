@@ -12868,7 +12868,7 @@ class pdf_itrenting extends pdf_cleodis {
 	public function contratPV($id,$s,$previsu) {
 		$this->commandeInit($id,$s,$previsu);
 		$partenaire = ATF::societe()->select($this->affaire["id_partenaire"]);
-		$points = "................................................";
+		$points = "................................................................................................";
 
 		$date_livraison = $points;
 		if ($this->affaire["date_livraison_prevu"]) {
@@ -12903,8 +12903,10 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$txt = "D. ".$points."certifica que todos los productos relacionados con el contrato ";
 		$txt .= ($this->affaire["ref_externe"] ? $this->affaire["ref_externe"] : $points). " a nombre de ". $this->client["societe"].", han sido entregados en perfecto orden y estado el día ".$date_livraison;
-		$txt .= " en la dirección ".($this->client["adresse"] ? $this->client["adresse"] : $points)." por la empresa ".($partenaire["societe"] ? $partenaire["societe"] : $points);
+		$txt .= " en la dirección ".($this->client["adresse"] ? $this->client["adresse"] : $points)." por la empresa ".($partenaire["societe"] ? $partenaire["societe"] : $points).".";
 		$this->MultiCell(0,5, $txt);
+
+		$this->ln(10);
 
 		$this->SetTextColor(255,255,255);
 		$this->setfont('arial','B',8);
