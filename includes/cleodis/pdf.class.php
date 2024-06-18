@@ -12450,7 +12450,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO",0,'C');
 		$this->SetTextColor($this->textVert[0],$this->textVert[1],$this->textVert[2]);
-		$this->multicell(0,5,"Nº ".$ref,0,'C');
+		$this->multicell(0,5,"Nº".$ref,0,'C');
 		$this->ln(10);
 		$this->SetTextColor(0,0,0);
 		$this->setfont('arial','',8);
@@ -12477,7 +12477,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->titreArticle("PRIMERA", " - BIEN OBJETO DEL ARRENDAMIENTO");
 		$this->MultiCell(0,5, "El objeto del contrato es el arrendamiento de los equipos que se detallan en el Anexo 1.");
-		$this->ln(5);
+		$this->ln(10);
 
 		$this->titreArticle("SEGUNDA", " - DURACIÓN Y PRECIO DEL CONTRATO DE ARRENDAMIENTO");
 		$this->SetTextColor(255,255,255);
@@ -12498,7 +12498,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->cell(44,14, strtoupper($this->frequenceEspagnol($this->loyer[0]["frequence_loyer"], true)),0,0,'C',1);
 		$this->cell(44,14, number_format($totMens, 2, ',', ' ').'€ + IVA',0,0,'C',1);
 		$this->cell(44,14, $this->affaire["date_demarrage_previsionnel"] ? date("d-m-Y", strtotime($this->affaire["date_demarrage_previsionnel"])) : "",0,1,'C',1);
-		$this->ln(5);
+		$this->ln(10);
 
 
 		$this->titreArticle("TERCERA", " - DOMICILIACIÓN BANCARIA");
@@ -12542,7 +12542,7 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->setY(265);
 		$this->setfont('arial','',8);
-		$this->multicell(0,4,$this->societe["nom_commercial"]." ".$this->societe["site_web"]." - ".$this->societe["tel"]."\n".$this->societe["adresse"].", ".$this->societe["cp"]." - ".$this->societe["ville"].", ".$this->societe["province"],0, "C");
+		$this->multicell(0,4,$this->societe["nom_commercial"]." ".$this->societe["web "]." - ".$this->societe["tel"]."\n".$this->societe["adresse"].", ".$this->societe["cp"]." - ".$this->societe["ville"].", ".$this->societe["province"],0, "C");
 
 
 		$this->AddPage();
@@ -12631,7 +12631,7 @@ class pdf_itrenting extends pdf_cleodis {
 	function titreArticle($text1, $text2) {
 		$this->setfont('arial','B',12);
 		$this->SetTextColor($this->textVert[0],$this->textVert[1],$this->textVert[2]);
-		$this->cell(20,5,$text1,0,0,'L');
+		$this->cell(23,5,$text1,0,0,'L');
 		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
 		$this->cell(50,5,$text2,0,1,'L');
 		$this->setfont('arial','',10);
