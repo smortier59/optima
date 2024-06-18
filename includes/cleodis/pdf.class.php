@@ -12868,7 +12868,9 @@ class pdf_itrenting extends pdf_cleodis {
 	public function contratPV($id,$s,$previsu) {
 		$this->commandeInit($id,$s,$previsu);
 		$partenaire = ATF::societe()->select($this->affaire["id_partenaire"]);
-		$date_livraison = "................................................";
+		$points = "................................................";
+
+		$date_livraison = $points;
 		if ($this->affaire["date_livraison_prevu"]) {
 			$d = getdate(strtotime($this->affaire["date_livraison_prevu"]));
 			$date_livraison = $d["mday"].' de '.loc::ation($d['month'],false,false,false,'es').' '.$d['year'];
@@ -12899,10 +12901,24 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->SetTextColor(0,0,0);
 		$this->setfont('arial','',9);
 
-		$txt = "D. certifica que todos los productos relacionados con el contrato ";
-		$txt .= $this->affaire["ref_externe"]. " a nombre de ". $this->client["societe"].", han sido entregados en perfecto orden y estado el día ".$date_livraison;
-		$txt .= " en la dirección ".$this->client["adresse"]." por la empresa ".$partenaire["societe"];
+		$txt = "D. ".$points."certifica que todos los productos relacionados con el contrato ";
+		$txt .= ($this->affaire["ref_externe"] ? $this->affaire["ref_externe"] : $points). " a nombre de ". $this->client["societe"].", han sido entregados en perfecto orden y estado el día ".$date_livraison;
+		$txt .= " en la dirección ".($this->client["adresse"] ? $this->client["adresse"] : $points)." por la empresa ".($partenaire["societe"] ? $partenaire["societe"] : $points);
 		$this->MultiCell(0,5, $txt);
+
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(60,10, "CANTIDAD",0,0,'C',1);
+		$this->cell(120,10, "DESCRIPCIÓN",0,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+
+		foreach($this->lignes as $l) {
+			$this->cell(60, 10, $l["quantite"], 0, 0, 'C', 1);
+			$this->cell(120, 10, $l["ref"]." ".$l["produit"], 0, 1, 'L', 1);
+		}
 
 
 
