@@ -58,15 +58,14 @@ function createSocietes($id_apporteur, &$sirens) {
     $doublons = 0;
 
     while (($ligne = fgetcsv($f, 0, ';'))) {
-        echo $ligne[0]."\n";
         $lines_count++;
         try{
             ATF::db()->begin_transaction();
 
             if ($sirens[$ligne[0]]) {
                 $siret = $sirens[$ligne[0]];
-                $societeExist = findSociete($siret);
-                if (!$societeExist) {
+                $id_societe = findSociete($siret);
+                if (!$id_societe) {
                     $data = ATF::creditsafe()->getInfosCompanyBySiret($ligne[0]);
                 }
             } else {
@@ -74,11 +73,11 @@ function createSocietes($id_apporteur, &$sirens) {
                 $data = ATF::creditsafe()->getInfosCompanyBySiret($ligne[0]);
                 $siret = $data["siret"];
                 echo $siret."\n";
-                $societeExist = findSociete($siret);
+                $id_societe = findSociete($siret);
             }
 
-            if ($societeExist) {
-                ATF::societe()->u(["id_societe"=> $societeExist["id_societe"], "province" => $ligne[2]]);
+            if ($id_societe) {
+                ATF::societe()->u(["id_societe"=> $id_societe, "province" => $ligne[2]]);
                 $doublons++;
             } else {
                 $data["province"] = $ligne[2];
