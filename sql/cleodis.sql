@@ -62,3 +62,8 @@ where
 
 -- TH 30409 - Export Vente - Num Facture
 ALTER TABLE `facture` ADD `numero` VARCHAR(12) NULL DEFAULT NULL AFTER `ref`;
+
+
+-- TH  - Contact prospection du partenaire au niveau de l'affaire
+ALTER TABLE `affaire` ADD `id_prospection` MEDIUMINT UNSIGNED NULL DEFAULT NULL COMMENT 'Contact prospection du partenaire' AFTER `id_partenaire`;
+ALTER TABLE `affaire` ADD FOREIGN KEY (`id_prospection`) REFERENCES `contact`(`id_contact`) ON DELETE SET NULL ON UPDATE CASCADE;

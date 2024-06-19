@@ -176,6 +176,7 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
+		$this->foreign_key["id_prospection"] = "contact";
 		$this->foreign_key['id_type_affaire'] = "type_affaire";
 		$this->foreign_key['id_commercial'] =  "user";
 
@@ -266,6 +267,7 @@ class affaire_cleodis extends affaire {
 		$affaire["date"]=$infos["date"];
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
+		$affaire["id_prospection"] = ($infos["id_partenaire"] ? ATF::societe()->select($infos["id_partenaire"], "id_prospection") : NULL);
 		$affaire["langue"]=$infos["langue"];
 		$affaire["id_type_affaire"]=$infos["id_type_affaire"];
 		$affaire["commentaire"] = $infos["commentaire"];
