@@ -12542,13 +12542,13 @@ class pdf_itrenting extends pdf_cleodis {
 
 		$this->setY(265);
 		$this->setfont('arial','',8);
-		$this->multicell(0,4,$this->societe["nom_commercial"]." ".$this->societe["web "]." - ".$this->societe["tel"]."\n".$this->societe["adresse"].", ".$this->societe["cp"]." - ".$this->societe["ville"].", ".$this->societe["province"],0, "C");
+		$this->multicell(0,4,$this->societe["nom_commercial"]." ".$this->societe["web"]." - ".$this->societe["tel"]."\n".$this->societe["adresse"].", ".$this->societe["cp"]." - ".$this->societe["ville"].", ".$this->societe["province"],0, "C");
 
 
 		$this->AddPage();
 		$this->multicell(0,5,"CONDICIONES GENERALES",0,'C');
 		$this->SetTextColor($this->textVert[0],$this->textVert[1],$this->textVert[2]);
-		$this->multicell(0,5,"CONTRATO Nº ".$ref,0,'C');
+		$this->multicell(0,5,"CONTRATO Nº".$ref,0,'C');
 
 		$this->unsetHeader();
 		$this->unsetFooter();
