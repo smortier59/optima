@@ -83,7 +83,7 @@ CREATE TABLE grille_tarifaire_ligne (
     `montant_max` MEDIUMINT NOT NULL ,
     `duree` SMALLINT NOT NULL ,
     `periodicite` ENUM('MOIS','TRIMESTRE','SEMESTRE','AN') NOT NULL DEFAULT 'MOIS' ,
-    `taux` DECIMAL(6,3) NOT NULL ,
+    `coefficient` DECIMAL(6,3) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id_grille_tarifaire_ligne`),
     INDEX (`id_grille_tarifaire`))
 ENGINE = InnoDB;
