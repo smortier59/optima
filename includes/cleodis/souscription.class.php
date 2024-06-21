@@ -157,6 +157,10 @@ class souscription_cleodis extends souscription {
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
 
+        if ($post["id_affaire_parent"]) {
+          ATF::affaire()->u(['id_affaire' => $id_affaire, "id_parent" => $post["id_affaire_parent"]]);
+        }
+
         ATF::affaire()->q->reset()->addField('affaire.ref','ref')->where('affaire.id_affaire', $id_affaire);
         $ref_affaire = ATF::affaire()->select_cell();
 
@@ -205,7 +209,8 @@ class souscription_cleodis extends souscription {
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
           "id_affaire"=>$id_affaire,
-          "id_partenaire"=>$this->id_partenaire,
+          "id_partenaire"=> $this->id_partenaire,
+          "id_prospection" => ($this->id_partenaire ? ATF::societe()->select($this->id_partenaire, "id_prospection") : null),
           "id_panier"=>$post['id_panier'],
           "hash_panier"=>$post['hash_panier'],
           "site_associe"=>$post['site_associe'],
@@ -285,6 +290,7 @@ class souscription_cleodis extends souscription {
           case 'inovshop':
           case 'laboutiquedunet':
           case 'mps':
+          case 'azfalte':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -872,6 +878,7 @@ class souscription_cleodis extends souscription {
       case 'laboutiquedunet':
       case 'solo':
       case 'mps':
+      case 'azfalte':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -936,8 +943,6 @@ class souscription_cleodis extends souscription {
         }
 
       break;
-
-
 
       default:
         throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500);
@@ -1162,6 +1167,9 @@ class souscription_cleodis extends souscription {
       break;
       case 'mps':
         $r = "MP";
+      break;
+      case 'azfalte':
+        $r = "AZ";
       break;
       default:
         $r = substr($site_associe, 0, 2);
