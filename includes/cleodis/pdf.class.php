@@ -17756,6 +17756,9 @@ class pdf_arrow extends pdf_cleodis
 			$this->AddPage();
 			$this->useTemplate($tplIdx,0,0, 0 ,0 , true);
 		}
+		$this->SetLeftMargin(15);
+
+		$this->conditionParContratLocation();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."arrow/mandatSepa.pdf");
 		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
@@ -17770,13 +17773,82 @@ class pdf_arrow extends pdf_cleodis
 		$this->pvReceptionEquipements();
 	}
 
+	function conditionParContratLocation() {
+		$this->AddPage();
+		$this->image($this->logo,10,10,50);
+
+		$this->setY(20);
+		$this->setFont('Arial','B', '10');
+		$this->multicell(0,4,"CONDITIONS PARTICULIERES DU \nCONTRAT DE LOCATION N°".$this->commande["ref"],0,'C');
+
+		$this->setY(35);
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(10,38,200,38);
+		$this->ln(6);
+
+		$this->titleContrat("Article 1: OBJET");
+
+		$this->multicell(0,4, "Les présentes Conditions Particulières s'appliquent aux Equipements suivants :");
+		$this->ln(4);
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,0,0);
+		$this->cell(50,10, "Réference",1,0,'C',1);
+		$this->cell(100,10, "Description",1,0,'C',1);
+		$this->cell(30,10, "Qté",1,1,'C',1);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+
+		foreach($this->lignes as $l) {
+			$this->cell(50, 7, $l["ref"], 1, 0, 'L');
+			$this->cell(100, 7, $l["produit"], 1, 0, 'L');
+			$this->cell(30, 7, $l["quantite"], 1, 1, 'C');
+		}
+
+		$this->ln(4);
+		$this->multicell(0,4, "L’Equipement sera installé à l'adresse suivante :");
+		$this->SetLeftMargin(45);
+		$this->cell(0,4,$this->client["livraison_adresse"],0, 1);
+		if ($this->client["livraison_adresse_2"]) $this->cell(0,4,$this->client["livraison_adresse_2"],0, 1);
+		if ($this->client["livraison_adresse_3"]) $this->cell(0,4,$this->client["livraison_adresse_3"],0, 1);
+		$this->cell(0,4,$this->client["livraison_cp"]." - ".$this->client["livraison_ville"],0, 1);
+		$this->SetLeftMargin(15);
+
+		$this->ln(4);
+		$this->multicell(0,4,"A la date de réception des Equipements dans les locaux du Locataire, la réception étant validée par la signature du Procès-Verbal de Réception conformément à l’article 2.2 ou dans les conditions prévues à l'article 2.3 des Conditions Générales");
+
+
+		$this->titleContrat("Article 2: DUREE DE LA LOCATION");
+		$this->multicell(0,4, "La durée ferme et irrévocable de la location sera de ".$this->loyer[0]["duree"]." ".$this->loyer[0]["frequence_loyer"].", et prendra effet le premier jour du trimestre suivant la réception de la totalité des équipements conformément à l’article 3 des Conditions Générales.");
+
+		$this->titleContrat("Article 3: LOYERS et PERIODICITE");
+		$this->multicell(0,4, "Les loyers sont calculés sur la base du prix des Equipements convenu par le locataire avec ses fournisseurs.\nIls sont calculés hors assurances.
+		\nLoyers HT : ".$this->loyer[0]["loyer"]." EUR HT\nPériodicité : ".$this->loyer[0]["frequence_loyer"]."\nCes loyers s’entendent Terme à échoir, et le règlement s’effectuera par prélèvement automatique.");
+
+		$this->titleContrat("Article 4: INDEXATION");
+		$this->multicell(0,4,"Si l’indice de référence (défini ci-dessous) venait à s’écarter de plus de 0.5 points entre la date de signature du présent contrat et la date de livraison, le montant du loyer serait ajusté proportionnellement.
+		\nIndice de référence :\nEURIBOR 12 mois + THO / 2\nT.H.O. : Taux de Rendement Moyen Brut hebdomadaire des Obligations de première signature sur le marché secondaire. Moyenne arithmétique mensuelle des THO.
+		\nLe taux deviendra ferme à la date de départ de la Location.");
+
+		$this->AddPage();
+		$this->titleContrat("Article 5: CONDITIONS D'EVOLUTION");
+		$this->multicell(0,4,"5.1. Ajout de matériels complémentaires\nLe financement de commandes d'Equipements supplémentaires fera l'objet d'une annexe au contrat de Location initial. Les équipements complémentaires, mises à jour et matériels autonomes pourront être financés sur une durée autonome ou sur la durée résiduelle.");
+
+		$this->ln(6);
+		$this->cell(0,4,"Le Locataire reconnaît avoir également pris connaissance des conditions particulières", 0, 1,'C');
+		$this->signatureInfos($this->contact, "LE LOUEUR CEDANT", "LE LOCATAIRE", $this->societe["societe"]);
+	}
+
 	function pvReceptionEquipements() {
 		$this->AddPage();
-		$this->image($this->logo,10,10,60);
+		$this->image($this->logo,15,10,50);
 
-		$this->setY(30);
+		$this->setY(15);
 		$this->setFont('Arial','B', '10');
 		$this->multicell(0,4,"CONTRAT DE LOCATION N°".$this->commande["ref"]."\nPROCES-VERBAL DE RECEPTION DES EQUIPEMENTS",0,'C');
+
+		$this->setY(35);
 
 		$this->SetLineWidth(0.35);
 		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
