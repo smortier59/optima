@@ -62,3 +62,46 @@ where
 
 -- TH 30409 - Export Vente - Num Facture
 ALTER TABLE `facture` ADD `numero` VARCHAR(12) NULL DEFAULT NULL AFTER `ref`;
+
+
+-- TH 30592 - Grille tarifaire - Calcul de loyer automatisé
+CREATE TABLE grille_tarifaire (
+    `id_grille_tarifaire` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+    `nom` VARCHAR(50) NOT NULL ,
+    `description` TEXT NOT NULL ,
+    `id_type_affaire` INT NULL,
+    `etat` ENUM('ACTIF','INACTIF') NOT NULL DEFAULT 'ACTIF' ,
+    `date_creation` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    PRIMARY KEY (`id_grille_tarifaire`),
+    INDEX (`id_type_affaire`))
+ENGINE = InnoDB;
+ALTER TABLE `grille_tarifaire` ADD FOREIGN KEY (`id_type_affaire`) REFERENCES `type_affaire`(`id_type_affaire`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE TABLE grille_tarifaire_ligne (
+    `id_grille_tarifaire_ligne` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id_grille_tarifaire` MEDIUMINT UNSIGNED NOT NULL ,
+    `montant_max` MEDIUMINT NOT NULL ,
+    `duree` SMALLINT NOT NULL ,
+    `periodicite` ENUM('MOIS','TRIMESTRE','SEMESTRE','AN') NOT NULL DEFAULT 'MOIS' ,
+    `coefficient` DECIMAL(6,3) NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id_grille_tarifaire_ligne`),
+    INDEX (`id_grille_tarifaire`))
+ENGINE = InnoDB;
+ALTER TABLE `grille_tarifaire_ligne` ADD FOREIGN KEY (`id_grille_tarifaire`) REFERENCES `grille_tarifaire`(`id_grille_tarifaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE `pack_produit_partenaire` ( `id_pack_produit_partenaire` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+ `id_pack_produit` MEDIUMINT UNSIGNED NOT NULL ,
+ `id_partenaire` MEDIUMINT UNSIGNED NOT NULL ,
+ `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' ,
+PRIMARY KEY (`id_pack_produit_partenaire`)) ENGINE = InnoDB;
+
+
+ALTER TABLE `pack_produit_partenaire` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit`(`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `pack_produit_partenaire` ADD FOREIGN KEY (`id_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT SELECT ON `optima_arrow`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_assets`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_cleodis`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_cleodisbe`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_itrenting`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+GRANT SELECT ON `optima_solo`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
