@@ -105,3 +105,8 @@ GRANT SELECT ON `optima_cleodis`.`pack_produit_partenaire` TO 'espace-client-cle
 GRANT SELECT ON `optima_cleodisbe`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
 GRANT SELECT ON `optima_itrenting`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
 GRANT SELECT ON `optima_solo`.`pack_produit_partenaire` TO 'espace-client-cleodis'@'%';
+
+
+-- TH  - Contact prospection du partenaire au niveau de l'affaire
+ALTER TABLE `affaire` ADD `id_prospection` MEDIUMINT UNSIGNED NULL DEFAULT NULL COMMENT 'Contact prospection du partenaire' AFTER `id_partenaire`;
+ALTER TABLE `affaire` ADD FOREIGN KEY (`id_prospection`) REFERENCES `contact`(`id_contact`) ON DELETE SET NULL ON UPDATE CASCADE;
