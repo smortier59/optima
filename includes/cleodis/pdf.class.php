@@ -12224,6 +12224,9 @@ class pdf_itrenting extends pdf_cleodis {
 	public $bgcolorTableau = "16145d";
 	public $txtcolorTableau = "ffffff";
 
+	public $textBleu = [0,51,102];
+	public $textVert = [153, 204, 51];
+
 	public $REnteteTextColor = 255;
 	public $GEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
@@ -12425,6 +12428,298 @@ class pdf_itrenting extends pdf_cleodis {
 
 	}
 
+	public function contratA4Societe($id, $signature,$sellsign) {
+		log::logger("Contrat A4 Societe ES", "mfleurquin");
+		$this->contratA4Es($id, $signature, $sellAndSign); }
+	public function contratA4Particulier($id, $signature,$sellsign) { $this->contratA4Es($id, $signature, $sellAndSign); }
+
+	function contratA4Es($id, $signature, $sellAndSign) {
+
+		$this->unsetHeader();
+
+		$this->image($this->logo,15,10,40);
+		$this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',170,10,15);
+
+		$this->SetLeftMargin(15);
+
+		$ref = $this->affaire["ref_externe"] ? $this->affaire["ref_externe"] : $this->affaire["ref"];
+
+		$this->setY(35);
+		$this->setfont('arial','B',12);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+
+		$this->multicell(0,5,"CONTRATO MERCANTIL DE ARRENDAMIENTO",0,'C');
+		$this->SetTextColor($this->textVert[0],$this->textVert[1],$this->textVert[2]);
+		$this->multicell(0,5,"Nº".$ref,0,'C');
+		$this->ln(10);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',8);
+
+		$this->setfont('arial','BU',10);
+		$this->cell(90,5,"EL ARRENDATARIO",0,0,'L');
+		$this->cell(90,5,"EL ARRENDADOR",0,1,'L');
+
+		$this->setfont('arial','',10);
+
+		$y = $this->getY();
+		$this->MultiCell(90,5,$this->client["societe"],0,'L');
+		$this->MultiCell(90,5,$this->client["adresse"].", ".$this->client["cp"]." ".$this->client["ville"]." (".$this->client["province"].")" ,0,'L');
+		$this->MultiCell(90,5,"C.I.F. ".$this->client["CIF"],0,'L',0,1);
+
+		$this->setY($y);
+		$this->setLeftMargin(105);
+		$this->MultiCell(90,5,$this->societe["nom_commercial"],0,'L');
+		$this->MultiCell(90,5,$this->societe["adresse"].", ".$this->societe["cp"]." ".$this->societe["ville"]." (".$this->societe["province"].")" ,0,'L');
+		$this->MultiCell(90,5,"C.I.F. ".$this->societe["CIF"],0,'L');
+
+		$this->ln(15);
+		$this->setLeftMargin(15);
+
+		$this->titreArticle("PRIMERA", " - BIEN OBJETO DEL ARRENDAMIENTO");
+		$this->MultiCell(0,5, "El objeto del contrato es el arrendamiento de los equipos que se detallan en el Anexo 1.");
+		$this->ln(10);
+
+		$this->titreArticle("SEGUNDA", " - DURACIÓN Y PRECIO DEL CONTRATO DE ARRENDAMIENTO");
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(44,14, "Nº DE CUOTAS",0,0,'C',1);
+		$this->cell(44,14, "PLAZO",0,0,'C',1);
+		$this->cell(44,14, "CUOTA",0,0,'C',1);
+		$this->cell(44,14, "FECHA INICIO",0,1,'C',1);
+
+		$duree = $this->loyer[0]["duree"];
+		$totMens = $this->loyer[0]["loyer"];
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+		$this->cell(44,14, $duree ,0,0,'C',1);
+		$this->cell(44,14, strtoupper($this->frequenceEspagnol($this->loyer[0]["frequence_loyer"], true)),0,0,'C',1);
+		$this->cell(44,14, number_format($totMens, 2, ',', ' ').'€ + IVA',0,0,'C',1);
+		$this->cell(44,14, $this->affaire["date_demarrage_previsionnel"] ? date("d-m-Y", strtotime($this->affaire["date_demarrage_previsionnel"])) : "",0,1,'C',1);
+		$this->ln(10);
+
+
+		$this->titreArticle("TERCERA", " - DOMICILIACIÓN BANCARIA");
+		$this->cell(10,5);
+		$this->setfont('arial','B',10);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->cell(20,5, "-  BANCO: " ,0,0,'L');
+		$this->setfont('arial','',10);
+		$this->SetTextColor(0,0,0);
+		$this->cell(90,5, $this->affaire["nom_banque"],0,1,'L');
+
+
+		$this->cell(10,5);
+		$this->setfont('arial','B',10);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->cell(20,5, "-  IBAN: " ,0,0,'L');
+		$this->setfont('arial','',10);
+		$this->SetTextColor(0,0,0);
+		$this->cell(90,5, $this->affaire["IBAN"] ,0,1,'L');
+
+		$this->setY(210);
+		$this->SetLineWidth(0.4);
+		$this->SetDrawColor(0,51,102);
+		$this->Line(15, $this->getY(), 190, $this->getY());
+		$this->ln(5);
+
+		$this->setfont('arial','B',10);
+		$this->cell(90,5,"EL ARRENDATARIO",0,0,'L');
+		$this->cell(90,5,"EL ARRENDADOR",0,1,'L');
+		$this->setfont('arial','',10);
+
+		$y = $this->getY();
+		$this->footerContrat();
+
+		$this->setY($y);
+		$this->setLeftMargin(105);
+		$this->footerContrat();
+		$this->setLeftMargin(15);
+
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+
+		$this->setY(265);
+		$this->setfont('arial','',8);
+		$this->multicell(0,4,$this->societe["nom_commercial"]." ".$this->societe["web"]." - ".$this->societe["tel"]."\n".$this->societe["adresse"].", ".$this->societe["cp"]." - ".$this->societe["ville"].", ".$this->societe["province"],0, "C");
+
+
+		$this->AddPage();
+		$this->multicell(0,5,"CONDICIONES GENERALES",0,'C');
+		$this->SetTextColor($this->textVert[0],$this->textVert[1],$this->textVert[2]);
+		$this->multicell(0,5,"CONTRATO Nº".$ref,0,'C');
+
+		$this->unsetHeader();
+		$this->unsetFooter();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."itrenting/cg-contratA4.pdf");
+		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+			$tplIdx = $this->importPage($pageNo);
+
+			// add a page
+			if ($pageNo > 1) $this->AddPage();
+			$this->useTemplate($tplIdx, -10, 0, 0, 0, true);
+		}
+
+		$this->AddPage();
+
+		$this->ln(10);
+
+		$this->setfont('arial','B',14);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->multicell(0,5,"ANEXO 1 | CONTRATO Nº".$ref,0,'C');
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',10);
+		$this->ln(10);
+
+		$this->multicell(0,5,"DESCRIPCIÓN DE LOS PRODUCTOS.",0,'L');
+		$this->ln(5);
+
+		$this->SetTextColor(255,255,255);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(0,51,102);
+		$this->cell(44,14, "CANTIDAD",0,0,'C',1);
+		$this->cell(132,14, "DESCRIPCIÓN",0,1,'C',1);
+
+
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->SetFillColor(242,242,242);
+
+		foreach($this->lignes as $l) {
+			if ($l["visible_pdf"]) {
+				$this->cell(44,14, $l["quantite"] ,0,0,'C',1);
+				$this->cell(132,14, $l["produit"] ,'L',1,'L',1);
+			}
+		}
+		$this->cell(44,14, "NOTA" ,0,0,'C',1);
+		$this->multicell(132,7, "SALVO INDICACIÓN EXPRESA, LA GARANTÍA DE LOS BIENES RELACIONADOS EN ESTA DESCRIPCIÓN ES LA BÁSICA DE SUS RESPECTIVOS FABRICANTES",'L','L',1);
+
+		$this->ln(10);
+		$this->setfont('arial','B',14);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->multicell(0,5,"ACTA DE ENTREGA Y CONFORMIDAD",0,'C');
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',10);
+		$this->ln(10);
+
+		$dateDemarrage = ".......................";
+		if ($this->affaire["date_demarrage_previsionnel"]) {
+			$date = getdate(strtotime($this->affaire["date_demarrage_previsionnel"]));
+			$dateDemarrage = $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'];
+		}
+		$this->multicell(0,5, "Por la presente, confirmamos nuestra aceptación de los Bienes relacionados en el Anexo número I del Contrato de Arrendamiento número ".$ref." firmado con fecha de inicio ".$dateDemarrage." entre ".$this->societe["nom_commercial"]." . y ".$this->client["societe"].".",0,'L');
+		$this->ln(2);
+		$this->multicell(0,5, "Por lo cual aceptamos nos sean cargados los recibos correspondientes a las rentas del arrendamiento del citado contrato en la cuenta bancaria descrita en la cláusula tercera.",0,"L");
+
+		$this->ln(5);
+		$this->setfont('arial','B',10);
+		$this->cell(0,5,"DIRECCIÓN DE ENTREGA",0,1,'L');
+		$this->setfont('arial','',10);
+		$this->cell(10,5);
+		$this->multicell(0,5,"-	NOMBRE DE EMPRESA: ".$this->societe["societe"],0,"L");
+		$this->cell(10,5);
+		$this->multicell(0,5,"-	DIRECCIÓN: ".$this->societe["adresse"].", ".$this->societe["cp"].", ".$this->societe["province"].", ".$this->societe["ville"],0,"L");
+
+		$this->footerSignature();
+
+		$this->contratNotificacion($ref);
+
+	}
+
+	function titreArticle($text1, $text2) {
+		$this->setfont('arial','B',12);
+		$this->SetTextColor($this->textVert[0],$this->textVert[1],$this->textVert[2]);
+		$this->cell(23,5,$text1,0,0,'L');
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->cell(50,5,$text2,0,1,'L');
+		$this->setfont('arial','',10);
+		$this->SetTextColor(0,0,0);
+		$this->ln(2);
+	}
+
+	function footerContrat(){
+		$this->ln(2);
+		$this->setfont('arial','B',9);
+		$this->SetLineWidth(0.2);
+
+		$fields = ["Fecha", "Nombre", "Apellido", "DNI"];
+		foreach($fields as $f) {
+			$this->cell(17,6, $f.": ",0,0);
+			$this->Line($this->getX(), $this->getY()+4, $this->getX()+50, $this->getY()+4);
+			$this->ln(5);
+		}
+
+		$this->ln(5);
+		$this->cell(25,5, "Firma y sello : ");
+	}
+
+	function footerSignature() {
+		$this->setY(270);
+		$this->setfont('arial','B',10);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->cell(45,5,"FIRMA ARRENDATARIO:");
+		$this->Line($this->getX(), $this->getY()+4, $this->getX()+40, $this->getY()+4);
+		$this->setX(105);
+		$this->cell(45,5,"FIRMA ARRENDADOR:");
+		$this->Line($this->getX(), $this->getY()+4, $this->getX()+40, $this->getY()+4);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',10);
+	}
+
+	function contratNotificacion($ref) {
+		$this->addPage();
+		$this->unsetHeader();
+
+		$this->image($this->logo,15,10,40);
+		$this->SetLeftMargin(15);
+		$this->SetRightMargin(15);
+		$this->setY(30);
+
+		$this->setfont('arial','B',14);
+		$this->SetTextColor($this->textBleu[0],$this->textBleu[1],$this->textBleu[2]);
+		$this->multicell(0,5,"NOTIFICACIÓN ARRENDATARIOS",0,'C');
+		$this->SetTextColor(0,0,0);
+		$this->ln(10);
+
+		$this->setfont('arial','BU',10);
+		$this->cell(0,4,$this->client["societe"],0,1);
+		$this->setfont('arial','',10);
+		$this->cell(0,4,$this->client["adresse"],0,1);
+		$this->cell(0,4,$this->client["cp"]." - ".$this->client["ville"]." (".$this->client["province"].")",0,1);
+
+		$date = getdate(strtotime($this->commande["date_debut"]));
+		$dateDebut = $date["mday"].' de '.loc::ation($date['month'],false,false,false,'es').' '.$date['year'];
+
+		$this->cell(0,4,"En madrid a ".$dateDebut.".",0,1,"R");
+
+		$this->ln(15);
+		//$this->setfont('arial','',9);
+		$this->cell(0,5,"Muy Señor nuestro:",0,1,"L");
+		$this->ln(5);
+
+		$this->multicell(0,5,"Tenemos el agrado de poner en su conocimiento que, con fecha de hoy y mediante contrato, ha sido cedido por ".$this->societe["nom_commercial"]." a ".$this->affaire["nom_banque"].", con domicilio en ".$this->affaire["ville_banque"].", ".$this->affaire["adresse_banque"].", C.P. ".$this->affaire["cp_banque"].", el contrato de arrendamiento nº".$ref." formalizado el día ".$dateDebut.", así como los derechos y acciones derivados de dicho contrato de arrendamiento que tenemos suscrito con Vdes., quedando ".$this->affaire["nom_banque"].". subrogada en la posición arrendadora en dicho contrato.");
+		$this->ln(5);
+
+		$this->multicell(0,5,"Dicho contrato de cesión entrará en vigor y surtirá efectos a partir del día de hoy, ".$dateDebut.", lo que les notificamos a los efectos pertinentes y, especialmente en lo que respecta al abono de las rentas del mencionado contrato, que a partir de la fecha de hoy sólo tendrá efecto liberatorio cuando se realice directamente a ".$this->affaire["nom_banque"]);
+		$this->ln(5);
+
+		$this->multicell(0,5,"Para cualquier cuestión relacionada con este asunto, les rogamos se pongan en contacto con ".$this->affaire["nom_banque"].".");
+		$this->ln(5);
+
+		$this->multicell(0,5,"No obstante, a la cesión comunicada mediante la presente carta, les comunicamos que para cualquier cuestión técnica o comercial concerniente a/a los bien/es arrendados, a su ampliación, sustitución y devolución, les rogamos se pongan en contacto con Dª Elena Pérez Dávila, de ".$this->societe["nom_commercial"]." en el teléfono ".$this->societe["tel"].".");
+		$this->ln(5);
+
+		$this->cell(0,5,"Atentamente,",0,1);
+		$this->ln(10);
+		$this->cell(0,5,$this->societe["nom_commercial"],0,1);
+		$this->ln(15);
+		$this->multicell(0,5,"ENTERADOS Y CONFORMES CON EL CONTENIDO DE LA PRESENTE. \n".$this->client["societe"]);
+
+		$this->footerSignature();
+	}
+
 	public function contrat_BBVAA4Particulier($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
 	public function contrat_BBVAA4Societe($id, $signature, $sellAndSign) { $this->contrat_BBVA($id); }
 	public function contrat_BBVA($id) {
@@ -12455,7 +12750,7 @@ class pdf_itrenting extends pdf_cleodis {
 		$notaire = false;
 		if ($this->loyer[0]["duree"] * $this->loyer[0]["loyer"] >= 50000) $notaire = true;
 
-		$this->unsetHeader();
+
 
 		$ref = $this->affaire["ref_externe"] ? $this->affaire["ref_externe"] : $this->affaire["ref"];
 
@@ -13053,7 +13348,6 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->cell(120, 5, "RENTING INFORMÁTICO Y TECNOLÓGICO, S.A.",0,1);
 
 	}
-
 }
 
 class pdf_midas extends pdf_cleodis {};
