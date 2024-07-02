@@ -18104,7 +18104,7 @@ class pdf_arrow extends pdf_cleodis
 			$total += ($l["duree"] * $l["loyer"]);
 		}
 		$this->setFont('arial', 'b', 10);
-		$this->cell(0, 4, ucfirst(util::nb2TextLanguage($total, true, 'fr')), 0, 1, 'C');
+		$this->MultiCell(0, 4, ucfirst(util::nb2TextLanguage($total, true, 'fr')), 0, 'C');
 		$this->setFont('arial', '', 8);
 		$this->cell(0, 4, "A ce montant doivent être ajoutées les taxes en vigueur (soit actuellement la TVA au taux de ".(($this->commande["tva"]-1) * 100 )."%).", 0, 1);
 
