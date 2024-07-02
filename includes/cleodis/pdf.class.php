@@ -13213,8 +13213,15 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->SetFillColor(242,242,242);
 
 		foreach($this->lignes as $l) {
-			$this->cell(60, 10, $l["quantite"], 0, 0, 'C', 1);
-			$this->cell(120, 10, $l["ref"]." ".$l["produit"], 0, 1, 'L', 1);
+
+			$this->setLeftMargin(75);
+			$yDeb = $this->getY();
+			$this->multicell(120,5, $l["ref"]." ".$l["produit"],0 ,'L',1);
+			$yFin = $this->getY();
+
+			$this->setLeftMargin(15);
+			$this->setY($yDeb);
+			$this->cell(60, $yFin - $yDeb , $l["quantite"], 0, 1, 'C', 1);
 		}
 
 
