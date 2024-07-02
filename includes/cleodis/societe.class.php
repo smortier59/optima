@@ -744,7 +744,6 @@ class societe_cleodis extends societe {
 
     // Vérification qu'il n'existe aucun autre parc d'existence active avec le même serial
     $this->infoCollapse($infos);
-    log::logger($infos , "mfleurquin");
 
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
@@ -1825,6 +1824,7 @@ class societe_cleodis extends societe {
         }
         $res = ATF::societe()->select_row();
 
+
         $company = $data->company;
         $legalUnit = $company->legalUnit;
         $gerants = array_merge($company->representatives, $company->shareHolders);
@@ -1901,7 +1901,8 @@ class societe_cleodis extends societe {
         if ($res) {
           $id_societe = $res["id_societe"];
           $data_soc["id_societe"] = $id_societe;
-          $this->update($data_soc);
+
+          $this->update(["societe" => $data_soc]);
         } else {
           $id_societe = $this->insert(array("societe" => $data_soc));
         }
