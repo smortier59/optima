@@ -18118,17 +18118,6 @@ class pdf_arrow extends pdf_cleodis
 		}
 
 		$this->ln(4);
-		$this->multicell(0,4, "L’Equipement sera installé à l'adresse suivante :");
-		$this->SetLeftMargin(45);
-		$this->cell(0,4,$this->client["livraison_adresse"],0, 1);
-		if ($this->client["livraison_adresse_2"]) $this->cell(0,4,$this->client["livraison_adresse_2"],0, 1);
-		if ($this->client["livraison_adresse_3"]) $this->cell(0,4,$this->client["livraison_adresse_3"],0, 1);
-		$this->cell(0,4,$this->client["livraison_cp"]." - ".$this->client["livraison_ville"],0, 1);
-		$this->SetLeftMargin(15);
-
-		$this->ln(4);
-		$this->multicell(0,4,"A la date de réception des Equipements dans les locaux du Locataire, la réception étant validée par la signature du Procès-Verbal de Réception conformément à l’article 2.2 ou dans les conditions prévues à l'article 2.3 des Conditions Générales");
-
 
 		$this->titleContrat("Article 2: DUREE DE LA LOCATION");
 		$this->multicell(0,4, "La durée ferme et irrévocable de la location sera de ".$this->loyer[0]["duree"]." ".$this->loyer[0]["frequence_loyer"].", et prendra effet le premier jour du trimestre suivant la réception de la totalité des équipements conformément à l’article 3 des Conditions Générales.");
@@ -18142,7 +18131,6 @@ class pdf_arrow extends pdf_cleodis
 		\nIndice de référence :\nEURIBOR 12 mois + THO / 2\nT.H.O. : Taux de Rendement Moyen Brut hebdomadaire des Obligations de première signature sur le marché secondaire. Moyenne arithmétique mensuelle des THO.
 		\nLe taux deviendra ferme à la date de départ de la Location.");
 
-		$this->AddPage();
 		$this->titleContrat("Article 5: CONDITIONS D'EVOLUTION");
 		$this->multicell(0,4,"5.1. Ajout de matériels complémentaires\nLe financement de commandes d'Equipements supplémentaires fera l'objet d'une annexe au contrat de Location initial. Les équipements complémentaires, mises à jour et matériels autonomes pourront être financés sur une durée autonome ou sur la durée résiduelle.");
 
@@ -18204,7 +18192,7 @@ class pdf_arrow extends pdf_cleodis
 		$this->ln(4);
 
 		$this->setFont('Arial', 'B', 8);
-		$this->cell(0,4,"Date de livraison des équipements : Le ".date("d/m/Y", strtotime($this->affaire["date_livraison_prevu"])), 0, 1);
+		$this->cell(0,4,"Date de livraison des équipements : Le ............................", 0, 1);
 		$this->setFont('Arial', '', 8);
 		$this->ln(10);
 		$this->cell(0,4,"Fait à .................................................................., le ............................", 0, 1);
@@ -18659,8 +18647,8 @@ class pdf_arrow extends pdf_cleodis
 
 		$this->setFont('Arial','', '8');
 		$lines = [
-			"Représentée par" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE",
-			"Qualité" => ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial",
+			"Représentée par" => ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : ".................................",
+			"Qualité" => ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : ".................................",
 			"Cachet de la société" => "",
 			"Signature" => ""
 		];
@@ -18743,7 +18731,7 @@ class pdf_arrow extends pdf_cleodis
 			["label" => "Forme et capital",	"valeur" => $this->societe["structure"]." au capital de ".$this->societe["capital"]." EUR",	"style" => null],
 			["label" => "N° unique d’identification",	"valeur" => "RCS n° ".$this->societe["siren"],	"style" => null],
 			["label" => "Siège social",	"valeur" => "Immeuble CANOPY – 6, Rue du général Audran 6 – 92400 COURBEVOIE",	"style" => null],
-			["label" => "Représentée par",	"valeur" => (ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : "Arnaud BAFFIE")." en qualité de ".(ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "Directeur Commercial"),	"style" => null],
+			["label" => "Représentée par",	"valeur" => (ATF::constante()->select($nomSignataire, "valeur") ? ATF::constante()->select($nomSignataire, "valeur") : ".................................")." en qualité de ".(ATF::constante()->select($fonctionSignataire, "valeur") ? ATF::constante()->select($fonctionSignataire, "valeur") : "................................."),	"style" => null],
 		];
 		foreach($loueur as $v) {
 			$this->setFont('Arial',null, 8);
