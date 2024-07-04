@@ -2922,6 +2922,177 @@ class affaire_cleodis extends affaire {
 		);
 	}
 
+	public function _CreateAffairePartenaireFromPack($get, $post) {
+
+		$id_partenaire = $post['apporteur'];
+		$apporteur = ATF::societe()->select($id_partenaire, 'id_apporteur');
+
+		ATF::contact()->q->reset()->where("email", $post["email_contact"])
+									->where("id_societe", $id_partenaire)
+									->where("etat", "actif")
+									->setLimit(1);
+		$contact = ATF::contact()->select_row();
+		$utilisateur = $contact;
+
+		ATF::user()->q->reset()->where('login', 'partenaire')->setLimit(1);
+		$user_partenaire = ATF::user()->select_row();
+
+		$pack_produit_partenaire = ATF::pack_produit_partenaire()->select($post["id_pack_produit_partenaire"]);
+
+		ATF::db($this->db)->begin_transaction();
+		try {
+			$id_societe = $post["id_societe"];
+			$societe = ATF::societe()->select($id_societe);
+
+			// dans le cas d'un nouveau dirigeant
+			if($post['gerant'] === "0"){
+				$post['gerant'] = ATF::contact()->i(
+					array(
+						"nom"=>$post["nom_gerant"],
+						"prenom"=>$post["prenom_gerant"],
+						"tel"=>$post["phone_gerant"],
+						"gsm"=>$post["phone_gerant"],
+						"email"=>$post["email_gerant"],
+						"fonction"=> $post["fonction_gerant"],
+						"id_societe"=> $id_societe,
+						"est_dirigeant"=> "oui"
+					)
+				);
+			}
+
+			$id_contact = $post["gerant"];
+			$devis = array(
+			  "id_societe" => $id_societe,
+			  "type_contrat" => "lld",
+			  "validite" => date("d-m-Y", strtotime("+1 month")),
+			  "tva" => __TVA__,
+			  "devis" => ATF::souscription()->getLibelleAffaire([$pack_produit_partenaire["id_pack_produit"]], null, [$pack_produit_partenaire["id_pack_produit"] => 1]),
+			  "date" => date("d-m-Y"),
+			  "type_devis" => "normal",
+			  "id_contact" => $id_contact,
+			  "id_user"=>$user_partenaire["id_user"],
+		      "id_type_affaire"=>$pack_produit_partenaire["id_type_affaire"],
+			  "langue"=>ATF::societe()->select($id_societe, "langue"),
+			  "id_partenaire"=>$id_partenaire
+			);
+
+			$values_devis =array();
+
+			$montantLoyer = $duree = 0;
+
+			$loyer = array();
+			$produits = array();
+			$loyer[0] = array(
+				"loyer__dot__loyer"=>$post["loyer"],
+				"loyer__dot__duree"=>$post["duree"],
+				"loyer__dot__type"=>"engagement",
+				"loyer__dot__assurance"=>"",
+				"loyer__dot__frais_de_gestion"=>"",
+				"loyer__dot__frequence_loyer"=>$post["fequence"],
+				"loyer__dot__serenite"=>"",
+				"loyer__dot__maintenance"=>"",
+				"loyer__dot__hotline"=>"",
+				"loyer__dot__supervision"=>"",
+				"loyer__dot__support"=>"",
+				"loyer__dot__avec_option"=>"non"
+			);
+
+			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $pack_produit_partenaire["id_pack_produit"])->addOrder("ordre", "ASC");
+			$lignes = ATF::pack_produit_ligne()->sa();
+
+			foreach ($lignes as $key => $value) {
+				$produits[] = array(
+					"devis_ligne__dot__produit"=> $value['produit'],
+					"devis_ligne__dot__quantite"=>$value["quantited"],
+					"devis_ligne__dot__type"=>ATF::produit()->select($value["id_produit"], "type"),
+					"devis_ligne__dot__ref"=>$value["ref"],
+					"devis_ligne__dot__prix_achat"=>ATF::produit()->select($value["id_produit"], "prix_achat"),
+					"devis_ligne__dot__id_produit"=>$value['id_produit'],
+					"devis_ligne__dot__id_fournisseur"=>$value["id_fournisseur"],
+					"devis_ligne__dot__visibilite_prix"=>$value["visibilite_prix"],
+					"devis_ligne__dot__date_achat"=>"",
+					"devis_ligne__dot__commentaire"=>"",
+					"devis_ligne__dot__neuf"=>"oui",
+					"devis_ligne__dot__id_produit_fk"=>$value["id_produit"],
+					"devis_ligne__dot__id_fournisseur_fk"=>$value["id_fournisseur"]
+				);
+			}
+			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
+
+			$id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+
+			$devis = ATF::devis()->select($id_devis);
+
+			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],	"provenance"=>"partenaire",	'id_partenaire'=>$id_partenaire));
+			ATF::affaire_etat()->insert(array("id_affaire"=>$devis["id_affaire"],"etat"=>"reception_demande"));
+
+			if (ATF::$codename !== 'itrenting') {
+				$comite = array  (
+					"id_societe" => $id_societe,
+					"id_affaire" => $devis["id_affaire"],
+					"id_contact" => $id_contact,
+					"activite" => $societe["activite"],
+					"id_refinanceur" => 4,
+					"date_creation" => $societe["date_creation"],
+					"date_compte" => $societe["lastaccountdate"],
+					"capitaux_propres" => $societe["capitaux_propres"],
+					"note" => $societe["cs_score"],
+					"dettes_financieres" => $societe["dettes_financieres"],
+					"limite" => $societe["cs_avis_credit"],
+					"ca" => $societe["ca"],
+					"capital_social" => $societe["capital_social"],
+					"resultat_exploitation" => $societe["resultat_exploitation"],
+					"date" => date("d-m-Y"),
+					"description" => "Comite CreditSafe",
+					"suivi_notifie"=>array(0=>"")
+				);
+
+				$creation = new DateTime( $societe["date_creation"] );
+				$creation = $creation->format("Ymd");
+				$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
+				$past2Years = $past2Years->format("Ymd");
+				$decision = null;
+
+				if( ($societe["cs_score"] > 39 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
+					$comite["etat"] = "accepte";
+					$decision = "accepte";
+					$comite["decisionComite"] = "Accepté automatiquement";
+				}else{
+					$comite["etat"] = "refuse";
+					$decision = "refuse";
+					$comite["decisionComite"] = "Refusé automatiquement (Note < 39, ou ancienneté < 2ans)";
+				}
+
+				$comite["reponse"] = date("Y-m-d");
+				$comite["validite_accord"] = date("Y-m-d");
+
+				ATF::comite()->insert(array("comite"=>$comite));
+
+				//Création du comité CLEODIS
+				$comite["description"] = "Comité CLEODIS";
+				$comite["etat"] = "en_attente";
+				$comite["reponse"] = NULL;
+				$comite["validite_accord"] = NULL;
+				$comite["decisionComite"] = NULL;
+				ATF::comite()->insert(array("comite"=>$comite));
+
+			}
+
+			ATF::db($this->db)->commit_transaction();
+		} catch (errorATF $e) {
+			log::logger($e, 'CreateAffairePartenaireFromPack');
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
+
+		return array(
+			"result"=>true,
+			"resultat_comite" => $decision,
+			"id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"])
+		);
+	}
+
+
 	public function _AffaireParcV2($get,$post){
 
 

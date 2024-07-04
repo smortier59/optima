@@ -349,7 +349,7 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false, $nature='location') {
+  public function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false, $nature='location') {
     $suffix = "";
     if ($id_pack_produits) {
       foreach ($id_pack_produits as $id_pack) {
@@ -387,10 +387,12 @@ class souscription_cleodis extends souscription {
       break;
 
       default:
+        $r = "";
+        if ($site_associe !== null) $r = strtoupper($site_associe)." : ";
         if ($nature === 'vente') {
-          $r = strtoupper($site_associe)." : Vente ".$suffix;
+          $r .= "Vente ".$suffix;
         } else {
-          $r = strtoupper($site_associe)." : Location ".$suffix;
+          $r .= "Location ".$suffix;
         }
 
       break;
