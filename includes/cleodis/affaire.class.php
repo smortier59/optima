@@ -2680,7 +2680,7 @@ class affaire_cleodis extends affaire {
 			$loyer = array();
 			$produits = array();
 			$loyer[0] = array(
-				"loyer__dot__loyer"=>$post["loyer"],
+				"loyer__dot__loyer"=> isset($post["loyer"]) ? $post["loyer"] : 0,
 				"loyer__dot__duree"=>$post["duree"],
 				"loyer__dot__type"=>"engagement",
 				"loyer__dot__assurance"=>"",
