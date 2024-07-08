@@ -2795,15 +2795,22 @@ class affaire_cleodis extends affaire {
 				$past2Years = $past2Years->format("Ymd");
 				$decision = null;
 
-				if( ($societe["cs_score"] > 39 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
-					$comite["etat"] = "accepte";
-					$decision = "accepte";
-					$comite["decisionComite"] = "Accepté automatiquement";
-				}else{
+				if ($societe["etat"] !== "actif") {
 					$comite["etat"] = "refuse";
 					$decision = "refuse";
-					$comite["decisionComite"] = "Refusé automatiquement (Note < 39, ou ancienneté < 2ans)";
+					$comite["decisionComite"] = "Refusé automatiquement, établissement fermé";
+				} else {
+					if( ($societe["cs_score"] > 39 && $creation < $past2Years) || $societe['force_acceptation'] == 'oui'){
+						$comite["etat"] = "accepte";
+						$decision = "accepte";
+						$comite["decisionComite"] = "Accepté automatiquement";
+					}else{
+						$comite["etat"] = "refuse";
+						$decision = "refuse";
+						$comite["decisionComite"] = "Refusé automatiquement (Note < 39, ou ancienneté < 2ans)";
+					}
 				}
+
 
 				$comite["reponse"] = date("Y-m-d");
 				$comite["validite_accord"] = date("Y-m-d");
