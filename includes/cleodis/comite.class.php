@@ -166,7 +166,7 @@ class comite extends classes_optima {
 
 
 
-//*****************************Transaction********************************
+
 		ATF::db($this->db)->begin_transaction();
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
@@ -384,19 +384,31 @@ class comite extends classes_optima {
 				}
 			case "pourcentage_materiel" : $pourcentage = ATF::affaire()->getPourcentagesMateriel($id_affaire);
 										  return $pourcentage["pourcentagesMat"];
-			case "suivi_notifie" :		  if(ATF::_r("id_comite")){
+			case "suivi_notifie" :
+				$constanteNotifie = ATF::constante()->getValue('__COMITE_USER_NOTIFIE__');
+				$constanteNotifie = array_map(function($item) {
+					return '"' . $item . '"';
+				}, explode(",", $constanteNotifie));
+
+				$query_select = "SELECT * FROM user WHERE login IN (".implode(",", $constanteNotifie).")";
+				$r = ATF::db()->sql2array($query_select);
+
+				$contacts = [];
+				foreach ($r as $key => $value) {
+					$contacts[$value["id_contact"]] = $value["prenom"]." ".$value["nom"];
+				}
+
+											if(ATF::_r("id_comite")){
 												$return = array();
-												$data = array(  '16' => 'Jérôme LOISON',
-																'17' => 'Christophe LOISON',
-																'18' => 'Pierre CAMINEL',
-																'93' => 'Térence DELATTRE');
 
 												$notifie = $this->select( $this->decryptId(ATF::_r("id_comite")), "notifie_utilisateur");
 												$notifie = explode(",", $notifie);
 												foreach ($notifie as $key => $value) {
-													if(in_array($value, $data)){ $return[] = array_search($value, $data); }
+													if(in_array($value, $contacts)){ $return[] = array_search($value, $contacts); }
 												}
 												return $return;
+										   } else {
+											return $contacts;
 										   }
 
 		}
@@ -558,6 +570,8 @@ class comite extends classes_optima {
 		$id_suivi = ATF::suivi()->insert($suivi);
 
 	}
+
+
 
 	/**
 	 * Permet d'envoyer le mail de demande de refi au refinanceur du comité

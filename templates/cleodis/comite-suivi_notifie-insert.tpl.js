@@ -1,3 +1,5 @@
+{$users = ATF::comite()->default_value("suivi_notifie")}
+
 {
 	xtype: 'superboxselect',
 	fieldLabel: '{ATF::$usr->trans($key,$current_class->table)|escape:javascript}',
@@ -5,13 +7,12 @@
 	id: '{$alternateId|default:$id}',
 	width: 400,
 	height: 200,
-	store: [		
-			['16', 'Jérome Loison'],
-			['17', 'Christophe Loison'],
-			['18', 'Pierre Caminel'],
-			['93', 'Térence Delattre'],
-			['35', 'Frédérique Randoux']		
-	]	
+	store: [
+		{foreach from=$users key=k item=i}
+			['{$k}', '{$i|escape:javascript}']
+			{if !$i@last}, {/if}
+		{/foreach}
+	]
 	,listeners: {
 		render : function(){
 			{if ATF::comite()->default_value("suivi_notifie")}
