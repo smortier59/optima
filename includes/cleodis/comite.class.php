@@ -395,7 +395,7 @@ class comite extends classes_optima {
 
 				$contacts = [];
 				foreach ($r as $key => $value) {
-					$contacts[$value["id_contact"]] = $value["prenom"]." ".$value["nom"];
+					$contacts[$value["id_user"]] = $value["prenom"]." ".$value["nom"];
 				}
 
 											if(ATF::_r("id_comite")){
