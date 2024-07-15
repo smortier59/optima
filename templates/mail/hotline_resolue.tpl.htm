@@ -20,6 +20,11 @@ Conformément aux conditions entendues, AbsysTech a pris ce temps à sa charge.
 
 <div style="font-size:13px; font-style:italic; color:grey; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</div>
 
+{if $infos.url_portail}
+	<p style="text-indent:30px;">
+		<a href="{$infos.url_portail}">Visualiser votre requête sur votre espace client</a>
+	</p>
+{/if}
 
 <p>Cordialement,<br /></p>
 <p style="margin-left:50px;">L'équipe Absystech</p>

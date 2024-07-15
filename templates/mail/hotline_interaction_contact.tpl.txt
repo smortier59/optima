@@ -30,6 +30,12 @@ Cordialement,
 
 L'équipe Absystech
 
+{if $infos.url_portail}
+	<p style="text-indent:30px;">
+		<a href="{$infos.url_portail}">Visualiser votre requête sur votre espace client</a>
+	</p>
+{/if}
+
 {if $infos.fichier}
 Un fichier est joint au mail, si vous ne le voyez pas rendez-vous votre portail pour le télécharger !
 {/if}

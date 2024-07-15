@@ -34,6 +34,12 @@ Le temps passé sur cette requête est à <strong>notre</strong> charge.
 
 <p style="margin-left:50px;">L'équipe Absystech</p>
 
+{if $infos.url_portail}
+	<p style="text-indent:30px;">
+		<a href="{$infos.url_portail}">Visualiser votre requête sur votre espace client</a>
+	</p>
+{/if}
+
 {if $infos.fichier}
 	<p style="font-style:italic; color:red;">
 		Un fichier est joint au mail, si vous ne le voyez pas rendez-vous votre portail pour le télécharger !

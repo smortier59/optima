@@ -13,3 +13,9 @@
 <p><b>Titre : </b>{$infos.hotline}</p>
 <p style="font-size:13px; font-style:italic; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</p>
 
+{if $infos.url_portail}
+	<p style="text-indent:30px;">
+		<a href="{$infos.url_portail}">Visualiser votre requête sur votre espace client</a>
+	</p>
+{/if}
+
