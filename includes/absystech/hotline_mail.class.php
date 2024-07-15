@@ -49,6 +49,10 @@ class hotline_mail {
 		$infos["objet"]=$obj;
 		$infos["template"]= $template;
 		$infos["fichier"]=$pj;
+		$infos["url_portail"] = null;
+		if (ATF::constante()->getValue("__HOTLINE_URL__")) {
+			$infos["url_portail"] = ATF::constante()->getValue("__HOTLINE_URL__")."/requests/".$id_hotline;
+		}
 
 
 		if($id_hotline_interaction){
@@ -56,7 +60,7 @@ class hotline_mail {
 		}
 
 		$this->current_mail = new mail($infos);
-		//return $this->mail->send();
+		// return $this->current_mail->send();
 	}
 
 	/**
