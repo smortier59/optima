@@ -4,7 +4,8 @@
 * @subpackage Cléodis
 */
 require __ABSOLUTE_PATH__ . 'libs/ATF/libs/phpseclib/vendor/autoload.php';
-use phpseclib\Net\SFTP as SFTP;
+use phpseclib\Net\SFTP;
+use phpseclib\Crypt\RSA;
 
 
 
@@ -905,6 +906,9 @@ class pack_produit extends classes_optima {
 			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
 		}*/
 
+
+
+
 		$packs = [];
 		$lignes = [];
 		$produits = [];
@@ -1089,14 +1093,17 @@ class pack_produit extends classes_optima {
 
 		$zip->close();
 
+
 		if($infos["export_from_batch"]){
 
 			return true;
 		}else{
+
 			header('Content-Type: application/zip');
 			header('Content-disposition: attachment; filename='.$zipname);
 			header('Content-Length: ' . filesize($zipname));
 			readfile($zipname);
+
 		}
 	}
 
@@ -1193,16 +1200,20 @@ class pack_produit extends classes_optima {
 	 */
 	public function csv_middleware_to_ftp($file){
 		try{
-			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__);
-
+			$key = new RSA();
+			$key->loadKey(file_get_contents(__MIDDLEWARE_FTP_PRIVATE_KEY__));
 			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__, __MIDDLEWARE_FTP_PORT__);
-			if (!$sftp->login(__MIDDLEWARE_FTP_LOGIN__, __MIDDLEWARE_FTP_PASS__)) {
+
+			if (!$sftp->login(__MIDDLEWARE_FTP_LOGIN__, $key)) {
 			    log::logger("Login failed" , "upload_middleware");
+				log::logger($sftp->getLastSFTPError(), "upload_middleware");
 			}else{
 				log::logger("Login success" , "upload_middleware");
 			}
 
 			$sftp->put(__MIDDLEWARE_FTP_FOLDER__.$file, $file, SFTP::SOURCE_LOCAL_FILE);
+
+			return true;
 
 		}catch(Exception $e){
 			log::logger($e->getMessage() , "upload_middleware");
