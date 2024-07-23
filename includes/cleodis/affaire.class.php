@@ -2654,9 +2654,14 @@ class affaire_cleodis extends affaire {
 						"est_dirigeant"=> "oui"
 					)
 				);
+			} else {
+				$contact = ATF::contact()->select($post["gerant"]);
+				if ($post["email_gerant"] && $post["email_gerant"] != "null" && $contact["email"] != $post["email_gerant"]) ATF::contact()->u(["id_contact" => $post["gerant"], "email" => $post["email_gerant"]]);
+				if ($post["phone_gerant"] && $post["phone_gerant"] != "null" && $contact["gsm"] != $post["phone_gerant"]) ATF::contact()->u(["id_contact" => $post["gerant"], "gsm" => $post["phone_gerant"]]);
 			}
 
 			$id_contact = $post["gerant"];
+
 			$devis = array(
 			  "id_societe" => $id_societe,
 			  "type_contrat" => "lld",
@@ -2724,6 +2729,9 @@ class affaire_cleodis extends affaire {
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
+
+			if ($post["email_gerant"]) ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"mail_signataire"=>$post["email_gerant"]));
+			if ($post["phone_gerant"]) ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"tel_signature"=>$post["phone_gerant"]));
 
 			if ($post["apporteur"]) {
 				ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>$post["apporteur"]));

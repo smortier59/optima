@@ -1931,6 +1931,8 @@ class societe_cleodis extends societe {
                                       "prenom" => $prenom,
                                       "fonction" => $fonction,
                                       "id_societe" => $id_societe,
+                                      "tel" => null,
+                                      "email" => null,
                                       "est_dirigeant" => "oui"
                                     );
                     $gerantsList[$i] = $contact;
@@ -1941,6 +1943,7 @@ class societe_cleodis extends societe {
                   $gerantsList[$i] = array("nom" => $c["nom"],
                                           "prenom" => $c["prenom"],
                                           "fonction" => $fonction,
+                                          "email" => $c["email"],
                                           "gsm" => $c["gsm"],
                                           "id_societe" => $id_societe,
                                           "id_contact" => $c["id_contact"]
@@ -1958,6 +1961,8 @@ class societe_cleodis extends societe {
           $gerantsList[0] = $contact;
           $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
         }
+        $gerantsList = self::supprimerGerantsDoublons($gerantsList , ["id_contact", "nom","prenom"]);
+
         ATF::db()->commit_transaction();
 
         return array("result"=>true ,
@@ -1988,6 +1993,27 @@ class societe_cleodis extends societe {
         throw new errorATF($e->getMessage(),500);
     }
   }
+
+  function supprimerGerantsDoublons($array, $keys) {
+    $tempArray = [];
+    $uniqueArray = [];
+
+    foreach ($array as $item) {
+        // Créer une clé unique pour comparaison basée sur les valeurs des clés spécifiées
+        $uniqueKey = '';
+        foreach ($keys as $key) {
+            $uniqueKey .= $item[$key];
+        }
+
+        // Si la clé unique n'existe pas dans le tableau temporaire, on l'ajoute
+        if (!isset($tempArray[$uniqueKey])) {
+            $tempArray[$uniqueKey] = $item;
+            $uniqueArray[] = $item;
+        }
+    }
+
+    return $uniqueArray;
+}
 
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
