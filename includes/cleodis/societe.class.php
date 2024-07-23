@@ -1850,7 +1850,6 @@ class societe_cleodis extends societe {
                 ATF::pays()->q->reset()->where("id_pays", $etablissement->address->country, "OR")->where("pays", $etablissement->address->country, "OR");
                 $pays = ATF::pays()->select_row();
 
-
                 $specifique = [
                   "siren" => $legalUnit->registrationNumber,
                   "siret" => $siret,
@@ -1862,6 +1861,8 @@ class societe_cleodis extends societe {
                   "structure" => $legalUnit->companyCategory,
                   "id_pays" => ($pays ? $pays["id_pays"]: null),
                 ];
+
+                if (!$etablissement->isActive) $specifique["etat"] = "ferme";
               }
             }
           break;
@@ -1883,6 +1884,8 @@ class societe_cleodis extends societe {
             } else {
               $specifique["siren"] = $legalUnit->registrationNumber;
             }
+
+            if (!$company->establishments[0]->isActive) $specifique["etat"] = "ferme";
           break;
 
           case 'BE':
@@ -1894,6 +1897,8 @@ class societe_cleodis extends societe {
               "ville" =>$company->establishments[0]->address->city,
               "id_pays" =>$company->establishments[0]->address->country,
             ];
+
+            if (!$company->establishments[0]->isActive) $specifique["etat"] = "ferme";
           break;
         }
         $data_soc = array_merge($commun, $specifique);
