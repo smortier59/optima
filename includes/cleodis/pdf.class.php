@@ -2369,16 +2369,20 @@ class pdf_cleodis extends pdf {
 			$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de PRESTATION n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 		  }else{
 			$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de ".($this->affaire['nature']=="vente"?"vente":"location")." n° : ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref']).($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-
 		  }
+
+
 		  if($this->lignes && $this->affaire["nature"]=="AR"){
-			foreach($this->AR as $k=>$i){
-			  $affaire=ATF::affaire()->select($i['id_affaire']);
-			  $ref_ar .=" ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref'])." (".$affaire["affaire"]."), ";
-			}
+			if ($this->AR) {
+				$ref_ar = "";
+				foreach ($this->AR as $k=>$i) {
+					$affaire=ATF::affaire()->select($i['id_affaire']);
+					$ref_ar .=" ".($affaire['ref_externe'] ? $affaire['ref_externe'] : $affaire['ref'])." (".$affaire["affaire"]."), ";
+				}
+			  }
 			$this->ln(2);
 			$this->setfont('arial','BI',7.5);
-			$this->multicell(0,2,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
+			$this->multicell(0,2,"Annule et remplace le(s) contrat(s) n°".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
 		  } else {
 			$this->ln(5);
 		  }
@@ -3296,7 +3300,7 @@ class pdf_cleodis extends pdf {
 			if($this->lignes && $this->affaire["nature"]=="AR"){
 				foreach($this->AR as $k=>$i){
 				$affaire=ATF::affaire()->select($i['id_affaire']);
-				$ref_ar .=" ".($this->affaire['ref_externe'] ? $this->affaire['ref_externe'] : $this->affaire['ref'])." (".$affaire["affaire"]."), ";
+				$ref_ar .=" ".($affaire['ref_externe'] ? $affaire['ref_externe'] : $affaire['ref'])." (".$affaire["affaire"]."), ";
 				}
 				$this->ln(2);
 				$this->setfont('arial','BI',7.5);
