@@ -88,8 +88,9 @@ function createAffaires() {
         // if ($lines_count === 1) {
         try{
             if (!$ligne[1]) continue;
-            ATF::db()->begin_transaction();
+            if (!$ligne[12]) continue;
 
+            ATF::db()->begin_transaction();
             ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
 
             if (!$a = ATF::affaire()->select_row()) {
@@ -114,6 +115,7 @@ function createAffaires() {
                     $clients[$cifClient] = createSociete($cifClient, $ligne[4]);
                     // throw new errorATF("CLIENT CIF: ".$cifClient." introuvable - Ligne ".$lines_count, 404);
                 }
+
                 // Création de l'affaire
                 $infos = creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifClient, $id_produit);
                 $idAffaire = $infos["idAffaire"];
@@ -202,85 +204,85 @@ function insertSociete($data) {
 }
 
 function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifClient, $idProduit) {
-    $loyers = [];
-    $l = [
-        "loyer__dot__loyer" => "",
-        "loyer__dot__duree" => "",
-        "loyer__dot__frequence_loyer" => "",
-        "loyer__dot__type" => "engagement",
-        "loyer__dot__avec_option" => "non",
-        "loyer__dot__assurance" => "",
-        "loyer__dot__frais_de_gestion" => "",
-        "loyer__dot__serenite" => "",
-        "loyer__dot__maintenance" => "",
-        "loyer__dot__hotline" => "",
-        "loyer__dot__supervision" => "",
-        "loyer__dot__support" => ""
-    ];
-    $i = 0;
-    if ($ligne[11]) {
+    try{
+        $loyers = [];
+        $l = [
+            "loyer__dot__loyer" => "",
+            "loyer__dot__duree" => "",
+            "loyer__dot__frequence_loyer" => "",
+            "loyer__dot__type" => "engagement",
+            "loyer__dot__avec_option" => "non",
+            "loyer__dot__assurance" => "",
+            "loyer__dot__frais_de_gestion" => "",
+            "loyer__dot__serenite" => "",
+            "loyer__dot__maintenance" => "",
+            "loyer__dot__hotline" => "",
+            "loyer__dot__supervision" => "",
+            "loyer__dot__support" => ""
+        ];
+        $i = 0;
+        if ($ligne[11]) {
+            $loyers[$i] = $l;
+            $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[11]);
+            $loyers[$i]["loyer__dot__duree"] = 1;
+            $loyers[$i]["loyer__dot__frequence_loyer"] = "mois";
+            $i++;
+        }
         $loyers[$i] = $l;
-        $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[11]);
-        $loyers[$i]["loyer__dot__duree"] = 1;
+        $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[12]);
+        $loyers[$i]["loyer__dot__duree"] = $ligne[9];
         $loyers[$i]["loyer__dot__frequence_loyer"] = "mois";
-        $i++;
-    }
-    $loyers[$i] = $l;
-    $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[12]);
-    $loyers[$i]["loyer__dot__duree"] = $ligne[9];
-    $loyers[$i]["loyer__dot__frequence_loyer"] = "mois";
 
-    $produits[] = [
-        "devis_ligne__dot__caracteristique" => "",
-        "devis_ligne__dot__quantite" => "1",
-        "devis_ligne__dot__type" => "fixe",
-        "devis_ligne__dot__ref" => "LB",
-        "devis_ligne__dot__prix_achat" => "1",
-        "devis_ligne__dot__produit" => "los bienes",
-        "devis_ligne__dot__visibilite_prix" => "invisible",
-        "devis_ligne__dot__date_achat" => "",
-        "devis_ligne__dot__commentaire" => "",
-        "devis_ligne__dot__neuf" => "oui",
-        "devis_ligne__dot__id_produit_fk" => $idProduit,
-        "devis_ligne__dot__id_fournisseur_fk" => $partenaires[$cifPartenaire]
-    ];
+        $produits[] = [
+            "devis_ligne__dot__caracteristique" => "",
+            "devis_ligne__dot__quantite" => "1",
+            "devis_ligne__dot__type" => "fixe",
+            "devis_ligne__dot__ref" => "LB",
+            "devis_ligne__dot__prix_achat" => "1",
+            "devis_ligne__dot__produit" => "los bienes",
+            "devis_ligne__dot__visibilite_prix" => "invisible",
+            "devis_ligne__dot__date_achat" => "",
+            "devis_ligne__dot__commentaire" => "",
+            "devis_ligne__dot__neuf" => "oui",
+            "devis_ligne__dot__id_produit_fk" => $idProduit,
+            "devis_ligne__dot__id_fournisseur_fk" => $partenaires[$cifPartenaire]
+        ];
 
-    $contacts = [];
-    ATF::contact()->q->reset()->where('id_societe', $clients[$cifClient]);
-    $contacts = ATF::contact()->sa();
-
-    if (!$contacts) {
-        $contact = array( "nom"=>"GERANT", "id_societe"=> $clients[$cifClient]);
-        ATF::contact()->insert( $contact );
-
+        $contacts = [];
         ATF::contact()->q->reset()->where('id_societe', $clients[$cifClient]);
         $contacts = ATF::contact()->sa();
-    }
 
-    $devis = [
-        "devis" => [
-            "id_societe" => $clients[$cifClient],
-            "ref_externe" => $ligne[5],
-            "date" => date("d-m-Y", strtotime($ligne["1"]."-".$ligne[0]."-01")),
-            "type_devis" => "normal",
-            "id_contact" => $contacts[0]["id_contact"],
-            "id_type_affaire" => 1,
-            "id_commercial" => 2,
-            "devis" => "importation",
-            "id_filiale" => 1,
-            "type_contrat" => "lld",
-            "validite" =>  date("d-m-Y", strtotime($ligne["1"]."-".$ligne[0]."-20")),
-            "tva" => "1.1",
-            "id_apporteur" => $partenaires["$cifPartenaire"],
-            "id_user" => 1
-        ],
-        "values_devis" => [
-            "loyer" => json_encode($loyers),
-            "produits" => json_encode($produits),
-        ]
-    ];
+        if (!$contacts) {
+            $contact = array( "nom"=>"GERANT", "id_societe"=> $clients[$cifClient]);
+            ATF::contact()->insert( $contact );
 
-    try{
+            ATF::contact()->q->reset()->where('id_societe', $clients[$cifClient]);
+            $contacts = ATF::contact()->sa();
+        }
+
+        $devis = [
+            "devis" => [
+                "id_societe" => $clients[$cifClient],
+                "ref_externe" => $ligne[5],
+                "date" => date("d-m-Y", strtotime($ligne["1"]."-".$ligne[0]."-01")),
+                "type_devis" => "normal",
+                "id_contact" => $contacts[0]["id_contact"],
+                "id_type_affaire" => 1,
+                "id_commercial" => 2,
+                "devis" => "importation",
+                "id_filiale" => 1,
+                "type_contrat" => "lld",
+                "validite" =>  date("d-m-Y", strtotime($ligne["1"]."-".$ligne[0]."-20")),
+                "tva" => "1.1",
+                "id_apporteur" => $partenaires["$cifPartenaire"],
+                "id_user" => 1
+            ],
+            "values_devis" => [
+                "loyer" => json_encode($loyers),
+                "produits" => json_encode($produits),
+            ]
+        ];
+
         $idDevis = ATF::devis()->insert($devis);
         $idAffaire = ATF::devis()->select($idDevis, "id_affaire");
         return ["idAffaire" => $idAffaire, "idDevis" => $idDevis];
@@ -290,59 +292,63 @@ function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifCli
 }
 
 function createContrat($id_devis, $id_affaire, $idSociete) {
-    ATF::devis_ligne()->q->reset()->where('id_devis', $id_devis);
-    $lignesDevis = ATF::devis_ligne()->select_all();
+    try {
+        ATF::devis_ligne()->q->reset()->where('id_devis', $id_devis);
+        $lignesDevis = ATF::devis_ligne()->select_all();
 
-    $commande =array(
-        "commande" => "importation",
-        "type" => "prelevement",
-        "id_societe" => $idSociete,
-        "date" => date("d-m-Y"),
-        "id_affaire" => $id_affaire,
-        "id_devis" => $id_devis,
-        "prix_achat" =>0,
-    );
+        $commande =array(
+            "commande" => "importation",
+            "type" => "prelevement",
+            "id_societe" => $idSociete,
+            "date" => date("d-m-Y"),
+            "id_affaire" => $id_affaire,
+            "id_devis" => $id_devis,
+            "prix_achat" =>0,
+        );
 
-    $total_achat = 0;
+        $total_achat = 0;
 
-    $toInsertProduitContrat = array();
-    foreach ($lignesDevis as $key => $value) {
-      $toInsertProduitContrat[] = array(
-          "commande_ligne__dot__produit"=>$value["produit"],
-          "commande_ligne__dot__quantite"=>$value["quantite"],
-          "commande_ligne__dot__ref"=>$value["ref"],
-          "commande_ligne__dot__id_fournisseur"=>$value['id_fournisseur'],
-          "commande_ligne__dot__id_fournisseur_fk"=>$value['id_fournisseur'],
-          "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
-          "commande_ligne__dot__id_produit"=>$value["produit"],
-          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
-          "commande_ligne__dot__visible"=>$value["visible"],
-          "commande_ligne__dot__serial"=>$value['serial'] ? $value['serial'] : '',
+        $toInsertProduitContrat = array();
+        foreach ($lignesDevis as $key => $value) {
+        $toInsertProduitContrat[] = array(
+            "commande_ligne__dot__produit"=>$value["produit"],
+            "commande_ligne__dot__quantite"=>$value["quantite"],
+            "commande_ligne__dot__ref"=>$value["ref"],
+            "commande_ligne__dot__id_fournisseur"=>$value['id_fournisseur'],
+            "commande_ligne__dot__id_fournisseur_fk"=>$value['id_fournisseur'],
+            "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
+            "commande_ligne__dot__id_produit"=>$value["produit"],
+            "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
+            "commande_ligne__dot__visible"=>$value["visible"],
+            "commande_ligne__dot__serial"=>$value['serial'] ? $value['serial'] : '',
 
-          "commande_ligne__dot__duree"=>$value['duree'],
-          "commande_ligne__dot__loyer"=>$value['loyer'],
-          "commande_ligne__dot__id_sous_categorie"=>$value['id_sous_categorie'],
-          "commande_ligne__dot__id_pack_produit"=>$value['id_pack_produit'],
-          "commande_ligne__dot__sous_categorie"=>$value['sous_categorie'],
-          "commande_ligne__dot__pack_produit"=>$value['pack_produit'],
-          "commande_ligne__dot__ean"=>$value['ean'],
-          "commande_ligne__dot__id_categorie"=>$value['id_categorie'],
-          "commande_ligne__dot__categorie"=>$value['categorie'],
-          "commande_ligne__dot__commentaire_produit"=>$value['commentaire'],
-          "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
-          "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
-          "commande_ligne__dot__frequence_fournisseur"=>$value['frequence_fournisseur'],
-          "commande_ligne__dot__ordre"=>$value['ordre'],
-          "commande_ligne__dot__caracteristique"=>$value['caracteristique']
-      );
-      $commande["prix_achat"] += ($value["prix_achat"] * $value["quantite"]);
+            "commande_ligne__dot__duree"=>$value['duree'],
+            "commande_ligne__dot__loyer"=>$value['loyer'],
+            "commande_ligne__dot__id_sous_categorie"=>$value['id_sous_categorie'],
+            "commande_ligne__dot__id_pack_produit"=>$value['id_pack_produit'],
+            "commande_ligne__dot__sous_categorie"=>$value['sous_categorie'],
+            "commande_ligne__dot__pack_produit"=>$value['pack_produit'],
+            "commande_ligne__dot__ean"=>$value['ean'],
+            "commande_ligne__dot__id_categorie"=>$value['id_categorie'],
+            "commande_ligne__dot__categorie"=>$value['categorie'],
+            "commande_ligne__dot__commentaire_produit"=>$value['commentaire'],
+            "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
+            "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
+            "commande_ligne__dot__frequence_fournisseur"=>$value['frequence_fournisseur'],
+            "commande_ligne__dot__ordre"=>$value['ordre'],
+            "commande_ligne__dot__caracteristique"=>$value['caracteristique']
+        );
+        $commande["prix_achat"] += ($value["prix_achat"] * $value["quantite"]);
+        }
+
+        $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
+
+        $id_commande = ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
+
+        return ATF::commande()->decryptId($id_commande);
+    } catch(errorATF $e) {
+        throw $e;
     }
-
-    $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
-
-    $id_commande = ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
-
-    return ATF::commande()->decryptId($id_commande);
 }
 
 function createProlongation($idAffaire, $idSociete, $idCommande, $ligne) {
