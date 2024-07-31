@@ -56,8 +56,6 @@ function createSocietes() {
 function createAffaires() {
     $fichier = $path == '' ? "./fichier.csv" : $path;
     $f = fopen($fichier, 'rb');
-    $entete = fgetcsv($f);
-    $societes = [];
     $lines_count = 1;
     $processed_lines = 0;
 
@@ -87,8 +85,14 @@ function createAffaires() {
 
         // if ($lines_count === 1) {
         try{
-            if (!$ligne[1]) continue;
-            if (!$ligne[12]) continue;
+            if (!$ligne[1]) {
+                echo "Affaire ".$ligne[5]." non traitée pas de ligne 1\n";
+                continue;
+            }
+            if (!$ligne[12]) {
+                echo "Affaire ".$ligne[5]." non traitée pas de loyer\n";
+                continue;
+            }
 
             ATF::db()->begin_transaction();
             ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
