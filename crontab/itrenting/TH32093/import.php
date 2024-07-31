@@ -90,7 +90,7 @@ function createAffaires() {
             if (!$ligne[1]) continue;
             ATF::db()->begin_transaction();
 
-            ATF::affaire()->q->reset()->where("ref_externe", $ligne[4]);
+            ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
 
             if (!$a = ATF::affaire()->select_row()) {
 
@@ -111,7 +111,8 @@ function createAffaires() {
                 if ($societeExist) {
                     $clients[$cifClient] = $societeExist;
                 } else {
-                    throw new errorATF("CLIENT CIF: ".$cifClient." introuvable - Ligne ".$lines_count, 404);
+                    $clients[$cifClient] = createSociete($cifClient, $ligne[4]);
+                    // throw new errorATF("CLIENT CIF: ".$cifClient." introuvable - Ligne ".$lines_count, 404);
                 }
                 // Création de l'affaire
                 $infos = creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifClient, $id_produit);
@@ -120,9 +121,9 @@ function createAffaires() {
 
                 // Création du contrat
                 $idContrat = createContrat($idDevis, $idAffaire, $clients[$cifClient]);
-                ATF::commande()->updateDate(["id_commande" => $idContrat, "key" => "date_debut", "value" => str_replace("/", "-", $ligne[7])]);
+                ATF::commande()->updateDate(["id_commande" => $idContrat, "key" => "date_debut", "value" => str_replace("/", "-", $ligne[8])]);
 
-                if ($ligne[12]) createProlongation($idAffaire, $clients[$cifClient], $idContrat, $ligne);
+                if ($ligne[13]) createProlongation($idAffaire, $clients[$cifClient], $idContrat, $ligne);
                 $processed_lines++;
             }
             ATF::db()->commit_transaction();
@@ -152,6 +153,25 @@ function findSociete($cif) {
     return null;
 }
 
+function createSociete($cif, $nom) {
+    try{
+
+        $data_soc = [
+            "societe" => $nom,
+            "id_pays" =>  "ES",
+            "cif" => cleanCIF($cif)
+        ];
+        $idSociete = ATF::societe()->insert(array("societe" => $data_soc));
+
+        $contact = array( "nom"=>"GERANT", "id_societe"=> $idSociete);
+        ATF::contact()->insert( $contact );
+
+        return $idSociete;
+
+    } catch(errorATF $e) {
+        throw $e;
+    }
+}
 
 function insertSociete($data) {
     try{
@@ -198,18 +218,17 @@ function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifCli
         "loyer__dot__support" => ""
     ];
     $i = 0;
-    if ($ligne[10]) {
+    if ($ligne[11]) {
         $loyers[$i] = $l;
-        $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[10]);
+        $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[11]);
         $loyers[$i]["loyer__dot__duree"] = 1;
         $loyers[$i]["loyer__dot__frequence_loyer"] = "mois";
         $i++;
     }
     $loyers[$i] = $l;
-    $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[11]);
-    $loyers[$i]["loyer__dot__duree"] = $ligne[8];
+    $loyers[$i]["loyer__dot__loyer"] = str_replace(",", ".", $ligne[12]);
+    $loyers[$i]["loyer__dot__duree"] = $ligne[9];
     $loyers[$i]["loyer__dot__frequence_loyer"] = "mois";
-
 
     $produits[] = [
         "devis_ligne__dot__caracteristique" => "",
@@ -241,7 +260,7 @@ function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifCli
     $devis = [
         "devis" => [
             "id_societe" => $clients[$cifClient],
-            "ref_externe" => $ligne[4],
+            "ref_externe" => $ligne[5],
             "date" => date("d-m-Y", strtotime($ligne["1"]."-".$ligne[0]."-01")),
             "type_devis" => "normal",
             "id_contact" => $contacts[0]["id_contact"],
@@ -329,12 +348,12 @@ function createContrat($id_devis, $id_affaire, $idSociete) {
 function createProlongation($idAffaire, $idSociete, $idCommande, $ligne) {
     try{
         $refi = null;
-        ATF::refinanceur()->q->reset()->where("refinanceur", str_replace(', S.A.', "", $ligne[5]));
+        ATF::refinanceur()->q->reset()->where("refinanceur", str_replace(', S.A.', "", $ligne[6]));
 
         if ($re = ATF::refinanceur()->select_row()) {
             $refi = $re["id_refinanceur"];
         } else {
-            $refi = ATF::refinanceur()->insert(["refinanceur" => str_replace(', S.A.', "", $ligne[5]), "code" => "R00", "code_refi"=> "REFACTURATION"]);
+            $refi = ATF::refinanceur()->insert(["refinanceur" => str_replace(', S.A.', "", $ligne[6]), "code" => "R00", "code_refi"=> "REFACTURATION"]);
         }
 
         $commande=ATF::commande()->select($idCommande);
@@ -345,12 +364,12 @@ function createProlongation($idAffaire, $idSociete, $idCommande, $ligne) {
             "date_debut" => date("Y-m-d",strtotime($commande["date_evolution"]."+1 day")),
             "id_societe" => $idSociete,
             "id_refinanceur" => $refi,
-            "prix" => $ligne[12],
+            "prix" => $ligne[13],
             "id_commande" => $idCommande
         ];
 
         $loyers[] = [
-            "loyer_prolongation__dot__loyer" => str_replace(",", ".", $ligne[12]),
+            "loyer_prolongation__dot__loyer" => str_replace(",", ".", $ligne[13]),
             "loyer_prolongation__dot__duree" => 1,
             "loyer_prolongation__dot__frequence_loyer" => "mois",
             "loyer_prolongation__dot__assurance" => "",
