@@ -766,7 +766,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function devisClassique() {
 		if (!$this->devis) return false;
-
 		/* PAGE 2 */
 		$this->setHeader();
 		$this->setTopMargin(30);
@@ -1597,11 +1596,11 @@ class pdf_cleodis extends pdf {
 		);
 
 		//Largeur des cellules
-		$plus = (5-count($this->loyer))*21;
-		$width = array(80+$plus);
+		$plus = (count($this->loyer))*30;
+		$width = array(185-$plus);
 
 		foreach ($this->loyer as $k=>$i) {
-			$width[] = 21;
+			$width[] = 30;
 		}
 		//Création des entêtes
 		if ($this->affaire['nature']=="avenant") {
@@ -1697,6 +1696,10 @@ class pdf_cleodis extends pdf {
 				$s[7][] = $style["loyer"];
 			}
 		}
+
+		log::logger($head, "mfleurquin");
+		log::logger($data, "mfleurquin");
+		log::logger($width, "mfleurquin");
 		$this->tableau($head,$data,$width,5,$s);
 		$this->headStyle = $saveHeadStyle;
 	}
@@ -12098,11 +12101,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		);
 
 		//Largeur des cellules
-		$plus = (5-count($this->loyer))*21;
-		$width = array(80+$plus);
+		$plus = (count($this->loyer))*30;
+		$width = array(185-$plus);
 
 		foreach ($this->loyer as $k=>$i) {
-			$width[] = 21;
+			$width[] = 30;
 		}
 		//Création des entêtes
 		if ($this->affaire['nature']=="avenant") {
