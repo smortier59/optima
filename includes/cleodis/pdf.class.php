@@ -4208,7 +4208,7 @@ class pdf_cleodis extends pdf {
 			,array("border"=>"TRB","bgcolor"=>"efefef","decoration"=>"B")
 		);
 		$this->styleLibTotaux = array("decoration"=>"B","align"=>"R");
-		$this->styleTotaux = array("decoration"=>"B");
+		$this->styleTotaux = array("decoration"=>"B", "align"=>"R");
 		$this->styleNotice = array("decoration"=>"I","size"=>6);
 	}
 
@@ -4318,8 +4318,8 @@ class pdf_cleodis extends pdf {
 		if ($this->lignes) {
 
 
-			$head = array("Référence","Désignation","Quantité","P.U","Total");
-			$w = array(30,100,20,20,20);
+			$head = array("Référence","Désignation","Qté","P.U","Total");
+			$w = array(30,90,15,25,30);
 
 			foreach($this->lignes as $k=>$i) {
 				if (!$i['id_produit'] && $i["id_commande_ligne"]) {
@@ -4375,7 +4375,7 @@ class pdf_cleodis extends pdf {
 									,array($this->styleLibTotaux,$this->styleTotaux)
 									,array($this->styleLibTotaux,$this->styleTotaux)
 								)
-				,"w"=>array(170,20)
+				,"w"=>array(160,30)
 			);
 			if (!$annexes) {
 				$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
@@ -8730,7 +8730,7 @@ class pdf_cleodis extends pdf {
 			,array("border"=>"TRB","bgcolor"=>"efefef","decoration"=>"B")
 		);
 		$this->styleLibTotaux = array("decoration"=>"B","align"=>"R");
-		$this->styleTotaux = array("decoration"=>"B");
+		$this->styleTotaux = array("decoration"=>"B", "align"=>"R");
 		$this->styleNotice = array("decoration"=>"I","size"=>6);
 	}
 
@@ -10907,7 +10907,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 			if ($this->lignes) {
 				$head = array("Referentie","Omschrijving","Aantal","E.P","Totaal");
-				$w = array(30,100,20,20,20);
+				$w = array(30,90,15,25,30);
 				foreach($this->lignes as $k=>$i) {
 
 					if (!$i['id_produit'] && $i["id_commande_ligne"]) {
@@ -10964,7 +10964,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 										,array($this->styleLibTotaux,$this->styleTotaux)
 										,array($this->styleLibTotaux,$this->styleTotaux)
 									)
-					,"w"=>array(170,20)
+					,"w"=>array(160,30)
 				);
 				if (!$annexes) {
 					$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
