@@ -766,7 +766,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function devisClassique() {
 		if (!$this->devis) return false;
-
 		/* PAGE 2 */
 		$this->setHeader();
 		$this->setTopMargin(30);
@@ -1597,11 +1596,11 @@ class pdf_cleodis extends pdf {
 		);
 
 		//Largeur des cellules
-		$plus = (5-count($this->loyer))*21;
-		$width = array(80+$plus);
+		$plus = (count($this->loyer))*30;
+		$width = array(185-$plus);
 
 		foreach ($this->loyer as $k=>$i) {
-			$width[] = 21;
+			$width[] = 30;
 		}
 		//Création des entêtes
 		if ($this->affaire['nature']=="avenant") {
@@ -1697,6 +1696,10 @@ class pdf_cleodis extends pdf {
 				$s[7][] = $style["loyer"];
 			}
 		}
+
+		log::logger($head, "mfleurquin");
+		log::logger($data, "mfleurquin");
+		log::logger($width, "mfleurquin");
 		$this->tableau($head,$data,$width,5,$s);
 		$this->headStyle = $saveHeadStyle;
 	}
@@ -4205,7 +4208,7 @@ class pdf_cleodis extends pdf {
 			,array("border"=>"TRB","bgcolor"=>"efefef","decoration"=>"B")
 		);
 		$this->styleLibTotaux = array("decoration"=>"B","align"=>"R");
-		$this->styleTotaux = array("decoration"=>"B");
+		$this->styleTotaux = array("decoration"=>"B", "align"=>"R");
 		$this->styleNotice = array("decoration"=>"I","size"=>6);
 	}
 
@@ -4315,8 +4318,8 @@ class pdf_cleodis extends pdf {
 		if ($this->lignes) {
 
 
-			$head = array("Référence","Désignation","Quantité","P.U","Total");
-			$w = array(30,100,20,20,20);
+			$head = array("Référence","Désignation","Qté","P.U","Total");
+			$w = array(30,90,15,25,30);
 
 			foreach($this->lignes as $k=>$i) {
 				if (!$i['id_produit'] && $i["id_commande_ligne"]) {
@@ -4372,7 +4375,7 @@ class pdf_cleodis extends pdf {
 									,array($this->styleLibTotaux,$this->styleTotaux)
 									,array($this->styleLibTotaux,$this->styleTotaux)
 								)
-				,"w"=>array(170,20)
+				,"w"=>array(160,30)
 			);
 			if (!$annexes) {
 				$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
@@ -8727,7 +8730,7 @@ class pdf_cleodis extends pdf {
 			,array("border"=>"TRB","bgcolor"=>"efefef","decoration"=>"B")
 		);
 		$this->styleLibTotaux = array("decoration"=>"B","align"=>"R");
-		$this->styleTotaux = array("decoration"=>"B");
+		$this->styleTotaux = array("decoration"=>"B", "align"=>"R");
 		$this->styleNotice = array("decoration"=>"I","size"=>6);
 	}
 
@@ -10904,7 +10907,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 			if ($this->lignes) {
 				$head = array("Referentie","Omschrijving","Aantal","E.P","Totaal");
-				$w = array(30,100,20,20,20);
+				$w = array(30,90,15,25,30);
 				foreach($this->lignes as $k=>$i) {
 
 					if (!$i['id_produit'] && $i["id_commande_ligne"]) {
@@ -10961,7 +10964,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 										,array($this->styleLibTotaux,$this->styleTotaux)
 										,array($this->styleLibTotaux,$this->styleTotaux)
 									)
-					,"w"=>array(170,20)
+					,"w"=>array(160,30)
 				);
 				if (!$annexes) {
 					$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
@@ -12098,11 +12101,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		);
 
 		//Largeur des cellules
-		$plus = (5-count($this->loyer))*21;
-		$width = array(80+$plus);
+		$plus = (count($this->loyer))*30;
+		$width = array(185-$plus);
 
 		foreach ($this->loyer as $k=>$i) {
-			$width[] = 21;
+			$width[] = 30;
 		}
 		//Création des entêtes
 		if ($this->affaire['nature']=="avenant") {
