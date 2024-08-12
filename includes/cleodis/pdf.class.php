@@ -266,7 +266,7 @@ class pdf_cleodis extends pdf {
 				$last = false;
 
 				if ($k == 0) $displayRum = true;
-				if ($k == count($mandataires)) $last = true;
+				if ($k == count($mandataires) -1) $last = true;
 
 				$this->templateMandat($id_affaire, $siret, $last, $displayRum);
 				$this->ln(5);
