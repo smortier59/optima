@@ -1448,6 +1448,7 @@ class affaire_cleodis extends affaire {
 					->from("societe","id_contact_signataire","contact","id_contact")
 					->from("affaire","id_affaire","bon_de_commande","id_affaire")
 					->from("affaire","id_affaire","commande","id_affaire")
+					->from("affaire","id_affaire","devis","id_affaire")
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
 					->from("societe","id_famille", "famille", "id_famille")
@@ -1463,9 +1464,12 @@ class affaire_cleodis extends affaire {
 				$this->q->where("affaire.date", $date_moins_6mois, "AND", "conditionSup", ">=");
 
 				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande");
+				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande")
+						->where("devis.etat", "perdu","OR","affaire_demande");
 			} else {
 				$this->q->where("affaire.etat", "devis","OR","affaire_demande","=")
-					->where("commande.etat", "non_loyer","OR","affaire_demande","=");
+						->where("devis.etat", "perdu","AND","devis_non_perdu","!=")
+						->where("commande.etat", "non_loyer","OR","affaire_demande","=");
 			}
 
 
