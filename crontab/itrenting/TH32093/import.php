@@ -437,9 +437,10 @@ function createDemandeRefi() {
                         "date" => $affaire["date"],
                         "id_affaire" => $affaire["id_affaire"],
                         "id_societe" => $affaire["id_societe"],
-                        "etat" => "accepte",
+                        "etat" => "valide",
                         "id_refinanceur" => $refinanceur["id_refinanceur"],
-                        "prix" => $ligne[7],
+                        "loyer_actualise" => $ligne[7],
+                        "taux" => number_format(floatval(str_replace(",", ".", $ligne[14])) * 100, 2),
                         "description" =>  $affaire["affaire"],
                         "id_contact" => $contacts[0]["id_contact"]
                     ];
