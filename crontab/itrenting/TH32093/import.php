@@ -97,6 +97,7 @@ function createAffaires() {
                 continue;
             }
 
+
             ATF::db()->begin_transaction();
             ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
 
@@ -247,7 +248,7 @@ function creationAffaire($ligne, $partenaires, $cifPartenaire, $clients, $cifCli
             "devis_ligne__dot__quantite" => "1",
             "devis_ligne__dot__type" => "fixe",
             "devis_ligne__dot__ref" => "LB",
-            "devis_ligne__dot__prix_achat" => "1",
+            "devis_ligne__dot__prix_achat" => floatval(str_replace(' ', '',str_replace(",", ".", $ligne[7]))) - floatval(str_replace(' ', '',str_replace(",", ".", $ligne[15]))),
             "devis_ligne__dot__produit" => "los bienes",
             "devis_ligne__dot__visibilite_prix" => "invisible",
             "devis_ligne__dot__date_achat" => "",
