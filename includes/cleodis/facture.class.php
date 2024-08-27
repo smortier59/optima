@@ -2316,17 +2316,19 @@ class facture_cleodis extends facture {
         	 "A"=>array('RESEAU',20)
         	,"B"=>array('X',5)
 			,"C"=>array('ENTITE',30)
-			,"D"=>array('REF EXTERNE',20)
-			,"E"=>array('AFFAIRE',20)
-			,"F"=>array('REFINANCEUR',30)
-			,"G"=>array('DATE DEBUT',10)
-			,"H"=>array('PERIODE',10)
-			,"I"=>array('JOUR',7)
-			,"J"=>array('DUREE',8)
-			,"K"=>array('LOYER HT',20)
-			,"L"=>array('TOTAL TTC CONTRAT',20)
-			,"M"=>array('ACHAT HT',20)
-			,"N"=>array('ACHAT TTC',20)
+			,"D"=>array('PARTENAIRE',30)
+			,"E"=>array('APPORTEUR',30)
+			,"F"=>array('REF EXTERNE',20)
+			,"G"=>array('AFFAIRE',20)
+			,"H"=>array('REFINANCEUR',30)
+			,"I"=>array('DATE DEBUT',10)
+			,"J"=>array('PERIODE',10)
+			,"K"=>array('JOUR',7)
+			,"L"=>array('DUREE',8)
+			,"M"=>array('LOYER HT',20)
+			,"N"=>array('TOTAL TTC CONTRAT',20)
+			,"O"=>array('ACHAT HT',20)
+			,"P"=>array('ACHAT TTC',20)
 		);
 
 		//A =65 Z=90
@@ -2462,21 +2464,36 @@ class facture_cleodis extends facture {
 
 							$fact = 0;
 							$row_data=array();
+							$affaire = ATF::affaire()->select($item["facture.id_affaire_fk"]);
 
-							$row_data["A"]=array($item["societe.code_client"],"border_cel_left");
-							$row_data["B"]=array("","border_cel_left");
-							$row_data["C"]=array($item["facture.id_societe"],"border_cel_left");
-							$row_data["D"]=array(ATF::affaire()->select($item["facture.id_affaire_fk"], "ref_externe"),"border_cel_right");
-							$row_data["E"]=array($item["facture.id_affaire"],"border_cel_right");
+							$partenaire = "";
+							$apporteur = "";
+							if ($affaire["id_partenaire"]) {
+								$partenaire = ATF::societe()->select($affaire["id_partenaire"], "societe");
+								$id_apporteur = ATF::societe()->select($affaire["id_partenaire"], "id_apporteur");
+								if ($id_apporteur) {
+									$apporteur = ATF::societe()->select($id_apporteur, "societe");
+								}
+							}
+
+
+							$row_data["A"] = array($item["societe.code_client"],"border_cel_left");
+							$row_data["B"] = array("","border_cel_left");
+							$row_data["C"] = array($item["facture.id_societe"],"border_cel_left");
+							$row_data["D"] = array($partenaire,"border_cel_left");
+							$row_data["E"] = array($apporteur,"border_cel_left");
+
+							$row_data["F"] = array($affaire["ref_externe"],"border_cel_right");
+							$row_data["G"] = array($item["facture.id_affaire"],"border_cel_right");
 
 							$res = $this->select($item["facture.id_facture_fk"] );
 
 
 							if(is_array($refi)){
-								$row_data["F"] = array(ATF::refinanceur()->select($refi["id_refinanceur"], "refinanceur") , "border_cel");
-							}else{ $row_data["F"] = array("","border_cel");	}
+								$row_data["H"] = array(ATF::refinanceur()->select($refi["id_refinanceur"], "refinanceur") , "border_cel");
+							}else{ $row_data["H"] = array("","border_cel");	}
 
-							$row_data["G"]=array($echeancier[$fact]["date_periode_debut"], "border_cel");
+							$row_data["I"]=array($echeancier[$fact]["date_periode_debut"], "border_cel");
 							$frequence = "";
 							if($loyer["frequence_loyer"]){
 								switch ($loyer["frequence_loyer"]) {
@@ -2486,16 +2503,16 @@ class facture_cleodis extends facture {
 									case 'an':$frequence = "A";	break;
 								}
 							}
-							$row_data["H"]=array($frequence,"border_cel");
+							$row_data["J"]=array($frequence,"border_cel");
 
 							//$jour = explode("-",$item['facture.date_periode_debut']);
 							$jour = explode("-", $echeancier[$fact]["date_periode_debut"]);
-							$row_data["I"]=array($jour[2],"border_cel_right");
-							$row_data["J"]=array($loyer["duree"],"border_cel_right");
-							$row_data["K"]=array(($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"]),"border_cel_right");
-							$row_data["L"]=array($loyer["duree"]*($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"])*1.2,"border_cel_right");
-							$row_data["M"]=array(abs($Achat["HT"]),"border_cel_right");
-							$row_data["N"]=array(round(abs($Achat["TTC"]),2),"border_cel_right");
+							$row_data["K"]=array($jour[2],"border_cel_right");
+							$row_data["L"]=array($loyer["duree"],"border_cel_right");
+							$row_data["M"]=array(($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"]),"border_cel_right");
+							$row_data["N"]=array($loyer["duree"]*($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"])*1.2,"border_cel_right");
+							$row_data["O"]=array(abs($Achat["HT"]),"border_cel_right");
+							$row_data["P"]=array(round(abs($Achat["TTC"]),2),"border_cel_right");
 
 
 							//A =65 Z=90
