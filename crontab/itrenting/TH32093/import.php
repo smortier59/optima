@@ -14,6 +14,9 @@ createSocietes();
 echo "CREATION DES AFFAIRES \n";
 createAffaires();
 
+echo "CREATION DES DEMANDES REFI \n";
+createDemandeRefi();
+
 echo "========= FIN DE SCRIPT =========\n";
 
 
@@ -130,6 +133,7 @@ function createAffaires() {
                 ATF::commande()->updateDate(["id_commande" => $idContrat, "key" => "date_debut", "value" => str_replace("/", "-", $ligne[8])]);
 
                 if ($ligne[13]) createProlongation($idAffaire, $clients[$cifClient], $idContrat, $ligne);
+
                 $processed_lines++;
             }
             ATF::db()->commit_transaction();
@@ -142,6 +146,7 @@ function createAffaires() {
 
     echo "Nouvelles affaires: ".$processed_lines." sur ".$lines_count."\n";
 }
+
 
 
 function cleanCIF($cif) {
@@ -397,6 +402,59 @@ function createProlongation($idAffaire, $idSociete, $idCommande, $ligne) {
     }catch(errorATF $e) {
         throw $e;
     }
+}
+
+function createDemandeRefi() {
+
+    $fichier = $path == '' ? "./fichier.csv" : $path;
+    $f = fopen($fichier, 'rb');
+    $lines_count = 1;
+    $processed_lines = 0;
+    while (($ligne = fgetcsv($f, 0, ';'))) {
+        $lines_count++;
+        try{
+            if (!$ligne[1]) {
+                echo "Affaire ".$ligne[5]." non traitée pas de ligne 1\n";
+                continue;
+            }
+            if (!$ligne[12]) {
+                echo "Affaire ".$ligne[5]." non traitée pas de loyer\n";
+                continue;
+            }
+            ATF::db()->begin_transaction();
+            ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
+            if ($a = ATF::affaire()->select_row()) {
+                ATF::refinanceur()->q->reset()->where("refinanceur", $ligne[6]);
+                $refinanceur = ATF::refinanceur()->select_row();
+
+                if ($refinanceur) {
+                    $affaire = ATF::affaire()->select($a["affaire.id_affaire"]);
+
+                    ATF::contact()->q->reset()->where('id_societe', $affaire["id_societe"]);
+                    $contacts = ATF::contact()->sa();
+
+                    $data = [
+                        "date" => $affaire["date"],
+                        "id_affaire" => $affaire["id_affaire"],
+                        "id_societe" => $affaire["id_societe"],
+                        "etat" => "accepte",
+                        "id_refinanceur" => $refinanceur["id_refinanceur"],
+                        "prix" => $ligne[7],
+                        "description" =>  $affaire["affaire"],
+                        "id_contact" => $contacts[0]["id_contact"]
+                    ];
+                    ATF::demande_refi()->insert($data);
+                }
+            }
+            ATF::db()->commit_transaction();
+        } catch(errorATF $e) {
+            ATF::db()->rollback_transaction();
+            echo $e->getMessage()."\n";
+        }
+    }
+
+
+
 }
 
 ?>
