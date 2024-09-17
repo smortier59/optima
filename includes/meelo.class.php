@@ -96,7 +96,7 @@ class meelo extends classes_optima {
     }
 
     function companyDetailTask($checkCompanyUrl, $token, $id, $try=0) {
-        $url = $checkCompanyUrl.'/v3/task/'.$id;
+        $url = $checkCompanyUrl.'/task/'.$id;
         log::logger("-- Récuperation du report de la societe ".$url , $this->logFile);
 
         $report = $this->curlCall($url, $token);
