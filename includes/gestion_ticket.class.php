@@ -437,5 +437,46 @@ class gestion_ticket extends classes_optima {
 		return $r;
 	}
 
+	public function _POST($get, $post) {
+		log::logger($post, "mfleurquin");
+
+		if(!$post["id_societe"]) throw new errorATF("SOCIETE MISSING", 400);
+		if(!$post["credit"]) throw new errorATF("CREDIT MISSING", 400);
+
+		// Transactionnel
+		ATF::db($this->db)->begin_transaction();
+		try{
+			// Recherche du crédit précédent
+			$credits=ATF::societe()->getSolde($post['id_societe']);
+
+			// historique du retrait de ticket pr facturation
+			$infos_ticket['id_societe']=$post['id_societe'];
+			$infos_ticket['date']=date('Y-m-d H:i:s');
+			if ($post["libelle"]) $infos_ticket['libelle'] = $post["libelle"];
+			$infos_ticket["operation"]=$this->getLastOp($post['id_societe'])+1;
+			$infos_ticket['solde']=$credits+$post["credit"];
+			$infos_ticket['nbre_tickets']=$post["credit"];
+
+			if ($post["credit"] > 0) {
+				$infos_ticket['type']='ajout';
+			} else {
+				$infos_ticket['type']='retrait';
+			}
+
+			log::logger($infos_ticket, "mfleurquin");
+			$this->insert($infos_ticket);
+
+			// Commit !
+			ATF::db()->commit_transaction();
+
+			return true;
+		} catch(errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw new errorATF($e->getMessage(), 400);
+		}
+
+
+
+	}
 };
 ?>
