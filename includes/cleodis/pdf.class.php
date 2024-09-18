@@ -6431,6 +6431,7 @@ class pdf_cleodis extends pdf {
 		foreach ($head as $k=>$i) {
 			$this->headStyle[] = $newStyleHead;
 		}
+
 		$this->tableau($head,$data,$width,$c_height,$style,$limitBottomMargin);
 		$this->headStyle = $save;
 	}
@@ -12234,8 +12235,10 @@ class pdf_itrenting extends pdf_cleodis {
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
 
-	public $bgcolorTableau = "16145d";
+	public $bgcolorTableau = "003366";
 	public $txtcolorTableau = "ffffff";
+
+
 
 	public $textBleu = [0,51,102];
 	public $textVert = [153, 204, 51];
@@ -13393,8 +13396,8 @@ class pdf_itrenting extends pdf_cleodis {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
-		$this->initLogo($this->affaire["id_type_affaire"]);
-		$this->image($this->logo,5,8,40);
+		// $this->initLogo($this->affaire["id_type_affaire"]);
+		// $this->image($this->logo,5,8,40);
 
 
 
@@ -13421,8 +13424,11 @@ class pdf_itrenting extends pdf_cleodis {
 	if(!$global){
 	  $this->open();
 	}
-	$this->setHeader();
+	$this->unsetHeader();
 	$this->addpage();
+	$this->image($this->logo,15,10,40);
+	$this->image(__PDF_PATH__."/".'itrenting/simpel.jpg',170,10,15);
+
 	$this->setMargins(15,30);
 	$this->sety(15);
 
@@ -13436,41 +13442,47 @@ class pdf_itrenting extends pdf_cleodis {
 	}else{
 	  $this->multicell(0,15,'FACTURA DE CREDITO',0,'C');
 	}
-	$this->setfont('arial','',8);
+	$this->ln(15);
 
-	//CADRE Societe
-	$cadre = array(
-	strtoupper($this->societe['adresse'])
-	,strtoupper($this->societe['adresse_2'])
-	,strtoupper($this->societe['cp']." ".$this->societe['ville']." - ".$this->societe['province'])
-	,"TEL : ".$this->agence['tel']
-	,"CIF/DNI : ". ($this->societe["CIF"] ? $this->societe["CIF"] : $this->societe["DNI"])
-	);
-	$this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
+	$this->setfont('arial','',10);
 
+	$y = $this->getY();
+	$this->MultiCell(80,5,$this->societe["societe"],0,'L');
+	$this->MultiCell(80,5,$this->societe["adresse"] ,0,'L');
+	if ($this->societe["adresse_2"]) $this->MultiCell(80,5,$this->societe["adresse_2"] ,0,'L');
+	if ($this->societe["adresse_3"]) $this->MultiCell(80,5,$this->societe["adresse_3"] ,0,'L');
+	$this->MultiCell(80,5,$this->societe["cp"]." ".$this->societe["ville"]." (".$this->societe["province"].")" ,0,'L');
+	$this->MultiCell(80,5,"TEL : ".$this->agence["tel"],0,'L',0,1);
+	$this->MultiCell(80,5,"CIF/DNI : ". ($this->societe["CIF"] ? $this->societe["CIF"] : $this->societe["DNI"]),0,'L',0,1);
+	$Yfin = $this->getY();
 
-	//CADRE Client
-	if($this->client['facturation_adresse']){
-	  $cadre = array(
-		 strtoupper($this->client['facturation_adresse'])
-		,strtoupper($this->client['facturation_adresse_2'])
-		,strtoupper($this->client['facturation_adresse_3'])
-		,strtoupper($this->client['facturation_cp']." ".$this->client['facturation_ville']." - ".$this->client['facturation_province'])
-		,"TEL : ".$this->client['tel']
-		,"CIF/DNI : ".($this->client["CIF"] ? $this->client["CIF"] : $this->client["DNI"])
-	  );
-	}else{
-	  $cadre = array(
-		 strtoupper($this->client['adresse'])
-		,strtoupper($this->client['adresse_2'])
-		,strtoupper($this->client['adresse_3'])
-		,strtoupper($this->client['cp']." ".$this->client['ville']." - ".$this->client['province'])
-		,"Tel : ".$this->client['tel']
-		,"CIF/DNI : ".($this->client["CIF"] ? $this->client["CIF"] : $this->client["DNI"])
-	  );
+	$this->setY($y);
+	$this->setLeftMargin(105);
+	$this->MultiCell(80,5,$this->client["societe"],0,'L');
+
+	if($this->client['facturation_adresse']) {
+		$this->MultiCell(80,5,$this->client["adresse"] ,0,'L');
+		if ($this->client["facturation_adresse_2"]) $this->MultiCell(80,5,$this->client["facturation_adresse_2"] ,0,'L');
+		if ($this->client["facturation_adresse_3"]) $this->MultiCell(80,5,$this->client["facturation_adresse_3"] ,0,'L');
+		$this->MultiCell(80,5,$this->client["facturation_cp"]." ".$this->client["facturation_ville"]." (".$this->client["facturation_province"].")" ,0,'L');
+
+	} else {
+		$this->MultiCell(80,5,$this->client["adresse"] ,0,'L');
+		if ($this->client["adresse_2"]) $this->MultiCell(80,5,$this->client["adresse_2"] ,0,'L');
+		if ($this->client["adresse_3"]) $this->MultiCell(80,5,$this->client["adresse_3"] ,0,'L');
+		$this->MultiCell(80,5,$this->client["cp"]." ".$this->client["ville"]." (".$this->client["province"].")" ,0,'L');
 	}
 
-	$this->cadre(110,35,80,35,$cadre,$this->client['societe']);
+	$this->MultiCell(80,5,$this->client["adresse"].", ".$this->client["cp"]." ".$this->client["ville"]." (".$this->client["province"].")" ,0,'L');
+	$this->MultiCell(80,5,"TEL : ".$this->client["tel"],0,'L',0,1);
+	$this->MultiCell(80,5,"CIF/DNI : ". ($this->client["CIF"] ? $this->client["CIF"] : $this->client["DNI"]),0,'L',0,1);
+
+	if ($this->getY() > $Yfin) { $this->ln(10); } else { $this->setY($Yfin +10); }
+
+	$this->setLeftMargin(15);
+
+	$this->setfont('arial','',8);
+
 
 	$this->multicell(0,5,"A la atención del Dpto. de Contabilidad");
 	$this->ln(5);
@@ -13627,17 +13639,33 @@ class pdf_itrenting extends pdf_cleodis {
 		}
 	  }else{
 		$head = array("Cuota/Mes ".$this->texteHT,"IVA","Imp. IVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-		  $data = array(
-			array(
-			  number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-			  ,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
-			  ,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
-			  ,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
-			)
-		  );
+		$data = array(
+		array(
+			number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+			,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+			,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+			,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+		)
+		);
 	  }
 
-	  $this->tableau($head,$data);
+	$this->setfont('arial','B',10);
+	$this->SetTextColor(255,255,255);
+	$this->SetFillColor(0,51,102);
+	$this->cell(45,14, $head[0],0,0,'C',1);
+	$this->cell(45,14, $head[1],0,0,'C',1);
+	$this->cell(45,14, $head[2],0,0,'C',1);
+	$this->cell(45,14, $head[3],0,1,'C',1);
+
+
+	$this->SetTextColor(0,0,0);
+	$this->setfont('arial','B',9);
+	$this->SetFillColor(242,242,242);
+	$this->cell(45,14, $data[0][0] ,0,0,'C',1);
+	$this->cell(45,14, $data[0][1],0,0,'C',1);
+	$this->cell(45,14, $data[0][2],0,0,'C',1);
+	$this->cell(45,14, $data[0][3],0,1,'C',1);
+	$this->ln(10);
 
 	}
 
