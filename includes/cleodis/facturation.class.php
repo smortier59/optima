@@ -817,14 +817,18 @@ class facturation extends classes_optima {
 	* Facturation automatique lancé par une crontab tout les 15 du mois
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	*/
-	function facturationMensuelle($tu=false){
+	function facturationMensuelle($tu=false, $date = null){
 		ATF::db($this->db)->begin_transaction();
 		$_SESSION["user"] = $this->s["user"] = new usr($this->id_user,"740102508660757876764523051621870449619421205063F");
 		$s=$_SESSION["user"];
 		log::logger("facturationMensuelle id_user = ".ATF::$usr->getID(),__CLASS__);
 
 		$tab["fc"]= $tab["fp"]= $tab["nfp"]= $tab["nfc"]=0;
-		$date_debut=date("Y-m-d",strtotime(date("Y-m-01")."+1 month"));
+		if ($date) {
+			$date_debut =date("Y-m-01",strtotime($date."+1 month"));
+		} else {
+			$date_debut=date("Y-m-d",strtotime(date("Y-m-01")."+1 month"));
+		}
 		$date_fin=date("Y-m-d",strtotime($date_debut."+1 month"));
 		$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
 
@@ -1212,14 +1216,18 @@ class facturation extends classes_optima {
 	}
 
 
-	function facturationMensuelleRestitution($tu=false){
+	function facturationMensuelleRestitution($tu=false, $date = null){
 		ATF::db($this->db)->begin_transaction();
 		$_SESSION["user"] = $this->s["user"] = new usr($this->id_user,"740102508660757876764523051621870449619421205063F");
 		$s=$_SESSION["user"];
 		log::logger("facturationMensuelleRestitution id_user = ".ATF::$usr->getID(),__CLASS__);
 
 		$tab["fc"]= $tab["fp"]= $tab["nfp"]= $tab["nfc"]=0;
-		$date_debut=date("Y-m-d",strtotime(date("Y-m-01")."+1 month"));
+		if ($date) {
+			$date_debut =date("Y-m-01",strtotime($date."+1 month"));
+		} else {
+			$date_debut=date("Y-m-d",strtotime(date("Y-m-01")."+1 month"));
+		}
 		$date_fin=date("Y-m-d",strtotime($date_debut."+1 month"));
 		$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
 
@@ -1724,7 +1732,9 @@ class facturation extends classes_optima {
 };
 
 class facturation_cleodisbe extends facturation { };
-class facturation_itrenting extends facturation { };
+class facturation_itrenting extends facturation {
+	public $user_facturation = array(1);
+};
 
 class facturation_cap extends facturation { };
 
