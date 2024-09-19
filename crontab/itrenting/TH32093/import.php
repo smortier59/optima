@@ -8,11 +8,11 @@ ATF::$usr->set('id_user',1);
 echo "========= DEBUT DE SCRIPT =========\n";
 
 echo "CREATION DES SOCIETES \n";
-createSocietes();
+//createSocietes();
 
 
 echo "CREATION DES AFFAIRES \n";
-createAffaires();
+//createAffaires();
 
 echo "CREATION DES DEMANDES REFI \n";
 createDemandeRefi();
@@ -413,18 +413,20 @@ function createDemandeRefi() {
     $processed_lines = 0;
     while (($ligne = fgetcsv($f, 0, ';'))) {
         $lines_count++;
-        try{
-            if (!$ligne[1]) {
-                echo "Affaire ".$ligne[5]." non traitée pas de ligne 1\n";
-                continue;
-            }
-            if (!$ligne[12]) {
-                echo "Affaire ".$ligne[5]." non traitée pas de loyer\n";
-                continue;
-            }
-            ATF::db()->begin_transaction();
-            ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
-            if ($a = ATF::affaire()->select_row()) {
+
+        if (!$ligne[1]) {
+            echo "Affaire ".$ligne[5]." non traitée pas de ligne 1\n";
+            continue;
+        }
+        if (!$ligne[12]) {
+            echo "Affaire ".$ligne[5]." non traitée pas de loyer\n";
+            continue;
+        }
+
+        ATF::affaire()->q->reset()->where("ref_externe", $ligne[5]);
+        if ($a = ATF::affaire()->select_row()) {
+            ATF::demande_refi()->q->reset()->where("id_affaire", $a["affaire.id_affaire"]);
+            if (!ATF::demande_refi()->select_row()) {
                 ATF::refinanceur()->q->reset()->where("refinanceur", $ligne[6]);
                 $refinanceur = ATF::refinanceur()->select_row();
 
@@ -445,18 +447,21 @@ function createDemandeRefi() {
                         "description" =>  $affaire["affaire"],
                         "id_contact" => $contacts[0]["id_contact"]
                     ];
-                    ATF::demande_refi()->insert($data);
+                    try{
+                        ATF::db()->begin_transaction();
+                        echo "--- Affaire ".$ligne[5]." - Refinanceur fichier : ".$ligne[6]." Refi BDD : ".$refinanceur["id_refinanceur"]."\n";
+                        ATF::demande_refi()->insert($data);
+                        ATF::db()->commit_transaction();
+                    } catch(errorATF $e) {
+                        ATF::db()->rollback_transaction();
+                        echo $e->getMessage()."\n";
+                    }
+                } else {
+                    echo "Refinanceur ". $ligne[6]." non trouvé\n";
                 }
             }
-            ATF::db()->commit_transaction();
-        } catch(errorATF $e) {
-            ATF::db()->rollback_transaction();
-            echo $e->getMessage()."\n";
         }
     }
-
-
-
 }
 
 ?>
