@@ -64,6 +64,11 @@ where
 ALTER TABLE `facture` ADD `numero` VARCHAR(12) NULL DEFAULT NULL AFTER `ref`;
 
 
+-- TH - affaire par pack espace partenaire
+ALTER TABLE `pack_produit_partenaire` ADD `id_type_affaire` INT(11) NOT NULL AFTER `id_partenaire`;
+ALTER TABLE `pack_produit_partenaire` ADD FOREIGN KEY (`id_type_affaire`) REFERENCES `type_affaire`(`id_type_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
 -- TH 30592 - Grille tarifaire - Calcul de loyer automatisé
 CREATE TABLE grille_tarifaire (
     `id_grille_tarifaire` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT ,
