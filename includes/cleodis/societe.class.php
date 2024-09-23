@@ -1793,209 +1793,228 @@ class societe_cleodis extends societe {
       $registrationNumber = substr($registrationNumber, 0, 9);
     }
 
-    try {
-      $data = ATF::meelo()->getInfosCompanyByRegistrationNumber($registrationNumber, $pays);
-    } catch (errorATF $e) {
-      log::logger("====================================================================", "meelo");
-      log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
-      log::logger($e->getMessage(), "meelo");
-      throw new errorATF($e->getMessage(),500);
+    if(ATF::$codename === "cleodisbe"){
+      ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string($registrationNumber),"OR","registrationNumber");
+    }elseif(ATF::$codename === "itrenting"){
+      ATF::societe()->q->reset()->where("CIF",ATF::db($this->db)->real_escape_string($registrationNumber));
+    }else {
+      ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($siret));
     }
+    $res = ATF::societe()->select_row();
 
-    try {
-      $scoring = ATF::meelo()->getScoring($registrationNumber, $pays);
-    } catch (errorATF $e) {
+    $date = new DateTime();
+    $date->modify('+6 months');
 
-      log::logger("====================================================================", "meelo");
-      log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
-      log::logger($e->getMessage(), "meelo");
-    }
-
-    try {
-      if ($data) {
-        ATF::db()->begin_transaction();
-        if(ATF::$codename === "cleodisbe"){
-          ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string($registrationNumber),"OR","registrationNumber")
-                                    ->where("reference_tva",$data["reference_tva"],"OR","registrationNumber");
-        }elseif(ATF::$codename === "itrenting"){
-          ATF::societe()->q->reset()->where("CIF",ATF::db($this->db)->real_escape_string($registrationNumber));
-        }else {
-          ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($siret));
-        }
-        $res = ATF::societe()->select_row();
-
-
-        $company = $data->company;
-        $legalUnit = $company->legalUnit;
-        $gerants = array_merge($company->representatives, $company->shareHolders);
-
-        $commun = [
-          "societe" => $legalUnit->corporateName,
-          "id_pays" =>  $company->country,
-          "activite" => $legalUnit->activity,
-          "date_creation" => $legalUnit->registrationDate,
-          "langue" => $post["langue"],
-          "id_apporteur" => $apporteur ? $apporteur : null,
-          "id_fournisseur" => $apporteur ? $apporteur : null,
-          "capital" => $legalUnit->shareCapital,
-          "activite" => $legalUnit->activity,
-        ];
-
-        if ($scoring->score) $commun["cs_score"] = $scoring->score;
-
-        switch ($company->country) {
-          case 'FR':
-            foreach ($company->establishments as $etablissement) {
-              if ($etablissement->siret === $siret) {
-                ATF::pays()->q->reset()->where("id_pays", $etablissement->address->country, "OR")->where("pays", $etablissement->address->country, "OR");
-                $pays = ATF::pays()->select_row();
-
-                $specifique = [
-                  "siren" => $legalUnit->registrationNumber,
-                  "siret" => $siret,
-                  "reference_tva" => $legalUnit->vatRegistrationNumber,
-                  "adresse" => $etablissement->address->address,
-                  "cp" => $etablissement->address->zipcode,
-                  "ville" => $etablissement->address->city,
-                  "tel" => $legalUnit->phone,
-                  "structure" => $legalUnit->companyCategory,
-                  "id_pays" => ($pays ? $pays["id_pays"]: null),
-                ];
-
-                if (!$etablissement->isActive) $specifique["etat"] = "ferme";
-              }
-            }
-          break;
-
-          case 'ES':
-            ATF::pays()->q->reset()->where("id_pays", $company->establishments[0]->address->country, "OR")->where("pays", $company->establishments[0]->address->country, "OR");
-            $pays = ATF::pays()->select_row();
-
-            $specifique = [
-              "capital" => $legalUnit->shareCapital->value,
-              "adresse" =>$company->establishments[0]->address->address,
-              "cp" =>$company->establishments[0]->address->zipcode,
-              "ville" =>$company->establishments[0]->address->city,
-              "province" =>$company->establishments[0]->address->province,
-              "id_pays" => ($pays ? $pays["id_pays"]: null)
-            ];
-            if (ATF::$codename === "itrenting") {
-              $specifique["cif"] = $legalUnit->companyRegistrationNumber;
-            } else {
-              $specifique["siren"] = $legalUnit->registrationNumber;
-            }
-
-            if (!$company->establishments[0]->isActive) $specifique["etat"] = "ferme";
-          break;
-
-          case 'BE':
-            $specifique = [
-              "num_ident" => $legalUnit->companyRegistrationNumber,
-              "capital" => $legalUnit->shareCapital->value,
-              "adresse" =>$company->establishments[0]->address->address,
-              "cp" =>$company->establishments[0]->address->zipcode,
-              "ville" =>$company->establishments[0]->address->city,
-              "id_pays" =>$company->establishments[0]->address->country,
-            ];
-
-            if (!$company->establishments[0]->isActive) $specifique["etat"] = "ferme";
-          break;
-        }
-        $data_soc = array_merge($commun, $specifique);
-
-        if ($res) {
-          $id_societe = $res["id_societe"];
-          $data_soc["id_societe"] = $id_societe;
-
-          $this->update(["societe" => $data_soc]);
-        } else {
-          $id_societe = $this->insert(array("societe" => $data_soc));
-        }
-
-        $gerantsList = [];
-        $i = 0;
-        if($gerants){
-          foreach ($gerants as $gerant) {
-              if ($gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
-                $nom = $gerant->lastName;
-                $prenom = $gerant->firstNames;
-                if (!$nom && !$prenom) $nom = $gerant->names;
-
-                ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($nom)), "AND")
-                                        ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($prenom)), "AND")
-                                        ->where("id_societe", $id_societe, "AND");
-                $c = ATF::contact()->select_row();
-
-                $fonction = "GERANT";
-                if ($gerant->position) $fonction = $gerant->position;
-                if ($gerant->positions) $fonction = $gerant->positions[count($gerant->positions)]["positionName"];
-
-                //Si le contact n'exite pas dans optima, on l'insert
-                if(!$c) {
-                    $contact = array( "nom" => $nom,
-                                      "prenom" => $prenom,
-                                      "fonction" => $fonction,
-                                      "id_societe" => $id_societe,
-                                      "tel" => null,
-                                      "email" => null,
-                                      "est_dirigeant" => "oui"
-                                    );
-                    $gerantsList[$i] = $contact;
-                    $gerantsList[$i]["id_contact"] = ATF::contact()->insert($contact);
-                    $i++;
-                } else {
-                  //Sinon on le met à jour
-                  $gerantsList[$i] = array("nom" => $c["nom"],
-                                          "prenom" => $c["prenom"],
-                                          "fonction" => $fonction,
-                                          "email" => $c["email"],
-                                          "gsm" => $c["gsm"],
-                                          "id_societe" => $id_societe,
-                                          "id_contact" => $c["id_contact"]
-                                        );
-                  ATF::contact()->u(array("id_contact" => $c["id_contact"], "fonction" => $fonction, "est_dirigeant" => "oui"));
-                  $i++;
-                }
-              }
-          }
-        }else{
-          //Si Credit Safe n'a retourné aucun dirigeant, on en crée un en attendant
-          $contact = array( "nom"=>"GERANT",
-                            "id_societe"=> $id_societe
-                        );
-          $gerantsList[0] = $contact;
-          $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
-        }
-        $gerantsList = self::supprimerGerantsDoublons($gerantsList , ["id_contact", "nom","prenom"]);
-
-        ATF::db()->commit_transaction();
-
-        return array("result"=>true ,
-          "societe"=>ATF::societe()->select($id_societe),
-          "gerants"=>$gerantsList
-        );
-      } else{
-        log::logger("AUCUNE DATA" , "meelo");
-        log::logger("====================================================================", "meelo");
-        log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
-        log::logger($data, "meelo");
-        log::logger($post, "meelo");
-
-        throw new errorATF("erreurCS : Il n'y a aucun retour de créditsafe",500);
+    if (!$res || ($res["date_cs_data"] == null || $res["date_cs_data"] > $date->format('Y-m-d'))) {
+      if ($res) {
+        log::logger("La société avec le Siret ".$registrationNumber." existe mais le dernier appel Meelo/CS date de plus de six mois (".$res["date_cs_data"].")", "meelo");
+      } else {
+        log::logger("La société avec le Siret ".$registrationNumber." n'existe pas", "meelo");
       }
-    } catch (errorSQL $e) {
-      ATF::db()->rollback_transaction();
-      log::logger("====================================================================", "meelo");
-      log::logger("ERREUR SQL : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
-      log::logger($e->getMessage(), "meelo");
-      log::logger($data, "meelo");
-      throw new errorATF($e->getMessage(),500);
-    } catch (errorATF $e) {
-        ATF::db()->rollback_transaction();
+
+      try {
+        $data = ATF::meelo()->getInfosCompanyByRegistrationNumber($registrationNumber, $pays);
+      } catch (errorATF $e) {
         log::logger("====================================================================", "meelo");
         log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
         log::logger($e->getMessage(), "meelo");
         throw new errorATF($e->getMessage(),500);
+      }
+
+      try {
+        $scoring = ATF::meelo()->getScoring($registrationNumber, $pays);
+      } catch (errorATF $e) {
+
+        log::logger("====================================================================", "meelo");
+        log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+        log::logger($e->getMessage(), "meelo");
+      }
+
+      try {
+        if ($data) {
+          ATF::db()->begin_transaction();
+          $company = $data->company;
+          $legalUnit = $company->legalUnit;
+          $gerants = array_merge($company->representatives, $company->shareHolders);
+
+          $commun = [
+            "societe" => $legalUnit->corporateName,
+            "id_pays" =>  $company->country,
+            "activite" => $legalUnit->activity,
+            "date_creation" => $legalUnit->registrationDate,
+            "langue" => $post["langue"],
+            "id_apporteur" => $apporteur ? $apporteur : null,
+            "id_fournisseur" => $apporteur ? $apporteur : null,
+            "capital" => $legalUnit->shareCapital,
+            "activite" => $legalUnit->activity,
+          ];
+
+          if ($scoring->score) $commun["cs_score"] = $scoring->score;
+
+          switch ($company->country) {
+            case 'FR':
+              foreach ($company->establishments as $etablissement) {
+                if ($etablissement->siret === $siret) {
+                  ATF::pays()->q->reset()->where("id_pays", $etablissement->address->country, "OR")->where("pays", $etablissement->address->country, "OR");
+                  $pays = ATF::pays()->select_row();
+
+                  $specifique = [
+                    "siren" => $legalUnit->registrationNumber,
+                    "siret" => $siret,
+                    "reference_tva" => $legalUnit->vatRegistrationNumber,
+                    "adresse" => $etablissement->address->address,
+                    "cp" => $etablissement->address->zipcode,
+                    "ville" => $etablissement->address->city,
+                    "tel" => $legalUnit->phone,
+                    "structure" => $legalUnit->companyCategory,
+                    "id_pays" => ($pays ? $pays["id_pays"]: null),
+                  ];
+
+                  if (!$etablissement->isActive) $specifique["etat"] = "ferme";
+                }
+              }
+            break;
+
+            case 'ES':
+              ATF::pays()->q->reset()->where("id_pays", $company->establishments[0]->address->country, "OR")->where("pays", $company->establishments[0]->address->country, "OR");
+              $pays = ATF::pays()->select_row();
+
+              $specifique = [
+                "capital" => $legalUnit->shareCapital->value,
+                "adresse" =>$company->establishments[0]->address->address,
+                "cp" =>$company->establishments[0]->address->zipcode,
+                "ville" =>$company->establishments[0]->address->city,
+                "province" =>$company->establishments[0]->address->province,
+                "id_pays" => ($pays ? $pays["id_pays"]: null)
+              ];
+              if (ATF::$codename === "itrenting") {
+                $specifique["cif"] = $legalUnit->companyRegistrationNumber;
+              } else {
+                $specifique["siren"] = $legalUnit->registrationNumber;
+              }
+
+              if (!$company->establishments[0]->isActive) $specifique["etat"] = "ferme";
+            break;
+
+            case 'BE':
+              $specifique = [
+                "num_ident" => $legalUnit->companyRegistrationNumber,
+                "capital" => $legalUnit->shareCapital->value,
+                "adresse" =>$company->establishments[0]->address->address,
+                "cp" =>$company->establishments[0]->address->zipcode,
+                "ville" =>$company->establishments[0]->address->city,
+                "id_pays" =>$company->establishments[0]->address->country,
+              ];
+
+              if (!$company->establishments[0]->isActive) $specifique["etat"] = "ferme";
+            break;
+          }
+          $data_soc = array_merge($commun, $specifique);
+          $data_soc["date_cs_data"] = $date->format('Y-m-d');
+
+          if ($res) {
+            $id_societe = $res["id_societe"];
+            $data_soc["id_societe"] = $id_societe;
+
+            $this->update(["societe" => $data_soc]);
+          } else {
+            $id_societe = $this->insert(array("societe" => $data_soc));
+          }
+
+          $gerantsList = [];
+          $i = 0;
+          if($gerants){
+            foreach ($gerants as $gerant) {
+                if ($gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
+                  $nom = $gerant->lastName;
+                  $prenom = $gerant->firstNames;
+                  if (!$nom && !$prenom) $nom = $gerant->names;
+
+                  ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($nom)), "AND")
+                                          ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($prenom)), "AND")
+                                          ->where("id_societe", $id_societe, "AND");
+                  $c = ATF::contact()->select_row();
+
+                  $fonction = "GERANT";
+                  if ($gerant->position) $fonction = $gerant->position;
+                  if ($gerant->positions) $fonction = $gerant->positions[count($gerant->positions)]["positionName"];
+
+                  //Si le contact n'exite pas dans optima, on l'insert
+                  if(!$c) {
+                      $contact = array( "nom" => $nom,
+                                        "prenom" => $prenom,
+                                        "fonction" => $fonction,
+                                        "id_societe" => $id_societe,
+                                        "tel" => null,
+                                        "email" => null,
+                                        "est_dirigeant" => "oui"
+                                      );
+                      $gerantsList[$i] = $contact;
+                      $gerantsList[$i]["id_contact"] = ATF::contact()->insert($contact);
+                      $i++;
+                  } else {
+                    //Sinon on le met à jour
+                    $gerantsList[$i] = array("nom" => $c["nom"],
+                                            "prenom" => $c["prenom"],
+                                            "fonction" => $fonction,
+                                            "email" => $c["email"],
+                                            "gsm" => $c["gsm"],
+                                            "id_societe" => $id_societe,
+                                            "id_contact" => $c["id_contact"]
+                                          );
+                    ATF::contact()->u(array("id_contact" => $c["id_contact"], "fonction" => $fonction, "est_dirigeant" => "oui"));
+                    $i++;
+                  }
+                }
+            }
+          }else{
+            //Si Credit Safe n'a retourné aucun dirigeant, on en crée un en attendant
+            $contact = array( "nom"=>"GERANT",
+                              "id_societe"=> $id_societe
+                          );
+            $gerantsList[0] = $contact;
+            $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
+          }
+          $gerantsList = self::supprimerGerantsDoublons($gerantsList , ["id_contact", "nom","prenom"]);
+
+          ATF::db()->commit_transaction();
+
+          return array("result"=>true ,
+            "societe"=>ATF::societe()->select($id_societe),
+            "gerants"=>$gerantsList
+          );
+        } else{
+          log::logger("AUCUNE DATA" , "meelo");
+          log::logger("====================================================================", "meelo");
+          log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+          log::logger($data, "meelo");
+          log::logger($post, "meelo");
+
+          throw new errorATF("erreurCS : Il n'y a aucun retour de créditsafe",500);
+        }
+      } catch (errorSQL $e) {
+        ATF::db()->rollback_transaction();
+        log::logger("====================================================================", "meelo");
+        log::logger("ERREUR SQL : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+        log::logger($e->getMessage(), "meelo");
+        log::logger($data, "meelo");
+        throw new errorATF($e->getMessage(),500);
+      } catch (errorATF $e) {
+          ATF::db()->rollback_transaction();
+          log::logger("====================================================================", "meelo");
+          log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "meelo");
+          log::logger($e->getMessage(), "meelo");
+          throw new errorATF($e->getMessage(),500);
+      }
+    } else {
+      $gerantsList = [];
+      ATF::contact()->q->reset()->where("id_societe", $res["id_societe"]);
+      $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["id_contact", "nom","prenom"]);
+
+      return array("result"=>true ,
+            "societe"=>ATF::societe()->select($res["id_societe"]),
+            "gerants"=>$gerantsList
+          );
     }
   }
 
