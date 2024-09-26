@@ -160,7 +160,8 @@ function creationCompteEspacePartenaire($url, $applicationId) {
                         "home.partenaire",
                         "business.view",
                         "optimaApi.public",
-                        "payments.list"
+                        "payments.list",
+                        "contactInfo.view"
                     ],
                     "email" => str_replace(" ", "", str_replace(",", ".", $ligne[5])),
                     "nom" => $ligne[1],
