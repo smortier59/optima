@@ -4,7 +4,7 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 ATF::$usr->set('id_user',16);
 
-$url = $arv[4];
+$url = $arv[2];
 $applicationId = $argv[3];
 
 echo "========= DEBUT DE SCRIPT =========\n";
@@ -174,16 +174,20 @@ function creationCompteEspacePartenaire($url, $applicationId) {
                     "password" => $ligne[6]
                 ];
 
-                print_r($data);
+
                 $data_string = json_encode($data);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string );
 
+                echo "https://".$url."/account/importAccount\n";
+
                 $response = curl_exec($ch);
                 $response = json_decode($response);
+                print_r($response);
                 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 curl_close($ch);
 
                 if ($http_status === 200) {
+                    echo "Insertion effectuée\n";
                     $processed_lines++;
                 }else{
                     echo $response->message;
