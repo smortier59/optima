@@ -129,6 +129,10 @@ function creationCompteEspacePartenaire($url, $applicationId) {
     $processed_lines = 0;
     $doublons = 0;
 
+    $res = [
+        "applicationId" => $applicationId,
+        "data" => []
+    ];
 
     while (($ligne = fgetcsv($f, 0, ';'))) {
         $lines_count++;
@@ -138,18 +142,9 @@ function creationCompteEspacePartenaire($url, $applicationId) {
             }
 
             if ($id_societe) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "https://".$url."/account/importAccount");
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, '');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_ENCODING, '');
-                curl_setopt($ch, CURLOPT_TIMEOUT, 0);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 
                 $data = [
-                    "applicationId" => $applicationId,
+
                     "permissions"  => [
                         "business.view",
                         "optimaApi.public",
@@ -174,24 +169,7 @@ function creationCompteEspacePartenaire($url, $applicationId) {
                     "password" => $ligne[6]
                 ];
 
-
-                $data_string = json_encode($data);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string );
-
-                echo "https://".$url."/account/importAccount\n";
-
-                $response = curl_exec($ch);
-                $response = json_decode($response);
-                print_r($response);
-                $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-
-                if ($http_status === 200) {
-                    echo "Insertion effectuée\n";
-                    $processed_lines++;
-                }else{
-                    echo $response->message;
-                }
+                $res["data"][] = $data;
 
             } else {
                 echo "SIRET non trouvé : ".$ligne[0]."\n";
@@ -200,6 +178,9 @@ function creationCompteEspacePartenaire($url, $applicationId) {
             echo $e->getMessage()."\n";
         }
     }
+
+    echo json_encode($res);
+
     echo "Contacts créés : ".$processed_lines." Total lignes: ".$lines_count."\n";
 }
 
