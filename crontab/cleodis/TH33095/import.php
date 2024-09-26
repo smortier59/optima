@@ -4,7 +4,7 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 ATF::$usr->set('id_user',16);
 
-$url = $arv[2];
+$url = $argv[2];
 $applicationId = $argv[3];
 
 echo "========= DEBUT DE SCRIPT =========\n";
