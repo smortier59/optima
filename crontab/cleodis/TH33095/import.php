@@ -4,9 +4,13 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 ATF::$usr->set('id_user',16);
 
+$url = $arv[4];
+$applicationId = $argv[3];
+
 echo "========= DEBUT DE SCRIPT =========\n";
-createSocietes();
-createContacts();
+// createSocietes();
+// createContacts();
+creationCompteEspacePartenaire($url, $applicationId);
 echo "========= FIN DE SCRIPT =========\n";
 
 
@@ -111,6 +115,84 @@ function createContacts() {
         } catch(errorATF $e) {
             log::logger($contact, "mfleurquin");
             ATF::db()->rollback_transaction();
+            echo $e->getMessage()."\n";
+        }
+    }
+    echo "Contacts créés : ".$processed_lines." Total lignes: ".$lines_count."\n";
+}
+
+function creationCompteEspacePartenaire($url, $applicationId) {
+    $fichier = $path == '' ? "./contactEspacePartenaire.csv" : $path;
+    $f = fopen($fichier, 'rb');
+    $entete = fgetcsv($f, 0, ';');
+    $lines_count = 0;
+    $processed_lines = 0;
+    $doublons = 0;
+
+
+    while (($ligne = fgetcsv($f, 0, ';'))) {
+        $lines_count++;
+        try{
+            if ($ligne[0] && $ligne[0]) {
+                $id_societe = findSociete($ligne[0]);
+            }
+
+            if ($id_societe) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "http://".$url."/account/importAccount");
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, '');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_ENCODING, '');
+                curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+
+                $data = [
+                    "applicationId" => $applicationId,
+                    "permissions"  => [
+                        "business.view",
+                        "optimaApi.public",
+                        "contract.view",
+                        "payments.list",
+                        "partenaire-demande.view",
+                        "partenaire-demande.create",
+                        "meeloInfos.view",
+                        "creditSafeInfos.view",
+                        "contrat.view",
+                        "parc.view",
+                        "suivis.view",
+                        "home.partenaire",
+                        "business.view",
+                        "optimaApi.public",
+                        "payments.list"
+                    ],
+                    "email" => str_replace(" ", "", str_replace(",", ".", $ligne[5])),
+                    "nom" => $ligne[1],
+                    "prenom" => $ligne[2],
+                    "idSocietes" => $id_societe,
+                    "password" => $ligne[6]
+                ];
+
+                print_r($data);
+                $data_string = json_encode($data);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string );
+
+                $response = curl_exec($ch);
+                $response = json_decode($response);
+                $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($http_status === 200) {
+                    $processed_lines++;
+                }else{
+                    echo $response->message;
+                }
+
+            } else {
+                echo "SIRET non trouvé : ".$ligne[0]."\n";
+            }
+        } catch(errorATF $e) {
             echo $e->getMessage()."\n";
         }
     }
