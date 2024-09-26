@@ -139,7 +139,7 @@ function creationCompteEspacePartenaire($url, $applicationId) {
 
             if ($id_societe) {
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "http://".$url."/account/importAccount");
+                curl_setopt($ch, CURLOPT_URL, "https://".$url."/account/importAccount");
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, '');
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
