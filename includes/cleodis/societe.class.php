@@ -1803,9 +1803,9 @@ class societe_cleodis extends societe {
     $res = ATF::societe()->select_row();
 
     $date = new DateTime();
-    $date->modify('+6 months');
+    $date->modify('-6 months');
 
-    if (!$res || ($res["date_cs_data"] == null || $res["date_cs_data"] > $date->format('Y-m-d'))) {
+    if (!$res || ($res["date_cs_data"] == null || $res["date_cs_data"] < $date->format('Y-m-d'))) {
       if ($res) {
         log::logger("La société avec le Siret ".$registrationNumber." existe mais le dernier appel Meelo/CS date de plus de six mois (".$res["date_cs_data"].")", "meelo");
       } else {
@@ -2008,8 +2008,8 @@ class societe_cleodis extends societe {
       }
     } else {
       $gerantsList = [];
-      ATF::contact()->q->reset()->where("id_societe", $res["id_societe"]);
-      $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["id_contact", "nom","prenom"]);
+      ATF::contact()->q->reset()->where("id_societe", $res["id_societe"])->where("est_dirigeant", "oui");
+      $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["nom","prenom"]);
 
       return array("result"=>true ,
             "societe"=>ATF::societe()->select($res["id_societe"]),
