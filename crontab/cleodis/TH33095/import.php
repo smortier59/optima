@@ -124,10 +124,10 @@ function createContacts() {
 function creationCompteEspacePartenaire($url, $applicationId) {
     $fichier = $path == '' ? "./contactEspacePartenaire.csv" : $path;
     $f = fopen($fichier, 'rb');
-    $entete = fgetcsv($f, 0, ';');
     $lines_count = 0;
     $processed_lines = 0;
     $doublons = 0;
+    $soc = [];
 
     $res = [
         "applicationId" => $applicationId,
@@ -135,16 +135,16 @@ function creationCompteEspacePartenaire($url, $applicationId) {
     ];
 
     while (($ligne = fgetcsv($f, 0, ';'))) {
-        $lines_count++;
+
         try{
-            if ($ligne[0] && $ligne[0]) {
+            if ($ligne[0]) {
                 $id_societe = findSociete($ligne[0]);
             }
 
             if ($id_societe) {
+                $soc[] = $id_societe;
 
                 $data = [
-
                     "permissions"  => [
                         "business.view",
                         "optimaApi.public",
@@ -175,10 +175,19 @@ function creationCompteEspacePartenaire($url, $applicationId) {
             } else {
                 echo "SIRET non trouvé : ".$ligne[0]."\n";
             }
+            $lines_count++;
         } catch(errorATF $e) {
             echo $e->getMessage()."\n";
         }
     }
+
+    $gerante = $data;
+    $gerante["email"] = "frederique.caron@laplateforme.com";
+    $gerante["nom"] = "Frédérique";
+    $gerante["prenom"] = "Caron";
+    $gerante["idSocietes"] = implode(",", $soc);
+    $res["data"][] = $gerante;
+    //array_unshift($res["data"], $gerante);
 
     echo json_encode($res);
 
