@@ -2238,8 +2238,14 @@ class pdf_cleodis extends pdf {
 			   ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
 			   ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
 			   // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
-			   ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+			   // ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
 			   ->setDimension('cell');
+
+			   if ($get["id_partenaire"]) {
+
+			   } else {
+				ATF::bon_de_commande()->q->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'));
+			   }
 
 			  if ($bon_de_commande = ATF::bon_de_commande()->sa()) {
 			   return array(
@@ -2253,8 +2259,14 @@ class pdf_cleodis extends pdf {
 			   ->from("commande", "id_affaire", "affaire", "id_affaire")
 			   ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
 			   // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
-			   ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+			   // ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
 			   ->setDimension('cell');
+
+			   if ($get["id_partenaire"]) {
+
+			   } else {
+				ATF::bon_de_commande()->q->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'));
+			   }
 
 			  if ($id_commande = ATF::commande()->sa()) {
 			   return array(
