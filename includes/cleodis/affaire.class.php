@@ -2690,7 +2690,7 @@ class affaire_cleodis extends affaire {
 				"loyer__dot__type"=>"engagement",
 				"loyer__dot__assurance"=>"",
 				"loyer__dot__frais_de_gestion"=>"",
-				"loyer__dot__frequence_loyer"=>"mois",
+				"loyer__dot__frequence_loyer"=>$post["periodicite"],
 				"loyer__dot__serenite"=>"",
 				"loyer__dot__maintenance"=>"",
 				"loyer__dot__hotline"=>"",

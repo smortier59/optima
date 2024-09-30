@@ -4,9 +4,13 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 ATF::$usr->set('id_user',16);
 
+$url = $argv[2];
+$applicationId = $argv[3];
+
 echo "========= DEBUT DE SCRIPT =========\n";
-createSocietes();
-createContacts();
+// createSocietes();
+// createContacts();
+creationCompteEspacePartenaire($url, $applicationId);
 echo "========= FIN DE SCRIPT =========\n";
 
 
@@ -114,6 +118,79 @@ function createContacts() {
             echo $e->getMessage()."\n";
         }
     }
+    echo "Contacts créés : ".$processed_lines." Total lignes: ".$lines_count."\n";
+}
+
+function creationCompteEspacePartenaire($url, $applicationId) {
+    $fichier = $path == '' ? "./contactEspacePartenaire.csv" : $path;
+    $f = fopen($fichier, 'rb');
+    $lines_count = 0;
+    $processed_lines = 0;
+    $doublons = 0;
+    $soc = [];
+
+    $res = [
+        "applicationId" => $applicationId,
+        "data" => []
+    ];
+
+    while (($ligne = fgetcsv($f, 0, ';'))) {
+
+        try{
+            if ($ligne[0]) {
+                $id_societe = findSociete($ligne[0]);
+            }
+
+            if ($id_societe) {
+                $soc[] = $id_societe;
+
+                $data = [
+                    "permissions"  => [
+                        "business.view",
+                        "optimaApi.public",
+                        "contract.view",
+                        "payments.list",
+                        "partenaire-demande.view",
+                        "partenaire-demande.create",
+                        "meeloInfos.view",
+                        "creditSafeInfos.view",
+                        "contrat.view",
+                        "parc.view",
+                        "suivis.view",
+                        "home.partenaire",
+                        "business.view",
+                        "optimaApi.public",
+                        "payments.list",
+                        "contactInfo.view"
+                    ],
+                    "email" => str_replace(" ", "", str_replace(",", ".", $ligne[5])),
+                    "nom" => $ligne[1],
+                    "prenom" => $ligne[2],
+                    "idSocietes" => $id_societe,
+                    "password" => $ligne[6]
+                ];
+
+                $res["data"][] = $data;
+
+            } else {
+                echo "SIRET non trouvé : ".$ligne[0]."\n";
+            }
+            $lines_count++;
+        } catch(errorATF $e) {
+            echo $e->getMessage()."\n";
+        }
+    }
+
+    $gerante = $data;
+    $gerante["email"] = "frederique.caron@laplateforme.com";
+    $gerante["nom"] = "Frédérique";
+    $gerante["prenom"] = "Caron";
+    $gerante["idSocietes"] = implode(",", $soc);
+    $res["data"][] = $gerante;
+    //array_unshift($res["data"], $gerante);
+
+    echo json_encode($res);
+
     echo "Contacts créés : ".$processed_lines." Total lignes: ".$lines_count."\n";
 }
 
