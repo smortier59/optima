@@ -2008,7 +2008,7 @@ class societe_cleodis extends societe {
       }
     } else {
       $gerantsList = [];
-      ATF::contact()->q->reset()->where("id_societe", $res["id_societe"])->where("est_dirigeant", "oui");
+      ATF::contact()->q->reset()->where("id_societe", $res["id_societe"])->where("est_dirigeant", "oui")->where("etat", "actif");
       $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["nom","prenom"]);
 
       return array("result"=>true ,
