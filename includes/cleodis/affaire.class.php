@@ -1804,10 +1804,9 @@ class affaire_cleodis extends affaire {
 				foreach ($devis_ligne as $k => $v) {
 					// Il ne faut prendre que les lignes ou le partenaire est le fourisseur
 
-					if($apporteur && $apporteur == $v["id_fournisseur"]){
+					if($apporteur && in_array($v["id_fournisseur"], explode(',', $apporteur))){
 						$data['data'][$key]["montant"] += ($v["quantite"] * $v["prix_achat"]);
 					}
-
 				}
 
 
