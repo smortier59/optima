@@ -426,7 +426,12 @@ class souscription_cleodis extends souscription {
         $assurance_sans_tva = ATF::type_affaire()->select($type_affaire, "assurance_sans_tva");
       }
     } else {
-      ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+      if (ATF::$codename === "itrenting") {
+        ATF::type_affaire()->q->reset()->where("type_affaire", "IT Renting", "OR")->where("type_affaire", "normal", "OR");
+      } else {
+        ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+      }
+
       $type_affaireNormal = ATF::type_affaire()->select_row();
       $type_affaire = $type_affaireNormal["id_type_affaire"];
     }
