@@ -1232,7 +1232,11 @@ class devis_cleodis extends devis {
 					}
 					return $return;
 				case "id_type_affaire":
-					ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+					if (ATF::$codename === "itrenting"){
+						ATF::type_affaire()->q->reset()->where("type_affaire", "IT Renting", "OR")->where("type_affaire", "normal", "OR");
+					} else {
+						ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+					}
 					$type_affaire =ATF::type_affaire()->select_row();
 					return $type_affaire["id_type_affaire"];
 
