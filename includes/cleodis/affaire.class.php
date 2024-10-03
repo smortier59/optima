@@ -1459,6 +1459,9 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['sans-suite'] == "on"){
+				$date_moins_6mois = date("Y-m-d",strtotime("-6 months"));
+				$this->q->where("affaire.date", $date_moins_6mois, "AND", "conditionSup", ">=");
+
 				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande");
 			} else {
 				$this->q->where("affaire.etat", "devis","OR","affaire_demande","=")
@@ -1764,11 +1767,15 @@ class affaire_cleodis extends affaire {
 					ATF::contact()->select(ATF::societe()->select($value['affaire.id_societe_fk'],'id_contact_signataire') , "email").
 					"?subject=Votre lien de signature de contrat&body=".$texte;
 
-
-				// pour chaque affaire on recupere ses comites
-				foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
-					if($comite['description']=== 'Comité CLEODIS'){
-						$data['data'][$key]["etat_comite_cleodis"] = $comite['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
+				if ($get['filters']['sans-suite'] == "on"){
+					$data['data'][$key]["etat_comite"] = "-";
+					$data['data'][$key]["etat_comite_cleodis"] = "refuse";
+				} else {
+					// pour chaque affaire on recupere ses comites
+					foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
+						if($comite['description']=== 'Comité CLEODIS'){
+							$data['data'][$key]["etat_comite_cleodis"] = $comite['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
+						}
 					}
 				}
 
@@ -1776,8 +1783,6 @@ class affaire_cleodis extends affaire {
 				/*$data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
 				$data['data'][$key]["contrat_signe"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"contrat_signe")) ? true : false;
 				$data['data'][$key]["facture_fournisseur"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"facture_fournisseur")) ? true : false;*/
-
-
 
 				$data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
 				if($loyer = $this->getLoyers($value['affaire.id_affaire_fk'])){
