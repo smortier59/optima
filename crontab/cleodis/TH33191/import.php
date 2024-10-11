@@ -4,9 +4,6 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 ATF::$usr->set('id_user',16);
 
-$url = $argv[2];
-$applicationId = $argv[3];
-
 echo "========= DEBUT DE SCRIPT =========\n";
 
 $fichier = $path == '' ? "./produits.csv" : $path;
@@ -32,7 +29,7 @@ while (($ligne = fgetcsv($f, 0, ';'))) {
                 "prix_achat" => $ligne[5],
                 "id_fournisseur" => findSociete($ligne[6])
             ];
-            $id_produit = existProduct($produit["ref"], $produit["produit"]);
+            $id_produit = existProduct($produit["ref"], $produit["id_fabriquant"]);
             if ($id_produit !== null) {
                 $produit["id_produit"] = $id_produit;
                 ATF::produit()->u($produit);
@@ -49,7 +46,6 @@ while (($ligne = fgetcsv($f, 0, ';'))) {
         }
         $lines_count++;
     }
-
 }
 
 echo "Produits insérés : ".$processed_lines." - Mis à jour : ".$update." Total de lignes: ".$lines_count."\n";
@@ -76,8 +72,8 @@ function findOrCreateSousCategorie($sousCat) {
     }
 }
 
-function existProduct($ref, $libelle) {
-    ATF::produit()->q->reset()->where("ref", $ref)->where("produit", $libelle);
+function existProduct($ref, $fabriquant) {
+    ATF::produit()->q->reset()->where("ref", $ref)->where("id_fabriquant", $fabriquant);
     if ($p = ATF::produit()->select_row()) {
         return $p["id_produit"];
     }
