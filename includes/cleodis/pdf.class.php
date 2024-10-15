@@ -248,6 +248,7 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
+
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
 		$this->unsetHeader();
@@ -2228,10 +2229,9 @@ class pdf_cleodis extends pdf {
   public function _documents($get){
 	$id_affaire = $get["id_affaire"];
 	$fonction = $get["document"];
-	$docAuth = array("contratA4", "mandatSepa", "contratPV", "bon_de_commande"); // liste des documents autorisés
+	$docAuth = array("contratA4", "mandatSepa", "mandatSepaV2", "contratPV", "bon_de_commande"); // liste des documents autorisés
 
 	if (ATF::affaire()->decryptId($id_affaire) && in_array($fonction, $docAuth)) {
-
 		if($fonction === "bon_de_commande"){
 			ATF::bon_de_commande()->q->reset()
 			   ->addField("id_bon_de_commande")
@@ -2253,7 +2253,12 @@ class pdf_cleodis extends pdf {
 				 "strMimeType" => "application/pdf"
 			   );
 			  }
-		}else{
+		} else if ($fonction === "mandatSepaV2") {
+			return array(
+				"data" => base64_encode( $this->generic($fonction,$id_affaire, true) ),
+				"strMimeType" => "application/pdf"
+			  );
+		} else{
 			ATF::commande()->q->reset()
 			   ->addField("id_commande")
 			   ->from("commande", "id_affaire", "affaire", "id_affaire")
@@ -2265,23 +2270,45 @@ class pdf_cleodis extends pdf {
 			   if ($get["id_partenaire"]) {
 
 			   } else {
-				ATF::bon_de_commande()->q->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'));
+				ATF::commande()->q->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'));
 			   }
-
 			  if ($id_commande = ATF::commande()->sa()) {
-			   return array(
-				 "data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
-				 "strMimeType" => "application/pdf"
-			   );
+				return array(
+					"data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
+					"strMimeType" => "application/pdf"
+					);
 			  }
 		}
-
 	}
 
 	return false;
 
   }
 
+  public function mandatSepaV2($id_affaire) {
+	$this->unsetHeader();
+	$this->unsetFooter();
+
+	$mandataires = [];
+	if (ATF::constante()->getConstante("__PDF_MANDAT_SOCIETE__")) {
+		$m = ATF::constante()->getValue('__PDF_MANDAT_SOCIETE__');
+		$mandataires = explode(",", $m);
+	}
+
+	if ($mandataires) {
+		$this->AddPage();
+		foreach($mandataires as $k => $v) {
+			$siret = ATF::societe()->select($v, "siret");
+			$last = false;
+
+			if ($k == 0) $displayRum = true;
+			if ($k == count($mandataires) -1) $last = true;
+
+			$this->templateMandat($id_affaire, $siret, $last, $displayRum);
+			$this->ln(5);
+		}
+	}
+}
 
 	public function contratA4Signature($id){
 
