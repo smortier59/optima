@@ -71,7 +71,7 @@ class societe_cleodis extends societe {
       ,"id_filiale"
       ,"date_creation"
       ,"relation"
-      ,"joignable"
+      ,"id_referent_commercial"
 
     );
 
@@ -262,6 +262,7 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_prospection"] = "contact";
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
+    $this->foreign_key["id_referent_commercial"] = "user";
 
     $this->files["logo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
