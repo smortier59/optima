@@ -1422,6 +1422,7 @@ class affaire_cleodis extends affaire {
 				"affaire.etat",
 				'affaire.date',
 				'affaire.ref',
+				"affaire.ref_externe",
 				'affaire.etat_comite',
 				'affaire.id_societe',
 				'affaire.pieces',
@@ -1435,7 +1436,7 @@ class affaire_cleodis extends affaire {
 			$this->q->setCount();
 
 
-			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
+			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref',"affaire.ref_externe",'affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 			$this->q->addField($colsData)
 					->addField("famille.famille","famille")
@@ -1459,6 +1460,9 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['sans-suite'] == "on"){
+				$date_moins_6mois = date("Y-m-d",strtotime("-6 months"));
+				$this->q->where("affaire.date", $date_moins_6mois, "AND", "conditionSup", ">=");
+
 				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande");
 			} else {
 				$this->q->where("affaire.etat", "devis","OR","affaire_demande","=")
@@ -1469,12 +1473,14 @@ class affaire_cleodis extends affaire {
 			if($get["search"]){
 				$this->q->where("affaire.affaire","%".$get["search"]."%","AND","searchquery","LIKE")
 						->where("affaire.ref","%".$get["search"]."%","OR","searchquery","LIKE")
+						->where("affaire.ref_externe","%".$get['filters']["search"]."%","OR","searchquery","LIKE")
 						->where("societe.societe","%".$get["search"]."%","OR","searchquery","LIKE");
 			}
 
 			if ($get['filters']["search"]) {
 				$this->q->where("affaire.affaire","%".$get['filters']["search"]."%","AND","searchquery","LIKE")
 						->where("affaire.ref","%".$get['filters']["search"]."%","OR","searchquery","LIKE")
+						->where("affaire.ref_externe","%".$get['filters']["search"]."%","OR","searchquery","LIKE")
 						->where("societe.societe","%".$get['filters']["search"]."%","OR","searchquery","LIKE");
 			}
 
@@ -1570,6 +1576,7 @@ class affaire_cleodis extends affaire {
 				"affaire.etat",
 				'affaire.date',
 				'affaire.ref',
+				'affaire.ref_externe',
 				'affaire.etat_comite',
 				'affaire.id_societe',
 				'affaire.pieces',
@@ -1583,7 +1590,7 @@ class affaire_cleodis extends affaire {
 			$this->q->setCount();
 
 
-			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
+			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.ref_externe','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 			$this->q->addField($colsData)
 					->addField("famille.famille","famille")
@@ -1764,11 +1771,15 @@ class affaire_cleodis extends affaire {
 					ATF::contact()->select(ATF::societe()->select($value['affaire.id_societe_fk'],'id_contact_signataire') , "email").
 					"?subject=Votre lien de signature de contrat&body=".$texte;
 
-
-				// pour chaque affaire on recupere ses comites
-				foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
-					if($comite['description']=== 'Comité CLEODIS'){
-						$data['data'][$key]["etat_comite_cleodis"] = $comite['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
+				if ($get['filters']['sans-suite'] == "on"){
+					$data['data'][$key]["etat_comite"] = "-";
+					$data['data'][$key]["etat_comite_cleodis"] = "refuse";
+				} else {
+					// pour chaque affaire on recupere ses comites
+					foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
+						if($comite['description']=== 'Comité CLEODIS'){
+							$data['data'][$key]["etat_comite_cleodis"] = $comite['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
+						}
 					}
 				}
 
@@ -1776,8 +1787,6 @@ class affaire_cleodis extends affaire {
 				/*$data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
 				$data['data'][$key]["contrat_signe"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"contrat_signe")) ? true : false;
 				$data['data'][$key]["facture_fournisseur"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"facture_fournisseur")) ? true : false;*/
-
-
 
 				$data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
 				if($loyer = $this->getLoyers($value['affaire.id_affaire_fk'])){
@@ -1931,6 +1940,7 @@ class affaire_cleodis extends affaire {
 			'affaire.date',
 			"affaire.site_associe",
 			'affaire.ref',
+			'affaire.ref_externe',
 			'affaire.etat_comite',
 			'affaire.pieces',
 			'affaire.id_societe',
@@ -1943,7 +1953,7 @@ class affaire_cleodis extends affaire {
 		$this->q->setCount();
 
 
-		if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.id_partenaire','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
+		if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.id_partenaire','affaire.date','affaire.ref','affaire.ref_externe','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 		$this->q->addField($colsData)
 				->addField("Count(bon_de_commande.id_bon_de_commande)","total_bdc")
@@ -3127,6 +3137,7 @@ class affaire_cleodis extends affaire {
 							   ->from("affaire","id_affaire","commande","id_affaire")
 							   ->from("parc","id_societe","societe","id_societe")
 							   ->addField("affaire.ref","affaire_ref")
+							   ->addField('affaire.ref_externe', 'affaire_ref_externe')
 							   ->addField("affaire.affaire","affaire_libelle")
 							   ->addField("societe.code_client","client_code_client")
 							   ->addField("societe.ref","client_ref")
@@ -3162,6 +3173,7 @@ class affaire_cleodis extends affaire {
 							   ->addField("affaire.id_affaire","id_affaire")
 							   ->addField("affaire.id_societe","id_societe")
 							   ->addField("affaire.ref","affaire_ref")
+							   ->addField('affaire.ref_externe', 'affaire_ref_externe')
 							   ->addField("affaire.affaire","affaire_libelle")
 							   ->addField("societe.code_client","client_code_client")
 							   ->addField("societe.ref","client_ref")
@@ -3197,6 +3209,7 @@ class affaire_cleodis extends affaire {
 		if($apporteur){
 			$societes = $ret= [];
 			ATF::affaire()->q->reset()->addField("affaire.ref","ref")
+									  ->addField('affaire.ref_externe', 'ref_externe')
 									  ->addField("devis.id_devis",'id_devis')
 									  ->addField("devis.id_societe",'id_societe')
 									  ->from("affaire","id_affaire","devis","id_affaire")
