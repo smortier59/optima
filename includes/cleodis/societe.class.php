@@ -1929,6 +1929,7 @@ class societe_cleodis extends societe {
                 if ($gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
                   $nom = $gerant->lastName;
                   $prenom = $gerant->firstNames;
+                  if (!$nom && !$prenom) $nom = $gerant->name;
                   if (!$nom && !$prenom) $nom = $gerant->names;
 
                   ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($nom)), "AND")
