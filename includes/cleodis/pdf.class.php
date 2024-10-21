@@ -3286,6 +3286,10 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
+	public function contrat_simpel_flux_sans_annexeA4Particulier($id, $signature,$sellsign) { $this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL FLUX"); }
+	public function contrat_simpel_flux_sans_annexeA4Societe($id, $signature,$sellsign) { $this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL FLUX"); }
+	public function contrat_simpel_start_sans_annexeA4Particulier($id, $signature,$sellsign) { $this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START"); }
+	public function contrat_simpel_start_sans_annexeA4Societe($id, $signature,$sellsign) { $this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL START"); }
 
 
   	function contrat_simpel_A4($id, $signature,$sellsign, $titleContrat, $denominationClient="Le Bénéficiaire", $typeContrat="") {
@@ -17693,6 +17697,7 @@ class pdf_assets extends pdf_cleodis {
 			$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 		}
 	}
+
 
 	public function contrat_simpel_customA4Societe($id, $signature,$sellsign) {
 		$this->contrat_simpel_A4($id, $signature, $sellsign, "SIMPEL CUSTOM");
