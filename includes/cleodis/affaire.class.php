@@ -1258,7 +1258,6 @@ class affaire_cleodis extends affaire {
 			$path = ATF::$table()->filepath($last_id,$item);
 			$mail->addFile($path,$key.$enregistrement["ref"].".pdf",true);
 		}
-		log::logger($info_mail , "mfleurquin");
 		$mail->send();
 
 
@@ -2639,12 +2638,23 @@ class affaire_cleodis extends affaire {
 		ATF::user()->q->reset()->where('login', 'partenaire')->setLimit(1);
 		$user_partenaire = ATF::user()->select_row();
 
-		if ($post["idGrille"]) {
+		if ($post["idGrille"] && $post["idGrille"] !== "null") {
 			$grille = ATF::grille_tarifaire()->select($post["idGrille"]);
 			$id_type_affaire = $grille["id_type_affaire"];
 		} else {
 			$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($id_partenaire);
 		}
+
+		if (!$id_type_affaire) {
+			if (ATF::$codename === "itrenting"){
+				ATF::type_affaire()->q->reset()->where("type_affaire", "IT Renting", "OR")->where("type_affaire", "normal", "OR");
+			} else {
+				ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+			}
+			$type_affaire =ATF::type_affaire()->select_row();
+			$id_type_affaire = $type_affaire["id_type_affaire"];
+		}
+
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2681,11 +2691,10 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>$user_partenaire["id_user"],
-		      "id_type_affaire"=>$id_type_affaire,
+			  "id_type_affaire" => $id_type_affaire,
 			  "langue"=>ATF::societe()->select($id_societe, "langue"),
 			  "id_partenaire"=>$id_partenaire
 			);
-
 
 			$values_devis =array();
 
