@@ -1461,17 +1461,28 @@ class affaire_cleodis extends affaire {
 
 			if ($get['filters']['sans-suite'] == "on"){
 				$date_moins_6mois = date("Y-m-d",strtotime("-6 months"));
-				$this->q->where("affaire.date", $date_moins_6mois, "AND", "conditionSup", ">=");
 
-				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande");
+				$qComite = 'SELECT comite.id_affaire
+							FROM `comite`
+							LEFT JOIN affaire ON affaire.id_affaire = comite.id_affaire
+							WHERE comite.etat = "refuse"
+							AND affaire.date >= "'.$date_moins_6mois.'"
+							GROUP BY comite.id_affaire';
+				$AffaireAveccomiteRefuse = [];
+				foreach(ATF::db()->sql2array($qComite) as $d) {
+					$AffaireAveccomiteRefuse[] = $d["id_affaire"];
+				}
+
+				$this->q->where("affaire.date", $date_moins_6mois, "AND", "conditionSup", ">=");
 				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande")
-						->where("devis.etat", "perdu","OR","affaire_demande");
+						->where("devis.etat", "perdu","OR","affaire_demande")
+						->where("affaire.id_affaire", implode(",", $AffaireAveccomiteRefuse), "OR", "affaire_demande", 'IN');
+
 			} else {
 				$this->q->where("affaire.etat", "devis","OR","affaire_demande","=")
 						->where("devis.etat", "perdu","AND","devis_non_perdu","!=")
 						->where("commande.etat", "non_loyer","OR","affaire_demande","=");
 			}
-
 
 			if($get["search"]){
 				$this->q->where("affaire.affaire","%".$get["search"]."%","AND","searchquery","LIKE")
