@@ -1951,9 +1951,9 @@ class societe_cleodis extends societe {
                                         "email" => null,
                                         "est_dirigeant" => "oui"
                                       );
-                      $gerantsList[$i] = $contact;
+                      /*$gerantsList[$i] = $contact;
                       $gerantsList[$i]["id_contact"] = ATF::contact()->insert($contact);
-                      $i++;
+                      $i++;*/
                   } else {
                     //Sinon on le met à jour
                     $gerantsList[$i] = array("nom" => $c["nom"],
@@ -1965,7 +1965,7 @@ class societe_cleodis extends societe {
                                             "id_contact" => $c["id_contact"]
                                           );
                     ATF::contact()->u(array("id_contact" => $c["id_contact"], "fonction" => $fonction, "est_dirigeant" => "oui"));
-                    $i++;
+                    //$i++;
                   }
                 }
             }
@@ -1974,10 +1974,14 @@ class societe_cleodis extends societe {
             $contact = array( "nom"=>"GERANT",
                               "id_societe"=> $id_societe
                           );
-            $gerantsList[0] = $contact;
-            $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
+            ATF::contact()->insert( $contact );
+            // $gerantsList[0] = $contact;
+            // $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
           }
-          $gerantsList = self::supprimerGerantsDoublons($gerantsList , ["id_contact", "nom","prenom"]);
+          $gerantsList = [];
+          ATF::contact()->q->reset()->where("id_societe", $res["id_societe"])->where("est_dirigeant", "oui")->where("etat", "actif");
+          $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["nom","prenom"]);
+          // $gerantsList = self::supprimerGerantsDoublons($gerantsList , ["id_contact", "nom","prenom"]);
 
           ATF::db()->commit_transaction();
 
