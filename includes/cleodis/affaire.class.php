@@ -2796,9 +2796,12 @@ class affaire_cleodis extends affaire {
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
 			// une fois l'id affaire connue on peut ajouter le devis
-			if ($content_file = file_get_contents($files['devis_file']['tmp_name'])) {
-				$this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file);
-			}
+			if ($content_file = file_get_contents($files['devis_file']['tmp_name'])) { $this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file); }
+			if ($content_file = file_get_contents($files['autre_document']['tmp_name'])) { $this->store(ATF::_s(),$devis["id_affaire"],'autre_document_partenaire',$content_file); }
+			if ($content_file = file_get_contents($files['autre_document_2']['tmp_name'])) { $this->store(ATF::_s(),$devis["id_affaire"],'autre_document_partenaire_2',$content_file); }
+			if ($content_file = file_get_contents($files['autre_document_3']['tmp_name'])) { $this->store(ATF::_s(),$devis["id_affaire"],'autre_document_partenaire_3',$content_file); }
+
+
 
 			ATF::affaire_etat()->insert(array(
 				"id_affaire"=>$devis["id_affaire"],
