@@ -3058,7 +3058,7 @@ class affaire_cleodis extends affaire {
 			foreach ($lignes as $key => $value) {
 				$produits[] = array(
 					"devis_ligne__dot__produit"=> $value['produit'],
-					"devis_ligne__dot__quantite"=>$value["quantited"],
+					"devis_ligne__dot__quantite"=>$value["quantite"],
 					"devis_ligne__dot__type"=>ATF::produit()->select($value["id_produit"], "type"),
 					"devis_ligne__dot__ref"=>$value["ref"],
 					"devis_ligne__dot__prix_achat"=>ATF::produit()->select($value["id_produit"], "prix_achat"),
