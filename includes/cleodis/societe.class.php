@@ -1926,7 +1926,7 @@ class societe_cleodis extends societe {
           $i = 0;
           if($gerants){
             foreach ($gerants as $gerant) {
-                if ($gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
+                if ($gerant->shareholderType === "Natural Person" || $gerant->shareholderType === "Other" || $gerant->type === "Natural Person" || $gerant->type === "Other" || $gerant->birthName) {
                   $nom = $gerant->lastName;
                   $prenom = $gerant->firstNames;
                   if (!$nom && !$prenom) $nom = $gerant->name;
@@ -1951,8 +1951,8 @@ class societe_cleodis extends societe {
                                         "email" => null,
                                         "est_dirigeant" => "oui"
                                       );
-                      /*$gerantsList[$i] = $contact;
                       $gerantsList[$i]["id_contact"] = ATF::contact()->insert($contact);
+                      /*$gerantsList[$i] = $contact;
                       $i++;*/
                   } else {
                     //Sinon on le met à jour
@@ -1979,7 +1979,7 @@ class societe_cleodis extends societe {
             // $gerantsList[0]["id_contact"] = ATF::contact()->insert( $contact );
           }
           $gerantsList = [];
-          ATF::contact()->q->reset()->where("id_societe", $res["id_societe"])->where("est_dirigeant", "oui")->where("etat", "actif");
+          ATF::contact()->q->reset()->where("id_societe", $id_societe)->where("est_dirigeant", "oui")->where("etat", "actif");
           $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["nom","prenom"]);
           // $gerantsList = self::supprimerGerantsDoublons($gerantsList , ["id_contact", "nom","prenom"]);
 
@@ -2013,12 +2013,13 @@ class societe_cleodis extends societe {
           throw new errorATF($e->getMessage(),500);
       }
     } else {
+      $id_societe = $res["id_societe"];
       $gerantsList = [];
-      ATF::contact()->q->reset()->where("id_societe", $res["id_societe"])->where("est_dirigeant", "oui")->where("etat", "actif");
+      ATF::contact()->q->reset()->where("id_societe", $id_societe)->where("est_dirigeant", "oui")->where("etat", "actif");
       $gerantsList = self::supprimerGerantsDoublons(ATF::contact()->sa() , ["nom","prenom"]);
 
       return array("result"=>true ,
-            "societe"=>ATF::societe()->select($res["id_societe"]),
+            "societe"=>ATF::societe()->select($id_societe),
             "gerants"=>$gerantsList
           );
     }
