@@ -1580,9 +1580,11 @@ class facture_cleodis extends facture {
 									$choix = "avoir_facture_refi";
 								} else {
 									// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
-									ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
-										->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
-										->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
+									ATF::facture()->q->reset()
+										->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND", "factureAnnulee")
+										->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND", "factureAnnulee")
+										->where("facture.id_affaire", $item['facture.id_affaire_fk'], "AND", "factureAnnulee")
+										->where("facture.ref", $item["facture.id_facture"], "AND", "factureAnnulee", '!=');
 									$facture_avoir = ATF::facture()->select_row();
 
 									if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
