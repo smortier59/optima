@@ -3064,6 +3064,8 @@ class affaire_cleodis extends affaire {
 					"devis_ligne__dot__prix_achat"=>ATF::produit()->select($value["id_produit"], "prix_achat"),
 					"devis_ligne__dot__id_produit"=>$value['id_produit'],
 					"devis_ligne__dot__id_fournisseur"=>$value["id_fournisseur"],
+					"devis_ligne__dot__visible"=>$value["visible"],
+					"devis_ligne__dot__visible_pdf"=>$value["visible_sur_pdf"],
 					"devis_ligne__dot__visibilite_prix"=>$value["visibilite_prix"],
 					"devis_ligne__dot__date_achat"=>"",
 					"devis_ligne__dot__commentaire"=>"",
