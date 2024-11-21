@@ -1,8 +1,10 @@
 ## Description
 
+**AbsysTech ne maintient plus ce projet.**
+
 Optima et AbsysTech Framework (ATF) sont maintenant téléchargeables sur Github, vous pouvez fork ou contribuer de la manière qui vous convienne.
 
-Les fichiers statiques restent disponible sur [le bucket AWS historique ici](https://s3-eu-west-1.amazonaws.com/static-absystech/).
+Les fichiers statiques restent disponible sur [le bucket AWS historique ici](https://s3-eu-west-1.amazonaws.com/static-absystech/), attention, il pourrait être stopper sans préavis.
 
 Optima est un outil de gestion de relations clients, il permet de créer, et modifier des données dans une base de données mysql.
 
